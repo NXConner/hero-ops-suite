@@ -13,6 +13,7 @@ import Communications from "./pages/Communications";
 import IntelReports from "./pages/IntelReports";
 import Settings from "./pages/Settings";
 import PavementScanPro from "./pages/PavementScanPro";
+import OverWatch from "./pages/OverWatch";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/communications" element={<Communications />} />
             <Route path="/intel-reports" element={<IntelReports />} />
             <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
+            <Route path="/overwatch" element={<OverWatch />} />
             <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
