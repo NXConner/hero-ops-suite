@@ -117,9 +117,34 @@ export interface RadarAPIResponse {
 }
 
 // Enhanced Weather API Service
+interface WeatherApiResponse {
+  main: {
+    temp: number;
+    humidity: number;
+    pressure: number;
+  };
+  wind: {
+    speed: number;
+    deg: number;
+  };
+  weather: Array<{
+    main: string;
+    description: string;
+    icon: string;
+  }>;
+  visibility: number;
+  name: string;
+  dt: number;
+}
+
+interface CachedWeatherData {
+  data: WeatherApiResponse;
+  timestamp: number;
+}
+
 export class WeatherService {
   private static instance: WeatherService;
-  private cache: Map<string, { data: any; timestamp: number }> = new Map();
+  private cache: Map<string, CachedWeatherData> = new Map();
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   static getInstance(): WeatherService {
@@ -313,7 +338,7 @@ export class WeatherService {
     };
   }
 
-  private getMockForecastData(): any {
+  private getMockForecastData(): { list: Array<Partial<WeatherApiResponse & { pop: number }>> } {
     const forecast = [];
     for (let i = 0; i < 12; i++) {
       forecast.push({

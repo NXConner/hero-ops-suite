@@ -4,17 +4,20 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Suspense, lazy } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import MissionPlanning from "./pages/MissionPlanning";
-import TeamManagement from "./pages/TeamManagement";
-import Analytics from "./pages/Analytics";
-import Communications from "./pages/Communications";
-import IntelReports from "./pages/IntelReports";
-import Settings from "./pages/Settings";
-import PavementScanPro from "./pages/PavementScanPro";
-import OverWatch from "./pages/OverWatch";
 import NotFound from "./pages/NotFound";
+
+// Lazy load heavy components that use 3D libraries, maps, or ML
+const MissionPlanning = lazy(() => import("./pages/MissionPlanning"));
+const TeamManagement = lazy(() => import("./pages/TeamManagement"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Communications = lazy(() => import("./pages/Communications"));
+const IntelReports = lazy(() => import("./pages/IntelReports"));
+const Settings = lazy(() => import("./pages/Settings"));
+const PavementScanPro = lazy(() => import("./pages/PavementScanPro"));
+const OverWatch = lazy(() => import("./pages/OverWatch"));
 
 const queryClient = new QueryClient();
 
@@ -30,20 +33,22 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/mission-planning" element={<MissionPlanning />} />
-            <Route path="/team-management" element={<TeamManagement />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/communications" element={<Communications />} />
-            <Route path="/intel-reports" element={<IntelReports />} />
-            <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
-            <Route path="/overwatch" element={<OverWatch />} />
-            <Route path="/settings" element={<Settings />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div></div>}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/mission-planning" element={<MissionPlanning />} />
+              <Route path="/team-management" element={<TeamManagement />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/communications" element={<Communications />} />
+              <Route path="/intel-reports" element={<IntelReports />} />
+              <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
+              <Route path="/overwatch" element={<OverWatch />} />
+              <Route path="/settings" element={<Settings />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
