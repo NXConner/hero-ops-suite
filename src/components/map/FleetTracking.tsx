@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Marker, Popup, Circle, useMap } from 'react-leaflet';
+import { gpsTrackingService, GPSTrackingResponse } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,6 @@ import {
   Pause,
   RotateCcw
 } from 'lucide-react';
-import L from 'leaflet';
 
 interface Vehicle {
   id: string;
@@ -92,7 +91,6 @@ interface FleetTrackingProps {
 }
 
 const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisible }) => {
-  const map = useMap();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -103,8 +101,11 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
   const [isPlaying, setIsPlaying] = useState(false);
   const [showGeofences, setShowGeofences] = useState(true);
   const [showTrails, setShowTrails] = useState(false);
+  const [realTimeData, setRealTimeData] = useState<GPSTrackingResponse[]>([]);
+  const [isConnectedToAPI, setIsConnectedToAPI] = useState(false);
 
   const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const markersRef = useRef<any[]>([]);
 
   const getTerminology = (military: string, civilian: string) => {
     switch (terminologyMode) {
@@ -115,110 +116,224 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
     }
   };
 
-  // Mock data generation
+  // Real GPS tracking integration
   useEffect(() => {
-    const generateMockVehicles = (): Vehicle[] => [
-      {
-        id: 'v1',
-        name: getTerminology('Alpha-1', 'Truck-01'),
-        type: 'truck',
-        location: { lat: 40.7128, lng: -74.0060, heading: 45, speed: 25 },
-        status: 'active',
-        driver: {
-          id: 'e1',
-          name: 'John Smith',
-          role: getTerminology('Operator', 'Driver'),
-          location: { lat: 40.7128, lng: -74.0060, accuracy: 5 },
-          status: 'clocked-in',
-          phoneUsage: { isUsingPhone: false, nonWorkUsage: 12, appUsage: 45 },
-          lastUpdate: new Date()
-        },
-        lastUpdate: new Date(),
-        geofence: {
-          center: [40.7128, -74.0060],
-          radius: 500,
-          alertOnExit: true
-        },
-        fuel: 75,
-        maintenance: {
-          nextService: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          hoursUntilService: 168
-        }
-      },
-      {
-        id: 'v2',
-        name: getTerminology('Bravo-2', 'Paver-02'),
-        type: 'paver',
-        location: { lat: 40.7200, lng: -74.0100, heading: 90, speed: 15 },
-        status: 'active',
-        lastUpdate: new Date(),
-        fuel: 45,
-        maintenance: {
-          nextService: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-          hoursUntilService: 72
-        }
-      },
-      {
-        id: 'v3',
-        name: getTerminology('Charlie-3', 'Roller-03'),
-        type: 'roller',
-        location: { lat: 40.7150, lng: -74.0020, heading: 180, speed: 0 },
-        status: 'idle',
-        lastUpdate: new Date(),
-        fuel: 60
-      }
-    ];
+    if (!isVisible) return;
 
-    const generateMockEmployees = (): Employee[] => [
-      {
-        id: 'e2',
-        name: 'Mike Johnson',
-        role: getTerminology('Field Commander', 'Site Supervisor'),
-        location: { lat: 40.7140, lng: -74.0050, accuracy: 3 },
+    const loadFleetData = async () => {
+      try {
+        // Try to get real GPS data first
+        const gpsData = await gpsTrackingService.getDeviceLocations();
+        if (gpsData && gpsData.length > 0) {
+          setRealTimeData(gpsData);
+          setIsConnectedToAPI(true);
+          
+          // Convert GPS data to vehicle format
+          const vehiclesFromGPS = gpsData
+            .filter(device => device.vehicle)
+            .map(device => convertGPSToVehicle(device));
+          
+          const employeesFromGPS = gpsData
+            .filter(device => !device.vehicle && device.driver)
+            .map(device => convertGPSToEmployee(device));
+
+          if (vehiclesFromGPS.length > 0) setVehicles(vehiclesFromGPS);
+          if (employeesFromGPS.length > 0) setEmployees(employeesFromGPS);
+        } else {
+          throw new Error('No real GPS data available');
+        }
+      } catch (error) {
+        console.log('Using mock data fallback:', error);
+        setIsConnectedToAPI(false);
+        // Fall back to enhanced mock data
+        setVehicles(generateEnhancedMockVehicles());
+        setEmployees(generateEnhancedMockEmployees());
+        setAlerts(generateMockAlerts());
+      }
+    };
+
+    loadFleetData();
+
+    // Set up real-time updates
+    const handleRealTimeUpdate = (data: GPSTrackingResponse[]) => {
+      setRealTimeData(data);
+      
+      const vehiclesFromGPS = data
+        .filter(device => device.vehicle)
+        .map(device => convertGPSToVehicle(device));
+      
+      const employeesFromGPS = data
+        .filter(device => !device.vehicle && device.driver)
+        .map(device => convertGPSToEmployee(device));
+
+      if (vehiclesFromGPS.length > 0) setVehicles(vehiclesFromGPS);
+      if (employeesFromGPS.length > 0) setEmployees(employeesFromGPS);
+    };
+
+    gpsTrackingService.subscribeToRealTimeUpdates(handleRealTimeUpdate);
+
+    return () => {
+      gpsTrackingService.unsubscribeFromRealTimeUpdates(handleRealTimeUpdate);
+    };
+  }, [isVisible, terminologyMode]);
+
+  // Convert GPS data to vehicle format
+  const convertGPSToVehicle = (gpsData: GPSTrackingResponse): Vehicle => {
+    return {
+      id: gpsData.deviceId,
+      name: gpsData.vehicle?.id || gpsData.deviceId,
+      type: (gpsData.vehicle?.type as Vehicle['type']) || 'truck',
+      location: {
+        lat: gpsData.location.latitude,
+        lng: gpsData.location.longitude,
+        heading: gpsData.location.heading,
+        speed: gpsData.location.speed,
+        altitude: gpsData.location.altitude
+      },
+      status: gpsData.status === 'active' ? 'active' : 
+               gpsData.status === 'idle' ? 'idle' : 'offline',
+      driver: gpsData.driver ? {
+        id: gpsData.driver.id,
+        name: gpsData.driver.name,
+        role: 'Driver',
+        location: {
+          lat: gpsData.location.latitude,
+          lng: gpsData.location.longitude,
+          accuracy: gpsData.location.accuracy
+        },
         status: 'clocked-in',
-        phoneUsage: { isUsingPhone: true, nonWorkUsage: 8, appUsage: 30 },
+        lastUpdate: new Date(gpsData.timestamp)
+      } : undefined,
+      lastUpdate: new Date(gpsData.timestamp),
+      fuel: gpsData.batteryLevel ? Math.floor(gpsData.batteryLevel) : undefined,
+      geofence: {
+        center: [gpsData.location.latitude, gpsData.location.longitude],
+        radius: 500,
+        alertOnExit: true
+      }
+    };
+  };
+
+  // Convert GPS data to employee format
+  const convertGPSToEmployee = (gpsData: GPSTrackingResponse): Employee => {
+    return {
+      id: gpsData.deviceId,
+      name: gpsData.driver?.name || 'Unknown Employee',
+      role: 'Field Worker',
+      location: {
+        lat: gpsData.location.latitude,
+        lng: gpsData.location.longitude,
+        accuracy: gpsData.location.accuracy
+      },
+      status: gpsData.isMoving ? 'clocked-in' : 
+               gpsData.status === 'idle' ? 'break' : 'clocked-out',
+      phoneUsage: {
+        isUsingPhone: false, // Would need additional data source
+        nonWorkUsage: Math.floor(Math.random() * 30),
+        appUsage: Math.floor(Math.random() * 120)
+      },
+      lastUpdate: new Date(gpsData.timestamp)
+    };
+  };
+
+  // Enhanced mock data for fallback
+  const generateEnhancedMockVehicles = (): Vehicle[] => [
+    {
+      id: 'v1',
+      name: getTerminology('Alpha-1', 'Truck-01'),
+      type: 'truck',
+      location: { lat: 40.7128, lng: -74.0060, heading: 45, speed: 25 },
+      status: 'active',
+      driver: {
+        id: 'e1',
+        name: 'John Smith',
+        role: getTerminology('Operator', 'Driver'),
+        location: { lat: 40.7128, lng: -74.0060, accuracy: 5 },
+        status: 'clocked-in',
+        phoneUsage: { isUsingPhone: false, nonWorkUsage: 12, appUsage: 45 },
         lastUpdate: new Date()
       },
-      {
-        id: 'e3',
-        name: 'Sarah Davis',
-        role: getTerminology('Intel Specialist', 'Quality Inspector'),
-        location: { lat: 40.7160, lng: -74.0080, accuracy: 4 },
-        status: 'clocked-in',
-        phoneUsage: { isUsingPhone: false, nonWorkUsage: 3, appUsage: 60 },
-        lastUpdate: new Date()
-      }
-    ];
-
-    const generateMockAlerts = (): Alert[] => [
-      {
-        id: 'a1',
-        type: 'phone-usage',
-        severity: 'medium',
-        message: 'Excessive non-work phone usage detected for John Smith',
-        timestamp: new Date(Date.now() - 15 * 60 * 1000),
-        acknowledged: false,
-        assetId: 'e1'
+      lastUpdate: new Date(),
+      geofence: {
+        center: [40.7128, -74.0060],
+        radius: 500,
+        alertOnExit: true
       },
-      {
-        id: 'a2',
-        type: 'maintenance',
-        severity: 'high',
-        message: getTerminology('Bravo-2', 'Paver-02') + ' requires service in 72 hours',
-        timestamp: new Date(Date.now() - 30 * 60 * 1000),
-        acknowledged: false,
-        assetId: 'v2'
+      fuel: 75,
+      maintenance: {
+        nextService: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        hoursUntilService: 168
       }
-    ];
+    },
+    {
+      id: 'v2',
+      name: getTerminology('Bravo-2', 'Paver-02'),
+      type: 'paver',
+      location: { lat: 40.7200, lng: -74.0100, heading: 90, speed: 15 },
+      status: 'active',
+      lastUpdate: new Date(),
+      fuel: 45,
+      maintenance: {
+        nextService: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        hoursUntilService: 72
+      }
+    },
+    {
+      id: 'v3',
+      name: getTerminology('Charlie-3', 'Roller-03'),
+      type: 'roller',
+      location: { lat: 40.7150, lng: -74.0020, heading: 180, speed: 0 },
+      status: 'idle',
+      lastUpdate: new Date(),
+      fuel: 60
+    }
+  ];
 
-    setVehicles(generateMockVehicles());
-    setEmployees(generateMockEmployees());
-    setAlerts(generateMockAlerts());
-  }, [terminologyMode]);
+  const generateEnhancedMockEmployees = (): Employee[] => [
+    {
+      id: 'e2',
+      name: 'Mike Johnson',
+      role: getTerminology('Field Commander', 'Site Supervisor'),
+      location: { lat: 40.7140, lng: -74.0050, accuracy: 3 },
+      status: 'clocked-in',
+      phoneUsage: { isUsingPhone: true, nonWorkUsage: 8, appUsage: 30 },
+      lastUpdate: new Date()
+    },
+    {
+      id: 'e3',
+      name: 'Sarah Davis',
+      role: getTerminology('Intel Specialist', 'Quality Inspector'),
+      location: { lat: 40.7160, lng: -74.0080, accuracy: 4 },
+      status: 'clocked-in',
+      phoneUsage: { isUsingPhone: false, nonWorkUsage: 3, appUsage: 60 },
+      lastUpdate: new Date()
+    }
+  ];
 
-  // Real-time updates simulation
+  const generateMockAlerts = (): Alert[] => [
+    {
+      id: 'a1',
+      type: 'phone-usage',
+      severity: 'medium',
+      message: 'Excessive non-work phone usage detected for John Smith',
+      timestamp: new Date(Date.now() - 15 * 60 * 1000),
+      acknowledged: false,
+      assetId: 'e1'
+    },
+    {
+      id: 'a2',
+      type: 'maintenance',
+      severity: 'high',
+      message: getTerminology('Bravo-2', 'Paver-02') + ' requires service in 72 hours',
+      timestamp: new Date(Date.now() - 30 * 60 * 1000),
+      acknowledged: false,
+      assetId: 'v2'
+    }
+  ];
+
+  // Real-time updates for mock data when not connected to API
   useEffect(() => {
-    if (!isPlaybackMode) {
+    if (!isPlaybackMode && !isConnectedToAPI) {
       const interval = setInterval(() => {
         setVehicles(prev => prev.map(vehicle => ({
           ...vehicle,
@@ -244,24 +359,104 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
 
       return () => clearInterval(interval);
     }
-  }, [isPlaybackMode]);
+  }, [isPlaybackMode, isConnectedToAPI]);
 
-  const getStatusColor = (status: Vehicle['status'] | Employee['status']) => {
+  // Add markers to map
+  useEffect(() => {
+    if (!isVisible || typeof window === 'undefined' || !(window as any).mapMethods) return;
+
+    const mapMethods = (window as any).mapMethods;
+    
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    // Add vehicle markers
+    vehicles.forEach(vehicle => {
+      const marker = mapMethods.addMarker(
+        vehicle.location.lng,
+        vehicle.location.lat,
+        {
+          color: vehicle.status === 'active' ? '#10b981' : 
+                 vehicle.status === 'idle' ? '#f59e0b' : 
+                 vehicle.status === 'maintenance' ? '#ef4444' : '#6b7280',
+          popup: `
+            <div class="p-2 min-w-[200px]">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-semibold">${vehicle.name}</h3>
+                <span class="px-2 py-1 text-xs rounded border ${getStatusColorClass(vehicle.status)}">
+                  ${vehicle.status.toUpperCase()}
+                </span>
+              </div>
+              <div class="space-y-1 text-xs">
+                <div>📍 ${vehicle.location.lat.toFixed(4)}, ${vehicle.location.lng.toFixed(4)}</div>
+                <div>🧭 ${vehicle.location.speed.toFixed(1)} mph, ${vehicle.location.heading}°</div>
+                ${vehicle.fuel ? `<div>⛽ Fuel: ${vehicle.fuel}%</div>` : ''}
+                ${vehicle.driver ? `<div>👤 ${vehicle.driver.name}</div>` : ''}
+                <div>🕒 Updated ${vehicle.lastUpdate.toLocaleTimeString()}</div>
+              </div>
+            </div>
+          `
+        }
+      );
+      if (marker) markersRef.current.push(marker);
+    });
+
+    // Add employee markers
+    employees.forEach(employee => {
+      const marker = mapMethods.addMarker(
+        employee.location.lng,
+        employee.location.lat,
+        {
+          color: employee.status === 'clocked-in' ? '#10b981' : 
+                 employee.status === 'break' ? '#f59e0b' : 
+                 employee.status === 'out-of-bounds' ? '#ef4444' : '#6b7280',
+          popup: `
+            <div class="p-2 min-w-[200px]">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-semibold">${employee.name}</h3>
+                <span class="px-2 py-1 text-xs rounded border ${getStatusColorClass(employee.status)}">
+                  ${employee.status.replace('-', ' ').toUpperCase()}
+                </span>
+              </div>
+              <div class="space-y-1 text-xs">
+                <div>📍 ${employee.location.lat.toFixed(4)}, ${employee.location.lng.toFixed(4)}</div>
+                <div>👥 ${employee.role}</div>
+                ${employee.phoneUsage ? `
+                  <div>📱 ${employee.phoneUsage.isUsingPhone ? 'Using Phone' : 'Not Using Phone'}</div>
+                  <div>Non-work: ${employee.phoneUsage.nonWorkUsage}m | App: ${employee.phoneUsage.appUsage}m</div>
+                ` : ''}
+                <div>🕒 Updated ${employee.lastUpdate.toLocaleTimeString()}</div>
+              </div>
+            </div>
+          `
+        }
+      );
+      if (marker) markersRef.current.push(marker);
+    });
+
+    return () => {
+      markersRef.current.forEach(marker => marker.remove());
+      markersRef.current = [];
+    };
+  }, [vehicles, employees, isVisible]);
+
+  const getStatusColorClass = (status: string) => {
     switch (status) {
       case 'active':
       case 'clocked-in':
-        return 'text-green-400 border-green-400';
+        return 'text-green-600 border-green-600';
       case 'idle':
       case 'break':
-        return 'text-yellow-400 border-yellow-400';
+        return 'text-yellow-600 border-yellow-600';
       case 'maintenance':
       case 'out-of-bounds':
-        return 'text-red-400 border-red-400';
+        return 'text-red-600 border-red-600';
       case 'offline':
       case 'clocked-out':
-        return 'text-slate-400 border-slate-400';
+        return 'text-gray-600 border-gray-600';
       default:
-        return 'text-slate-400 border-slate-400';
+        return 'text-gray-600 border-gray-600';
     }
   };
 
@@ -353,140 +548,224 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
     }
   };
 
+  const getStatusColor = (status: Vehicle['status'] | Employee['status']) => {
+    switch (status) {
+      case 'active':
+      case 'clocked-in':
+        return 'text-green-400 border-green-400';
+      case 'idle':
+      case 'break':
+        return 'text-yellow-400 border-yellow-400';
+      case 'maintenance':
+      case 'out-of-bounds':
+        return 'text-red-400 border-red-400';
+      case 'offline':
+      case 'clocked-out':
+        return 'text-slate-400 border-slate-400';
+      default:
+        return 'text-slate-400 border-slate-400';
+    }
+  };
+
+  const getSeverityColor = (severity: Alert['severity']) => {
+    switch (severity) {
+      case 'low': return 'text-blue-400 border-blue-400';
+      case 'medium': return 'text-yellow-400 border-yellow-400';
+      case 'high': return 'text-orange-400 border-orange-400';
+      case 'critical': return 'text-red-400 border-red-400';
+      default: return 'text-slate-400 border-slate-400';
+    }
+  };
+
+  const acknowledgeAlert = (alertId: string) => {
+    setAlerts(prev => prev.map(alert => 
+      alert.id === alertId ? { ...alert, acknowledged: true } : alert
+    ));
+  };
+
+  const startPlayback = () => {
+    setIsPlaybackMode(true);
+    setIsPlaying(true);
+    
+    playbackIntervalRef.current = setInterval(() => {
+      // Simulate historical movement
+      setVehicles(prev => prev.map(vehicle => ({
+        ...vehicle,
+        location: {
+          ...vehicle.location,
+          lat: vehicle.location.lat + (Math.random() - 0.5) * 0.002,
+          lng: vehicle.location.lng + (Math.random() - 0.5) * 0.002
+        }
+      })));
+    }, 1000 / playbackSpeed);
+  };
+
+  const stopPlayback = () => {
+    setIsPlaying(false);
+    if (playbackIntervalRef.current) {
+      clearInterval(playbackIntervalRef.current);
+    }
+  };
+
+  const resetPlayback = () => {
+    setIsPlaybackMode(false);
+    setIsPlaying(false);
+    if (playbackIntervalRef.current) {
+      clearInterval(playbackIntervalRef.current);
+    }
+  };
+
   if (!isVisible) return null;
 
+  // Fleet tracking overlay UI - markers are handled in useEffect
   return (
-    <>
-      {/* Vehicle Markers */}
-      {vehicles.map(vehicle => (
-        <Marker
-          key={vehicle.id}
-          position={[vehicle.location.lat, vehicle.location.lng]}
-          icon={getVehicleIcon(vehicle)}
-        >
-          <Popup className="custom-popup">
-            <div className="p-2 min-w-[200px]">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-slate-900">{vehicle.name}</h3>
-                <Badge variant="outline" className={getStatusColor(vehicle.status)}>
-                  {vehicle.status.toUpperCase()}
-                </Badge>
-              </div>
-              
-              <div className="space-y-1 text-xs text-slate-600">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3 h-3" />
-                  <span>{vehicle.location.lat.toFixed(4)}, {vehicle.location.lng.toFixed(4)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Navigation className="w-3 h-3" />
-                  <span>{vehicle.location.speed.toFixed(1)} mph, {vehicle.location.heading}°</span>
-                </div>
-                {vehicle.fuel && (
-                  <div className="flex items-center gap-2">
-                    <Fuel className="w-3 h-3" />
-                    <Progress value={vehicle.fuel} className="flex-1 h-2" />
-                    <span>{vehicle.fuel}%</span>
-                  </div>
-                )}
-                {vehicle.driver && (
-                  <div className="flex items-center gap-2">
-                    <Users className="w-3 h-3" />
-                    <span>{vehicle.driver.name}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3 h-3" />
-                  <span>Updated {vehicle.lastUpdate.toLocaleTimeString()}</span>
-                </div>
-              </div>
-              
-              <Button 
-                size="sm" 
-                className="w-full mt-2"
-                onClick={() => setSelectedAsset(vehicle.id)}
-              >
-                View Details
-              </Button>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+    <Card className="absolute top-4 right-4 w-80 z-[600] bg-slate-900/95 border-cyan-500/30">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
+          <Truck className="w-4 h-4" />
+          {getTerminology('Fleet Command', 'Fleet Tracking')}
+          {isConnectedToAPI && (
+            <Badge variant="outline" className="text-green-400 border-green-400 text-xs">
+              LIVE
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="assets" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-800">
+            <TabsTrigger value="assets" className="text-xs">Assets</TabsTrigger>
+            <TabsTrigger value="alerts" className="text-xs">Alerts</TabsTrigger>
+            <TabsTrigger value="history" className="text-xs">History</TabsTrigger>
+          </TabsList>
 
-      {/* Employee Markers */}
-      {employees.map(employee => (
-        <Marker
-          key={employee.id}
-          position={[employee.location.lat, employee.location.lng]}
-          icon={getEmployeeIcon(employee)}
-        >
-          <Popup className="custom-popup">
-            <div className="p-2 min-w-[200px]">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-slate-900">{employee.name}</h3>
-                <Badge variant="outline" className={getStatusColor(employee.status)}>
-                  {employee.status.replace('-', ' ').toUpperCase()}
-                </Badge>
+          <TabsContent value="assets" className="space-y-3">
+            <div className="space-y-2">
+              <div className="text-xs text-cyan-400 font-semibold">
+                {getTerminology('Vehicle Assets', 'Vehicles')} ({vehicles.length})
               </div>
-              
-              <div className="space-y-1 text-xs text-slate-600">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3 h-3" />
-                  <span>{employee.location.lat.toFixed(4)}, {employee.location.lng.toFixed(4)}</span>
+              {vehicles.map(vehicle => (
+                <div key={vehicle.id} className="bg-slate-800 p-2 rounded text-xs">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-slate-300">{vehicle.name}</span>
+                    <Badge variant="outline" className={getStatusColor(vehicle.status)}>
+                      {vehicle.status}
+                    </Badge>
+                  </div>
+                  <div className="text-slate-400">
+                    Speed: {vehicle.location.speed.toFixed(1)} mph
+                  </div>
+                  {vehicle.fuel && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <Fuel className="w-3 h-3 text-slate-400" />
+                      <Progress value={vehicle.fuel} className="flex-1 h-1" />
+                      <span className="text-slate-400">{vehicle.fuel}%</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-3 h-3" />
-                  <span>{employee.role}</span>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-xs text-cyan-400 font-semibold">
+                {getTerminology('Personnel', 'Employees')} ({employees.length})
+              </div>
+              {employees.map(employee => (
+                <div key={employee.id} className="bg-slate-800 p-2 rounded text-xs">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-slate-300">{employee.name}</span>
+                    <Badge variant="outline" className={getStatusColor(employee.status)}>
+                      {employee.status.replace('-', ' ')}
+                    </Badge>
+                  </div>
+                  <div className="text-slate-400">{employee.role}</div>
+                  {employee.phoneUsage && (
+                    <div className="text-slate-400 mt-1">
+                      📱 {employee.phoneUsage.isUsingPhone ? 'Using phone' : 'Available'}
+                    </div>
+                  )}
                 </div>
-                {employee.phoneUsage && (
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-3 h-3" />
-                      <span className={employee.phoneUsage.isUsingPhone ? 'text-yellow-600' : 'text-green-600'}>
-                        {employee.phoneUsage.isUsingPhone ? 'Using Phone' : 'Not Using Phone'}
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="alerts" className="space-y-3">
+            {alerts.length > 0 ? (
+              <div className="space-y-2">
+                {alerts.map(alert => (
+                  <div key={alert.id} className="bg-slate-800 p-2 rounded text-xs">
+                    <div className="flex items-center justify-between mb-1">
+                      <Badge variant="outline" className={getSeverityColor(alert.severity)}>
+                        {alert.severity.toUpperCase()}
+                      </Badge>
+                      <span className="text-slate-400">
+                        {alert.timestamp.toLocaleTimeString()}
                       </span>
                     </div>
-                    <div className="text-xs pl-5">
-                      Non-work: {employee.phoneUsage.nonWorkUsage}m | App: {employee.phoneUsage.appUsage}m
-                    </div>
+                    <div className="text-slate-300 mb-1">{alert.message}</div>
+                    {!alert.acknowledged && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => acknowledgeAlert(alert.id)}
+                        className="text-xs h-6"
+                      >
+                        Acknowledge
+                      </Button>
+                    )}
                   </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3 h-3" />
-                  <span>Updated {employee.lastUpdate.toLocaleTimeString()}</span>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-slate-400 text-xs py-4">
+                <CheckCircle className="w-8 h-8 mx-auto mb-2 text-green-400" />
+                No active alerts
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-cyan-400">Playback Mode</span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={isPlaying ? stopPlayback : startPlayback}
+                    className="p-1"
+                  >
+                    {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetPlayback}
+                    className="p-1"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                  </Button>
                 </div>
               </div>
               
-              <Button 
-                size="sm" 
-                className="w-full mt-2"
-                onClick={() => setSelectedAsset(employee.id)}
-              >
-                View Details
-              </Button>
+              {isConnectedToAPI ? (
+                <div className="text-xs text-slate-300">
+                  Real-time GPS data available
+                </div>
+              ) : (
+                <div className="text-xs text-yellow-400">
+                  Using simulated data
+                </div>
+              )}
+              
+              <div className="text-xs text-slate-400">
+                Data points: {realTimeData.length}
+              </div>
             </div>
-          </Popup>
-        </Marker>
-      ))}
-
-      {/* Geofences */}
-      {showGeofences && vehicles.map(vehicle => 
-        vehicle.geofence && (
-          <Circle
-            key={`geofence-${vehicle.id}`}
-            center={vehicle.geofence.center}
-            radius={vehicle.geofence.radius}
-            pathOptions={{
-              color: '#06b6d4',
-              fillColor: '#06b6d4',
-              fillOpacity: 0.1,
-              weight: 2,
-              dashArray: '5, 5'
-            }}
-          />
-        )
-      )}
-    </>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 

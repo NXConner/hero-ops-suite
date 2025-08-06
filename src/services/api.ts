@@ -3,12 +3,18 @@ import axios from 'axios';
 
 // API Configuration
 const API_CONFIG = {
-  WEATHER_API_KEY: process.env.REACT_APP_WEATHER_API_KEY || 'demo_key',
+  WEATHER_API_KEY: process.env.REACT_APP_WEATHER_API_KEY || 'YOUR_OPENWEATHER_API_KEY',
   WEATHER_BASE_URL: 'https://api.openweathermap.org/data/2.5',
-  GPS_TRACKING_URL: process.env.REACT_APP_GPS_API_URL || 'https://api.example.com/gps',
-  SENSOR_DATA_URL: process.env.REACT_APP_SENSOR_API_URL || 'https://api.example.com/sensors',
+  GPS_TRACKING_URL: process.env.REACT_APP_GPS_API_URL || 'https://api.fleet-tracker.com/v1',
+  SENSOR_DATA_URL: process.env.REACT_APP_SENSOR_API_URL || 'https://api.iot-sensors.com/v1',
   RADAR_API_URL: 'https://api.rainviewer.com/public/weather-maps.json',
-  GEOLOCATION_API_URL: 'https://api.bigdatacloud.net/data/reverse-geocode-client'
+  GEOLOCATION_API_URL: 'https://api.bigdatacloud.net/data/reverse-geocode-client',
+  // Real IoT sensor endpoints
+  TEMPERATURE_SENSOR_URL: process.env.REACT_APP_TEMP_SENSOR_URL || 'http://localhost:8080/api/sensors/temperature',
+  PRESSURE_SENSOR_URL: process.env.REACT_APP_PRESSURE_SENSOR_URL || 'http://localhost:8080/api/sensors/pressure',
+  VIBRATION_SENSOR_URL: process.env.REACT_APP_VIBRATION_SENSOR_URL || 'http://localhost:8080/api/sensors/vibration',
+  // Real fleet tracking
+  FLEET_WEBSOCKET_URL: process.env.REACT_APP_FLEET_WS_URL || 'ws://localhost:8080/ws/fleet'
 };
 
 // Types for API responses
@@ -17,6 +23,7 @@ export interface WeatherAPIResponse {
     temp: number;
     humidity: number;
     pressure: number;
+    feels_like: number;
   };
   weather: Array<{
     main: string;
@@ -26,6 +33,7 @@ export interface WeatherAPIResponse {
   wind: {
     speed: number;
     deg: number;
+    gust?: number;
   };
   visibility: number;
   dt: number;
@@ -33,6 +41,15 @@ export interface WeatherAPIResponse {
   coord: {
     lat: number;
     lon: number;
+  };
+  clouds: {
+    all: number;
+  };
+  rain?: {
+    '1h': number;
+  };
+  snow?: {
+    '1h': number;
   };
 }
 
@@ -50,6 +67,15 @@ export interface GPSTrackingResponse {
   status: 'active' | 'idle' | 'offline';
   batteryLevel?: number;
   isMoving: boolean;
+  driver?: {
+    id: string;
+    name: string;
+  };
+  vehicle?: {
+    id: string;
+    type: string;
+    license: string;
+  };
 }
 
 export interface SensorDataResponse {
@@ -64,6 +90,8 @@ export interface SensorDataResponse {
   };
   quality: 'good' | 'fair' | 'poor';
   alerts?: string[];
+  calibrationDate?: string;
+  batteryLevel?: number;
 }
 
 export interface RadarAPIResponse {
@@ -88,7 +116,7 @@ export interface RadarAPIResponse {
   };
 }
 
-// Weather API Service
+// Enhanced Weather API Service
 export class WeatherService {
   private static instance: WeatherService;
   private cache: Map<string, { data: any; timestamp: number }> = new Map();
@@ -117,6 +145,12 @@ export class WeatherService {
       return cached.data;
     }
 
+    // Check if we have a valid API key
+    if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
+      console.warn('Please set REACT_APP_WEATHER_API_KEY environment variable');
+      return this.getMockWeatherData(lat, lon);
+    }
+
     try {
       const response = await axios.get<WeatherAPIResponse>(
         `${API_CONFIG.WEATHER_BASE_URL}/weather`,
@@ -135,12 +169,18 @@ export class WeatherService {
       return response.data;
     } catch (error) {
       console.error('Weather API Error:', error);
-      // Return mock data as fallback
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.error('Invalid API key. Please check your OpenWeather API key.');
+      }
       return this.getMockWeatherData(lat, lon);
     }
   }
 
   async getWeatherForecast(lat: number, lon: number, hours: number = 12): Promise<any> {
+    if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
+      return this.getMockForecastData();
+    }
+
     try {
       const response = await axios.get(
         `${API_CONFIG.WEATHER_BASE_URL}/forecast`,
@@ -176,26 +216,100 @@ export class WeatherService {
     }
   }
 
+  // Enhanced UV Index API (requires separate service)
+  async getUVIndex(lat: number, lon: number): Promise<number> {
+    try {
+      if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
+        return 6; // Mock UV index
+      }
+
+      const response = await axios.get(
+        `${API_CONFIG.WEATHER_BASE_URL}/uvi`,
+        {
+          params: {
+            lat,
+            lon,
+            appid: API_CONFIG.WEATHER_API_KEY
+          },
+          timeout: 5000
+        }
+      );
+
+      return response.data.value || 6;
+    } catch (error) {
+      console.error('UV Index API Error:', error);
+      return 6; // Default safe value
+    }
+  }
+
+  // Air Quality API
+  async getAirQuality(lat: number, lon: number): Promise<any> {
+    try {
+      if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
+        return {
+          aqi: 3,
+          components: {
+            co: 233.4,
+            no: 0.01,
+            no2: 13.64,
+            o3: 54.31,
+            so2: 0.75,
+            pm2_5: 8.04,
+            pm10: 9.78
+          }
+        };
+      }
+
+      const response = await axios.get(
+        `${API_CONFIG.WEATHER_BASE_URL}/air_pollution`,
+        {
+          params: {
+            lat,
+            lon,
+            appid: API_CONFIG.WEATHER_API_KEY
+          },
+          timeout: 5000
+        }
+      );
+
+      return response.data.list[0];
+    } catch (error) {
+      console.error('Air Quality API Error:', error);
+      return null;
+    }
+  }
+
   private getMockWeatherData(lat: number, lon: number): WeatherAPIResponse {
+    const conditions = ['Clear', 'Clouds', 'Rain', 'Drizzle', 'Snow'];
+    const selectedCondition = conditions[Math.floor(Math.random() * conditions.length)];
+    
     return {
       main: {
-        temp: 72 + Math.random() * 10,
-        humidity: 60 + Math.random() * 20,
-        pressure: 1013 + Math.random() * 20
+        temp: 65 + Math.random() * 20,
+        humidity: 50 + Math.random() * 30,
+        pressure: 1013 + Math.random() * 20,
+        feels_like: 65 + Math.random() * 20
       },
       weather: [{
-        main: 'Clouds',
-        description: 'partly cloudy',
-        icon: '02d'
+        main: selectedCondition,
+        description: selectedCondition.toLowerCase(),
+        icon: selectedCondition === 'Clear' ? '01d' : 
+              selectedCondition === 'Clouds' ? '02d' :
+              selectedCondition === 'Rain' ? '10d' : '50d'
       }],
       wind: {
-        speed: 5 + Math.random() * 10,
-        deg: Math.random() * 360
+        speed: Math.random() * 15,
+        deg: Math.random() * 360,
+        gust: Math.random() * 20
       },
-      visibility: 10000,
+      visibility: 8000 + Math.random() * 2000,
       dt: Date.now() / 1000,
       name: 'Mock Location',
-      coord: { lat, lon }
+      coord: { lat, lon },
+      clouds: {
+        all: Math.floor(Math.random() * 100)
+      },
+      rain: selectedCondition === 'Rain' ? { '1h': Math.random() * 5 } : undefined
     };
   }
 

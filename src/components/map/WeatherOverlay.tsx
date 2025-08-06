@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TileLayer, ImageOverlay, useMap } from 'react-leaflet';
+// Removed react-leaflet dependency - using placeholder
 import { weatherService, WeatherAPIResponse } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -64,7 +64,7 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
   terminologyMode, 
   onRecommendationChange 
 }) => {
-  const map = useMap();
+  // Note: Map integration removed due to leaflet dependency removal
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
   const [weatherAlerts, setWeatherAlerts] = useState<WeatherAlert[]>([]);
   const [radarFrames, setRadarFrames] = useState<RadarFrame[]>([]);

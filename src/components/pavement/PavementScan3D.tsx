@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, Html, Environment, Grid, Box } from '@react-three/drei';
-import { Mesh, Vector3, Color, BufferGeometry, BufferAttribute, DoubleSide } from 'three';
+// Removed React Three.js dependencies - using real 3D implementation
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Real3DPavementViewer from './Real3DPavementViewer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
@@ -31,6 +30,13 @@ import {
   Ruler,
   Target
 } from 'lucide-react';
+
+// Placeholder types to replace Three.js
+interface Vector3 {
+  x: number;
+  y: number;
+  z: number;
+}
 
 interface DefectData {
   id: string;
@@ -72,155 +78,7 @@ interface PavementScan3DProps {
   terminologyMode: 'military' | 'civilian' | 'both';
 }
 
-// 3D Mesh Component
-const PavementMesh: React.FC<{ 
-  scanData: ScanData; 
-  showDefects: boolean; 
-  selectedDefectTypes: string[];
-  opacity: number;
-}> = ({ scanData, showDefects, selectedDefectTypes, opacity }) => {
-  const meshRef = useRef<Mesh>(null);
-  const { scene } = useThree();
-
-  useEffect(() => {
-    if (!meshRef.current || !scanData.meshData) return;
-
-    const geometry = new BufferGeometry();
-    geometry.setAttribute('position', new BufferAttribute(scanData.meshData.vertices, 3));
-    geometry.setAttribute('normal', new BufferAttribute(scanData.meshData.normals, 3));
-    geometry.setAttribute('color', new BufferAttribute(scanData.meshData.colors, 3));
-    geometry.setIndex(new BufferAttribute(scanData.meshData.indices, 1));
-
-    meshRef.current.geometry = geometry;
-  }, [scanData]);
-
-  return (
-    <>
-      <mesh ref={meshRef} position={[0, 0, 0]}>
-        <meshStandardMaterial 
-          vertexColors 
-          transparent 
-          opacity={opacity}
-          side={DoubleSide}
-        />
-      </mesh>
-      
-      {showDefects && scanData.defects
-        .filter(defect => selectedDefectTypes.includes(defect.type))
-        .map((defect) => (
-          <DefectMarker key={defect.id} defect={defect} />
-        ))}
-    </>
-  );
-};
-
-// Defect Marker Component
-const DefectMarker: React.FC<{ defect: DefectData }> = ({ defect }) => {
-  const [hovered, setHovered] = useState(false);
-  
-  const getDefectColor = (type: string, severity: string): string => {
-    const colors = {
-      crack: severity === 'critical' ? '#ef4444' : severity === 'high' ? '#f97316' : '#eab308',
-      pothole: '#dc2626',
-      alligator: '#7c3aed',
-      rutting: '#059669',
-      bleeding: '#be185d',
-      raveling: '#0891b2',
-      patching: '#6b7280'
-    };
-    return colors[type as keyof typeof colors] || '#6b7280';
-  };
-
-  return (
-    <group position={defect.position}>
-      <Box
-        args={[0.5, 0.1, 0.5]}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-      >
-        <meshStandardMaterial 
-          color={getDefectColor(defect.type, defect.severity)}
-          transparent
-          opacity={hovered ? 0.8 : 0.6}
-        />
-      </Box>
-      
-      {hovered && (
-        <Html position={[0, 1, 0]} center>
-          <div className="bg-slate-900 text-white p-2 rounded border border-cyan-500 text-xs max-w-48">
-            <div className="font-semibold text-cyan-400">{defect.type.toUpperCase()}</div>
-            <div>Severity: {defect.severity}</div>
-            <div>Area: {defect.area.toFixed(1)} sq ft</div>
-            <div>Cost: ${defect.repairCost.toLocaleString()}</div>
-          </div>
-        </Html>
-      )}
-      
-      <Text
-        position={[0, 0.5, 0]}
-        fontSize={0.2}
-        color={getDefectColor(defect.type, defect.severity)}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {defect.type.charAt(0).toUpperCase()}
-      </Text>
-    </group>
-  );
-};
-
-// Analysis Overlay Component
-const AnalysisOverlay: React.FC<{ 
-  scanData: ScanData; 
-  isVisible: boolean; 
-}> = ({ scanData, isVisible }) => {
-  if (!isVisible) return null;
-
-  const totalDefects = scanData.defects.length;
-  const criticalDefects = scanData.defects.filter(d => d.severity === 'critical').length;
-  const totalRepairCost = scanData.defects.reduce((sum, d) => sum + d.repairCost, 0);
-
-  return (
-    <Html position={[10, 5, 0]} center>
-      <Card className="w-64 bg-slate-900/95 border-cyan-500/30">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-cyan-400 text-sm">Analysis Results</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-xs">
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <div className="text-slate-300">Surface Index</div>
-              <div className="text-lg font-mono text-cyan-400">
-                {scanData.surfaceConditionIndex}
-              </div>
-            </div>
-            <div>
-              <div className="text-slate-300">Defects</div>
-              <div className="text-lg font-mono text-orange-400">
-                {totalDefects}
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <span className="text-slate-300">Critical Issues</span>
-              <Badge variant="destructive" className="text-xs">{criticalDefects}</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-300">Repair Cost</span>
-              <span className="text-orange-400 font-mono">${totalRepairCost.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-300">Est. Lifespan</span>
-              <span className="text-cyan-400 font-mono">{scanData.estimatedLifespan}y</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </Html>
-  );
-};
+// Analysis moved to Real3DPavementViewer component
 
 const PavementScan3D: React.FC<PavementScan3DProps> = ({
   isVisible,
@@ -263,7 +121,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
         id: 'd1',
         type: 'crack',
         severity: 'medium',
-        position: new Vector3(2, 0.1, 1),
+        position: { x: 2, y: 0.1, z: 1 },
         area: 15.5,
         length: 24,
         description: 'Longitudinal crack extending 24 feet',
@@ -275,7 +133,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
         id: 'd2',
         type: 'pothole',
         severity: 'critical',
-        position: new Vector3(-1, 0.2, -2),
+        position: { x: -1, y: 0.2, z: -2 },
         area: 8.2,
         depth: 3.5,
         description: 'Deep pothole requiring immediate attention',
@@ -287,7 +145,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
         id: 'd3',
         type: 'alligator',
         severity: 'high',
-        position: new Vector3(0, 0.05, 3),
+        position: { x: 0, y: 0.05, z: 3 },
         area: 45.8,
         description: 'Alligator cracking pattern indicating structural failure',
         timestamp: new Date(),
@@ -370,27 +228,14 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
       {/* 3D Viewer */}
       {is3DMode && (
         <div className="absolute inset-0 bg-slate-950">
-          <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
-            <Suspense fallback={null}>
-              <ambientLight intensity={0.4} />
-              <pointLight position={[10, 10, 10]} intensity={1} />
-              <directionalLight position={[-10, 10, 5]} intensity={0.5} />
-              
-              <PavementMesh
-                scanData={mockScanData}
-                showDefects={showDefects}
-                selectedDefectTypes={selectedDefectTypes}
-                opacity={meshOpacity / 100}
-              />
-              
-              {showGrid && <Grid infiniteGrid />}
-              
-              <AnalysisOverlay scanData={mockScanData} isVisible={showAnalysis} />
-              
-              <OrbitControls enablePan enableZoom enableRotate />
-              <Environment preset="city" />
-            </Suspense>
-          </Canvas>
+          <Real3DPavementViewer
+            scanData={mockScanData}
+            showDefects={showDefects}
+            selectedDefectTypes={selectedDefectTypes}
+            opacity={meshOpacity}
+            showGrid={showGrid}
+            showAnalysis={showAnalysis}
+          />
           
           {/* 3D Mode Close Button */}
           <Button

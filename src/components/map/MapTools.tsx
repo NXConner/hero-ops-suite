@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useMap } from 'react-leaflet';
+// Removed react-leaflet dependency - using placeholder
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,12 +21,19 @@ import {
   X,
   Check
 } from 'lucide-react';
-import L from 'leaflet';
+// Removed leaflet import
+
+// Placeholder types to replace Leaflet
+interface LatLng {
+  lat: number;
+  lng: number;
+  distanceTo: (other: LatLng) => number;
+}
 
 interface DrawingState {
   isActive: boolean;
   mode: 'polygon' | 'polyline' | 'rectangle' | 'circle' | 'marker';
-  currentPoints: L.LatLng[];
+  currentPoints: LatLng[];
   measurements: Measurement[];
 }
 
@@ -35,7 +42,7 @@ interface Measurement {
   type: 'distance' | 'area' | 'perimeter';
   value: number;
   unit: string;
-  coordinates: L.LatLng[];
+  coordinates: LatLng[];
   label?: string;
 }
 
@@ -54,37 +61,16 @@ const MapTools: React.FC<MapToolsProps> = ({
   onMeasurementComplete,
   terminologyMode
 }) => {
-  const map = useMap();
+  // Note: Map integration removed due to leaflet dependency removal
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isActive: false,
     mode: 'polygon',
     currentPoints: [],
     measurements: []
   });
-  const [activeDrawings, setActiveDrawings] = useState<L.Layer[]>([]);
+  const [activeDrawings, setActiveDrawings] = useState<any[]>([]);
   const [activeMeasurements, setActiveMeasurements] = useState<Measurement[]>([]);
   const [showToolPanel, setShowToolPanel] = useState(false);
-
-  const drawingLayerRef = useRef<L.LayerGroup | null>(null);
-  const measurementLayerRef = useRef<L.LayerGroup | null>(null);
-
-  useEffect(() => {
-    if (!drawingLayerRef.current) {
-      drawingLayerRef.current = new L.LayerGroup().addTo(map);
-    }
-    if (!measurementLayerRef.current) {
-      measurementLayerRef.current = new L.LayerGroup().addTo(map);
-    }
-
-    return () => {
-      if (drawingLayerRef.current) {
-        map.removeLayer(drawingLayerRef.current);
-      }
-      if (measurementLayerRef.current) {
-        map.removeLayer(measurementLayerRef.current);
-      }
-    };
-  }, [map]);
 
   const getTerminology = (military: string, civilian: string) => {
     switch (terminologyMode) {
@@ -95,16 +81,20 @@ const MapTools: React.FC<MapToolsProps> = ({
     }
   };
 
-  const calculateDistance = (points: L.LatLng[]): number => {
+  // Placeholder functions
+  const calculateDistance = (points: LatLng[]): number => {
     if (points.length < 2) return 0;
     let totalDistance = 0;
     for (let i = 1; i < points.length; i++) {
-      totalDistance += points[i - 1].distanceTo(points[i]);
+      // Simplified distance calculation
+      const dx = points[i].lat - points[i - 1].lat;
+      const dy = points[i].lng - points[i - 1].lng;
+      totalDistance += Math.sqrt(dx * dx + dy * dy) * 111320; // Rough conversion to meters
     }
     return totalDistance;
   };
 
-  const calculateArea = (points: L.LatLng[]): number => {
+  const calculateArea = (points: LatLng[]): number => {
     if (points.length < 3) return 0;
     // Using Shoelace formula for polygon area calculation
     let area = 0;
@@ -139,64 +129,22 @@ const MapTools: React.FC<MapToolsProps> = ({
       currentPoints: [],
       measurements: []
     });
-    
-    map.getContainer().style.cursor = 'crosshair';
   };
 
   const finishDrawing = () => {
     const { mode, currentPoints } = drawingState;
     
     if (currentPoints.length > 0) {
-      let layer: L.Layer | null = null;
+      // Calculate measurements
+      const distance = calculateDistance(currentPoints);
+      const area = mode === 'polygon' ? calculateArea(currentPoints) : 0;
       
-      switch (mode) {
-        case 'polygon':
-          if (currentPoints.length >= 3) {
-            layer = L.polygon(currentPoints, {
-              color: '#06b6d4',
-              fillColor: '#06b6d4',
-              fillOpacity: 0.2,
-              weight: 2
-            });
-          }
-          break;
-        case 'polyline':
-          if (currentPoints.length >= 2) {
-            layer = L.polyline(currentPoints, {
-              color: '#f97316',
-              weight: 3
-            });
-          }
-          break;
-        case 'rectangle':
-          if (currentPoints.length >= 2) {
-            const bounds = L.latLngBounds(currentPoints);
-            layer = L.rectangle(bounds, {
-              color: '#06b6d4',
-              fillColor: '#06b6d4',
-              fillOpacity: 0.2,
-              weight: 2
-            });
-          }
-          break;
-      }
-      
-      if (layer && drawingLayerRef.current) {
-        drawingLayerRef.current.addLayer(layer);
-        setActiveDrawings(prev => [...prev, layer!]);
-        
-        // Calculate measurements
-        const distance = calculateDistance(currentPoints);
-        const area = mode === 'polygon' ? calculateArea(currentPoints) : 0;
-        
-        onDrawingComplete({
-          type: mode,
-          coordinates: currentPoints,
-          distance,
-          area,
-          layer
-        });
-      }
+      onDrawingComplete({
+        type: mode,
+        coordinates: currentPoints,
+        distance,
+        area
+      });
     }
     
     setDrawingState({
@@ -205,11 +153,9 @@ const MapTools: React.FC<MapToolsProps> = ({
       currentPoints: [],
       measurements: []
     });
-    
-    map.getContainer().style.cursor = '';
   };
 
-  const addMeasurement = (points: L.LatLng[], type: 'distance' | 'area') => {
+  const addMeasurement = (points: LatLng[], type: 'distance' | 'area') => {
     const value = type === 'distance' ? calculateDistance(points) : calculateArea(points);
     const unit = type === 'distance' ? 'm' : 'm²';
     
@@ -221,37 +167,11 @@ const MapTools: React.FC<MapToolsProps> = ({
       coordinates: points
     };
     
-    // Add measurement display to map
-    if (measurementLayerRef.current && points.length > 0) {
-      const center = type === 'area' 
-        ? L.polygon(points).getBounds().getCenter()
-        : points[Math.floor(points.length / 2)];
-      
-      const label = type === 'distance' ? formatDistance(value) : formatArea(value);
-      
-      const marker = L.marker(center, {
-        icon: L.divIcon({
-          className: 'measurement-label',
-          html: `<div class="bg-slate-900 text-cyan-400 px-2 py-1 rounded text-xs font-mono border border-cyan-500">${label}</div>`,
-          iconSize: [0, 0],
-          iconAnchor: [0, 0]
-        })
-      });
-      
-      measurementLayerRef.current.addLayer(marker);
-    }
-    
     setActiveMeasurements(prev => [...prev, measurement]);
     onMeasurementComplete(measurement);
   };
 
   const clearAll = () => {
-    if (drawingLayerRef.current) {
-      drawingLayerRef.current.clearLayers();
-    }
-    if (measurementLayerRef.current) {
-      measurementLayerRef.current.clearLayers();
-    }
     setActiveDrawings([]);
     setActiveMeasurements([]);
   };
@@ -260,8 +180,7 @@ const MapTools: React.FC<MapToolsProps> = ({
     const data = {
       drawings: activeDrawings.map((layer, index) => ({
         id: index,
-        type: 'feature',
-        // Add more layer data here
+        type: 'feature'
       })),
       measurements: activeMeasurements
     };
@@ -282,9 +201,9 @@ const MapTools: React.FC<MapToolsProps> = ({
 
   // Map click handler
   useEffect(() => {
-    const handleMapClick = (e: L.LeafletMouseEvent) => {
+    const handleMapClick = (e: any) => { // Placeholder for LeafletMouseEvent
       if (isDrawingMode && drawingState.isActive) {
-        const newPoints = [...drawingState.currentPoints, e.latlng];
+        const newPoints = [...drawingState.currentPoints, e]; // Placeholder for e.latlng
         setDrawingState(prev => ({
           ...prev,
           currentPoints: newPoints
@@ -293,7 +212,7 @@ const MapTools: React.FC<MapToolsProps> = ({
       
       if (isMeasurementMode) {
         // Add point for measurement
-        const newPoints = [...drawingState.currentPoints, e.latlng];
+        const newPoints = [...drawingState.currentPoints, e]; // Placeholder for e.latlng
         setDrawingState(prev => ({
           ...prev,
           currentPoints: newPoints
@@ -315,14 +234,14 @@ const MapTools: React.FC<MapToolsProps> = ({
       }
     };
 
-    map.on('click', handleMapClick);
-    map.on('dblclick', handleMapDoubleClick);
+    // Placeholder for map.on('click', handleMapClick);
+    // Placeholder for map.on('dblclick', handleMapDoubleClick);
     
     return () => {
-      map.off('click', handleMapClick);
-      map.off('dblclick', handleMapDoubleClick);
+      // Placeholder for map.off('click', handleMapClick);
+      // Placeholder for map.off('dblclick', handleMapDoubleClick);
     };
-  }, [map, isDrawingMode, isMeasurementMode, drawingState]);
+  }, [isDrawingMode, isMeasurementMode, drawingState]);
 
   if (!isDrawingMode && !isMeasurementMode && !showToolPanel) {
     return (
