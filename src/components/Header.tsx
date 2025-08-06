@@ -1,6 +1,8 @@
 import { Shield, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,9 +28,12 @@ const Header = () => {
             <a href="#contact" className="text-foreground hover:text-primary transition-colors">
               Contact
             </a>
-            <Button variant="default" className="bg-gradient-to-r from-primary to-accent">
-              Get Started
-            </Button>
+            <ThemeToggle />
+            <Link to="/dashboard">
+              <Button variant="default" className="bg-gradient-to-r from-primary to-accent">
+                Launch System
+              </Button>
+            </Link>
           </nav>
 
           <button
@@ -51,9 +56,11 @@ const Header = () => {
               <a href="#contact" className="text-foreground hover:text-primary transition-colors">
                 Contact
               </a>
-              <Button variant="default" className="bg-gradient-to-r from-primary to-accent">
-                Get Started
-              </Button>
+              <Link to="/dashboard">
+                <Button variant="default" className="bg-gradient-to-r from-primary to-accent">
+                  Launch System
+                </Button>
+              </Link>
             </nav>
           </div>
         )}
