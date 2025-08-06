@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import MissionPlanning from "./pages/MissionPlanning";
 import TeamManagement from "./pages/TeamManagement";
 import Analytics from "./pages/Analytics";
+import Communications from "./pages/Communications";
+import IntelReports from "./pages/IntelReports";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/mission-planning" element={<MissionPlanning />} />
             <Route path="/team-management" element={<TeamManagement />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/communications" element={<Communications />} />
+            <Route path="/intel-reports" element={<IntelReports />} />
             <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

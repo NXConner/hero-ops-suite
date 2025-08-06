@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CTASection = () => {
   return (
@@ -25,13 +26,17 @@ const CTASection = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:shadow-glow transition-all duration-300 text-lg px-8 py-6">
-              Start Mission Planning
-              <ArrowRight className="ml-2 h-6 w-6" />
-            </Button>
-            <Button size="lg" variant="outline" className="border-primary/50 hover:bg-primary/10 text-lg px-8 py-6">
-              Request Demo
-            </Button>
+            <Link to="/dashboard">
+              <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:shadow-glow transition-all duration-300 text-lg px-8 py-6">
+                Start Mission Planning
+                <ArrowRight className="ml-2 h-6 w-6" />
+              </Button>
+            </Link>
+            <Link to="/analytics">
+              <Button size="lg" variant="outline" className="border-primary/50 hover:bg-primary/10 text-lg px-8 py-6">
+                View Analytics
+              </Button>
+            </Link>
           </div>
 
           <div className="bg-card/30 backdrop-blur-sm border border-border/50 rounded-lg p-8 max-w-2xl mx-auto">

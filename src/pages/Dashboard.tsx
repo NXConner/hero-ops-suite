@@ -234,18 +234,24 @@ const Dashboard = () => {
                       New Mission
                     </Button>
                   </Link>
-                  <Button variant="outline" className="h-20 flex-col gap-2">
-                    <Radio className="h-5 w-5" />
-                    Broadcast
-                  </Button>
-                  <Button variant="outline" className="h-20 flex-col gap-2">
-                    <AlertTriangle className="h-5 w-5" />
-                    Alert Status
-                  </Button>
-                  <Button variant="outline" className="h-20 flex-col gap-2">
-                    <Lock className="h-5 w-5" />
-                    Secure Comm
-                  </Button>
+                  <Link to="/communications">
+                    <Button variant="outline" className="h-20 flex-col gap-2 w-full">
+                      <Radio className="h-5 w-5" />
+                      Communications
+                    </Button>
+                  </Link>
+                  <Link to="/intel-reports">
+                    <Button variant="outline" className="h-20 flex-col gap-2 w-full">
+                      <AlertTriangle className="h-5 w-5" />
+                      Intel Reports
+                    </Button>
+                  </Link>
+                  <Link to="/team-management">
+                    <Button variant="outline" className="h-20 flex-col gap-2 w-full">
+                      <Lock className="h-5 w-5" />
+                      Team Management
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
