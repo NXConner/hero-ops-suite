@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+// Removed react-leaflet dependency - using placeholder
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -18,16 +18,9 @@ import DraggableWidgets from '@/components/map/DraggableWidgets';
 import WeatherOverlay from '@/components/map/WeatherOverlay';
 import PavementScan3D from '@/components/pavement/PavementScan3D';
 import VoiceCommandInterface from '@/components/ai/VoiceCommandInterface';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import RealMapComponent from '@/components/map/RealMapComponent';
 
-// Fix leaflet default markers
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Removed leaflet icon configuration
 
 interface MapService {
   id: string;
@@ -160,26 +153,7 @@ const OverWatch: React.FC = () => {
     );
   };
 
-  const MapControls = () => {
-    const map = useMap();
-    
-    useMapEvents({
-      click: (e) => {
-        if (isDrawingMode) {
-          console.log('Drawing mode click:', e.latlng);
-        }
-        if (isMeasurementMode) {
-          console.log('Measurement mode click:', e.latlng);
-        }
-      },
-      moveend: () => {
-        setMapCenter([map.getCenter().lat, map.getCenter().lng]);
-        setMapZoom(map.getZoom());
-      }
-    });
-
-    return null;
-  };
+  // MapControls functionality moved to RealMapComponent event handlers
 
   const handleDrawingComplete = (feature: any) => {
     setDrawings(prev => [...prev, feature]);
@@ -500,17 +474,23 @@ const OverWatch: React.FC = () => {
         <div className="flex-1 relative">
           {/* Map Container */}
           <div className="absolute inset-0">
-            <MapContainer
+            <RealMapComponent
               center={mapCenter}
               zoom={mapZoom}
               className="h-full w-full"
-              zoomControl={false}
+              onMapClick={(e) => {
+                if (isDrawingMode) {
+                  console.log('Drawing mode click:', e.lngLat);
+                }
+                if (isMeasurementMode) {
+                  console.log('Measurement mode click:', e.lngLat);
+                }
+              }}
+              onMapMove={(center, zoom) => {
+                setMapCenter(center);
+                setMapZoom(zoom);
+              }}
             >
-              <TileLayer
-                url={currentService.url}
-                attribution={currentService.attribution}
-              />
-              <MapControls />
               <FleetTracking 
                 terminologyMode={terminologyMode}
                 isVisible={activeOverlays.includes('fleet')}
@@ -533,7 +513,7 @@ const OverWatch: React.FC = () => {
                 onMeasurementComplete={handleMeasurementComplete}
                 terminologyMode={terminologyMode}
               />
-            </MapContainer>
+            </RealMapComponent>
           </div>
 
           {/* Draggable Widgets System */}
