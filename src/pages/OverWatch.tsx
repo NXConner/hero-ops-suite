@@ -11,10 +11,13 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Sidebar } from '@/components/Sidebar';
 import { Radar, Map, Layers, Navigation, Crosshair, Ruler, Camera, Users, Truck, Cloud, Thermometer, Eye, Settings, Target, RadioIcon as Radio, Activity, AlertTriangle, Zap } from 'lucide-react';
+import html2canvas from 'html2canvas';
 import MapTools from '@/components/map/MapTools';
 import FleetTracking from '@/components/map/FleetTracking';
 import DraggableWidgets from '@/components/map/DraggableWidgets';
 import WeatherOverlay from '@/components/map/WeatherOverlay';
+import PavementScan3D from '@/components/pavement/PavementScan3D';
+import VoiceCommandInterface from '@/components/ai/VoiceCommandInterface';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -62,6 +65,56 @@ const mapServices: MapService[] = [
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
     attribution: '© Esri',
     icon: <Target className="w-4 h-4" />
+  },
+  {
+    id: 'google-satellite',
+    name: 'Google Satellite',
+    url: process.env.REACT_APP_GOOGLE_MAPS_API_KEY 
+      ? `https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '© Google',
+    icon: <Eye className="w-4 h-4" />
+  },
+  {
+    id: 'google-roads',
+    name: 'Google Roads',
+    url: process.env.REACT_APP_GOOGLE_MAPS_API_KEY
+      ? `https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '© Google',
+    icon: <Navigation className="w-4 h-4" />
+  },
+  {
+    id: 'mapbox-streets',
+    name: 'Mapbox Streets',
+    url: process.env.REACT_APP_MAPBOX_API_KEY
+      ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${process.env.REACT_APP_MAPBOX_API_KEY}`
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '© Mapbox',
+    icon: <Map className="w-4 h-4" />
+  },
+  {
+    id: 'mapbox-satellite',
+    name: 'Mapbox Satellite',
+    url: process.env.REACT_APP_MAPBOX_API_KEY
+      ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${process.env.REACT_APP_MAPBOX_API_KEY}`
+      : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: '© Mapbox',
+    icon: <Eye className="w-4 h-4" />
+  },
+  {
+    id: 'carto-dark',
+    name: 'Dark Theme',
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+    attribution: '© CARTO',
+    icon: <Target className="w-4 h-4" />
+  },
+  {
+    id: 'qgis-local',
+    name: 'QGIS Local Server',
+    url: process.env.REACT_APP_QGIS_SERVER_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '© Local QGIS Server',
+    icon: <Layers className="w-4 h-4" />
   }
 ];
 
@@ -86,6 +139,7 @@ const OverWatch: React.FC = () => {
   const [measurements, setMeasurements] = useState<any[]>([]);
   const [showWidgets, setShowWidgets] = useState(true);
   const [weatherRecommendations, setWeatherRecommendations] = useState<string[]>([]);
+  const [showVoiceInterface, setShowVoiceInterface] = useState(false);
 
   const currentService = mapServices.find(service => service.id === selectedMapService) || mapServices[0];
 
@@ -135,6 +189,60 @@ const OverWatch: React.FC = () => {
   const handleMeasurementComplete = (measurement: any) => {
     setMeasurements(prev => [...prev, measurement]);
     console.log('Measurement completed:', measurement);
+  };
+
+  const handleVoiceCommand = (command: any) => {
+    console.log('Voice command received:', command);
+    
+    // Execute the command based on its action
+    switch (command.action) {
+      case 'show_weather_overlay':
+        if (!activeOverlays.includes('weather')) {
+          setActiveOverlays(prev => [...prev, 'weather']);
+        }
+        break;
+      case 'hide_weather_overlay':
+        setActiveOverlays(prev => prev.filter(id => id !== 'weather'));
+        break;
+      case 'show_fleet_tracking':
+        if (!activeOverlays.includes('fleet')) {
+          setActiveOverlays(prev => [...prev, 'fleet']);
+        }
+        break;
+      case 'hide_fleet_tracking':
+        setActiveOverlays(prev => prev.filter(id => id !== 'fleet'));
+        break;
+      case 'show_defects':
+        if (!activeOverlays.includes('pavement')) {
+          setActiveOverlays(prev => [...prev, 'pavement']);
+        }
+        break;
+      case 'hide_defects':
+        setActiveOverlays(prev => prev.filter(id => id !== 'pavement'));
+        break;
+      case 'switch_map_service':
+        if (command.parameters?.service) {
+          setSelectedMapService(command.parameters.service);
+        }
+        break;
+      case 'start_measuring':
+        setIsMeasurementMode(true);
+        break;
+      case 'stop_measuring':
+        setIsMeasurementMode(false);
+        break;
+      case 'take_screenshot':
+        // Implement screenshot functionality
+        html2canvas(document.body).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `overwatch-screenshot-${Date.now()}.png`;
+          link.href = canvas.toDataURL();
+          link.click();
+        });
+        break;
+      default:
+        console.log('Unhandled voice command:', command.action);
+    }
   };
 
   const FleetTrackingWidget = () => (
@@ -374,6 +482,16 @@ const OverWatch: React.FC = () => {
                 <Settings className="w-3 h-3 mr-1" />
                 Widgets
               </Button>
+              
+              <Button
+                variant={showVoiceInterface ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowVoiceInterface(!showVoiceInterface)}
+                className="bg-slate-800 border-slate-600 text-xs"
+              >
+                <Radio className="w-3 h-3 mr-1" />
+                Voice
+              </Button>
             </div>
           </div>
         </div>
@@ -402,6 +520,12 @@ const OverWatch: React.FC = () => {
                 isVisible={activeOverlays.includes('weather')}
                 onRecommendationChange={setWeatherRecommendations}
               />
+              <PavementScan3D
+                terminologyMode={terminologyMode}
+                isVisible={activeOverlays.includes('pavement')}
+                onDefectSelect={(defect) => console.log('Defect selected:', defect)}
+                onAnalysisComplete={(analysis) => console.log('Analysis complete:', analysis)}
+              />
               <MapTools
                 isDrawingMode={isDrawingMode}
                 isMeasurementMode={isMeasurementMode}
@@ -417,6 +541,14 @@ const OverWatch: React.FC = () => {
             terminologyMode={terminologyMode}
             isVisible={showWidgets}
             onLayoutChange={(layout) => console.log('Layout changed:', layout)}
+          />
+
+          {/* Voice Command Interface */}
+          <VoiceCommandInterface
+            isVisible={showVoiceInterface}
+            terminologyMode={terminologyMode}
+            onCommand={handleVoiceCommand}
+            onClose={() => setShowVoiceInterface(false)}
           />
 
           {/* Bottom Status Bar */}

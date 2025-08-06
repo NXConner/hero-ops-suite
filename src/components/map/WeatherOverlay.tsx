@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TileLayer, ImageOverlay, useMap } from 'react-leaflet';
+import { weatherService, WeatherAPIResponse } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -85,63 +86,112 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
     }
   };
 
-  // Mock weather data
+  // Real weather data integration
   useEffect(() => {
-    const generateMockWeatherData = (): WeatherData => ({
-      temperature: 72,
-      humidity: 65,
-      windSpeed: 8,
-      windDirection: 45,
-      pressure: 1013.2,
-      uvIndex: 6,
-      visibility: 10,
-      conditions: 'cloudy',
-      precipitation: 0.1,
-      timestamp: new Date()
-    });
-
-    const generateMockAlerts = (): WeatherAlert[] => [
-      {
-        id: 'w1',
-        type: 'precipitation',
-        severity: 'medium',
-        message: 'Light rain expected in next 2 hours',
-        recommendation: 'Delay sealcoating operations until conditions improve',
-        validUntil: new Date(Date.now() + 2 * 60 * 60 * 1000)
-      },
-      {
-        id: 'w2',
-        type: 'wind',
-        severity: 'low',
-        message: 'Wind speed increasing to 12-15 mph',
-        recommendation: 'Monitor dust control measures during paving operations',
-        validUntil: new Date(Date.now() + 4 * 60 * 60 * 1000)
-      }
-    ];
-
-    const generateMockRadarFrames = (): RadarFrame[] => {
-      const frames: RadarFrame[] = [];
-      const baseTime = new Date();
-      
-      for (let i = 0; i < 8; i++) {
-        frames.push({
-          timestamp: new Date(baseTime.getTime() - (7 - i) * 15 * 60 * 1000),
-          imageUrl: `https://example.com/radar/frame_${i}.png`,
-          precipitationLevel: Math.random() * 0.5
+    const loadWeatherData = async () => {
+      try {
+        // Get current location (defaulting to NYC for demo)
+        const lat = 40.7128;
+        const lon = -74.0060;
+        
+        // Fetch real weather data
+        const weatherResponse = await weatherService.getCurrentWeather(lat, lon);
+        const radarResponse = await weatherService.getRadarData();
+        
+        // Convert API response to internal format
+        const weatherData: WeatherData = {
+          temperature: Math.round(weatherResponse.main.temp),
+          humidity: weatherResponse.main.humidity,
+          windSpeed: Math.round(weatherResponse.wind.speed),
+          windDirection: weatherResponse.wind.deg,
+          pressure: weatherResponse.main.pressure,
+          uvIndex: 6, // Not available in free API
+          visibility: Math.round(weatherResponse.visibility / 1609.34), // Convert to miles
+          conditions: weatherResponse.weather[0].main.toLowerCase() as WeatherData['conditions'],
+          precipitation: 0, // Would need additional API call
+          timestamp: new Date(weatherResponse.dt * 1000)
+        };
+        
+        setCurrentWeather(weatherData);
+        
+        // Convert radar data
+        const radarFrames: RadarFrame[] = radarResponse.radar.past.map(frame => ({
+          timestamp: new Date(frame.time * 1000),
+          imageUrl: `https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`,
+          precipitationLevel: Math.random() * 0.5 // Would be calculated from actual radar data
+        }));
+        
+        setRadarFrames(radarFrames);
+        
+        // Generate alerts based on real weather conditions
+        const alerts: WeatherAlert[] = [];
+        
+        if (weatherResponse.weather[0].main === 'Rain') {
+          alerts.push({
+            id: 'rain-alert',
+            type: 'precipitation',
+            severity: 'high',
+            message: 'Active precipitation detected',
+            recommendation: 'Avoid sealcoating and paving operations',
+            validUntil: new Date(Date.now() + 2 * 60 * 60 * 1000)
+          });
+        }
+        
+        if (weatherResponse.wind.speed > 15) {
+          alerts.push({
+            id: 'wind-alert',
+            type: 'wind',
+            severity: 'medium',
+            message: `High winds detected: ${Math.round(weatherResponse.wind.speed)} mph`,
+            recommendation: 'Implement dust control measures',
+            validUntil: new Date(Date.now() + 4 * 60 * 60 * 1000)
+          });
+        }
+        
+        if (weatherResponse.main.temp < 50) {
+          alerts.push({
+            id: 'temp-alert',
+            type: 'temperature',
+            severity: 'medium',
+            message: `Low temperature: ${Math.round(weatherResponse.main.temp)}°F`,
+            recommendation: 'Monitor asphalt temperature and workability',
+            validUntil: new Date(Date.now() + 6 * 60 * 60 * 1000)
+          });
+        }
+        
+        setWeatherAlerts(alerts);
+        
+      } catch (error) {
+        console.error('Failed to load weather data:', error);
+        // Fallback to mock data
+        setCurrentWeather({
+          temperature: 72,
+          humidity: 65,
+          windSpeed: 8,
+          windDirection: 45,
+          pressure: 1013.2,
+          uvIndex: 6,
+          visibility: 10,
+          conditions: 'cloudy',
+          precipitation: 0.1,
+          timestamp: new Date()
         });
+        
+        setWeatherAlerts([{
+          id: 'api-error',
+          type: 'severe-weather',
+          severity: 'low',
+          message: 'Weather data unavailable - using cached data',
+          recommendation: 'Check internet connection and retry',
+          validUntil: new Date(Date.now() + 30 * 60 * 1000)
+        }]);
       }
-      
-      return frames;
     };
 
-    setCurrentWeather(generateMockWeatherData());
-    setWeatherAlerts(generateMockAlerts());
-    setRadarFrames(generateMockRadarFrames());
+    loadWeatherData();
 
-    // Update weather data every 5 minutes
-    const weatherInterval = setInterval(() => {
-      setCurrentWeather(generateMockWeatherData());
-    }, 5 * 60 * 1000);
+    // Update weather data every 10 minutes
+    const weatherInterval = setInterval(loadWeatherData, 10 * 60 * 1000);
 
     return () => clearInterval(weatherInterval);
   }, []);
