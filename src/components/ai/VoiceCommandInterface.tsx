@@ -21,6 +21,15 @@ import {
   Send
 } from 'lucide-react';
 
+interface CommandParameters {
+  location?: { lat: number; lng: number };
+  distance?: number;
+  time?: string;
+  filter?: string;
+  value?: string | number;
+  [key: string]: unknown;
+}
+
 interface VoiceCommand {
   id: string;
   text: string;
@@ -28,7 +37,7 @@ interface VoiceCommand {
   timestamp: Date;
   response: string;
   action?: string;
-  parameters?: any;
+  parameters?: CommandParameters;
   success: boolean;
 }
 
@@ -46,10 +55,75 @@ interface SpeechRecognitionResult {
 }
 
 // Extend the Window interface for Speech Recognition
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognition;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  maxAlternatives: number;
+  serviceURI: string;
+  grammars: SpeechGrammarList;
+  start(): void;
+  stop(): void;
+  abort(): void;
+  onaudiostart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onaudioend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => unknown) | null;
+  onnomatch: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown) | null;
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown) | null;
+  onsoundstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onsoundend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onspeechstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onspeechend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message: string;
+}
+
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+}
+
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionAlternative;
+  length: number;
+  isFinal: boolean;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechGrammarList {
+  [index: number]: SpeechGrammar;
+  length: number;
+  addFromString(string: string, weight?: number): void;
+  addFromURI(src: string, weight?: number): void;
+}
+
+interface SpeechGrammar {
+  src: string;
+  weight: number;
+}
+
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition: SpeechRecognitionConstructor;
+    webkitSpeechRecognition: SpeechRecognitionConstructor;
   }
 }
 
@@ -67,17 +141,17 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [supportedCommands, setSupportedCommands] = useState<string[]>([]);
 
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  const getTerminology = (military: string, civilian: string) => {
+  const getTerminology = useCallback((military: string, civilian: string) => {
     switch (terminologyMode) {
       case 'military': return military;
       case 'civilian': return civilian;
       case 'both': return `${military} / ${civilian}`;
       default: return military;
     }
-  };
+  }, [terminologyMode]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -95,7 +169,7 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
         setCurrentTranscript('');
       };
 
-      recognitionRef.current.onresult = (event: any) => {
+              recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
         let interimTranscript = '';
         let finalTranscript = '';
 
@@ -115,7 +189,7 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
         }
       };
 
-      recognitionRef.current.onerror = (event: any) => {
+              recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
         
@@ -195,12 +269,12 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
     } finally {
       setIsProcessing(false);
     }
-  }, [onCommand]);
+  }, [onCommand, parseCommand, speak]);
 
   // Natural Language Understanding for commands
-  const parseCommand = async (input: string): Promise<{
+  const parseCommand = useCallback(async (input: string): Promise<{
     action?: string;
-    parameters?: any;
+    parameters?: CommandParameters;
     response: string;
     success: boolean;
   }> => {
@@ -235,10 +309,10 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
 
       // Navigation commands
       {
-        pattern: /(zoom to|go to|navigate to)\s*coordinates?\s*([\d\.\-,\s]+)/i,
+        pattern: /(zoom to|go to|navigate to)\s*coordinates?\s*([\d.,\s-]+)/i,
         action: 'zoom_to_coordinates',
         extractParams: (match: RegExpMatchArray) => {
-          const coords = match[2].match(/[\d\.\-]+/g);
+          const coords = match[2].match(/[\d.,-]+/g);
           return coords && coords.length >= 2 ? { lat: parseFloat(coords[0]), lng: parseFloat(coords[1]) } : null;
         },
         response: 'Navigating to specified coordinates'
@@ -379,10 +453,10 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
         : 'Command not recognized. Say "help" for available commands.',
       success: false
     };
-  };
+  }, [terminologyMode, getSuggestions, getTerminology]);
 
   // Get command suggestions based on partial input
-  const getSuggestions = (input: string): string[] => {
+  const getSuggestions = useCallback((input: string): string[] => {
     const keywords = input.split(' ');
     const suggestions: string[] = [];
 
@@ -402,10 +476,10 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
       const bMatches = keywords.filter(k => b.toLowerCase().includes(k)).length;
       return bMatches - aMatches;
     });
-  };
+  }, [supportedCommands]);
 
   // Text-to-speech function
-  const speak = (text: string) => {
+  const speak = useCallback((text: string) => {
     if (!isSpeechEnabled || !('speechSynthesis' in window)) return;
 
     // Cancel any ongoing speech
@@ -431,7 +505,7 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
 
     speechSynthesisRef.current = utterance;
     window.speechSynthesis.speak(utterance);
-  };
+  }, [isSpeechEnabled]);
 
   // Start/stop listening
   const toggleListening = () => {
