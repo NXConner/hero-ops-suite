@@ -18,37 +18,7 @@ import DraggableWidgets from '@/components/map/DraggableWidgets';
 import WeatherOverlay from '@/components/map/WeatherOverlay';
 import PavementScan3D from '@/components/pavement/PavementScan3D';
 import VoiceCommandInterface from '@/components/ai/VoiceCommandInterface';
-// Removed leaflet imports
-
-// Placeholder Map Component (replaces MapContainer)
-const MapPlaceholder: React.FC<{ 
-  center: [number, number]; 
-  zoom: number; 
-  children?: React.ReactNode; 
-  className?: string;
-}> = ({ center, zoom, children, className }) => {
-  return (
-    <div className={`w-full h-full bg-slate-800 relative ${className}`}>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center text-slate-400">
-          <Map className="w-16 h-16 mx-auto mb-4" />
-          <div className="text-xl mb-2">OverWatch Map Interface</div>
-          <div className="text-sm">Leaflet dependencies removed for compatibility</div>
-          <div className="text-xs mt-4 space-y-1">
-            <div>Center: {center[0].toFixed(4)}, {center[1].toFixed(4)}</div>
-            <div>Zoom Level: {zoom}</div>
-          </div>
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-};
-
-// Placeholder TileLayer Component
-const TileLayerPlaceholder: React.FC<{ url: string; attribution?: string }> = ({ url, attribution }) => {
-  return <div className="hidden" />;
-};
+import RealMapComponent from '@/components/map/RealMapComponent';
 
 // Removed leaflet icon configuration
 
@@ -183,26 +153,7 @@ const OverWatch: React.FC = () => {
     );
   };
 
-  const MapControls = () => {
-    // const map = useMap(); // Removed useMap
-    
-    // useMapEvents({ // Removed useMapEvents
-    //   click: (e) => {
-    //     if (isDrawingMode) {
-    //       console.log('Drawing mode click:', e.latlng);
-    //     }
-    //     if (isMeasurementMode) {
-    //       console.log('Measurement mode click:', e.latlng);
-    //     }
-    //   },
-    //   moveend: () => {
-    //     setMapCenter([map.getCenter().lat, map.getCenter().lng]);
-    //     setMapZoom(map.getZoom());
-    //   }
-    // });
-
-    return null;
-  };
+  // MapControls functionality moved to RealMapComponent event handlers
 
   const handleDrawingComplete = (feature: any) => {
     setDrawings(prev => [...prev, feature]);
@@ -523,16 +474,23 @@ const OverWatch: React.FC = () => {
         <div className="flex-1 relative">
           {/* Map Container */}
           <div className="absolute inset-0">
-            <MapPlaceholder
+            <RealMapComponent
               center={mapCenter}
               zoom={mapZoom}
               className="h-full w-full"
+              onMapClick={(e) => {
+                if (isDrawingMode) {
+                  console.log('Drawing mode click:', e.lngLat);
+                }
+                if (isMeasurementMode) {
+                  console.log('Measurement mode click:', e.lngLat);
+                }
+              }}
+              onMapMove={(center, zoom) => {
+                setMapCenter(center);
+                setMapZoom(zoom);
+              }}
             >
-              <TileLayerPlaceholder
-                url={currentService.url}
-                attribution={currentService.attribution}
-              />
-              <MapControls />
               <FleetTracking 
                 terminologyMode={terminologyMode}
                 isVisible={activeOverlays.includes('fleet')}
@@ -555,7 +513,7 @@ const OverWatch: React.FC = () => {
                 onMeasurementComplete={handleMeasurementComplete}
                 terminologyMode={terminologyMode}
               />
-            </MapPlaceholder>
+            </RealMapComponent>
           </div>
 
           {/* Draggable Widgets System */}
