@@ -16,7 +16,8 @@ import {
   Menu,
   X,
   Bell,
-  Search
+  Search,
+  Scan
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -60,6 +61,13 @@ const Sidebar = () => {
       href: "/intel-reports",
       icon: FileText,
       current: location.pathname === "/intel-reports"
+    },
+    {
+      name: "PavementScan Pro",
+      href: "/pavement-scan-pro",
+      icon: Scan,
+      current: location.pathname === "/pavement-scan-pro",
+      badge: "NEW"
     },
     {
       name: "Settings",
