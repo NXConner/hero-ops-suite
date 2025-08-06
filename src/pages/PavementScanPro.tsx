@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { 
   Camera, 
   Scan, 
-  Cube, 
+  Layers, 
   Download, 
   Share, 
   AlertTriangle, 
@@ -261,7 +261,7 @@ const PavementScanPro = () => {
                     onClick={() => setScanningMode('complete')}
                     disabled={isScanning}
                   >
-                    <Cube className="h-4 w-4 mr-1" />
+                    <Layers className="h-4 w-4 mr-1" />
                     Complete
                   </Button>
                 </div>
@@ -365,7 +365,7 @@ const PavementScanPro = () => {
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button variant="outline" size="sm" className="w-full">
-                  <Cube className="h-4 w-4 mr-1" />
+                  <Layers className="h-4 w-4 mr-1" />
                   View 3D Model
                 </Button>
                 <Button variant="outline" size="sm" className="w-full">

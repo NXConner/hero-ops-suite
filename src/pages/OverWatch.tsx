@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Sidebar } from '@/components/Sidebar';
+import Sidebar from '@/components/Sidebar';
 import { Radar, Map, Layers, Navigation, Crosshair, Ruler, Camera, Users, Truck, Cloud, Thermometer, Eye, Settings, Target, RadioIcon as Radio, Activity, AlertTriangle, Zap } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import MapTools from '@/components/map/MapTools';

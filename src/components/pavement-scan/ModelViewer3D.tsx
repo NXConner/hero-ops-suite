@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  Cube, 
+  Layers as LayersIcon, 
   RotateCcw, 
   ZoomIn, 
   ZoomOut, 
@@ -278,7 +278,7 @@ const ModelViewer3D: React.FC<ModelViewer3DProps> = ({ scanData, defects }) => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Cube className="h-5 w-5" />
+                <LayersIcon className="h-5 w-5" />
                 3D Model Viewer
               </CardTitle>
               <CardDescription>
