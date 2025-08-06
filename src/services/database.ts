@@ -1,13 +1,34 @@
 // Database Service Layer for Blacktop Blackout OverWatch System
 // Supports both client-side IndexedDB and server-side API integration
 
+interface WidgetLayoutConfig {
+  i: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  minW?: number;
+  minH?: number;
+  maxW?: number;
+  maxH?: number;
+  static?: boolean;
+}
+
+interface OverlaySettings {
+  showWeather: boolean;
+  showFleet: boolean;
+  showDefects: boolean;
+  transparency: number;
+  layerOrder: string[];
+}
+
 interface UserPreferences {
   id: string;
   userId: string;
   terminologyMode: 'military' | 'civilian' | 'both';
   mapService: string;
-  widgetLayouts: any;
-  overlaySettings: any;
+  widgetLayouts: WidgetLayoutConfig[];
+  overlaySettings: OverlaySettings;
   notifications: boolean;
   theme: 'dark' | 'light' | 'auto';
   lastUpdated: Date;
@@ -17,17 +38,58 @@ interface WidgetLayout {
   id: string;
   userId: string;
   name: string;
-  layout: any;
+  layout: WidgetLayoutConfig[];
   isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
+interface GPSData {
+  latitude: number;
+  longitude: number;
+  altitude?: number;
+  speed?: number;
+  heading?: number;
+  accuracy?: number;
+}
+
+interface WeatherData {
+  temperature: number;
+  humidity: number;
+  pressure: number;
+  windSpeed: number;
+  windDirection: number;
+  precipitation: number;
+  visibility: number;
+}
+
+interface SensorData {
+  sensorId: string;
+  sensorType: string;
+  value: number;
+  unit: string;
+  status: 'active' | 'inactive' | 'error';
+}
+
+interface ScanData {
+  scanId: string;
+  scanType: '3d' | '2d' | 'thermal';
+  resolution: number;
+  fileUrl?: string;
+  defects?: Array<{
+    type: string;
+    severity: number;
+    location: { x: number; y: number };
+  }>;
+}
+
+type HistoricalDataValue = GPSData | WeatherData | SensorData | ScanData;
+
 interface HistoricalData {
   id: string;
   type: 'gps' | 'weather' | 'sensor' | 'scan';
   deviceId?: string;
-  data: any;
+  data: HistoricalDataValue;
   timestamp: Date;
   location?: {
     latitude: number;
@@ -54,13 +116,22 @@ interface Project {
   updatedAt: Date;
 }
 
+interface AlertData {
+  location?: { latitude: number; longitude: number };
+  sensorId?: string;
+  threshold?: number;
+  currentValue?: number;
+  deviceId?: string;
+  [key: string]: unknown;
+}
+
 interface Alert {
   id: string;
   type: 'weather' | 'maintenance' | 'geofence' | 'sensor' | 'system';
   severity: 'low' | 'medium' | 'high' | 'critical';
   title: string;
   message: string;
-  data?: any;
+  data?: AlertData;
   acknowledged: boolean;
   acknowledgedBy?: string;
   acknowledgedAt?: Date;
@@ -332,7 +403,7 @@ class DatabaseService {
   }
 
   // Generic Store Methods
-  private async saveToStore(storeName: string, data: any): Promise<void> {
+  private async saveToStore(storeName: string, data: unknown): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -364,7 +435,7 @@ class DatabaseService {
     });
   }
 
-  private async getAllFromStore(storeName: string, indexName?: string, indexValue?: any): Promise<any[]> {
+  private async getAllFromStore(storeName: string, indexName?: string, indexValue?: unknown): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -404,7 +475,7 @@ class DatabaseService {
   }
 
   // Server Sync Methods
-  private async syncToServer(endpoint: string, data: any): Promise<void> {
+  private async syncToServer(endpoint: string, data: unknown): Promise<void> {
     try {
       const response = await fetch(`${this.API_BASE_URL}/${endpoint}`, {
         method: 'POST',
@@ -491,7 +562,7 @@ class DatabaseService {
     }
   }
 
-  async importData(data: any): Promise<void> {
+  async importData(data: Record<string, unknown>): Promise<void> {
     try {
       if (data.userPreferences) {
         for (const pref of data.userPreferences) {
