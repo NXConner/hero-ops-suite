@@ -17,7 +17,8 @@ import {
   X,
   Bell,
   Search,
-  Scan
+  Scan,
+  Radar
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -30,6 +31,13 @@ const Sidebar = () => {
       href: "/dashboard",
       icon: LayoutDashboard,
       current: location.pathname === "/dashboard"
+    },
+    {
+      name: "OverWatch Map",
+      href: "/overwatch",
+      icon: Radar,
+      current: location.pathname === "/overwatch",
+      badge: "LIVE"
     },
     {
       name: "Mission Planning",
