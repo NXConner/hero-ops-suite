@@ -567,54 +567,6 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
     }
   };
 
-  const getSeverityColor = (severity: Alert['severity']) => {
-    switch (severity) {
-      case 'low': return 'text-blue-400 border-blue-400';
-      case 'medium': return 'text-yellow-400 border-yellow-400';
-      case 'high': return 'text-orange-400 border-orange-400';
-      case 'critical': return 'text-red-400 border-red-400';
-      default: return 'text-slate-400 border-slate-400';
-    }
-  };
-
-  const acknowledgeAlert = (alertId: string) => {
-    setAlerts(prev => prev.map(alert => 
-      alert.id === alertId ? { ...alert, acknowledged: true } : alert
-    ));
-  };
-
-  const startPlayback = () => {
-    setIsPlaybackMode(true);
-    setIsPlaying(true);
-    
-    playbackIntervalRef.current = setInterval(() => {
-      // Simulate historical movement
-      setVehicles(prev => prev.map(vehicle => ({
-        ...vehicle,
-        location: {
-          ...vehicle.location,
-          lat: vehicle.location.lat + (Math.random() - 0.5) * 0.002,
-          lng: vehicle.location.lng + (Math.random() - 0.5) * 0.002
-        }
-      })));
-    }, 1000 / playbackSpeed);
-  };
-
-  const stopPlayback = () => {
-    setIsPlaying(false);
-    if (playbackIntervalRef.current) {
-      clearInterval(playbackIntervalRef.current);
-    }
-  };
-
-  const resetPlayback = () => {
-    setIsPlaybackMode(false);
-    setIsPlaying(false);
-    if (playbackIntervalRef.current) {
-      clearInterval(playbackIntervalRef.current);
-    }
-  };
-
   if (!isVisible) return null;
 
   // Fleet tracking overlay UI - markers are handled in useEffect

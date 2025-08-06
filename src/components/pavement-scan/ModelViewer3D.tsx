@@ -153,15 +153,17 @@ const PointCloud: React.FC<{
       positions[i * 3 + 1] = point.y;
       positions[i * 3 + 2] = point.z;
       
-      let color = new THREE.Color();
+      const color = new THREE.Color();
       switch (colorMode) {
-        case 'height':
+        case 'height': {
           color.setHSL(0.6 - (point.y + 1) * 0.3, 1, 0.5);
           break;
-        case 'intensity':
+        }
+        case 'intensity': {
           const intensity = point.intensity || 0.7;
           color.setRGB(intensity, intensity, intensity);
           break;
+        }
         default:
           color.set(point.color || '#888888');
       }
