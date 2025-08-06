@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, Html, Environment, Grid, Box } from '@react-three/drei';
-import { Mesh, Vector3, Color, BufferGeometry, BufferAttribute, DoubleSide } from 'three';
+// Removed React Three.js dependencies - using placeholder
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +29,13 @@ import {
   Ruler,
   Target
 } from 'lucide-react';
+
+// Placeholder types to replace Three.js
+interface Vector3 {
+  x: number;
+  y: number;
+  z: number;
+}
 
 interface DefectData {
   id: string;
@@ -72,45 +77,28 @@ interface PavementScan3DProps {
   terminologyMode: 'military' | 'civilian' | 'both';
 }
 
-// 3D Mesh Component
-const PavementMesh: React.FC<{ 
+// Placeholder 3D Viewer Component (replaces Three.js Canvas)
+const PavementViewer3D: React.FC<{ 
   scanData: ScanData; 
   showDefects: boolean; 
   selectedDefectTypes: string[];
   opacity: number;
-}> = ({ scanData, showDefects, selectedDefectTypes, opacity }) => {
-  const meshRef = useRef<Mesh>(null);
-  const { scene } = useThree();
-
-  useEffect(() => {
-    if (!meshRef.current || !scanData.meshData) return;
-
-    const geometry = new BufferGeometry();
-    geometry.setAttribute('position', new BufferAttribute(scanData.meshData.vertices, 3));
-    geometry.setAttribute('normal', new BufferAttribute(scanData.meshData.normals, 3));
-    geometry.setAttribute('color', new BufferAttribute(scanData.meshData.colors, 3));
-    geometry.setIndex(new BufferAttribute(scanData.meshData.indices, 1));
-
-    meshRef.current.geometry = geometry;
-  }, [scanData]);
-
+  showGrid: boolean;
+  showAnalysis: boolean;
+}> = ({ scanData, showDefects, selectedDefectTypes, opacity, showGrid, showAnalysis }) => {
   return (
-    <>
-      <mesh ref={meshRef} position={[0, 0, 0]}>
-        <meshStandardMaterial 
-          vertexColors 
-          transparent 
-          opacity={opacity}
-          side={DoubleSide}
-        />
-      </mesh>
-      
-      {showDefects && scanData.defects
-        .filter(defect => selectedDefectTypes.includes(defect.type))
-        .map((defect) => (
-          <DefectMarker key={defect.id} defect={defect} />
-        ))}
-    </>
+    <div className="w-full h-full bg-slate-950 flex items-center justify-center">
+      <div className="text-center text-slate-400">
+        <Scan className="w-16 h-16 mx-auto mb-4" />
+        <div className="text-xl mb-2">3D Viewer Placeholder</div>
+        <div className="text-sm">Three.js dependencies removed for compatibility</div>
+        <div className="text-xs mt-4 space-y-1">
+          <div>Defects: {scanData.defects.filter(d => selectedDefectTypes.includes(d.type)).length}</div>
+          <div>Surface Index: {scanData.surfaceConditionIndex}</div>
+          <div>Opacity: {opacity}%</div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -263,7 +251,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
         id: 'd1',
         type: 'crack',
         severity: 'medium',
-        position: new Vector3(2, 0.1, 1),
+        position: { x: 2, y: 0.1, z: 1 },
         area: 15.5,
         length: 24,
         description: 'Longitudinal crack extending 24 feet',
@@ -275,7 +263,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
         id: 'd2',
         type: 'pothole',
         severity: 'critical',
-        position: new Vector3(-1, 0.2, -2),
+        position: { x: -1, y: 0.2, z: -2 },
         area: 8.2,
         depth: 3.5,
         description: 'Deep pothole requiring immediate attention',
@@ -287,7 +275,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
         id: 'd3',
         type: 'alligator',
         severity: 'high',
-        position: new Vector3(0, 0.05, 3),
+        position: { x: 0, y: 0.05, z: 3 },
         area: 45.8,
         description: 'Alligator cracking pattern indicating structural failure',
         timestamp: new Date(),
@@ -370,27 +358,14 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
       {/* 3D Viewer */}
       {is3DMode && (
         <div className="absolute inset-0 bg-slate-950">
-          <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
-            <Suspense fallback={null}>
-              <ambientLight intensity={0.4} />
-              <pointLight position={[10, 10, 10]} intensity={1} />
-              <directionalLight position={[-10, 10, 5]} intensity={0.5} />
-              
-              <PavementMesh
-                scanData={mockScanData}
-                showDefects={showDefects}
-                selectedDefectTypes={selectedDefectTypes}
-                opacity={meshOpacity / 100}
-              />
-              
-              {showGrid && <Grid infiniteGrid />}
-              
-              <AnalysisOverlay scanData={mockScanData} isVisible={showAnalysis} />
-              
-              <OrbitControls enablePan enableZoom enableRotate />
-              <Environment preset="city" />
-            </Suspense>
-          </Canvas>
+          <PavementViewer3D
+            scanData={mockScanData}
+            showDefects={showDefects}
+            selectedDefectTypes={selectedDefectTypes}
+            opacity={meshOpacity}
+            showGrid={showGrid}
+            showAnalysis={showAnalysis}
+          />
           
           {/* 3D Mode Close Button */}
           <Button

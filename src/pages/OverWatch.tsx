@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+// Removed react-leaflet dependency - using placeholder
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -18,16 +18,39 @@ import DraggableWidgets from '@/components/map/DraggableWidgets';
 import WeatherOverlay from '@/components/map/WeatherOverlay';
 import PavementScan3D from '@/components/pavement/PavementScan3D';
 import VoiceCommandInterface from '@/components/ai/VoiceCommandInterface';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+// Removed leaflet imports
 
-// Fix leaflet default markers
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Placeholder Map Component (replaces MapContainer)
+const MapPlaceholder: React.FC<{ 
+  center: [number, number]; 
+  zoom: number; 
+  children?: React.ReactNode; 
+  className?: string;
+}> = ({ center, zoom, children, className }) => {
+  return (
+    <div className={`w-full h-full bg-slate-800 relative ${className}`}>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="text-center text-slate-400">
+          <Map className="w-16 h-16 mx-auto mb-4" />
+          <div className="text-xl mb-2">OverWatch Map Interface</div>
+          <div className="text-sm">Leaflet dependencies removed for compatibility</div>
+          <div className="text-xs mt-4 space-y-1">
+            <div>Center: {center[0].toFixed(4)}, {center[1].toFixed(4)}</div>
+            <div>Zoom Level: {zoom}</div>
+          </div>
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+};
+
+// Placeholder TileLayer Component
+const TileLayerPlaceholder: React.FC<{ url: string; attribution?: string }> = ({ url, attribution }) => {
+  return <div className="hidden" />;
+};
+
+// Removed leaflet icon configuration
 
 interface MapService {
   id: string;
@@ -161,22 +184,22 @@ const OverWatch: React.FC = () => {
   };
 
   const MapControls = () => {
-    const map = useMap();
+    // const map = useMap(); // Removed useMap
     
-    useMapEvents({
-      click: (e) => {
-        if (isDrawingMode) {
-          console.log('Drawing mode click:', e.latlng);
-        }
-        if (isMeasurementMode) {
-          console.log('Measurement mode click:', e.latlng);
-        }
-      },
-      moveend: () => {
-        setMapCenter([map.getCenter().lat, map.getCenter().lng]);
-        setMapZoom(map.getZoom());
-      }
-    });
+    // useMapEvents({ // Removed useMapEvents
+    //   click: (e) => {
+    //     if (isDrawingMode) {
+    //       console.log('Drawing mode click:', e.latlng);
+    //     }
+    //     if (isMeasurementMode) {
+    //       console.log('Measurement mode click:', e.latlng);
+    //     }
+    //   },
+    //   moveend: () => {
+    //     setMapCenter([map.getCenter().lat, map.getCenter().lng]);
+    //     setMapZoom(map.getZoom());
+    //   }
+    // });
 
     return null;
   };
@@ -500,13 +523,12 @@ const OverWatch: React.FC = () => {
         <div className="flex-1 relative">
           {/* Map Container */}
           <div className="absolute inset-0">
-            <MapContainer
+            <MapPlaceholder
               center={mapCenter}
               zoom={mapZoom}
               className="h-full w-full"
-              zoomControl={false}
             >
-              <TileLayer
+              <TileLayerPlaceholder
                 url={currentService.url}
                 attribution={currentService.attribution}
               />
@@ -533,7 +555,7 @@ const OverWatch: React.FC = () => {
                 onMeasurementComplete={handleMeasurementComplete}
                 terminologyMode={terminologyMode}
               />
-            </MapContainer>
+            </MapPlaceholder>
           </div>
 
           {/* Draggable Widgets System */}
