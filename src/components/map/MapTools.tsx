@@ -8,12 +8,12 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Polygon, 
-  Move3d, 
+  Pentagon, 
+  Move, 
   Ruler, 
   Square, 
   Circle, 
-  Triangle, 
+  Play, 
   Trash2, 
   Download, 
   Upload,
@@ -331,7 +331,7 @@ const MapTools: React.FC<MapToolsProps> = ({
         className="absolute top-20 left-4 z-[1000] bg-slate-900/95 border-cyan-500/30 text-cyan-400"
         size="sm"
       >
-        <Move3d className="w-4 h-4 mr-2" />
+        <Move className="w-4 h-4 mr-2" />
         Tools
       </Button>
     );
@@ -342,7 +342,7 @@ const MapTools: React.FC<MapToolsProps> = ({
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
-            <Move3d className="w-4 h-4" />
+            <Move className="w-4 h-4" />
             {getTerminology('Tactical Tools', 'Map Tools')}
           </CardTitle>
           <Button
@@ -374,7 +374,7 @@ const MapTools: React.FC<MapToolsProps> = ({
                 onClick={() => startDrawing('polygon')}
                 className="text-xs"
               >
-                <Polygon className="w-3 h-3 mr-1" />
+                <Pentagon className="w-3 h-3 mr-1" />
                 Polygon
               </Button>
               <Button
@@ -383,7 +383,7 @@ const MapTools: React.FC<MapToolsProps> = ({
                 onClick={() => startDrawing('polyline')}
                 className="text-xs"
               >
-                <Move3d className="w-3 h-3 mr-1" />
+                <Move className="w-3 h-3 mr-1" />
                 Line
               </Button>
               <Button
