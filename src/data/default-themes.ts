@@ -1,0 +1,801 @@
+import { Theme, ThemeColor } from '@/types/theme';
+
+// Helper function to create ThemeColor objects
+const color = (h: number, s: number, l: number, a?: number): ThemeColor => ({ h, s, l, a });
+
+// Common effect templates
+const commonShadows = {
+  sm: { type: 'drop' as const, x: 0, y: 1, blur: 2, color: color(0, 0, 0), intensity: 0.1 },
+  md: { type: 'drop' as const, x: 0, y: 4, blur: 6, color: color(0, 0, 0), intensity: 0.1 },
+  lg: { type: 'drop' as const, x: 0, y: 10, blur: 15, color: color(0, 0, 0), intensity: 0.1 },
+  xl: { type: 'drop' as const, x: 0, y: 20, blur: 25, color: color(0, 0, 0), intensity: 0.25 },
+  glow: { type: 'glow' as const, x: 0, y: 0, blur: 20, color: color(220, 100, 50), intensity: 0.5 },
+  inner: { type: 'inner' as const, x: 0, y: 2, blur: 4, color: color(0, 0, 0), intensity: 0.06 }
+};
+
+const commonAnimations = {
+  fadeIn: { name: 'fadeIn', duration: 150, easing: 'ease-out' as const, iterations: 1, direction: 'normal' as const },
+  slideIn: { name: 'slideInRight', duration: 300, easing: 'ease-out' as const, iterations: 1, direction: 'normal' as const },
+  bounce: { name: 'bounce', duration: 1000, easing: 'ease-in-out' as const, iterations: 'infinite' as const, direction: 'normal' as const },
+  pulse: { name: 'pulse', duration: 2000, easing: 'ease-in-out' as const, iterations: 'infinite' as const, direction: 'alternate' as const },
+  rotate: { name: 'rotate', duration: 20000, easing: 'linear' as const, iterations: 'infinite' as const, direction: 'normal' as const },
+  scale: { name: 'scale', duration: 200, easing: 'ease-out' as const, iterations: 1, direction: 'normal' as const },
+  glow: { name: 'glow', duration: 3000, easing: 'ease-in-out' as const, iterations: 'infinite' as const, direction: 'alternate' as const }
+};
+
+export const getDefaultThemes = (): Theme[] => [
+  // Military & Tactical Themes
+  {
+    id: 'military-tactical',
+    name: 'Military Tactical',
+    description: 'Professional military-grade interface with tactical colors and effects',
+    category: 'military',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(222, 84, 5),
+      foreground: color(210, 40, 98),
+      primary: color(210, 100, 70),
+      primaryForeground: color(220, 100, 8),
+      secondary: color(220, 40, 25),
+      secondaryForeground: color(210, 40, 98),
+      accent: color(120, 100, 50),
+      accentForeground: color(220, 100, 8),
+      destructive: color(0, 85, 60),
+      destructiveForeground: color(210, 40, 98),
+      success: color(120, 100, 40),
+      successForeground: color(220, 100, 8),
+      warning: color(45, 100, 60),
+      warningForeground: color(220, 100, 8),
+      info: color(210, 100, 50),
+      infoForeground: color(220, 100, 8),
+      muted: color(220, 20, 20),
+      mutedForeground: color(220, 15, 65),
+      border: color(217, 33, 18),
+      input: color(217, 33, 18),
+      ring: color(213, 27, 84),
+      card: color(222, 84, 5),
+      cardForeground: color(210, 40, 98),
+      popover: color(222, 84, 5),
+      popoverForeground: color(210, 40, 98),
+      sidebar: color(240, 6, 10),
+      sidebarForeground: color(240, 5, 96),
+      sidebarPrimary: color(224, 76, 48),
+      sidebarPrimaryForeground: color(0, 0, 100),
+      sidebarAccent: color(240, 4, 16),
+      sidebarAccentForeground: color(240, 5, 96),
+      sidebarBorder: color(240, 4, 16),
+      sidebarRing: color(217, 91, 60)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 20, color: color(120, 100, 50), intensity: 0.3 }
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 120, brightness: 80 },
+        overlay: { enabled: true, radius: 4, saturation: 100, brightness: 90 },
+        card: { enabled: true, radius: 2, saturation: 110, brightness: 95 }
+      },
+      particles: {
+        enabled: true,
+        type: 'geometric',
+        count: 30,
+        speed: 0.5,
+        size: { min: 1, max: 3 },
+        color: color(120, 100, 50),
+        opacity: { min: 0.1, max: 0.3 },
+        direction: 45,
+        wind: 0.1
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 135, stops: [{ color: color(210, 100, 70), position: 0 }, { color: color(120, 100, 50), position: 100 }] },
+        secondary: { type: 'linear', angle: 90, stops: [{ color: color(220, 40, 25), position: 0 }, { color: color(222, 84, 5), position: 100 }] },
+        hero: { type: 'linear', angle: 180, stops: [{ color: color(220, 100, 8), position: 0 }, { color: color(220, 60, 15), position: 100 }] },
+        card: { type: 'linear', angle: 145, stops: [{ color: color(222, 84, 5), position: 0 }, { color: color(240, 6, 10), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(210, 100, 70), position: 0 }, { color: color(210, 100, 60), position: 100 }] },
+        border: { type: 'linear', angle: 0, stops: [{ color: color(120, 100, 50, 0.3), position: 0 }, { color: color(210, 100, 70, 0.3), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'gradient',
+      gradient: { type: 'linear', angle: 135, stops: [{ color: color(220, 100, 3), position: 0 }, { color: color(240, 6, 8), position: 100 }] },
+      overlay: { color: color(0, 0, 0), opacity: 0.4, blendMode: 'multiply' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.015, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'high'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['military', 'tactical', 'professional', 'dark'],
+    featured: true,
+    public: true
+  },
+
+  // Asphalt Industry Themes
+  {
+    id: 'asphalt-pro',
+    name: 'Asphalt Professional',
+    description: 'Professional asphalt industry theme with road construction colors',
+    category: 'asphalt',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(30, 15, 8),
+      foreground: color(40, 10, 85),
+      primary: color(35, 70, 45),
+      primaryForeground: color(0, 0, 100),
+      secondary: color(25, 25, 20),
+      secondaryForeground: color(40, 10, 85),
+      accent: color(45, 90, 55),
+      accentForeground: color(30, 15, 8),
+      destructive: color(0, 85, 60),
+      destructiveForeground: color(40, 10, 85),
+      success: color(120, 60, 40),
+      successForeground: color(0, 0, 100),
+      warning: color(45, 100, 60),
+      warningForeground: color(30, 15, 8),
+      info: color(200, 70, 50),
+      infoForeground: color(0, 0, 100),
+      muted: color(30, 10, 15),
+      mutedForeground: color(30, 8, 60),
+      border: color(35, 20, 25),
+      input: color(35, 20, 25),
+      ring: color(35, 70, 45),
+      card: color(30, 15, 8),
+      cardForeground: color(40, 10, 85),
+      popover: color(30, 15, 8),
+      popoverForeground: color(40, 10, 85),
+      sidebar: color(25, 20, 5),
+      sidebarForeground: color(40, 10, 85),
+      sidebarPrimary: color(35, 70, 45),
+      sidebarPrimaryForeground: color(0, 0, 100),
+      sidebarAccent: color(30, 15, 12),
+      sidebarAccentForeground: color(40, 10, 85),
+      sidebarBorder: color(30, 15, 12),
+      sidebarRing: color(35, 70, 45),
+      asphalt: color(30, 15, 8),
+      concrete: color(0, 0, 75),
+      machinery: color(45, 90, 40),
+      safety: color(45, 100, 60)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 15, color: color(45, 90, 55), intensity: 0.4 }
+      },
+      blur: {
+        background: { enabled: true, radius: 6, saturation: 110, brightness: 85 },
+        overlay: { enabled: true, radius: 3, saturation: 105, brightness: 92 },
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 98 }
+      },
+      particles: {
+        enabled: true,
+        type: 'dust',
+        count: 40,
+        speed: 0.3,
+        size: { min: 0.5, max: 2 },
+        color: color(45, 60, 40),
+        opacity: { min: 0.05, max: 0.2 },
+        direction: 90,
+        wind: 0.05
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 45, stops: [{ color: color(35, 70, 45), position: 0 }, { color: color(45, 90, 55), position: 100 }] },
+        secondary: { type: 'linear', angle: 90, stops: [{ color: color(25, 25, 20), position: 0 }, { color: color(30, 15, 8), position: 100 }] },
+        hero: { type: 'radial', stops: [{ color: color(30, 15, 12), position: 0 }, { color: color(25, 20, 5), position: 100 }] },
+        card: { type: 'linear', angle: 135, stops: [{ color: color(30, 15, 10), position: 0 }, { color: color(25, 20, 6), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(35, 70, 50), position: 0 }, { color: color(35, 70, 40), position: 100 }] },
+        border: { type: 'linear', angle: 0, stops: [{ color: color(45, 90, 55, 0.3), position: 0 }, { color: color(35, 70, 45, 0.3), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'gradient',
+      gradient: { type: 'linear', angle: 45, stops: [{ color: color(25, 20, 5), position: 0 }, { color: color(30, 15, 8), position: 100 }] },
+      overlay: { color: color(0, 0, 0), opacity: 0.3, blendMode: 'overlay' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'high'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['asphalt', 'construction', 'professional', 'industry'],
+    featured: true,
+    public: true
+  },
+
+  {
+    id: 'paving-master',
+    name: 'Paving Master',
+    description: 'Advanced paving operations theme with construction machinery aesthetics',
+    category: 'asphalt',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'light',
+    colors: {
+      background: color(0, 0, 95),
+      foreground: color(30, 30, 25),
+      primary: color(25, 80, 35),
+      primaryForeground: color(0, 0, 100),
+      secondary: color(40, 40, 85),
+      secondaryForeground: color(30, 30, 25),
+      accent: color(45, 95, 50),
+      accentForeground: color(0, 0, 100),
+      destructive: color(0, 85, 60),
+      destructiveForeground: color(0, 0, 100),
+      success: color(120, 60, 40),
+      successForeground: color(0, 0, 100),
+      warning: color(45, 100, 60),
+      warningForeground: color(30, 30, 25),
+      info: color(200, 70, 50),
+      infoForeground: color(0, 0, 100),
+      muted: color(30, 10, 90),
+      mutedForeground: color(30, 15, 45),
+      border: color(30, 20, 80),
+      input: color(30, 20, 80),
+      ring: color(25, 80, 35),
+      card: color(0, 0, 98),
+      cardForeground: color(30, 30, 25),
+      popover: color(0, 0, 98),
+      popoverForeground: color(30, 30, 25),
+      sidebar: color(40, 15, 92),
+      sidebarForeground: color(30, 30, 25),
+      sidebarPrimary: color(25, 80, 35),
+      sidebarPrimaryForeground: color(0, 0, 100),
+      sidebarAccent: color(40, 10, 88),
+      sidebarAccentForeground: color(30, 30, 25),
+      sidebarBorder: color(40, 10, 88),
+      sidebarRing: color(25, 80, 35),
+      asphalt: color(30, 15, 8),
+      concrete: color(0, 0, 85),
+      machinery: color(45, 95, 40),
+      safety: color(45, 100, 60)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 12, color: color(45, 95, 50), intensity: 0.2 }
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 2, saturation: 105, brightness: 95 },
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 98 }
+      },
+      particles: {
+        enabled: false,
+        type: 'dust',
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 90, stops: [{ color: color(25, 80, 40), position: 0 }, { color: color(25, 80, 30), position: 100 }] },
+        secondary: { type: 'linear', angle: 90, stops: [{ color: color(40, 40, 90), position: 0 }, { color: color(40, 40, 80), position: 100 }] },
+        hero: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 98), position: 0 }, { color: color(40, 15, 95), position: 100 }] },
+        card: { type: 'linear', angle: 145, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(40, 5, 98), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(25, 80, 40), position: 0 }, { color: color(25, 80, 30), position: 100 }] },
+        border: { type: 'linear', angle: 0, stops: [{ color: color(25, 80, 35, 0.3), position: 0 }, { color: color(45, 95, 50, 0.3), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'gradient',
+      gradient: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 98), position: 0 }, { color: color(40, 10, 95), position: 100 }] }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.015, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'medium'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['asphalt', 'paving', 'construction', 'light'],
+    featured: true,
+    public: true
+  },
+
+  // Road Construction Theme
+  {
+    id: 'road-construction',
+    name: 'Road Construction',
+    description: 'Heavy machinery and road work theme with safety-focused design',
+    category: 'asphalt',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(35, 20, 12),
+      foreground: color(45, 15, 88),
+      primary: color(45, 100, 55),
+      primaryForeground: color(35, 20, 8),
+      secondary: color(30, 30, 18),
+      secondaryForeground: color(45, 15, 88),
+      accent: color(60, 100, 50),
+      accentForeground: color(35, 20, 8),
+      destructive: color(0, 90, 65),
+      destructiveForeground: color(45, 15, 88),
+      success: color(120, 70, 45),
+      successForeground: color(0, 0, 100),
+      warning: color(45, 100, 65),
+      warningForeground: color(35, 20, 8),
+      info: color(210, 80, 55),
+      infoForeground: color(0, 0, 100),
+      muted: color(35, 15, 20),
+      mutedForeground: color(35, 12, 65),
+      border: color(40, 25, 28),
+      input: color(40, 25, 28),
+      ring: color(45, 100, 55),
+      card: color(35, 20, 12),
+      cardForeground: color(45, 15, 88),
+      popover: color(35, 20, 12),
+      popoverForeground: color(45, 15, 88),
+      sidebar: color(30, 25, 8),
+      sidebarForeground: color(45, 15, 88),
+      sidebarPrimary: color(45, 100, 55),
+      sidebarPrimaryForeground: color(35, 20, 8),
+      sidebarAccent: color(35, 20, 15),
+      sidebarAccentForeground: color(45, 15, 88),
+      sidebarBorder: color(35, 20, 15),
+      sidebarRing: color(45, 100, 55),
+      asphalt: color(35, 20, 12),
+      concrete: color(0, 0, 78),
+      machinery: color(45, 100, 45),
+      safety: color(60, 100, 50)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 18, color: color(60, 100, 50), intensity: 0.35 }
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 125, brightness: 75 },
+        overlay: { enabled: true, radius: 5, saturation: 110, brightness: 85 },
+        card: { enabled: true, radius: 3, saturation: 105, brightness: 95 }
+      },
+      particles: {
+        enabled: true,
+        type: 'dust',
+        count: 50,
+        speed: 0.4,
+        size: { min: 0.8, max: 2.5 },
+        color: color(60, 80, 35),
+        opacity: { min: 0.08, max: 0.25 },
+        direction: 75,
+        wind: 0.08
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 60, stops: [{ color: color(45, 100, 60), position: 0 }, { color: color(60, 100, 45), position: 100 }] },
+        secondary: { type: 'linear', angle: 120, stops: [{ color: color(30, 30, 22), position: 0 }, { color: color(35, 20, 15), position: 100 }] },
+        hero: { type: 'radial', stops: [{ color: color(35, 20, 15), position: 0 }, { color: color(30, 25, 10), position: 100 }] },
+        card: { type: 'linear', angle: 150, stops: [{ color: color(35, 20, 14), position: 0 }, { color: color(30, 25, 10), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 100, 60), position: 0 }, { color: color(45, 100, 50), position: 100 }] },
+        border: { type: 'linear', angle: 45, stops: [{ color: color(60, 100, 50, 0.4), position: 0 }, { color: color(45, 100, 55, 0.3), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'gradient',
+      gradient: { type: 'linear', angle: 60, stops: [{ color: color(30, 25, 8), position: 0 }, { color: color(35, 20, 12), position: 100 }] },
+      overlay: { color: color(0, 0, 0), opacity: 0.35, blendMode: 'multiply' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.02, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'high'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['asphalt', 'construction', 'safety', 'heavy-machinery'],
+    featured: true,
+    public: true
+  },
+
+  // Highway Patrol Theme
+  {
+    id: 'highway-patrol',
+    name: 'Highway Patrol',
+    description: 'Highway maintenance and patrol operations with high visibility colors',
+    category: 'asphalt',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'light',
+    colors: {
+      background: color(0, 0, 97),
+      foreground: color(220, 40, 15),
+      primary: color(45, 100, 40),
+      primaryForeground: color(0, 0, 100),
+      secondary: color(220, 25, 85),
+      secondaryForeground: color(220, 40, 15),
+      accent: color(210, 100, 50),
+      accentForeground: color(0, 0, 100),
+      destructive: color(0, 85, 55),
+      destructiveForeground: color(0, 0, 100),
+      success: color(120, 60, 35),
+      successForeground: color(0, 0, 100),
+      warning: color(45, 100, 55),
+      warningForeground: color(220, 40, 15),
+      info: color(210, 100, 45),
+      infoForeground: color(0, 0, 100),
+      muted: color(220, 8, 92),
+      mutedForeground: color(220, 15, 40),
+      border: color(220, 15, 82),
+      input: color(220, 15, 82),
+      ring: color(45, 100, 40),
+      card: color(0, 0, 99),
+      cardForeground: color(220, 40, 15),
+      popover: color(0, 0, 99),
+      popoverForeground: color(220, 40, 15),
+      sidebar: color(45, 12, 94),
+      sidebarForeground: color(220, 40, 15),
+      sidebarPrimary: color(45, 100, 40),
+      sidebarPrimaryForeground: color(0, 0, 100),
+      sidebarAccent: color(220, 8, 90),
+      sidebarAccentForeground: color(220, 40, 15),
+      sidebarBorder: color(220, 8, 90),
+      sidebarRing: color(45, 100, 40),
+      asphalt: color(220, 40, 8),
+      concrete: color(0, 0, 88),
+      machinery: color(45, 100, 35),
+      safety: color(45, 100, 55)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 10, color: color(210, 100, 50), intensity: 0.15 }
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 1, saturation: 102, brightness: 98 },
+        card: { enabled: true, radius: 0.5, saturation: 101, brightness: 99 }
+      },
+      particles: {
+        enabled: false,
+        type: 'geometric',
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 90, stops: [{ color: color(45, 100, 45), position: 0 }, { color: color(45, 100, 35), position: 100 }] },
+        secondary: { type: 'linear', angle: 90, stops: [{ color: color(220, 25, 90), position: 0 }, { color: color(220, 25, 80), position: 100 }] },
+        hero: { type: 'linear', angle: 180, stops: [{ color: color(0, 0, 99), position: 0 }, { color: color(45, 8, 96), position: 100 }] },
+        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(220, 5, 98), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 100, 45), position: 0 }, { color: color(45, 100, 35), position: 100 }] },
+        border: { type: 'linear', angle: 0, stops: [{ color: color(45, 100, 40, 0.25), position: 0 }, { color: color(210, 100, 50, 0.25), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'gradient',
+      gradient: { type: 'linear', angle: 180, stops: [{ color: color(0, 0, 99), position: 0 }, { color: color(220, 5, 96), position: 100 }] }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.015, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'medium'
+    },
+    accessibility: {
+      highContrast: true,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['asphalt', 'highway', 'patrol', 'safety', 'high-visibility'],
+    featured: true,
+    public: true
+  },
+
+  // Tech & Modern Themes
+  {
+    id: 'cyber-neon',
+    name: 'Cyber Neon',
+    description: 'Futuristic cyberpunk theme with neon glows and electric effects',
+    category: 'tech',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(240, 100, 3),
+      foreground: color(180, 100, 85),
+      primary: color(300, 100, 60),
+      primaryForeground: color(240, 100, 3),
+      secondary: color(240, 80, 15),
+      secondaryForeground: color(180, 100, 85),
+      accent: color(180, 100, 50),
+      accentForeground: color(240, 100, 3),
+      destructive: color(0, 100, 60),
+      destructiveForeground: color(180, 100, 85),
+      success: color(120, 100, 40),
+      successForeground: color(240, 100, 3),
+      warning: color(45, 100, 55),
+      warningForeground: color(240, 100, 3),
+      info: color(300, 100, 60),
+      infoForeground: color(240, 100, 3),
+      muted: color(240, 50, 10),
+      mutedForeground: color(240, 30, 70),
+      border: color(300, 100, 30),
+      input: color(300, 100, 30),
+      ring: color(300, 100, 60),
+      card: color(240, 100, 3),
+      cardForeground: color(180, 100, 85),
+      popover: color(240, 100, 3),
+      popoverForeground: color(180, 100, 85),
+      sidebar: color(260, 100, 5),
+      sidebarForeground: color(180, 100, 85),
+      sidebarPrimary: color(300, 100, 60),
+      sidebarPrimaryForeground: color(240, 100, 3),
+      sidebarAccent: color(240, 80, 8),
+      sidebarAccentForeground: color(180, 100, 85),
+      sidebarBorder: color(240, 80, 8),
+      sidebarRing: color(300, 100, 60)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 25, color: color(300, 100, 60), intensity: 0.8 }
+      },
+      blur: {
+        background: { enabled: true, radius: 12, saturation: 150, brightness: 60 },
+        overlay: { enabled: true, radius: 8, saturation: 130, brightness: 70 },
+        card: { enabled: true, radius: 4, saturation: 120, brightness: 85 }
+      },
+      particles: {
+        enabled: true,
+        type: 'sparks',
+        count: 60,
+        speed: 1.2,
+        size: { min: 1, max: 4 },
+        color: color(300, 100, 70),
+        opacity: { min: 0.3, max: 0.8 },
+        direction: 0,
+        wind: 0.2
+      },
+      animations: {
+        ...commonAnimations,
+        glow: { name: 'neonGlow', duration: 2000, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' }
+      },
+      gradients: {
+        primary: { type: 'linear', angle: 90, stops: [{ color: color(300, 100, 70), position: 0 }, { color: color(300, 100, 50), position: 100 }] },
+        secondary: { type: 'linear', angle: 45, stops: [{ color: color(240, 80, 20), position: 0 }, { color: color(240, 100, 8), position: 100 }] },
+        hero: { type: 'radial', stops: [{ color: color(260, 100, 8), position: 0 }, { color: color(240, 100, 3), position: 100 }] },
+        card: { type: 'linear', angle: 135, stops: [{ color: color(240, 100, 5), position: 0 }, { color: color(260, 100, 3), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(300, 100, 70), position: 0 }, { color: color(300, 100, 50), position: 100 }] },
+        border: { type: 'conic', angle: 0, stops: [{ color: color(300, 100, 60, 0.8), position: 0 }, { color: color(180, 100, 50, 0.8), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'gradient',
+      gradient: { type: 'radial', stops: [{ color: color(260, 100, 5), position: 0 }, { color: color(240, 100, 1), position: 100 }] },
+      overlay: { color: color(300, 100, 30), opacity: 0.1, blendMode: 'screen' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.04, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'ultra'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['tech', 'cyberpunk', 'neon', 'futuristic'],
+    featured: true,
+    public: true
+  },
+
+  // Nature Theme
+  {
+    id: 'forest-guardian',
+    name: 'Forest Guardian',
+    description: 'Natural forest theme with organic greens and earth tones',
+    category: 'nature',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(120, 30, 8),
+      foreground: color(60, 20, 85),
+      primary: color(120, 60, 40),
+      primaryForeground: color(60, 30, 95),
+      secondary: color(90, 40, 20),
+      secondaryForeground: color(60, 20, 85),
+      accent: color(80, 70, 50),
+      accentForeground: color(120, 30, 8),
+      destructive: color(0, 70, 55),
+      destructiveForeground: color(60, 20, 85),
+      success: color(120, 80, 35),
+      successForeground: color(60, 30, 95),
+      warning: color(45, 80, 60),
+      warningForeground: color(120, 30, 8),
+      info: color(200, 60, 50),
+      infoForeground: color(60, 30, 95),
+      muted: color(120, 20, 15),
+      mutedForeground: color(120, 15, 65),
+      border: color(120, 40, 25),
+      input: color(120, 40, 25),
+      ring: color(120, 60, 40),
+      card: color(120, 30, 8),
+      cardForeground: color(60, 20, 85),
+      popover: color(120, 30, 8),
+      popoverForeground: color(60, 20, 85),
+      sidebar: color(140, 40, 6),
+      sidebarForeground: color(60, 20, 85),
+      sidebarPrimary: color(120, 60, 40),
+      sidebarPrimaryForeground: color(60, 30, 95),
+      sidebarAccent: color(120, 30, 12),
+      sidebarAccentForeground: color(60, 20, 85),
+      sidebarBorder: color(120, 30, 12),
+      sidebarRing: color(120, 60, 40)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 15, color: color(80, 70, 50), intensity: 0.3 }
+      },
+      blur: {
+        background: { enabled: true, radius: 6, saturation: 115, brightness: 85 },
+        overlay: { enabled: true, radius: 3, saturation: 108, brightness: 92 },
+        card: { enabled: true, radius: 2, saturation: 105, brightness: 96 }
+      },
+      particles: {
+        enabled: true,
+        type: 'dust',
+        count: 25,
+        speed: 0.2,
+        size: { min: 0.5, max: 1.5 },
+        color: color(80, 60, 40),
+        opacity: { min: 0.1, max: 0.3 },
+        direction: 135,
+        wind: 0.03
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 135, stops: [{ color: color(120, 60, 45), position: 0 }, { color: color(80, 70, 55), position: 100 }] },
+        secondary: { type: 'linear', angle: 90, stops: [{ color: color(90, 40, 25), position: 0 }, { color: color(120, 30, 12), position: 100 }] },
+        hero: { type: 'radial', stops: [{ color: color(120, 30, 12), position: 0 }, { color: color(140, 40, 8), position: 100 }] },
+        card: { type: 'linear', angle: 120, stops: [{ color: color(120, 30, 10), position: 0 }, { color: color(140, 40, 6), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(120, 60, 45), position: 0 }, { color: color(120, 60, 35), position: 100 }] },
+        border: { type: 'linear', angle: 45, stops: [{ color: color(80, 70, 50, 0.3), position: 0 }, { color: color(120, 60, 40, 0.3), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'gradient',
+      gradient: { type: 'linear', angle: 135, stops: [{ color: color(140, 40, 6), position: 0 }, { color: color(120, 30, 8), position: 100 }] },
+      overlay: { color: color(80, 30, 20), opacity: 0.2, blendMode: 'overlay' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'high'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['nature', 'forest', 'organic', 'earth-tones'],
+    featured: true,
+    public: true
+  }
+
+  // Continue with remaining 15 themes...
+  // I'll add them in the next part to keep the file manageable
+];
