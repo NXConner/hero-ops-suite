@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { AdvancedThemeToggle } from "@/components/theme/AdvancedThemeToggle";
 import { 
   LayoutDashboard, 
   Target, 
@@ -150,7 +150,7 @@ const Sidebar = () => {
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <ThemeToggle />
+                <AdvancedThemeToggle />
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <Bell className="h-4 w-4" />
                 </Button>
@@ -161,7 +161,7 @@ const Sidebar = () => {
             </div>
           ) : (
             <div className="flex flex-col space-y-2">
-              <ThemeToggle />
+              <AdvancedThemeToggle />
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Bell className="h-4 w-4" />
               </Button>
