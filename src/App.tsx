@@ -19,6 +19,7 @@ const IntelReports = lazy(() => import("./pages/IntelReports"));
 const Settings = lazy(() => import("./pages/Settings"));
 const PavementScanPro = lazy(() => import("./pages/PavementScanPro"));
 const OverWatch = lazy(() => import("./pages/OverWatch"));
+const Estimator = lazy(() => import("./pages/Estimator"));
 const AdvancedThemeCustomizer = lazy(() => import("./components/theme/AdvancedThemeCustomizer"));
 const ThemeBackground = lazy(() => import("./components/theme/ThemeBackground"));
 
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
                 <Route path="/overwatch" element={<OverWatch />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/pavement-estimator" element={<Estimator />} />
                 <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

@@ -78,6 +78,13 @@ const Sidebar = () => {
       badge: "NEW"
     },
     {
+      name: "Estimator",
+      href: "/pavement-estimator",
+      icon: Shield,
+      current: location.pathname === "/pavement-estimator",
+      badge: "BETA"
+    },
+    {
       name: "Settings",
       href: "/settings",
       icon: Settings,
