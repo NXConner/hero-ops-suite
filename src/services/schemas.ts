@@ -47,6 +47,7 @@ export const GPSTrackingSchema = z.object({
 });
 
 export type GPSTracking = z.infer<typeof GPSTrackingSchema>;
+export const GPSTrackingArraySchema = z.array(GPSTrackingSchema);
 
 export const SensorDataSchema = z.object({
   sensorId: z.string(),
@@ -62,6 +63,7 @@ export const SensorDataSchema = z.object({
 });
 
 export type SensorData = z.infer<typeof SensorDataSchema>;
+export const SensorDataArraySchema = z.array(SensorDataSchema);
 
 export const RadarSchema = z.object({
   version: z.string(),
