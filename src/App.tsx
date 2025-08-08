@@ -9,6 +9,9 @@ import { Suspense, lazy } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
+import ScrollToTop from "@/components/ScrollToTop";
+import ThemeBackground from "./components/theme/ThemeBackground";
 
 // Lazy load heavy components that use 3D libraries, maps, or ML
 const MissionPlanning = lazy(() => import("./pages/MissionPlanning"));
@@ -21,9 +24,24 @@ const PavementScanPro = lazy(() => import("./pages/PavementScanPro"));
 const OverWatch = lazy(() => import("./pages/OverWatch"));
 const Estimator = lazy(() => import("./pages/Estimator"));
 const AdvancedThemeCustomizer = lazy(() => import("./components/theme/AdvancedThemeCustomizer"));
-const ThemeBackground = lazy(() => import("./components/theme/ThemeBackground"));
+// ThemeBackground is imported eagerly above for consistent rendering
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 5 * 60_000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+const LoadingScreen = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+  </div>
+);
 
 const App = () => (
   <AdvancedThemeProvider defaultTheme="military-tactical">
@@ -34,29 +52,32 @@ const App = () => (
       disableTransitionOnChange
     >
       <QueryClientProvider client={queryClient}>
-                 <TooltipProvider>
-           <Toaster />
-           <Sonner />
-           <ThemeBackground />
-           <BrowserRouter>
-             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div></div>}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/mission-planning" element={<MissionPlanning />} />
-                <Route path="/team-management" element={<TeamManagement />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/communications" element={<Communications />} />
-                <Route path="/intel-reports" element={<IntelReports />} />
-                <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
-                <Route path="/overwatch" element={<OverWatch />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/pavement-estimator" element={<Estimator />} />
-                <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <ThemeBackground />
+          <BrowserRouter>
+            <ScrollToTop />
+            <ErrorBoundary>
+              <Suspense fallback={<LoadingScreen />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/mission-planning" element={<MissionPlanning />} />
+                  <Route path="/team-management" element={<TeamManagement />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/communications" element={<Communications />} />
+                  <Route path="/intel-reports" element={<IntelReports />} />
+                  <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
+                  <Route path="/overwatch" element={<OverWatch />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/pavement-estimator" element={<Estimator />} />
+                  <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </ErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

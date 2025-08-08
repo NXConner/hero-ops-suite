@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Mapbox access token - should be set via environment variable
-const MAPBOX_TOKEN = ((typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_MAPBOX_TOKEN : undefined) as string) || 'pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example';
+// Mapbox access token - must be set via environment variable VITE_MAPBOX_TOKEN
+const MAPBOX_TOKEN = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_MAPBOX_TOKEN : undefined) as string | undefined;
 
 interface RealMapComponentProps {
   center: [number, number];
@@ -27,9 +27,15 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [tokenMissing, setTokenMissing] = useState(false);
 
   useEffect(() => {
     if (!mapContainer.current) return;
+
+    if (!MAPBOX_TOKEN) {
+      setTokenMissing(true);
+      return;
+    }
 
     // Set mapbox access token
     mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -174,9 +180,17 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   return (
     <div className={`relative w-full h-full ${className}`}>
       <div ref={mapContainer} className="w-full h-full" />
-      
+
+      {tokenMissing && (
+        <div className="absolute inset-0 bg-slate-900/80 backdrop-blur flex items-center justify-center">
+          <div className="text-center text-red-300 space-y-2">
+            <div className="font-semibold">Mapbox token is not configured</div>
+            <div className="text-sm">Set VITE_MAPBOX_TOKEN in your environment to enable maps.</div>
+          </div>
+        </div>
+      )}
       {/* Loading indicator */}
-      {!mapLoaded && (
+      {!tokenMissing && !mapLoaded && (
         <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
           <div className="text-center text-cyan-400">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-2"></div>
@@ -186,7 +200,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       )}
 
       {/* Render children after map is loaded */}
-      {mapLoaded && children}
+      {!tokenMissing && mapLoaded && children}
     </div>
   );
 };
