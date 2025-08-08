@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
+import { safeHtml } from '@/lib/sanitize';
 import { gpsTrackingService, GPSTrackingResponse } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -383,7 +384,7 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
           color: vehicle.status === 'active' ? '#10b981' : 
                  vehicle.status === 'idle' ? '#f59e0b' : 
                  vehicle.status === 'maintenance' ? '#ef4444' : '#6b7280',
-          popup: `
+          popup: safeHtml`
             <div class="p-2 min-w-[200px]">
               <div class="flex items-center justify-between mb-2">
                 <h3 class="font-semibold">${vehicle.name}</h3>
@@ -414,7 +415,7 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
           color: employee.status === 'clocked-in' ? '#10b981' : 
                  employee.status === 'break' ? '#f59e0b' : 
                  employee.status === 'out-of-bounds' ? '#ef4444' : '#6b7280',
-          popup: `
+          popup: safeHtml`
             <div class="p-2 min-w-[200px]">
               <div class="flex items-center justify-between mb-2">
                 <h3 class="font-semibold">${employee.name}</h3>
