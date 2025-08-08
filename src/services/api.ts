@@ -419,7 +419,8 @@ export class GPSTrackingService {
           timeout: 10000
         }
       );
-      return response.data;
+      const parsed = Array.isArray(response.data) ? response.data.filter((d: any) => GPSTrackingSchema.safeParse(d).success) : response.data;
+      return parsed;
     } catch (error) {
       console.error('GPS Tracking API Error:', error);
       return this.getMockGPSData();
@@ -578,7 +579,8 @@ export class SensorDataService {
           timeout: 10000
         }
       );
-      return response.data;
+      const parsed = Array.isArray(response.data) ? response.data.filter((d: any) => SensorDataSchema.safeParse(d).success) : response.data;
+      return parsed;
     } catch (error) {
       console.error('Sensor Data API Error:', error);
       return this.getMockSensorData();

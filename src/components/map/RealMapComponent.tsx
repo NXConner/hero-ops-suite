@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import type * as mapboxgl from 'mapbox-gl';
 import { MapProvider } from './MapContext';
 
 // Mapbox access token - must be set via environment variable VITE_MAPBOX_TOKEN
@@ -29,68 +28,69 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [tokenMissing, setTokenMissing] = useState(false);
+  const mapboxModuleRef = useRef<typeof import('mapbox-gl') | null>(null);
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    let isCancelled = false;
 
-    if (!MAPBOX_TOKEN) {
-      setTokenMissing(true);
-      return;
-    }
-
-    // Set mapbox access token
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-
-    // Initialize map
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satellite view for operations
-      center: center,
-      zoom: zoom,
-      attributionControl: true
-    });
-
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    // Add geolocate control
-    map.current.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true
-        },
-        trackUserLocation: true,
-        showUserHeading: true
-      }),
-      'top-right'
-    );
-
-    // Add scale control
-    map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
-
-    // Add fullscreen control
-    map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
-
-    // Set up event listeners
-    map.current.on('load', () => {
-      setMapLoaded(true);
-      onMapLoad?.(map.current!);
-    });
-
-    map.current.on('click', (e) => {
-      onMapClick?.(e);
-    });
-
-    map.current.on('moveend', () => {
-      if (map.current) {
-        const newCenter = map.current.getCenter();
-        const newZoom = map.current.getZoom();
-        onMapMove?.([newCenter.lng, newCenter.lat], newZoom);
+    const init = async () => {
+      if (!mapContainer.current) return;
+      if (!MAPBOX_TOKEN) {
+        setTokenMissing(true);
+        return;
       }
-    });
 
-    // Clean up on unmount
+      const [{ default: mapboxgl }, _css] = await Promise.all([
+        import('mapbox-gl'),
+        import('mapbox-gl/dist/mapbox-gl.css'),
+      ]);
+      if (isCancelled) return;
+
+      mapboxModuleRef.current = mapboxgl;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
+        center: center,
+        zoom: zoom,
+        attributionControl: true
+      });
+
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.current.addControl(
+        new mapboxgl.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+          trackUserLocation: true,
+          showUserHeading: true
+        }),
+        'top-right'
+      );
+      map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+      map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+
+      map.current.on('load', () => {
+        if (isCancelled) return;
+        setMapLoaded(true);
+        onMapLoad?.(map.current!);
+      });
+
+      map.current.on('click', (e) => {
+        onMapClick?.(e as mapboxgl.MapMouseEvent);
+      });
+
+      map.current.on('moveend', () => {
+        if (map.current) {
+          const newCenter = map.current.getCenter();
+          const newZoom = map.current.getZoom();
+          onMapMove?.([newCenter.lng, newCenter.lat], newZoom);
+        }
+      });
+    };
+
+    init();
     return () => {
+      isCancelled = true;
       if (map.current) {
         map.current.remove();
         map.current = null;
@@ -115,7 +115,8 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     draggable?: boolean;
     className?: string;
   }) => {
-    if (!map.current) return null;
+    if (!map.current || !mapboxModuleRef.current) return null;
+    const mapboxgl = mapboxModuleRef.current;
 
     const marker = new mapboxgl.Marker({
       color: options?.color || '#3FB1CE',
@@ -142,13 +143,12 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       map.current.addSource(sourceId, {
         type: 'geojson',
         data: data
-      });
+      } as mapboxgl.GeoJSONSourceRaw);
     }
   };
 
   const addLayer = (layer: mapboxgl.LayerSpecification) => {
     if (!map.current || !mapLoaded) return;
-
     if (!map.current.getLayer(layer.id)) {
       map.current.addLayer(layer);
     }
@@ -156,23 +156,10 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
 
   const flyTo = (center: [number, number], zoom?: number) => {
     if (!map.current) return;
-
-    map.current.flyTo({
-      center: center,
-      zoom: zoom || map.current.getZoom(),
-      duration: 2000
-    });
+    map.current.flyTo({ center, zoom: zoom || map.current.getZoom(), duration: 2000 });
   };
 
-  // Expose map methods to children via context provider
-  const mapMethods = {
-    addMarker,
-    addGeoJSONSource,
-    addLayer,
-    flyTo,
-    getMap: () => map.current,
-  };
-
+  const mapMethods = { addMarker, addGeoJSONSource, addLayer, flyTo, getMap: () => map.current };
 
   return (
     <div className={`relative w-full h-full ${className}`}>
@@ -186,7 +173,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
           </div>
         </div>
       )}
-      {/* Loading indicator */}
+
       {!tokenMissing && !mapLoaded && (
         <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
           <div className="text-center text-cyan-400">
@@ -196,7 +183,6 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         </div>
       )}
 
-      {/* Render children after map is loaded */}
       {!tokenMissing && mapLoaded && (
         <MapProvider value={mapMethods}>
           {children}
