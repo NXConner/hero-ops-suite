@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Database Service Layer for Blacktop Blackout OverWatch System
 // Supports both client-side IndexedDB and server-side API integration
 

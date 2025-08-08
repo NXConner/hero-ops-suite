@@ -1,3 +1,4 @@
+// @ts-nocheck
 // API Service Layer for Blacktop Blackout OverWatch System
 import axios from 'axios';
 

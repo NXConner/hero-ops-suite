@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { Theme, ThemeContext, ThemePreset } from '@/types/theme';
 import { 

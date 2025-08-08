@@ -31,7 +31,9 @@ import {
   Lock,
   AlertTriangle,
   Clock,
-  Signal
+  Signal,
+  MoreVertical,
+  CheckCircle2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
