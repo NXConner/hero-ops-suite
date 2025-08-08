@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { MapProvider } from './MapContext';
 
 // Mapbox access token - must be set via environment variable VITE_MAPBOX_TOKEN
 const MAPBOX_TOKEN = (typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_MAPBOX_TOKEN : undefined) as string | undefined;
@@ -163,19 +164,15 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     });
   };
 
-  // Expose map methods for parent components
-  useEffect(() => {
-    if (mapLoaded && map.current) {
-      // Store map methods on a global reference for access by children
-      (window as any).mapMethods = {
-        addMarker,
-        addGeoJSONSource,
-        addLayer,
-        flyTo,
-        getMap: () => map.current
-      };
-    }
-  }, [mapLoaded]);
+  // Expose map methods to children via context provider
+  const mapMethods = {
+    addMarker,
+    addGeoJSONSource,
+    addLayer,
+    flyTo,
+    getMap: () => map.current,
+  };
+
 
   return (
     <div className={`relative w-full h-full ${className}`}>
@@ -200,7 +197,11 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       )}
 
       {/* Render children after map is loaded */}
-      {!tokenMissing && mapLoaded && children}
+      {!tokenMissing && mapLoaded && (
+        <MapProvider value={mapMethods}>
+          {children}
+        </MapProvider>
+      )}
     </div>
   );
 };
