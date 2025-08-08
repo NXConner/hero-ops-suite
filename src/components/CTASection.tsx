@@ -37,6 +37,11 @@ const CTASection = () => {
                 View Analytics
               </Button>
             </Link>
+            <Link to="/pavement-estimator">
+              <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+                Open Estimator
+              </Button>
+            </Link>
           </div>
 
           <div className="bg-card/30 backdrop-blur-sm border border-border/50 rounded-lg p-8 max-w-2xl mx-auto">
