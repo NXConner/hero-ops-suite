@@ -15,7 +15,7 @@ import {
   MessageSquare, 
   Zap, 
   Settings, 
-  X,
+  X as CloseIcon,
   Play,
   Pause,
   RotateCcw,
@@ -554,7 +554,7 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
               onClick={onClose}
               className="text-slate-400 hover:text-cyan-400 p-1"
             >
-              <X className="w-4 h-4" />
+              <CloseIcon className="w-4 h-4" />
             </Button>
           </div>
         </div>
