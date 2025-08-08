@@ -63,16 +63,16 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/mission-planning" element={<MissionPlanning />} />
-                  <Route path="/team-management" element={<TeamManagement />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/communications" element={<Communications />} />
-                  <Route path="/intel-reports" element={<IntelReports />} />
-                  <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
-                  <Route path="/overwatch" element={<OverWatch />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/pavement-estimator" element={<Estimator />} />
-                  <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
+                  <Route path="/mission-planning" element={<ErrorBoundary><MissionPlanning /></ErrorBoundary>} />
+                  <Route path="/team-management" element={<ErrorBoundary><TeamManagement /></ErrorBoundary>} />
+                  <Route path="/analytics" element={<ErrorBoundary><Analytics /></ErrorBoundary>} />
+                  <Route path="/communications" element={<ErrorBoundary><Communications /></ErrorBoundary>} />
+                  <Route path="/intel-reports" element={<ErrorBoundary><IntelReports /></ErrorBoundary>} />
+                  <Route path="/pavement-scan-pro" element={<ErrorBoundary><PavementScanPro /></ErrorBoundary>} />
+                  <Route path="/overwatch" element={<ErrorBoundary><OverWatch /></ErrorBoundary>} />
+                  <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
+                  <Route path="/pavement-estimator" element={<ErrorBoundary><Estimator /></ErrorBoundary>} />
+                  <Route path="/theme-customizer" element={<ErrorBoundary><AdvancedThemeCustomizer /></ErrorBoundary>} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
