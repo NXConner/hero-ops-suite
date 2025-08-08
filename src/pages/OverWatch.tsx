@@ -16,8 +16,9 @@ import MapTools from '@/components/map/MapTools';
 import FleetTracking from '@/components/map/FleetTracking';
 import DraggableWidgets from '@/components/map/DraggableWidgets';
 import WeatherOverlay from '@/components/map/WeatherOverlay';
-import PavementScan3D from '@/components/pavement/PavementScan3D';
-import VoiceCommandInterface from '@/components/ai/VoiceCommandInterface';
+import { lazy, Suspense } from 'react';
+const PavementScan3D = lazy(() => import('@/components/pavement/PavementScan3D'));
+const VoiceCommandInterface = lazy(() => import('@/components/ai/VoiceCommandInterface'));
 import RealMapComponent from '@/components/map/RealMapComponent';
 
 // Removed leaflet icon configuration
@@ -80,8 +81,8 @@ const mapServices: MapService[] = [
   {
     id: 'mapbox-streets',
     name: 'Mapbox Streets',
-      url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_MAPBOX_API_KEY))
-        ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_API_KEY}`
+      url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_MAPBOX_TOKEN))
+        ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_TOKEN}`
         : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '© Mapbox',
     icon: <Map className="w-4 h-4" />
@@ -89,8 +90,8 @@ const mapServices: MapService[] = [
   {
     id: 'mapbox-satellite',
     name: 'Mapbox Satellite',
-      url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_MAPBOX_API_KEY))
-        ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_API_KEY}`
+      url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_MAPBOX_TOKEN))
+        ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_TOKEN}`
         : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: '© Mapbox',
     icon: <Eye className="w-4 h-4" />
@@ -500,12 +501,14 @@ const OverWatch: React.FC = () => {
                 isVisible={activeOverlays.includes('weather')}
                 onRecommendationChange={setWeatherRecommendations}
               />
-              <PavementScan3D
-                terminologyMode={terminologyMode}
-                isVisible={activeOverlays.includes('pavement')}
-                onDefectSelect={(defect) => console.log('Defect selected:', defect)}
-                onAnalysisComplete={(analysis) => console.log('Analysis complete:', analysis)}
-              />
+              <Suspense fallback={null}>
+                <PavementScan3D
+                  terminologyMode={terminologyMode}
+                  isVisible={activeOverlays.includes('pavement')}
+                  onDefectSelect={(defect) => console.log('Defect selected:', defect)}
+                  onAnalysisComplete={(analysis) => console.log('Analysis complete:', analysis)}
+                />
+              </Suspense>
               <MapTools
                 isDrawingMode={isDrawingMode}
                 isMeasurementMode={isMeasurementMode}
@@ -524,12 +527,14 @@ const OverWatch: React.FC = () => {
           />
 
           {/* Voice Command Interface */}
-          <VoiceCommandInterface
-            isVisible={showVoiceInterface}
-            terminologyMode={terminologyMode}
-            onCommand={handleVoiceCommand}
-            onClose={() => setShowVoiceInterface(false)}
-          />
+          <Suspense fallback={null}>
+            <VoiceCommandInterface
+              isVisible={showVoiceInterface}
+              terminologyMode={terminologyMode}
+              onCommand={handleVoiceCommand}
+              onClose={() => setShowVoiceInterface(false)}
+            />
+          </Suspense>
 
           {/* Bottom Status Bar */}
           <div className="absolute bottom-0 left-0 right-0 bg-slate-900/95 border-t border-cyan-500/30 p-2">

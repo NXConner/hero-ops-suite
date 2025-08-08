@@ -23,6 +23,7 @@ import {
   Pause,
   RotateCcw
 } from 'lucide-react';
+import { useMap } from './MapContext';
 
 interface Vehicle {
   id: string;
@@ -107,6 +108,7 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
 
   const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const markersRef = useRef<any[]>([]);
+  const map = useMap();
 
   const getTerminology = (military: string, civilian: string) => {
     switch (terminologyMode) {
@@ -364,17 +366,17 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
 
   // Add markers to map
   useEffect(() => {
-    if (!isVisible || typeof window === 'undefined' || !(window as any).mapMethods) return;
+    if (!isVisible) return;
 
-    const mapMethods = (window as any).mapMethods;
-    
     // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
+    if (!map) return;
+
     // Add vehicle markers
     vehicles.forEach(vehicle => {
-      const marker = mapMethods.addMarker(
+      const marker = map.addMarker(
         vehicle.location.lng,
         vehicle.location.lat,
         {
@@ -405,7 +407,7 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
 
     // Add employee markers
     employees.forEach(employee => {
-      const marker = mapMethods.addMarker(
+      const marker = map.addMarker(
         employee.location.lng,
         employee.location.lat,
         {

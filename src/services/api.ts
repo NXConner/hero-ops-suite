@@ -1,6 +1,7 @@
 // @ts-nocheck
 // API Service Layer for Blacktop Blackout OverWatch System
-import axios from 'axios';
+import http from './http';
+import { WeatherSchema, RadarSchema, GPSTrackingSchema, SensorDataSchema } from './schemas';
 
 // API Configuration
 const getEnv = (key: string): string | undefined => {
@@ -11,7 +12,7 @@ const getEnv = (key: string): string | undefined => {
     return undefined;
   }
 };
-const API_CONFIG = {
+export const API_CONFIG = {
   WEATHER_API_KEY: getEnv('VITE_WEATHER_API_KEY') || getEnv('REACT_APP_WEATHER_API_KEY') || 'YOUR_OPENWEATHER_API_KEY',
   WEATHER_BASE_URL: 'https://api.openweathermap.org/data/2.5',
   GPS_TRACKING_URL: getEnv('VITE_GPS_API_URL') || getEnv('REACT_APP_GPS_API_URL') || 'https://api.fleet-tracker.com/v1',
@@ -186,7 +187,7 @@ export class WeatherService {
     }
 
     try {
-      const response = await axios.get<WeatherAPIResponse>(
+      const response = await http.get(
         `${API_CONFIG.WEATHER_BASE_URL}/weather`,
         {
           params: {
@@ -199,11 +200,14 @@ export class WeatherService {
         }
       );
 
-      this.cache.set(cacheKey, { data: response.data, timestamp: Date.now() });
-      return response.data;
+      const parsed = WeatherSchema.safeParse(response.data);
+      const data = parsed.success ? parsed.data : response.data;
+
+      this.cache.set(cacheKey, { data, timestamp: Date.now() });
+      return data;
     } catch (error) {
       console.error('Weather API Error:', error);
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
+      if ((error as any).isAxiosError && (error as any).response?.status === 401) {
         console.error('Invalid API key. Please check your OpenWeather API key.');
       }
       return this.getMockWeatherData(lat, lon);
@@ -216,7 +220,7 @@ export class WeatherService {
     }
 
     try {
-      const response = await axios.get(
+      const response = await http.get(
         `${API_CONFIG.WEATHER_BASE_URL}/forecast`,
         {
           params: {
@@ -239,11 +243,12 @@ export class WeatherService {
 
   async getRadarData(): Promise<RadarAPIResponse> {
     try {
-      const response = await axios.get<RadarAPIResponse>(
+      const response = await http.get(
         API_CONFIG.RADAR_API_URL,
         { timeout: 10000 }
       );
-      return response.data;
+      const parsed = RadarSchema.safeParse(response.data);
+      return parsed.success ? parsed.data : response.data;
     } catch (error) {
       console.error('Radar API Error:', error);
       return this.getMockRadarData();
@@ -257,7 +262,7 @@ export class WeatherService {
         return 6; // Mock UV index
       }
 
-      const response = await axios.get(
+      const response = await http.get(
         `${API_CONFIG.WEATHER_BASE_URL}/uvi`,
         {
           params: {
@@ -294,7 +299,7 @@ export class WeatherService {
         };
       }
 
-      const response = await axios.get(
+      const response = await http.get(
         `${API_CONFIG.WEATHER_BASE_URL}/air_pollution`,
         {
           params: {
@@ -407,14 +412,15 @@ export class GPSTrackingService {
 
   async getDeviceLocations(deviceIds?: string[]): Promise<GPSTrackingResponse[]> {
     try {
-      const response = await axios.get<GPSTrackingResponse[]>(
+      const response = await http.get<GPSTrackingResponse[]>(
         `${API_CONFIG.GPS_TRACKING_URL}/locations`,
         {
           params: deviceIds ? { devices: deviceIds.join(',') } : {},
           timeout: 10000
         }
       );
-      return response.data;
+      const parsed = Array.isArray(response.data) ? response.data.filter((d: any) => GPSTrackingSchema.safeParse(d).success) : response.data;
+      return parsed;
     } catch (error) {
       console.error('GPS Tracking API Error:', error);
       return this.getMockGPSData();
@@ -423,7 +429,7 @@ export class GPSTrackingService {
 
   async getDeviceHistory(deviceId: string, startTime: Date, endTime: Date): Promise<GPSTrackingResponse[]> {
     try {
-      const response = await axios.get<GPSTrackingResponse[]>(
+      const response = await http.get<GPSTrackingResponse[]>(
         `${API_CONFIG.GPS_TRACKING_URL}/history/${deviceId}`,
         {
           params: {
@@ -566,14 +572,15 @@ export class SensorDataService {
 
   async getSensorData(sensorIds?: string[]): Promise<SensorDataResponse[]> {
     try {
-      const response = await axios.get<SensorDataResponse[]>(
+      const response = await http.get<SensorDataResponse[]>(
         `${API_CONFIG.SENSOR_DATA_URL}/current`,
         {
           params: sensorIds ? { sensors: sensorIds.join(',') } : {},
           timeout: 10000
         }
       );
-      return response.data;
+      const parsed = Array.isArray(response.data) ? response.data.filter((d: any) => SensorDataSchema.safeParse(d).success) : response.data;
+      return parsed;
     } catch (error) {
       console.error('Sensor Data API Error:', error);
       return this.getMockSensorData();
@@ -582,7 +589,7 @@ export class SensorDataService {
 
   async getSensorHistory(sensorId: string, startTime: Date, endTime: Date): Promise<SensorDataResponse[]> {
     try {
-      const response = await axios.get<SensorDataResponse[]>(
+      const response = await http.get<SensorDataResponse[]>(
         `${API_CONFIG.SENSOR_DATA_URL}/history/${sensorId}`,
         {
           params: {
@@ -678,7 +685,7 @@ export class SensorDataService {
 export class GeolocationService {
   static async reverseGeocode(lat: number, lon: number): Promise<any> {
     try {
-      const response = await axios.get(API_CONFIG.GEOLOCATION_API_URL, {
+      const response = await http.get(API_CONFIG.GEOLOCATION_API_URL, {
         params: { latitude: lat, longitude: lon },
         timeout: 5000
       });
