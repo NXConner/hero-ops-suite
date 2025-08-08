@@ -1,0 +1,14 @@
+openapi: 3.0.3
+info:
+  title: Hero Ops Suite API
+  version: 0.1.0
+  description: Placeholder OpenAPI spec for future backend integrations.
+servers:
+  - url: https://api.example.com
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK

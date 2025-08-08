@@ -173,7 +173,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
 
   return (
     <div className={`relative w-full h-full ${className}`}>
-      <div ref={mapContainer} className="w-full h-full" />
+      <div ref={mapContainer} data-testid="map-container" className="w-full h-full" />
       
       {/* Loading indicator */}
       {!mapLoaded && (

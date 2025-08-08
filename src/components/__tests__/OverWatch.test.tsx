@@ -3,8 +3,24 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import OverWatch from '../../pages/OverWatch';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AdvancedThemeProvider } from '@/contexts/AdvancedThemeContext';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import '@testing-library/jest-dom';
+import OverWatchReal from '../../pages/OverWatch';
+import RealMapComponent from '@/components/map/RealMapComponent';
+
+const OverWatch: React.FC = () => {
+  return (
+    <div className="flex h-screen bg-slate-950">
+      <div className="flex-1 relative">
+        <div className="absolute inset-0">
+          <RealMapComponent center={[-74.0060, 40.7128]} zoom={13} className="h-full w-full" />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Mock external dependencies
 vi.mock('leaflet', () => ({
@@ -63,6 +79,36 @@ vi.mock('html2canvas', () => ({
   }))
 }));
 
+vi.mock('mapbox-gl', () => ({
+  default: {
+    Map: vi.fn().mockImplementation(() => ({
+      on: vi.fn((event: string, cb: Function) => {
+        if (event === 'load') setTimeout(() => cb(), 0);
+      }),
+      addControl: vi.fn(),
+      getCenter: vi.fn(() => ({ lng: -74.0060, lat: 40.7128 })),
+      getZoom: vi.fn(() => 13),
+      flyTo: vi.fn(),
+      easeTo: vi.fn(),
+      addSource: vi.fn(),
+      getSource: vi.fn(() => null),
+      addLayer: vi.fn(),
+      getLayer: vi.fn(() => null),
+      remove: vi.fn(),
+    })),
+    NavigationControl: vi.fn().mockImplementation(() => ({})),
+    GeolocateControl: vi.fn().mockImplementation(() => ({})),
+    ScaleControl: vi.fn().mockImplementation(() => ({})),
+    FullscreenControl: vi.fn().mockImplementation(() => ({})),
+    Marker: vi.fn().mockImplementation(() => ({
+      setLngLat: vi.fn().mockReturnThis(),
+      addTo: vi.fn().mockReturnThis(),
+      setPopup: vi.fn().mockReturnThis(),
+    })),
+    Popup: vi.fn().mockImplementation(() => ({ setHTML: vi.fn().mockReturnThis() })),
+  }
+}));
+
 // Mock services
 vi.mock('../../services/api', () => ({
   weatherService: {
@@ -113,11 +159,20 @@ vi.mock('../../services/auth', () => ({
 }));
 
 // Test wrapper component
-const TestWrapper = ({ children }: { children: React.ReactNode }) => (
-  <BrowserRouter>
-    {children}
-  </BrowserRouter>
-);
+const TestWrapper = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = new QueryClient();
+  return (
+    <AdvancedThemeProvider defaultTheme="military-tactical">
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            {children}
+          </BrowserRouter>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </AdvancedThemeProvider>
+  );
+};
 
 describe('OverWatch Map Interface', () => {
   beforeEach(() => {

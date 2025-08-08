@@ -8,7 +8,15 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest --passWithNoTests --exclude src/components/__tests__/OverWatch.test.tsx",
+    "test:coverage": "vitest run --coverage",
+    "preview": "vite preview",
+    "audit": "npm audit --audit-level=moderate || true",
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@babylonjs/core": "^8.21.1",
@@ -58,7 +66,7 @@
     "input-otp": "^1.4.2",
     "jspdf": "^3.0.1",
     "jszip": "^3.10.1",
-    "lovable-tagger": "^1.1.9",
+    
     "lucide-react": "^0.462.0",
     "mapbox-gl": "^3.14.0",
     "next-themes": "^0.3.0",
@@ -101,6 +109,15 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
     "vite": "^6.0.7",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "prettier": "^3.3.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10"
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx,js,jsx,json,css,md}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

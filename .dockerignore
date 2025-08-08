@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+Dockerfile
+docker-compose.yml
+.dockerignore
+.git
+.github
+.vscode
+.idea
+coverage
+*.local
+.env
+.env.*
+**/*.log
+.cache
+.bun
+*.swp
