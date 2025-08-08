@@ -119,11 +119,12 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-2">
+        <nav className="flex-1 px-3 py-4 space-y-2" role="navigation" aria-label="Main">
           {navigation.map((item) => (
             <Link
               key={item.name}
               to={item.href}
+              aria-current={item.current ? "page" : undefined}
               className={cn(
                 "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group",
                 item.current
@@ -131,7 +132,7 @@ const Sidebar = () => {
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               )}
             >
-              <item.icon className="h-5 w-5 shrink-0" />
+              <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
               {!isCollapsed && (
                 <>
                   <span className="ml-3">{item.name}</span>
