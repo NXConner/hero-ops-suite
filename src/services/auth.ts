@@ -2,6 +2,11 @@
 // Authentication Service for Blacktop Blackout OverWatch System
 import { databaseService } from './database';
 
+const USE_IN_MEMORY_TOKENS = true;
+
+let inMemoryAuthToken: string | null = null;
+let inMemoryRefreshToken: string | null = null;
+
 export interface User {
   id: string;
   email: string;
@@ -115,26 +120,46 @@ class AuthService {
     this.startSessionCheck();
   }
 
+  private get storage() {
+    return {
+      get token() {
+        if (USE_IN_MEMORY_TOKENS) return inMemoryAuthToken;
+        try { return localStorage.getItem('authToken'); } catch { return null; }
+      },
+      set token(value: string | null) {
+        if (USE_IN_MEMORY_TOKENS) { inMemoryAuthToken = value; return; }
+        try {
+          if (value === null) localStorage.removeItem('authToken');
+          else localStorage.setItem('authToken', value);
+        } catch {}
+      },
+      get refresh() {
+        if (USE_IN_MEMORY_TOKENS) return inMemoryRefreshToken;
+        try { return localStorage.getItem('refreshToken'); } catch { return null; }
+      },
+      set refresh(value: string | null) {
+        if (USE_IN_MEMORY_TOKENS) { inMemoryRefreshToken = value; return; }
+        try {
+          if (value === null) localStorage.removeItem('refreshToken');
+          else localStorage.setItem('refreshToken', value);
+        } catch {}
+      },
+    };
+  }
+
   private initializeFromStorage(): void {
     try {
-      const storedToken = localStorage.getItem('authToken');
-      const storedRefreshToken = localStorage.getItem('refreshToken');
-      const storedUser = localStorage.getItem('currentUser');
+      this.authToken = this.storage.token;
+      this.refreshToken = this.storage.refresh;
+      // user can be restored from IndexedDB if needed
+    } catch {}
+  }
 
-      if (storedToken && storedUser) {
-        this.authToken = storedToken;
-        this.refreshToken = storedRefreshToken;
-        this.currentUser = JSON.parse(storedUser);
-        
-        // Verify token is still valid
-        this.verifyToken().catch(() => {
-          this.logout();
-        });
-      }
-    } catch (error) {
-      console.error('Failed to initialize auth from storage:', error);
-      this.logout();
-    }
+  private persistTokens(token: string | null, refreshToken: string | null) {
+    this.storage.token = token;
+    this.storage.refresh = refreshToken;
+    this.authToken = token;
+    this.refreshToken = refreshToken;
   }
 
   async login(credentials: LoginCredentials): Promise<User> {
@@ -154,20 +179,10 @@ class AuthService {
       const authData: AuthToken = await response.json();
       
       // Store authentication data
-      this.authToken = authData.token;
-      this.refreshToken = authData.refreshToken;
-      this.currentUser = authData.user;
+      this.persistTokens(authData.token, authData.refreshToken);
 
       // Persist to storage
-      localStorage.setItem('authToken', authData.token);
-      if (authData.refreshToken) {
-        localStorage.setItem('refreshToken', authData.refreshToken);
-      }
-      localStorage.setItem('currentUser', JSON.stringify(authData.user));
-
-      if (credentials.rememberMe) {
-        localStorage.setItem('rememberMe', 'true');
-      }
+      localStorage.setItem('rememberMe', 'true');
 
       // Update user's last login
       this.currentUser.lastLogin = new Date();
@@ -197,9 +212,7 @@ class AuthService {
       console.warn('Server logout failed:', error);
     } finally {
       // Clear local data
-      this.authToken = null;
-      this.refreshToken = null;
-      this.currentUser = null;
+      this.persistTokens(null, null);
 
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
@@ -235,8 +248,7 @@ class AuthService {
       }
 
       const data = await response.json();
-      this.authToken = data.token;
-      localStorage.setItem('authToken', data.token);
+      this.persistTokens(data.token, data.refreshToken);
 
       return data.token;
     } catch (error) {
