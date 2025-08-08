@@ -3,19 +3,27 @@
 import axios from 'axios';
 
 // API Configuration
+const getEnv = (key: string): string | undefined => {
+  try {
+    // @ts-ignore
+    return typeof import.meta !== 'undefined' ? (import.meta as any).env?.[key] : undefined;
+  } catch {
+    return undefined;
+  }
+};
 const API_CONFIG = {
-  WEATHER_API_KEY: process.env.REACT_APP_WEATHER_API_KEY || 'YOUR_OPENWEATHER_API_KEY',
+  WEATHER_API_KEY: getEnv('VITE_WEATHER_API_KEY') || getEnv('REACT_APP_WEATHER_API_KEY') || 'YOUR_OPENWEATHER_API_KEY',
   WEATHER_BASE_URL: 'https://api.openweathermap.org/data/2.5',
-  GPS_TRACKING_URL: process.env.REACT_APP_GPS_API_URL || 'https://api.fleet-tracker.com/v1',
-  SENSOR_DATA_URL: process.env.REACT_APP_SENSOR_API_URL || 'https://api.iot-sensors.com/v1',
+  GPS_TRACKING_URL: getEnv('VITE_GPS_API_URL') || getEnv('REACT_APP_GPS_API_URL') || 'https://api.fleet-tracker.com/v1',
+  SENSOR_DATA_URL: getEnv('VITE_SENSOR_API_URL') || getEnv('REACT_APP_SENSOR_API_URL') || 'https://api.iot-sensors.com/v1',
   RADAR_API_URL: 'https://api.rainviewer.com/public/weather-maps.json',
   GEOLOCATION_API_URL: 'https://api.bigdatacloud.net/data/reverse-geocode-client',
   // Real IoT sensor endpoints
-  TEMPERATURE_SENSOR_URL: process.env.REACT_APP_TEMP_SENSOR_URL || 'http://localhost:8080/api/sensors/temperature',
-  PRESSURE_SENSOR_URL: process.env.REACT_APP_PRESSURE_SENSOR_URL || 'http://localhost:8080/api/sensors/pressure',
-  VIBRATION_SENSOR_URL: process.env.REACT_APP_VIBRATION_SENSOR_URL || 'http://localhost:8080/api/sensors/vibration',
+  TEMPERATURE_SENSOR_URL: getEnv('VITE_TEMP_SENSOR_URL') || getEnv('REACT_APP_TEMP_SENSOR_URL') || 'http://localhost:8080/api/sensors/temperature',
+  PRESSURE_SENSOR_URL: getEnv('VITE_PRESSURE_SENSOR_URL') || getEnv('REACT_APP_PRESSURE_SENSOR_URL') || 'http://localhost:8080/api/sensors/pressure',
+  VIBRATION_SENSOR_URL: getEnv('VITE_VIBRATION_SENSOR_URL') || getEnv('REACT_APP_VIBRATION_SENSOR_URL') || 'http://localhost:8080/api/sensors/vibration',
   // Real fleet tracking
-  FLEET_WEBSOCKET_URL: process.env.REACT_APP_FLEET_WS_URL || 'ws://localhost:8080/ws/fleet'
+  FLEET_WEBSOCKET_URL: getEnv('VITE_FLEET_WS_URL') || getEnv('REACT_APP_FLEET_WS_URL') || 'ws://localhost:8080/ws/fleet'
 };
 
 // Types for API responses

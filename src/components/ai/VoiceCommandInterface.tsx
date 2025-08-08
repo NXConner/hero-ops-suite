@@ -33,12 +33,14 @@ interface VoiceCommandInterfaceProps {
   isVisible: boolean;
   onClose: () => void;
   terminologyMode: 'military' | 'civilian' | 'both';
+  onCommand?: (command: any) => void;
 }
 
 const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
   isVisible,
   onClose,
-  terminologyMode
+  terminologyMode,
+  onCommand
 }) => {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);

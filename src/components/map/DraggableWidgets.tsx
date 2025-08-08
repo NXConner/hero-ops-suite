@@ -72,7 +72,17 @@ const WidgetControls: React.FC<WidgetControlsProps> = ({
   );
 };
 
-const DraggableWidgets: React.FC = () => {
+interface DraggableWidgetsProps {
+  isVisible?: boolean;
+  terminologyMode?: 'military' | 'civilian' | 'both';
+  onLayoutChange?: (layout: any) => void;
+}
+
+const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
+  isVisible = true,
+  terminologyMode = 'military',
+  onLayoutChange
+}) => {
   const [widgets, setWidgets] = useState<Widget[]>([
     {
       id: 'comms',
@@ -193,6 +203,12 @@ const DraggableWidgets: React.FC = () => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [dragState, widgets]);
+
+  useEffect(() => {
+    onLayoutChange?.(widgets);
+  }, [widgets, onLayoutChange]);
+
+  if (!isVisible) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none z-[500]">

@@ -62,36 +62,36 @@ const mapServices: MapService[] = [
   {
     id: 'google-satellite',
     name: 'Google Satellite',
-    url: process.env.REACT_APP_GOOGLE_MAPS_API_KEY 
-      ? `https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
-      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY))
+        ? `https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&key=${(import.meta as any).env.VITE_GOOGLE_MAPS_API_KEY}`
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '© Google',
     icon: <Eye className="w-4 h-4" />
   },
   {
     id: 'google-roads',
     name: 'Google Roads',
-    url: process.env.REACT_APP_GOOGLE_MAPS_API_KEY
-      ? `https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
-      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY))
+        ? `https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}&key=${(import.meta as any).env.VITE_GOOGLE_MAPS_API_KEY}`
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '© Google',
     icon: <Navigation className="w-4 h-4" />
   },
   {
     id: 'mapbox-streets',
     name: 'Mapbox Streets',
-    url: process.env.REACT_APP_MAPBOX_API_KEY
-      ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${process.env.REACT_APP_MAPBOX_API_KEY}`
-      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_MAPBOX_API_KEY))
+        ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_API_KEY}`
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '© Mapbox',
     icon: <Map className="w-4 h-4" />
   },
   {
     id: 'mapbox-satellite',
     name: 'Mapbox Satellite',
-    url: process.env.REACT_APP_MAPBOX_API_KEY
-      ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${process.env.REACT_APP_MAPBOX_API_KEY}`
-      : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_MAPBOX_API_KEY))
+        ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_API_KEY}`
+        : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: '© Mapbox',
     icon: <Eye className="w-4 h-4" />
   },
@@ -105,7 +105,7 @@ const mapServices: MapService[] = [
   {
     id: 'qgis-local',
     name: 'QGIS Local Server',
-    url: process.env.REACT_APP_QGIS_SERVER_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    url: ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_QGIS_SERVER_URL)) || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '© Local QGIS Server',
     icon: <Layers className="w-4 h-4" />
   }
