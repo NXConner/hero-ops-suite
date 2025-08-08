@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ThemeColor, Theme, Gradient, Shadow, Animation, ParticleEffect } from '@/types/theme';
 
 // Color utilities

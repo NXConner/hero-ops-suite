@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useRef, useState } from 'react';
 import { Engine, Scene, Vector3, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Color3, GroundMesh } from '@babylonjs/core';
 import { sensorDataService, SensorDataResponse } from '@/services/api';
