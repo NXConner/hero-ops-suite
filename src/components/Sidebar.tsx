@@ -14,7 +14,7 @@ import {
   Settings, 
   Shield,
   Menu,
-  X,
+  X as CloseIcon,
   Bell,
   Search,
   Scan,
@@ -114,7 +114,7 @@ const Sidebar = () => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="h-8 w-8"
           >
-            {isCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
+            {isCollapsed ? <Menu className="h-4 w-4" /> : <CloseIcon className="h-4 w-4" />}
           </Button>
         </div>
 

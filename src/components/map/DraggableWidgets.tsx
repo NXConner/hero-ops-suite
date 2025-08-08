@@ -25,7 +25,7 @@ import {
   Navigation,
   Settings,
   Plus,
-  X,
+  X as CloseIcon,
   Move,
   RotateCw,
   Save,
@@ -503,7 +503,7 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
                     onClick={() => removeWidget(widgetId)}
                     className="absolute top-1 right-1 z-10 p-1 text-red-400 hover:text-red-300 bg-slate-800/80"
                   >
-                    <X className="w-3 h-3" />
+                    <CloseIcon className="w-3 h-3" />
                   </Button>
                 )}
               </div>
