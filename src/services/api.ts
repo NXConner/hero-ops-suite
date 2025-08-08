@@ -1,6 +1,7 @@
 // @ts-nocheck
 // API Service Layer for Blacktop Blackout OverWatch System
 import http from './http';
+import { WeatherSchema, RadarSchema, GPSTrackingSchema, SensorDataSchema } from './schemas';
 
 // API Configuration
 const getEnv = (key: string): string | undefined => {
@@ -186,7 +187,7 @@ export class WeatherService {
     }
 
     try {
-      const response = await http.get<WeatherAPIResponse>(
+      const response = await http.get(
         `${API_CONFIG.WEATHER_BASE_URL}/weather`,
         {
           params: {
@@ -199,8 +200,11 @@ export class WeatherService {
         }
       );
 
-      this.cache.set(cacheKey, { data: response.data, timestamp: Date.now() });
-      return response.data;
+      const parsed = WeatherSchema.safeParse(response.data);
+      const data = parsed.success ? parsed.data : response.data;
+
+      this.cache.set(cacheKey, { data, timestamp: Date.now() });
+      return data;
     } catch (error) {
       console.error('Weather API Error:', error);
       if ((error as any).isAxiosError && (error as any).response?.status === 401) {
@@ -239,11 +243,12 @@ export class WeatherService {
 
   async getRadarData(): Promise<RadarAPIResponse> {
     try {
-      const response = await http.get<RadarAPIResponse>(
+      const response = await http.get(
         API_CONFIG.RADAR_API_URL,
         { timeout: 10000 }
       );
-      return response.data;
+      const parsed = RadarSchema.safeParse(response.data);
+      return parsed.success ? parsed.data : response.data;
     } catch (error) {
       console.error('Radar API Error:', error);
       return this.getMockRadarData();
