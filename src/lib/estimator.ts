@@ -300,8 +300,8 @@ export function computeTransportLoad(concentrateGallons: number) {
 export function buildEstimate(input: EstimateInput): EstimateOutput {
   const notes: string[] = [];
   let materials: EstimateBreakdownItem[] = [];
-  let labor: EstimateBreakdownItem[] = [];
-  let equipmentAndFuel: EstimateBreakdownItem[] = [];
+  const labor: EstimateBreakdownItem[] = [];
+  const equipmentAndFuel: EstimateBreakdownItem[] = [];
   const mobilization: EstimateBreakdownItem[] = [
     { label: 'Mobilization', cost: DEFAULTS.mobilizationFee }
   ];
@@ -376,7 +376,7 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
 
   // Equipment & Fuel
   const fuel = computeFuelAndEquipment(input, concentrateGallons);
-  equipmentAndFuel = equipmentAndFuel.concat(fuel.items);
+  equipmentAndFuel.push(...fuel.items);
 
   // Subtotal of cost-basis materials + labor + equipment + mobilization
   const materialsCost = materials.reduce((sum, m) => sum + m.cost, 0);
