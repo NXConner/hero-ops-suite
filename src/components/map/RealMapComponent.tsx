@@ -163,7 +163,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
 
   return (
     <div className={`relative w-full h-full ${className}`}>
-      <div ref={mapContainer} className="w-full h-full" />
+      <div ref={mapContainer} className="w-full h-full" data-testid="map-container" />
 
       {tokenMissing && (
         <div className="absolute inset-0 bg-slate-900/80 backdrop-blur flex items-center justify-center">
