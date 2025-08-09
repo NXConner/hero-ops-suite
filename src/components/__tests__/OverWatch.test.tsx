@@ -82,7 +82,7 @@ vi.mock('html2canvas', () => ({
 vi.mock('mapbox-gl', () => ({
   default: {
     Map: vi.fn().mockImplementation(() => ({
-      on: vi.fn((event: string, cb: Function) => {
+      on: vi.fn((event: string, cb: () => void) => {
         if (event === 'load') setTimeout(() => cb(), 0);
       }),
       addControl: vi.fn(),

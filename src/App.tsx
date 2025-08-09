@@ -9,6 +9,8 @@ import { Suspense, lazy } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import ThemeBackground from "./components/theme/ThemeBackground";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
 
 // Lazy load heavy components that use 3D libraries, maps, or ML
 const MissionPlanning = lazy(() => import("./pages/MissionPlanning"));
@@ -21,7 +23,6 @@ const PavementScanPro = lazy(() => import("./pages/PavementScanPro"));
 const OverWatch = lazy(() => import("./pages/OverWatch"));
 const Estimator = lazy(() => import("./pages/Estimator"));
 const AdvancedThemeCustomizer = lazy(() => import("./components/theme/AdvancedThemeCustomizer"));
-const ThemeBackground = lazy(() => import("./components/theme/ThemeBackground"));
 
 const queryClient = new QueryClient();
 
@@ -39,8 +40,9 @@ const App = () => (
            <Sonner />
            <ThemeBackground />
            <BrowserRouter>
-             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div></div>}>
-              <Routes>
+             <ErrorBoundary>
+               <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div></div>}>
+                <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/mission-planning" element={<MissionPlanning />} />
@@ -55,9 +57,10 @@ const App = () => (
                 <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
+                </Routes>
+               </Suspense>
+              </ErrorBoundary>
+            </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>

@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 // Mapbox access token - should be set via environment variable
-const MAPBOX_TOKEN = ((typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_MAPBOX_TOKEN : undefined) as string) || 'pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example';
+const MAPBOX_TOKEN: string = (typeof import.meta !== 'undefined' && (import.meta as ImportMeta).env?.VITE_MAPBOX_TOKEN) ?? 'pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example';
 
 interface RealMapComponentProps {
   center: [number, number];
@@ -89,6 +89,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         map.current = null;
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update map center and zoom when props change
@@ -126,7 +127,10 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     return marker;
   };
 
-  const addGeoJSONSource = (sourceId: string, data: any) => {
+  const addGeoJSONSource = (
+    sourceId: string,
+    data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>
+  ) => {
     if (!map.current || !mapLoaded) return;
 
     if (map.current.getSource(sourceId)) {
@@ -169,6 +173,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         getMap: () => map.current
       };
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]);
 
   return (
