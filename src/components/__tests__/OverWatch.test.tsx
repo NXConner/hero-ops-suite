@@ -5,6 +5,8 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import OverWatch from '../../pages/OverWatch';
 import '@testing-library/jest-dom';
+import { AdvancedThemeProvider } from '@/contexts/AdvancedThemeContext';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 // Mock external dependencies
 vi.mock('leaflet', () => ({
@@ -115,7 +117,11 @@ vi.mock('../../services/auth', () => ({
 // Test wrapper component
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
-    {children}
+    <AdvancedThemeProvider defaultTheme="military-tactical">
+      <ThemeProvider attribute="class" defaultTheme="system">
+        {children}
+      </ThemeProvider>
+    </AdvancedThemeProvider>
   </BrowserRouter>
 );
 
