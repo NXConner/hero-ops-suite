@@ -8,6 +8,11 @@ import '@testing-library/jest-dom';
 import { AdvancedThemeProvider } from '@/contexts/AdvancedThemeContext';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
+// Mock next-themes to avoid matchMedia listener issues in jsdom
+vi.mock('next-themes', () => ({
+  ThemeProvider: ({ children }: any) => <>{children}</>,
+}));
+
 // Mock external dependencies
 vi.mock('leaflet', () => ({
   Map: vi.fn(),
