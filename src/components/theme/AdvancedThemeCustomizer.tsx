@@ -538,6 +538,31 @@ export function AdvancedThemeCustomizer() {
                       />
                     </div>
                   </div>
+
+                  <Separator />
+
+                  {/* Overlay Effects (live) */}
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium">Overlay Effects (Preview)</div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ scanlines: true })}>Scanlines On</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ scanlines: false })}>Scanlines Off</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ radarSweep: true })}>Radar</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ vignette: true })}>Vignette</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ glitch: true })}>Glitch</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.reset?.()}>Reset</Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Scanline Spacing</Label>
+                        <Slider min={2} max={10} step={1} value={[3]} onValueChange={([v]) => (window as any).owEffects?.set?.({ scanlineSpacing: v })} />
+                      </div>
+                      <div>
+                        <Label>Glitch Intensity</Label>
+                        <Slider min={0} max={1} step={0.05} value={[0.3]} onValueChange={([v]) => (window as any).owEffects?.set?.({ glitchLevel: v })} />
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -894,22 +919,31 @@ export function AdvancedThemeCustomizer() {
                   <Button className="bg-primary text-primary-foreground">Primary Button</Button>
                   <Button variant="outline">Secondary Button</Button>
                   <div className="rounded-md p-4 border border-border bg-card">Card</div>
-                  <Input placeholder="Input" />
-                  <Badge>Badge</Badge>
+                  <div className="border rounded">
+                    <div className="px-3 py-2 text-xs text-muted-foreground">Table</div>
+                    <div className="px-3 py-2 border-t border-border/50 text-sm">Row A</div>
+                    <div className="px-3 py-2 border-t border-border/50 text-sm">Row B</div>
+                  </div>
+                  <div className="inline-flex items-center gap-2">
+                    <Badge>Badge</Badge>
+                    <Badge variant="secondary">Secondary</Badge>
+                  </div>
                 </div>
 
                 {isTargetsMode && (
                   <>
                     {/* Card */}
-                    <button onClick={() => openInspector('colors.card')} className="absolute inset-x-4 top-[92px] h-16 rounded-md ring-2 ring-accent/60 bg-accent/10" />
+                    <button onClick={() => openInspector('colors.card')} className="absolute inset-x-4 top-[140px] h-14 rounded-md ring-2 ring-accent/60 bg-accent/10" />
                     {/* Primary Button */}
                     <button onClick={() => openInspector('colors.primary')} className="absolute left-4 top-4 h-10 w-40 rounded ring-2 ring-primary/60 bg-primary/10" />
-                    {/* Input */}
-                    <button onClick={() => openInspector('colors.input')} className="absolute left-4 bottom-4 h-10 w-[calc(100%-2rem)] rounded ring-2 ring-foreground/40" />
-                    {/* Header (use popover/bg) */}
+                    {/* Input/Table (use muted/border) */}
+                    <button onClick={() => openInspector('colors.muted')} className="absolute left-4 top-[200px] h-24 w-[calc(100%-2rem)] rounded ring-2 ring-foreground/40" />
+                    {/* Header (use background) */}
                     <button onClick={() => openInspector('colors.background')} className="absolute inset-x-0 -top-3 h-8 ring-2 ring-secondary/50" />
                     {/* Sidebar/nav (use sidebar color) */}
                     <button onClick={() => openInspector('colors.sidebar')} className="absolute -left-3 inset-y-8 w-3 ring-2 ring-sidebar/50" />
+                    {/* Badge (use accent) */}
+                    <button onClick={() => openInspector('colors.accent')} className="absolute right-6 bottom-20 h-6 w-24 rounded ring-2 ring-accent/60" />
                   </>
                 )}
               </div>
