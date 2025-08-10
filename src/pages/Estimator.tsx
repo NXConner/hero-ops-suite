@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Textarea } from '@/components/ui/textarea';
 import type { EstimateInput, ServiceType } from '@/lib/estimator';
 import { buildEstimate } from '@/lib/estimator';
+import { BUSINESS_PROFILE } from '@/data/business';
 
-const DEFAULT_FUEL_PRICE = 3.50; // will be editable
+const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
 const Estimator = () => {
   const [serviceType, setServiceType] = useState<ServiceType>('sealcoating');
@@ -25,17 +26,19 @@ const Estimator = () => {
     oilSpotSquareFeet: 0,
     surfacePorosityFactor: 1,
   });
-  const [jobAddress, setJobAddress] = useState('337 Ayers Orchard Road, Stuart, VA 24171');
-  const [roundTripMilesSupplier, setRoundTripMilesSupplier] = useState(96); // Stuart, VA ↔ Madison, NC approx
+  const [jobAddress, setJobAddress] = useState(BUSINESS_PROFILE.address.full);
+  const [roundTripMilesSupplier, setRoundTripMilesSupplier] = useState(BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier); // Stuart, VA ↔ Madison, NC approx
   const [roundTripMilesJob, setRoundTripMilesJob] = useState(0); // default same as business if unknown
   const [fuelPrice, setFuelPrice] = useState(DEFAULT_FUEL_PRICE);
 
-  const [laborRate, setLaborRate] = useState(12);
-  const [numFullTime, setNumFullTime] = useState(2);
-  const [numPartTime, setNumPartTime] = useState(1);
+  const [laborRate, setLaborRate] = useState(BUSINESS_PROFILE.crew.hourlyRatePerPerson);
+  const [numFullTime, setNumFullTime] = useState(BUSINESS_PROFILE.crew.numFullTime);
+  const [numPartTime, setNumPartTime] = useState(BUSINESS_PROFILE.crew.numPartTime);
 
   const [sealerActiveHours, setSealerActiveHours] = useState(0);
   const [excessiveIdleHours, setExcessiveIdleHours] = useState(0);
+
+  const [pmmPrice, setPmmPrice] = useState(BUSINESS_PROFILE.materials.pmmPricePerGallon);
 
   const [notes, setNotes] = useState('');
 
@@ -59,14 +62,14 @@ const Estimator = () => {
     fuelPricePerGallon: Number(fuelPrice) || DEFAULT_FUEL_PRICE,
     sealerActiveHours: Number(sealerActiveHours) || 0,
     excessiveIdleHours: Number(excessiveIdleHours) || 0,
-    pmmPricePerGallon: 3.65,
-    sandPricePer50lbBag: 10,
-    fastDryPricePer5Gal: 50,
-    prepSealPricePer5Gal: 50,
-    crackBoxPricePer30lb: 44.99,
-    propanePerTank: 10,
+    pmmPricePerGallon: Number(pmmPrice) || BUSINESS_PROFILE.materials.pmmPricePerGallon,
+    sandPricePer50lbBag: BUSINESS_PROFILE.materials.sandPricePer50lbBag,
+    fastDryPricePer5Gal: BUSINESS_PROFILE.materials.fastDryPricePer5Gal,
+    prepSealPricePer5Gal: BUSINESS_PROFILE.materials.prepSealPricePer5Gal,
+    crackBoxPricePer30lb: BUSINESS_PROFILE.materials.crackBoxPricePer30lb,
+    propanePerTank: BUSINESS_PROFILE.materials.propanePerTank,
     includeTransportWeightCheck: true
-  }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, sealerActiveHours, excessiveIdleHours]);
+  }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, pmmPrice, sealerActiveHours, excessiveIdleHours]);
 
   const result = useMemo(() => buildEstimate(estimateInput), [estimateInput]);
 
@@ -226,6 +229,19 @@ const Estimator = () => {
                 <div>
                   <Label>Fuel price $/gal</Label>
                   <Input type="number" step="0.01" value={fuelPrice} onChange={e => setFuelPrice(Number(e.target.value))} />
+                </div>
+                <div>
+                  <Label>PMM price $/gal</Label>
+                  <div className="flex gap-2">
+                    <Input type="number" step="0.01" value={pmmPrice} onChange={e => setPmmPrice(Number(e.target.value))} />
+                    <Select onValueChange={(v) => setPmmPrice(v === 'bulk' ? BUSINESS_PROFILE.materials.pmmBulkPricePerGallon : BUSINESS_PROFILE.materials.pmmPricePerGallon)}>
+                      <SelectTrigger className="w-[140px]"><SelectValue placeholder="Preset" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default ${BUSINESS_PROFILE.materials.pmmPricePerGallon.toFixed(2)}</SelectItem>
+                        <SelectItem value="bulk">Bulk ${BUSINESS_PROFILE.materials.pmmBulkPricePerGallon.toFixed(2)}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div>
                   <Label>Labor rate $/hr per person</Label>

@@ -5,7 +5,7 @@ Supplier: SealMaster, Madison NC
 Crew: 2 FT, 1 PT (default), $12/hr per person
 
 Material Pricing (defaults):
-- PMM concentrate: $3.65/gal (bulk)
+- PMM concentrate: $3.65/gal (default) | bulk ref: $3.79/gal
 - Sand 50lb: $10
 - Prep Seal 5gal: $50
 - Fast Dry 5gal: $50
@@ -33,3 +33,8 @@ Pricing baselines:
 Outputs include:
 - Base total, +25% markup total, rounded-to-$10 total, rounded +25%
 - Transport weight advisory based on SK 550 + sealer
+
+Configuration
+- All defaults are centralized in `src/data/business.ts` as `BUSINESS_PROFILE`.
+- Types are defined in `src/types/business.ts`.
+- Estimator logic pulls from `BUSINESS_PROFILE` so updating that file will flow through the app.

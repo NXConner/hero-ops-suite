@@ -90,13 +90,14 @@ const Settings = () => {
 
         <div className="container mx-auto px-6 py-8">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full lg:w-auto lg:grid-cols-6">
+            <TabsList className="grid w-full lg:w-auto lg:grid-cols-7">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
               <TabsTrigger value="display">Display</TabsTrigger>
               <TabsTrigger value="backup">Backup</TabsTrigger>
+<TabsTrigger value="business">Business</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
@@ -705,6 +706,91 @@ const Settings = () => {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="business" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Database className="h-5 w-5 text-primary" />
+                      Business Profile
+                    </CardTitle>
+                    <CardDescription>Defaults used by the Asphalt Estimator</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Business Address</Label>
+                        <div className="mt-1 text-muted-foreground">337 Ayers Orchard Road, Stuart, VA 24171</div>
+                      </div>
+                      <div>
+                        <Label>Supplier</Label>
+                        <div className="mt-1 text-muted-foreground">SealMaster, 703 West Decatur Street, Madison, NC 27025</div>
+                      </div>
+                      <div>
+                        <Label>Crew (FT / PT)</Label>
+                        <div className="mt-1 text-muted-foreground">2 FT, 1 PT @ $12/hr per person</div>
+                      </div>
+                      <div>
+                        <Label>Travel (supplier RT miles)</Label>
+                        <div className="mt-1 text-muted-foreground">~96 miles</div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Materials</Label>
+                        <div className="mt-1 text-muted-foreground space-y-1">
+                          <div>PMM: $3.65/gal (bulk ref $3.79)</div>
+                          <div>Sand 50lb: $10</div>
+                          <div>Prep Seal 5gal: $50</div>
+                          <div>Fast Dry 5gal: $50</div>
+                          <div>CrackMaster 30lb: $44.99</div>
+                          <div>Propane tank: $10</div>
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Mix & Coverage</Label>
+                        <div className="mt-1 text-muted-foreground space-y-1">
+                          <div>Water: 20% of concentrate</div>
+                          <div>Sand: 6 bags / 100 gal concentrate</div>
+                          <div>FastDry: 2 gal / 125 gal concentrate</div>
+                          <div>Mixed coverage: 76 sqft/gal</div>
+                          <div>Prep Seal: ~175 sqft/gal</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Pricing Baselines</Label>
+                        <div className="mt-1 text-muted-foreground space-y-1">
+                          <div>Crack fill: $1.75/lf</div>
+                          <div>Patching: $3.50/sqft</div>
+                          <div>Striping: $0.90/lf + extras</div>
+                          <div>Mobilization: $250</div>
+                          <div>Overhead: 10%</div>
+                          <div>Profit: 18%</div>
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Fleet & Equipment</Label>
+                        <div className="mt-1 text-muted-foreground space-y-1">
+                          <div>C30 curb 4,300 lbs; GVWR ≥ 10,000 lbs; ~12 mpg loaded</div>
+                          <div>Dakota ~17 mpg</div>
+                          <div>SK 550 empty 1,865 lbs; 10 lbs/gal sealer</div>
+                          <div>Trailers: 8ft/10ft utility, 8ft white, 10ft tilt, 12ft heavy-duty</div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
