@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBusinessProfile } from "@/hooks/useBusinessProfile";
+import { exportAll, importAll } from "@/services/exportImport";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -870,9 +871,39 @@ const Settings = () => {
                       </div>
                     </div>
 
-                    <div className="flex gap-2 justify-end pt-2">
-                      <Button variant="outline" onClick={reset}>Reset Defaults</Button>
-                      <Button onClick={() => save({})}>Save Changes</Button>
+                    <div className="flex gap-2 justify-between pt-2">
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={reset}>Reset Defaults</Button>
+                        <Button onClick={() => save({})}>Save Changes</Button>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => {
+                          const data = exportAll();
+                          const blob = new Blob([data], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `export_${new Date().toISOString()}.json`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }}>Export All</Button>
+                        <Button onClick={async () => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'application/json';
+                          input.onchange = async () => {
+                            const file = input.files?.[0];
+                            if (!file) return;
+                            const text = await file.text();
+                            try {
+                              const json = JSON.parse(text);
+                              importAll(json);
+                              window.location.reload();
+                            } catch {}
+                          };
+                          input.click();
+                        }}>Import</Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

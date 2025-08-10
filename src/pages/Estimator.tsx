@@ -257,6 +257,21 @@ const Estimator = () => {
                 </div>
                 <div className="flex gap-2 justify-end">
                   <Button type="button" variant="outline" onClick={handleSaveJob}>Save Job</Button>
+                  <Button type="button" onClick={() => navigator.clipboard.writeText(textInvoice)}>Copy Invoice</Button>
+                  <Button type="button" variant="outline" onClick={() => {
+                    const all = `${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`;
+                    navigator.clipboard.writeText(all);
+                  }}>Copy All</Button>
+                  <Button type="button" variant="outline" onClick={() => {
+                    const all = `${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`;
+                    const blob = new Blob([all], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${jobName || 'invoice'}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}>Download .txt</Button>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
