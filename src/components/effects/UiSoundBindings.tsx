@@ -30,9 +30,28 @@ export default function UiSoundBindings() {
       }
     };
 
+    // Observe DOM for toasts/dialogs
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.addedNodes && m.addedNodes.length > 0) {
+          (m.addedNodes as any).forEach((node: any) => {
+            if (!(node instanceof HTMLElement)) return;
+            if (node.matches('[data-sonner-toaster], .sonner, .toast')) {
+              (window as any).owSounds?.ui.notification?.();
+            }
+            if (node.matches('[role="dialog"], dialog, .radix-dialog-content')) {
+              (window as any).owSounds?.ui.confirm?.();
+            }
+          });
+        }
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
     document.addEventListener('mouseover', onMouseOver);
     document.addEventListener('click', onClick);
     return () => {
+      observer.disconnect();
       document.removeEventListener('mouseover', onMouseOver);
       document.removeEventListener('click', onClick);
     };
