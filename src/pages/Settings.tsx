@@ -37,6 +37,7 @@ import {
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
+import ColorPicker from "@/components/theme/ColorPicker";
 
 const Settings = () => {
   const [activeAlerts, setActiveAlerts] = useState(true);
@@ -727,18 +728,56 @@ const Settings = () => {
                             value={globalWallpaperOverride?.source || ''}
                             onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride || { type: 'image' }), source: e.target.value })}
                           />
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <input type="file" accept={globalWallpaperOverride?.type === 'video' ? 'video/*' : 'image/*'} onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const url = URL.createObjectURL(file);
+                              setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), source: url });
+                            }} />
+                            <span>(Local uploads use temporary URLs; not persisted across reloads)</span>
+                          </div>
                         </div>
                       )}
 
                       {globalWallpaperOverride?.type === 'color' && (
-                        <div className="space-y-2">
-                          <Label>Tint (hsla string)</Label>
-                          <Input
-                            placeholder="hsl(215 20% 8% / 0.8)"
-                            value={''}
-                            onChange={() => {}}
-                          />
-                          <p className="text-xs text-muted-foreground">Advanced color editor available in Theme Customizer.</p>
+                        <ColorPicker
+                          color={globalWallpaperOverride?.color || { h: 215, s: 20, l: 8 }}
+                          onChange={(color) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), color })}
+                          label="Background Color"
+                        />
+                      )}
+
+                      {globalWallpaperOverride?.type === 'gradient' && (
+                        <div className="space-y-4">
+                          <Label>Gradient Angle</Label>
+                          <input type="range" min={0} max={360} step={1} value={globalWallpaperOverride?.gradient?.angle || 135} onChange={(e) => {
+                            const angle = parseInt(e.target.value, 10);
+                            const grad = globalWallpaperOverride?.gradient || { type: 'linear', stops: [{ color: { h: 220, s: 100, l: 3 }, position: 0 }, { color: { h: 240, s: 6, l: 8 }, position: 100 }] };
+                            setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, angle } });
+                          }} className="w-full" />
+                          <div className="grid grid-cols-2 gap-2">
+                            <ColorPicker
+                              color={globalWallpaperOverride?.gradient?.stops?.[0]?.color || { h: 220, s: 100, l: 3 }}
+                              onChange={(color) => {
+                                const grad = globalWallpaperOverride?.gradient || { type: 'linear', angle: 135, stops: [{ color, position: 0 }, { color, position: 100 }] };
+                                const stops = [...(grad.stops || [])];
+                                stops[0] = { ...(stops[0] || { position: 0 }), color };
+                                setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, stops } });
+                              }}
+                              label="Stop 1"
+                            />
+                            <ColorPicker
+                              color={globalWallpaperOverride?.gradient?.stops?.[1]?.color || { h: 240, s: 6, l: 8 }}
+                              onChange={(color) => {
+                                const grad = globalWallpaperOverride?.gradient || { type: 'linear', angle: 135, stops: [{ color, position: 0 }, { color, position: 100 }] };
+                                const stops = [...(grad.stops || [])];
+                                stops[1] = { ...(stops[1] || { position: 100 }), color };
+                                setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, stops } });
+                              }}
+                              label="Stop 2"
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -785,6 +824,38 @@ const Settings = () => {
                             value={globalWallpaperOverride?.overlay?.opacity ?? 0.3}
                             onChange={(e) => globalWallpaperOverride && setGlobalWallpaperOverride({ ...globalWallpaperOverride, overlay: { ...(globalWallpaperOverride.overlay as any), opacity: parseFloat(e.target.value) } })}
                           />
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <Label>Positioning</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label>Position</Label>
+                          <Input placeholder="center" value={globalWallpaperOverride?.position || 'center'} onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), position: e.target.value })} />
+                        </div>
+                        <div>
+                          <Label>Size</Label>
+                          <Input placeholder="cover" value={globalWallpaperOverride?.size || 'cover'} onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), size: e.target.value })} />
+                        </div>
+                        <div>
+                          <Label>Tiling</Label>
+                          <Select value={globalWallpaperOverride?.tiling || 'no-repeat'} onValueChange={(tiling: any) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), tiling })}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="no-repeat">no-repeat</SelectItem>
+                              <SelectItem value="repeat">repeat</SelectItem>
+                              <SelectItem value="repeat-x">repeat-x</SelectItem>
+                              <SelectItem value="repeat-y">repeat-y</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch checked={!!globalWallpaperOverride?.parallax} onCheckedChange={(parallax) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), parallax })} />
+                          <span className="text-sm">Parallax</span>
                         </div>
                       </div>
                     </div>
