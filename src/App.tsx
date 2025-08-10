@@ -24,6 +24,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const PavementScanPro = lazy(() => import("./pages/PavementScanPro"));
 const OverWatch = lazy(() => import("./pages/OverWatch"));
 const Estimator = lazy(() => import("./pages/Estimator"));
+const Builder = lazy(() => import("./pages/Builder"));
 const AdvancedThemeCustomizer = lazy(() => import("./components/theme/AdvancedThemeCustomizer"));
 
 const queryClient = new QueryClient();
@@ -58,7 +59,8 @@ const App = () => (
                 <Route path="/overwatch" element={<OverWatch />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/pavement-estimator" element={<Estimator />} />
-                <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
+                                 <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
+                 <Route path="/builder" element={<Builder />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                 </Routes>

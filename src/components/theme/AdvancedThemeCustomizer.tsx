@@ -35,8 +35,10 @@ import {
   Tablet,
   Tv,
   Gauge,
-  Accessibility
+  Accessibility,
+  Target
 } from 'lucide-react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 interface ColorPickerProps {
   color: ThemeColor;
@@ -179,6 +181,9 @@ export function AdvancedThemeCustomizer() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [customTheme, setCustomTheme] = useState<Theme>(currentTheme);
   const [selectedDevice, setSelectedDevice] = useState<'mobile' | 'tablet' | 'desktop' | 'tv'>('desktop');
+  const [isTargetsMode, setIsTargetsMode] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [inspectorPath, setInspectorPath] = useState<string>('colors.card');
 
   // Real-time preview theme
   const previewTheme = useMemo(() => {
@@ -197,6 +202,11 @@ export function AdvancedThemeCustomizer() {
     current[pathParts[pathParts.length - 1]] = color;
     
     setCustomTheme(updatedTheme);
+  };
+
+  const openInspector = (path: string) => {
+    setInspectorPath(path);
+    setInspectorOpen(true);
   };
 
   const generateScheme = (baseColor: ThemeColor, type: 'monochromatic' | 'complementary' | 'triadic' | 'analogous') => {
@@ -267,6 +277,14 @@ export function AdvancedThemeCustomizer() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                variant={isTargetsMode ? "default" : "outline"}
+                onClick={() => setIsTargetsMode(!isTargetsMode)}
+                className="flex items-center gap-2"
+              >
+                <Target className="h-4 w-4" />
+                {isTargetsMode ? "Targets On" : "Targets Mode"}
+              </Button>
               <Button
                 variant={isPreviewMode ? "default" : "outline"}
                 onClick={() => setIsPreviewMode(!isPreviewMode)}
@@ -833,78 +851,54 @@ export function AdvancedThemeCustomizer() {
           </Card>
         </div>
 
-        {/* Live Preview */}
-        <div className="space-y-6">
-          <Card>
+        {/* Preview Pane with Targets */}
+        <div className="lg:col-span-1">
+          <Card className="relative overflow-hidden">
             <CardHeader>
-              <CardTitle>Live Preview</CardTitle>
-              <CardDescription>
-                See your changes in real-time
-              </CardDescription>
+              <CardTitle className="text-lg">Live Preview</CardTitle>
+              <CardDescription>Click targets to edit their tokens</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Theme info */}
-              <div>
-                <div className="text-lg font-semibold">{customTheme.name}</div>
-                <div className="text-sm text-muted-foreground">{customTheme.description}</div>
-                <div className="flex gap-1 mt-2">
-                  {customTheme.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
+            <CardContent>
+              <div className="relative rounded-md border border-border p-4 bg-card">
+                <div className="space-y-3">
+                  <Button className="bg-primary text-primary-foreground">Primary Button</Button>
+                  <Button variant="outline">Secondary Button</Button>
+                  <div className="rounded-md p-4 border border-border bg-card">Card</div>
+                  <Input placeholder="Input" />
+                  <Badge>Badge</Badge>
                 </div>
-              </div>
 
-              {/* Color swatches */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">Color Palette</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {Object.entries(customTheme.colors).slice(0, 8).map(([name, color]) => (
-                    <div key={name} className="text-center">
-                      <div 
-                        className="w-full h-12 rounded border border-border mb-1"
-                        style={{ backgroundColor: hslToString(color) }}
-                      />
-                      <div className="text-xs text-muted-foreground capitalize">
-                        {name.replace(/([A-Z])/g, ' $1').trim()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Preview components */}
-              <div className="space-y-2">
-                <Button className="w-full">Primary Button</Button>
-                <Button variant="secondary" className="w-full">Secondary Button</Button>
-                <Card className="p-4">
-                  <div className="text-sm font-medium">Preview Card</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    This shows how cards will look with your theme.
-                  </div>
-                </Card>
+                {isTargetsMode && (
+                  <>
+                    <button onClick={() => openInspector('colors.card')} className="absolute inset-x-4 top-[92px] h-16 rounded-md ring-2 ring-accent/60 bg-accent/10" />
+                    <button onClick={() => openInspector('colors.primary')} className="absolute left-4 top-4 h-10 w-40 rounded ring-2 ring-primary/60 bg-primary/10" />
+                    <button onClick={() => openInspector('colors.input')} className="absolute left-4 bottom-4 h-10 w-[calc(100%-2rem)] rounded ring-2 ring-foreground/40" />
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
-
-          {/* Particle Preview */}
-          {customTheme.effects.particles.enabled && (
-            <Card className="relative overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-sm">Particle Preview</CardTitle>
-              </CardHeader>
-              <CardContent className="relative h-32">
-                <ParticleSystem
-                  effect={customTheme.effects.particles}
-                  containerWidth={300}
-                  containerHeight={128}
-                />
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
+
+      <Drawer open={inspectorOpen} onOpenChange={setInspectorOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Inspector: {inspectorPath}</DrawerTitle>
+          </DrawerHeader>
+          <div className="p-4">
+            <ColorPicker
+              color={customTheme.colors[(inspectorPath.split('.')[1]) as keyof typeof customTheme.colors] || customTheme.colors.card}
+              onChange={(color) => updateColor(inspectorPath, color)}
+              label={inspectorPath}
+            />
+            <div className="mt-4 flex items-center gap-2">
+              <Button variant="outline" onClick={() => setInspectorOpen(false)}>Close</Button>
+              <Button onClick={() => setIsPreviewMode(true)}>Preview Changes</Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }
