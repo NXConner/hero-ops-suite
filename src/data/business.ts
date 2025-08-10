@@ -53,10 +53,13 @@ export const BUSINESS_PROFILE: BusinessProfile = {
     handicapSymbolCost: 40,
     arrowCost: 15,
     crosswalkCost: 60,
+    stopBarCost: 25,
+    textStencilCost: 15,
     paintColors: ["white", "yellow", "blue"],
     paintColorCostDelta: { blue: 0.05 },
     patchingHotPerSqft: 3.5,
     patchingColdPerSqft: 3.0,
+    salesTaxPct: 0,
   },
   fuel: {
     c30MpgLoaded: 12,

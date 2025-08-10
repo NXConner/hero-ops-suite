@@ -309,8 +309,26 @@ const Estimator = () => {
                   <Input type="number" min={0} value={params.patchSquareFeet} onChange={e => setParams(p => ({ ...p, patchSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
+                  <Label>Patch thickness (in)</Label>
+                  <Input type="number" step="0.5" min={1} max={6} onChange={e => (null)} onBlur={e => setParams(p => ({ ...p, patchThicknessInches: Math.min(6, Math.max(1, Number(e.currentTarget.value) || 2)) }))} placeholder="2" />
+                </div>
+                <div>
+                  <Label>Patch material</Label>
+                  <Select onValueChange={(v) => setParams(p => ({ ...p, patchMaterial: v as any }))}>
+                    <SelectTrigger><SelectValue placeholder="hot" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hot">Hot mix</SelectItem>
+                      <SelectItem value="cold">Cold patch</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <Label>Crack feet</Label>
                   <Input type="number" min={0} value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Math.max(0, Number(e.target.value) || 0) }))} />
+                </div>
+                <div>
+                  <Label>Deep crack prefill (%)</Label>
+                  <Input type="number" step="5" min={0} max={100} onChange={e => (null)} onBlur={e => setParams(p => ({ ...p, deepCrackPrefillPct: Math.min(100, Math.max(0, Number(e.currentTarget.value) || 0)) }))} placeholder="0" />
                 </div>
                 <div>
                   <Label>Oil spots sq ft</Label>
@@ -339,6 +357,14 @@ const Estimator = () => {
                 <div>
                   <Label>Crosswalks count</Label>
                   <Input type="number" value={params.numCrosswalks} onChange={e => setParams(p => ({ ...p, numCrosswalks: Number(e.target.value) }))} />
+                </div>
+                <div>
+                  <Label>Stop bars</Label>
+                  <Input type="number" min={0} onChange={e => setParams(p => ({ ...p, numStopBars: Math.max(0, Number(e.target.value) || 0) }))} />
+                </div>
+                <div>
+                  <Label>Text stencils</Label>
+                  <Input type="number" min={0} onChange={e => setParams(p => ({ ...p, numTextStencils: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
                   <Label>Paint color</Label>

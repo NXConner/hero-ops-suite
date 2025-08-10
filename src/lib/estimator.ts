@@ -223,6 +223,8 @@ export function computeStriping(
     numArrows: number;
     numCrosswalks?: number;
     paintColor?: string;
+    numStopBars?: number;
+    numTextStencils?: number;
   },
   unitCostPerLinearFoot: number
 ) {
@@ -238,6 +240,14 @@ export function computeStriping(
   if (crosswalks > 0) {
     const cx = BUSINESS_PROFILE.pricing.crosswalkCost ?? 60;
     extras += crosswalks * cx;
+  }
+  if ((params.numStopBars ?? 0) > 0) {
+    const sb = BUSINESS_PROFILE.pricing.stopBarCost ?? 25;
+    extras += (params.numStopBars ?? 0) * sb;
+  }
+  if ((params.numTextStencils ?? 0) > 0) {
+    const ts = BUSINESS_PROFILE.pricing.textStencilCost ?? 15;
+    extras += (params.numTextStencils ?? 0) * ts;
   }
   if (params.numArrows > 0) {
     const ar = BUSINESS_PROFILE.pricing.arrowCost ?? 15;
@@ -393,6 +403,8 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
       numArrows: input.numArrows || 0,
       numCrosswalks: (input as any).numCrosswalks || 0,
       paintColor: (input as any).paintColor || undefined,
+      numStopBars: (input as any).numStopBars || 0,
+      numTextStencils: (input as any).numTextStencils || 0,
     };
     const strip = computeStriping(params, DEFAULTS.lineCostPerLinearFoot);
     baseSellFromTasks += strip.sellPrice;
@@ -426,6 +438,13 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
   let transportLoad: EstimateOutput['transportLoad'];
   if (input.includeTransportWeightCheck && scContext) {
     transportLoad = computeTransportLoad(scContext.concentrateGallons, scContext.sandBags, scContext.waterGallons);
+  }
+
+  const taxPct = BUSINESS_PROFILE.pricing.salesTaxPct ?? 0;
+  if (taxPct > 0) {
+    const tax = roundToTwo(total * taxPct);
+    materials.push({ label: `Sales Tax (${Math.round(taxPct * 100)}%)`, cost: tax });
+    // update totals to reflect tax separately if desired; leaving total as-is keeps prior logic
   }
 
   notes.push('Estimate valid for 30 days. Subject to site inspection.');

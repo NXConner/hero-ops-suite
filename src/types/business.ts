@@ -48,10 +48,13 @@ export interface PricingBaselines {
   handicapSymbolCost?: number; // e.g., 40
   arrowCost?: number; // e.g., 15
   crosswalkCost?: number; // e.g., 60
+  stopBarCost?: number; // e.g., 25
+  textStencilCost?: number; // e.g., 15
   paintColors?: string[]; // optional available paint colors
   paintColorCostDelta?: Record<string, number>; // per-color cost delta per LF
   patchingHotPerSqft?: number; // baseline at 2"
   patchingColdPerSqft?: number; // baseline at 2"
+  salesTaxPct?: number; // optional sales tax
 }
 
 export interface FuelAssumptions {
