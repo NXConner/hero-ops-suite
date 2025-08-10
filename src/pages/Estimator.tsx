@@ -13,6 +13,7 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { computeRoundTripMilesBetween } from '@/lib/geo';
 import { saveJob, listJobs, type StoredJob } from '@/services/jobs';
 import { listCustomers, saveCustomer, type Customer } from '@/services/customers';
+import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile } from '@/services/exporters';
 
 const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
@@ -301,23 +302,23 @@ const Estimator = () => {
                 </div>
                 <div>
                   <Label>Sealcoat sq ft</Label>
-                  <Input type="number" value={params.sealcoatSquareFeet} onChange={e => setParams(p => ({ ...p, sealcoatSquareFeet: Number(e.target.value) }))} />
+                  <Input type="number" min={0} value={params.sealcoatSquareFeet} onChange={e => setParams(p => ({ ...p, sealcoatSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
                   <Label>Patch sq ft</Label>
-                  <Input type="number" value={params.patchSquareFeet} onChange={e => setParams(p => ({ ...p, patchSquareFeet: Number(e.target.value) }))} />
+                  <Input type="number" min={0} value={params.patchSquareFeet} onChange={e => setParams(p => ({ ...p, patchSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
                   <Label>Crack feet</Label>
-                  <Input type="number" value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Number(e.target.value) }))} />
+                  <Input type="number" min={0} value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
                   <Label>Oil spots sq ft</Label>
-                  <Input type="number" value={params.oilSpotSquareFeet} onChange={e => setParams(p => ({ ...p, oilSpotSquareFeet: Number(e.target.value) }))} />
+                  <Input type="number" min={0} value={params.oilSpotSquareFeet} onChange={e => setParams(p => ({ ...p, oilSpotSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
                   <Label>Porosity factor</Label>
-                  <Input type="number" step="0.1" value={params.surfacePorosityFactor} onChange={e => setParams(p => ({ ...p, surfacePorosityFactor: Number(e.target.value) }))} />
+                  <Input type="number" step="0.1" min={0.5} max={2.5} value={params.surfacePorosityFactor} onChange={e => setParams(p => ({ ...p, surfacePorosityFactor: Math.min(2.5, Math.max(0.5, Number(e.target.value) || 1)) }))} />
                 </div>
                 <div>
                   <Label>Stalls (single)</Label>
@@ -356,20 +357,20 @@ const Estimator = () => {
                 <div>
                   <Label>Round trip miles (supplier)</Label>
                   <div className="flex gap-2">
-                    <Input type="number" value={roundTripMilesSupplier} onChange={e => setRoundTripMilesSupplier(Number(e.target.value))} />
+                    <Input type="number" min={0} value={roundTripMilesSupplier} onChange={e => setRoundTripMilesSupplier(Math.max(0, Number(e.target.value) || 0))} />
                     <Button type="button" variant="outline" onClick={handleComputeSupplierMiles}>Auto</Button>
                   </div>
                 </div>
                 <div>
                   <Label>Round trip miles (job)</Label>
                   <div className="flex gap-2">
-                    <Input type="number" value={roundTripMilesJob} onChange={e => setRoundTripMilesJob(Number(e.target.value))} />
+                    <Input type="number" min={0} value={roundTripMilesJob} onChange={e => setRoundTripMilesJob(Math.max(0, Number(e.target.value) || 0))} />
                     <Button type="button" variant="outline" onClick={handleComputeJobMiles}>Auto</Button>
                   </div>
                 </div>
                 <div>
                   <Label>Fuel price $/gal</Label>
-                  <Input type="number" step="0.01" value={fuelPrice} onChange={e => setFuelPrice(Number(e.target.value))} />
+                  <Input type="number" step="0.01" min={0} value={fuelPrice} onChange={e => setFuelPrice(Math.max(0, Number(e.target.value) || 0))} />
                 </div>
                 <div>
                   <Label>PMM price $/gal</Label>
@@ -446,6 +447,11 @@ ${textInvoice25}
 
 ${textInvoiceRounded}`}
               </pre>
+              <div className="mt-3 flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={() => exportInvoicePDF(`${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`, jobName || 'invoice')}>Export PDF</Button>
+                <Button type="button" variant="outline" onClick={() => downloadTextFile(exportJobsCSV(jobs), 'jobs.csv', 'text/csv')}>Jobs CSV</Button>
+                <Button type="button" variant="outline" onClick={() => downloadTextFile(exportCustomersCSV(customers), 'customers.csv', 'text/csv')}>Customers CSV</Button>
+              </div>
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label>Recent Jobs</Label>
