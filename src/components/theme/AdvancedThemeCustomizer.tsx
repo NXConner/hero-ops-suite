@@ -492,6 +492,7 @@ export function AdvancedThemeCustomizer() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Particles (existing) */}
                   <ParticleControls
                     particles={customTheme.effects.particles}
                     onChange={(particles) => 
@@ -504,50 +505,37 @@ export function AdvancedThemeCustomizer() {
 
                   <Separator />
 
-                  <div>
-                    <Label className="text-sm font-medium mb-2 block">Blur Effects</Label>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm">Background Blur</Label>
-                        <Switch 
-                          checked={customTheme.effects.blur.background.enabled}
-                          onCheckedChange={(enabled) => 
-                            setCustomTheme({
-                              ...customTheme,
-                              effects: {
-                                ...customTheme.effects,
-                                blur: {
-                                  ...customTheme.effects.blur,
-                                  background: { ...customTheme.effects.blur.background, enabled }
-                                }
-                              }
-                            })
-                          }
-                        />
-                      </div>
-                      {customTheme.effects.blur.background.enabled && (
-                        <div>
-                          <Label className="text-xs">Radius: {customTheme.effects.blur.background.radius}px</Label>
-                          <Slider
-                            value={[customTheme.effects.blur.background.radius]}
-                            onValueChange={([radius]) => 
-                              setCustomTheme({
-                                ...customTheme,
-                                effects: {
-                                  ...customTheme.effects,
-                                  blur: {
-                                    ...customTheme.effects.blur,
-                                    background: { ...customTheme.effects.blur.background, radius }
-                                  }
-                                }
-                              })
-                            }
-                            min={0}
-                            max={20}
-                            step={1}
-                          />
-                        </div>
-                      )}
+                  {/* Border radius and glow */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Border Radius</Label>
+                      <Slider
+                        value={[parseInt(getComputedStyle(document.documentElement).getPropertyValue('--border-radius') || '8', 10)]}
+                        min={0}
+                        max={24}
+                        step={1}
+                        onValueChange={([v]) => {
+                          const s = document.getElementById('preview-theme-styles');
+                          const style = s || document.createElement('style');
+                          style.id = 'preview-theme-styles';
+                          style.textContent = `:root{ --border-radius: ${v}px; }`;
+                          if (!s) document.head.appendChild(style);
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label>Glow Intensity</Label>
+                      <Slider
+                        value={[Math.round((customTheme.effects.shadows.glow.intensity || 0.3) * 100)]}
+                        min={0}
+                        max={100}
+                        step={5}
+                        onValueChange={([v]) => {
+                          const updated = { ...customTheme };
+                          updated.effects = { ...customTheme.effects, shadows: { ...customTheme.effects.shadows, glow: { ...customTheme.effects.shadows.glow, intensity: v/100 } } } as any;
+                          setCustomTheme(updated);
+                        }}
+                      />
                     </div>
                   </div>
                 </CardContent>

@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import ThemeBackground from "./components/theme/ThemeBackground";
 import EffectsOverlay from "./components/effects/EffectsOverlay";
 import SoundManager from "./components/effects/SoundManager";
+import UiSoundBindings from "./components/effects/UiSoundBindings";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 
 // Lazy load heavy components that use 3D libraries, maps, or ML
@@ -42,6 +43,7 @@ const App = () => (
            <Toaster />
            <Sonner />
                        <SoundManager />
+            <UiSoundBindings />
             <EffectsOverlay />
             <ThemeBackground />
            <BrowserRouter>
