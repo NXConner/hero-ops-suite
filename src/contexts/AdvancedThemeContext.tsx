@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
-import { Theme, ThemeContext, ThemePreset } from '@/types/theme';
+import { Theme, ThemeContext, ThemePreset, ThemeWallpaper } from '@/types/theme';
 import { 
   generateThemeCSS, 
   generateWallpaperCSS, 
@@ -31,6 +31,10 @@ export function AdvancedThemeProvider({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Global wallpaper override
+  const [globalWallpaperOverride, setGlobalWallpaperOverrideState] = useState<ThemeWallpaper | null>(null);
+  const [isGlobalWallpaperEnabled, setIsGlobalWallpaperEnabledState] = useState<boolean>(false);
+
   // Load themes from storage
   useEffect(() => {
     try {
@@ -39,6 +43,13 @@ export function AdvancedThemeProvider({
         const config = JSON.parse(stored);
         setCustomThemes(config.customThemes || []);
         setPresets(config.presets || []);
+      }
+
+      const globalWpStr = localStorage.getItem('global-wallpaper-config');
+      if (globalWpStr) {
+        const parsed = JSON.parse(globalWpStr);
+        setGlobalWallpaperOverrideState(parsed.wallpaper || null);
+        setIsGlobalWallpaperEnabledState(!!parsed.enabled);
       }
     } catch (err) {
       console.error('Failed to load theme config:', err);
@@ -58,6 +69,14 @@ export function AdvancedThemeProvider({
       console.error('Failed to save theme config:', err);
     }
   }, [storageKey]);
+
+  const saveGlobalWallpaper = useCallback((wallpaper: ThemeWallpaper | null, enabled: boolean) => {
+    try {
+      localStorage.setItem('global-wallpaper-config', JSON.stringify({ wallpaper, enabled }));
+    } catch (err) {
+      console.error('Failed to save global wallpaper:', err);
+    }
+  }, []);
 
   // Initialize with default themes
   useEffect(() => {
@@ -105,7 +124,7 @@ export function AdvancedThemeProvider({
       const timeVariant = getCurrentTimeVariant();
 
       // Apply responsive variant if available
-      let activeTheme = { ...theme };
+      let activeTheme = { ...theme } as Theme;
       if (theme.variants && theme.variants[deviceType]) {
         activeTheme = mergeThemes(activeTheme, theme.variants[deviceType]);
       }
@@ -124,9 +143,14 @@ export function AdvancedThemeProvider({
         enableShadows: activeTheme.performance.enableShadows && performanceLevel !== 'low'
       };
 
+      // Apply global wallpaper override if enabled
+      const effectiveTheme: Theme = isGlobalWallpaperEnabled && globalWallpaperOverride
+        ? { ...activeTheme, wallpaper: globalWallpaperOverride }
+        : activeTheme;
+
       // Generate and inject CSS
-      const themeCSS = generateThemeCSS(activeTheme);
-      const wallpaperCSS = generateWallpaperCSS(activeTheme);
+      const themeCSS = generateThemeCSS(effectiveTheme);
+      const wallpaperCSS = generateWallpaperCSS(effectiveTheme);
       
       // Remove existing theme styles
       const existingStyle = document.getElementById('advanced-theme-styles');
@@ -144,35 +168,35 @@ export function AdvancedThemeProvider({
           ${wallpaperCSS}
         }
         
-        ${activeTheme.customCSS || ''}
+        ${effectiveTheme.customCSS || ''}
       `;
       document.head.appendChild(styleElement);
 
       // Set theme data attribute
-      document.documentElement.setAttribute('data-theme', activeTheme.id);
-      document.documentElement.setAttribute('data-performance', activeTheme.performance.quality);
+      document.documentElement.setAttribute('data-theme', effectiveTheme.id);
+      document.documentElement.setAttribute('data-performance', effectiveTheme.performance.quality);
       
       // Apply accessibility settings
-      if (activeTheme.accessibility.reducedMotion) {
+      if (effectiveTheme.accessibility.reducedMotion) {
         document.documentElement.style.setProperty('--animation-duration', '0.01ms');
       }
       
-      if (activeTheme.accessibility.highContrast) {
+      if (effectiveTheme.accessibility.highContrast) {
         document.documentElement.classList.add('high-contrast');
       } else {
         document.documentElement.classList.remove('high-contrast');
       }
 
-      setCurrentTheme(activeTheme);
+      setCurrentTheme(effectiveTheme);
       
       // Save current theme to localStorage
-      localStorage.setItem('current-theme-id', activeTheme.id);
+      localStorage.setItem('current-theme-id', effectiveTheme.id);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply theme');
       console.error('Theme application error:', err);
     }
-  }, []);
+  }, [globalWallpaperOverride, isGlobalWallpaperEnabled]);
 
   // Theme management functions
   const setTheme = useCallback((themeId: string) => {
@@ -314,6 +338,19 @@ export function AdvancedThemeProvider({
     }
   }, [presets, applyTheme]);
 
+  // Global wallpaper API (exposed)
+  const setGlobalWallpaperOverride = useCallback((wallpaper: ThemeWallpaper | null) => {
+    setGlobalWallpaperOverrideState(wallpaper);
+    saveGlobalWallpaper(wallpaper, isGlobalWallpaperEnabled);
+    if (currentTheme) applyTheme(currentTheme);
+  }, [isGlobalWallpaperEnabled, currentTheme, applyTheme, saveGlobalWallpaper]);
+
+  const setIsGlobalWallpaperEnabled = useCallback((enabled: boolean) => {
+    setIsGlobalWallpaperEnabledState(enabled);
+    saveGlobalWallpaper(globalWallpaperOverride, enabled);
+    if (currentTheme) applyTheme(currentTheme);
+  }, [globalWallpaperOverride, currentTheme, applyTheme, saveGlobalWallpaper]);
+
   // Handle window resize for responsive themes
   useEffect(() => {
     const handleResize = () => {
@@ -353,7 +390,12 @@ export function AdvancedThemeProvider({
     resetTheme,
     applyPreset,
     isLoading,
-    error
+    error,
+    // Global wallpaper
+    globalWallpaperOverride,
+    isGlobalWallpaperEnabled,
+    setGlobalWallpaperOverride,
+    setIsGlobalWallpaperEnabled
   }), [
     currentTheme,
     availableThemes,
@@ -368,7 +410,11 @@ export function AdvancedThemeProvider({
     resetTheme,
     applyPreset,
     isLoading,
-    error
+    error,
+    globalWallpaperOverride,
+    isGlobalWallpaperEnabled,
+    setGlobalWallpaperOverride,
+    setIsGlobalWallpaperEnabled
   ]);
 
   return (

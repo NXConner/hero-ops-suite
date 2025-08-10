@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import ThemeBackground from "./components/theme/ThemeBackground";
+import EffectsOverlay from "./components/effects/EffectsOverlay";
+import SoundManager from "./components/effects/SoundManager";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 
 // Lazy load heavy components that use 3D libraries, maps, or ML
@@ -38,7 +40,9 @@ const App = () => (
                  <TooltipProvider>
            <Toaster />
            <Sonner />
-           <ThemeBackground />
+                       <SoundManager />
+            <EffectsOverlay />
+            <ThemeBackground />
            <BrowserRouter>
              <ErrorBoundary>
                <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div></div>}>

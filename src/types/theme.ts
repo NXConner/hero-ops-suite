@@ -37,7 +37,7 @@ export interface Animation {
 
 export interface ParticleEffect {
   enabled: boolean;
-  type: 'snow' | 'rain' | 'dust' | 'sparks' | 'geometric' | 'custom';
+  type: 'snow' | 'rain' | 'dust' | 'sparks' | 'geometric' | 'custom' | 'fog';
   count: number;
   speed: number;
   size: { min: number; max: number };
@@ -266,4 +266,9 @@ export interface ThemeContext {
   applyPreset: (presetId: string) => void;
   isLoading: boolean;
   error: string | null;
+  // Global wallpaper override API
+  globalWallpaperOverride: ThemeWallpaper | null;
+  isGlobalWallpaperEnabled: boolean;
+  setGlobalWallpaperOverride: (wallpaper: ThemeWallpaper | null) => void;
+  setIsGlobalWallpaperEnabled: (enabled: boolean) => void;
 }

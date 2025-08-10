@@ -2632,5 +2632,334 @@ export const getDefaultThemes = (): Theme[] => [
     tags: ['nature', 'desert', 'sunset'],
     featured: false,
     public: true
-  }
+  },
+  // TECH: ISAC Protocol (Cyber Orange)
+  {
+    id: 'isac-protocol',
+    name: 'ISAC Protocol',
+    description: 'Division-inspired cyber orange with cyan HUD accents on deep neutrals',
+    category: 'tech',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(215, 19, 8), // deep charcoal
+      foreground: color(196, 18, 94), // off-white
+      primary: color(24, 100, 53), // ISAC orange
+      primaryForeground: color(210, 10, 10),
+      secondary: color(215, 19, 8),
+      secondaryForeground: color(196, 18, 94),
+      accent: color(193, 100, 58), // tech cyan
+      accentForeground: color(210, 10, 10),
+      destructive: color(0, 78, 57), // #E74C3C approx
+      destructiveForeground: color(0, 0, 100),
+      success: color(145, 63, 49), // #2ECC71 approx
+      successForeground: color(0, 0, 100),
+      warning: color(35, 90, 50), // #F39C12 approx
+      warningForeground: color(0, 0, 0),
+      info: color(197, 100, 35), // #00B2FF approx
+      infoForeground: color(0, 0, 100),
+      muted: color(215, 10, 20),
+      mutedForeground: color(215, 10, 60),
+      border: color(215, 12, 15),
+      input: color(215, 12, 15),
+      ring: color(24, 100, 53),
+      card: color(215, 19, 9),
+      cardForeground: color(196, 18, 94),
+      popover: color(215, 19, 9),
+      popoverForeground: color(196, 18, 94),
+      sidebar: color(215, 19, 6),
+      sidebarForeground: color(196, 18, 94),
+      sidebarPrimary: color(24, 100, 53),
+      sidebarPrimaryForeground: color(0, 0, 0),
+      sidebarAccent: color(193, 100, 58),
+      sidebarAccentForeground: color(0, 0, 0),
+      sidebarBorder: color(215, 19, 10),
+      sidebarRing: color(193, 100, 58)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 28, color: color(24, 100, 53), intensity: 0.35 }
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 110, brightness: 90 },
+        overlay: { enabled: true, radius: 4, saturation: 105, brightness: 95 },
+        card: { enabled: true, radius: 2, saturation: 110, brightness: 98 }
+      },
+      particles: {
+        enabled: true,
+        type: 'fog',
+        count: 20,
+        speed: 0.1,
+        size: { min: 40, max: 100 },
+        color: color(200, 10, 80),
+        opacity: { min: 0.02, max: 0.06 },
+        direction: 0,
+        wind: 0.02
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 135, stops: [{ color: color(24, 100, 53), position: 0 }, { color: color(24, 100, 46), position: 100 }] },
+        secondary: { type: 'linear', angle: 90, stops: [{ color: color(215, 19, 8), position: 0 }, { color: color(215, 19, 12), position: 100 }] },
+        hero: { type: 'linear', angle: 180, stops: [{ color: color(215, 19, 6), position: 0 }, { color: color(215, 19, 10), position: 100 }] },
+        card: { type: 'linear', angle: 145, stops: [{ color: color(215, 19, 9), position: 0 }, { color: color(215, 19, 12), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(24, 100, 53), position: 0 }, { color: color(24, 100, 46), position: 100 }] },
+        border: { type: 'linear', angle: 0, stops: [{ color: color(24, 100, 53, 0.4), position: 0 }, { color: color(193, 100, 58, 0.4), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'image',
+      source: '/hero-bg.jpg',
+      position: 'center',
+      size: 'cover',
+      overlay: { color: color(193, 100, 58), opacity: 0.08, blendMode: 'screen' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'high'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['tech', 'isac', 'division', 'hud'],
+    featured: true,
+    public: true
+  },
+
+  // TECH: Disavowed Protocol (Rogue)
+  {
+    id: 'disavowed-protocol',
+    name: 'Disavowed Protocol',
+    description: 'Rogue red on black with tactical greys and aggressive glitch accents',
+    category: 'tech',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(215, 20, 6),
+      foreground: color(210, 10, 90),
+      primary: color(0, 82, 50), // rogue red
+      primaryForeground: color(0, 0, 100),
+      secondary: color(215, 20, 6),
+      secondaryForeground: color(210, 10, 90),
+      accent: color(43, 100, 52), // amber
+      accentForeground: color(0, 0, 0),
+      destructive: color(0, 85, 55),
+      destructiveForeground: color(0, 0, 100),
+      success: color(145, 63, 49),
+      successForeground: color(0, 0, 0),
+      warning: color(43, 100, 52),
+      warningForeground: color(0, 0, 0),
+      info: color(210, 100, 50),
+      infoForeground: color(0, 0, 0),
+      muted: color(215, 10, 18),
+      mutedForeground: color(215, 10, 60),
+      border: color(0, 70, 30),
+      input: color(215, 12, 12),
+      ring: color(0, 82, 50),
+      card: color(215, 20, 7),
+      cardForeground: color(210, 10, 90),
+      popover: color(215, 20, 7),
+      popoverForeground: color(210, 10, 90),
+      sidebar: color(215, 22, 5),
+      sidebarForeground: color(210, 10, 90),
+      sidebarPrimary: color(0, 82, 50),
+      sidebarPrimaryForeground: color(0, 0, 100),
+      sidebarAccent: color(43, 100, 52),
+      sidebarAccentForeground: color(0, 0, 0),
+      sidebarBorder: color(0, 70, 30),
+      sidebarRing: color(0, 82, 50)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 24, color: color(0, 82, 50), intensity: 0.4 }
+      },
+      blur: {
+        background: { enabled: true, radius: 6, saturation: 110, brightness: 85 },
+        overlay: { enabled: true, radius: 3, saturation: 100, brightness: 92 },
+        card: { enabled: true, radius: 2, saturation: 105, brightness: 96 }
+      },
+      particles: {
+        enabled: false,
+        type: 'dust',
+        count: 10,
+        speed: 0.2,
+        size: { min: 1, max: 2 },
+        color: color(0, 82, 50),
+        opacity: { min: 0.05, max: 0.15 },
+        direction: 0,
+        wind: 0.02
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 135, stops: [{ color: color(0, 82, 50), position: 0 }, { color: color(0, 82, 40), position: 100 }] },
+        secondary: { type: 'linear', angle: 90, stops: [{ color: color(215, 20, 6), position: 0 }, { color: color(215, 20, 10), position: 100 }] },
+        hero: { type: 'linear', angle: 180, stops: [{ color: color(215, 20, 5), position: 0 }, { color: color(215, 20, 10), position: 100 }] },
+        card: { type: 'linear', angle: 145, stops: [{ color: color(215, 20, 8), position: 0 }, { color: color(215, 20, 12), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(0, 82, 50), position: 0 }, { color: color(0, 82, 40), position: 100 }] },
+        border: { type: 'linear', angle: 0, stops: [{ color: color(0, 82, 50, 0.4), position: 0 }, { color: color(43, 100, 52, 0.4), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'image',
+      source: '/hero-bg.jpg',
+      position: 'center',
+      size: 'cover',
+      overlay: { color: color(0, 82, 50), opacity: 0.1, blendMode: 'screen' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'high'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['tech', 'rogue', 'disavowed', 'glitch'],
+    featured: true,
+    public: true
+  },
+
+  // TECH: Darkzone Containment (DZ)
+  {
+    id: 'darkzone-containment',
+    name: 'Darkzone Containment',
+    description: 'Dark Zone purple + black/steel with UV neon atmosphere',
+    category: 'tech',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(233, 20, 6), // near black steel
+      foreground: color(250, 25, 91), // #E8E6F7
+      primary: color(265, 100, 50), // DZ purple
+      primaryForeground: color(0, 0, 100),
+      secondary: color(233, 20, 6),
+      secondaryForeground: color(250, 25, 91),
+      accent: color(255, 86, 67), // #8B5CF6 approx
+      accentForeground: color(0, 0, 0),
+      destructive: color(0, 78, 57),
+      destructiveForeground: color(0, 0, 100),
+      success: color(145, 63, 49),
+      successForeground: color(0, 0, 0),
+      warning: color(43, 100, 52),
+      warningForeground: color(0, 0, 0),
+      info: color(196, 88, 63), // UV blue approx
+      infoForeground: color(0, 0, 0),
+      muted: color(250, 15, 70), // muted foreground
+      mutedForeground: color(255, 12, 75),
+      border: color(265, 100, 50),
+      input: color(250, 12, 18),
+      ring: color(265, 100, 50),
+      card: color(233, 20, 7),
+      cardForeground: color(250, 25, 91),
+      popover: color(233, 20, 7),
+      popoverForeground: color(250, 25, 91),
+      sidebar: color(233, 22, 5),
+      sidebarForeground: color(250, 25, 91),
+      sidebarPrimary: color(265, 100, 50),
+      sidebarPrimaryForeground: color(0, 0, 100),
+      sidebarAccent: color(255, 86, 67),
+      sidebarAccentForeground: color(0, 0, 0),
+      sidebarBorder: color(250, 12, 18),
+      sidebarRing: color(265, 100, 50)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 26, color: color(265, 100, 50), intensity: 0.4 }
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 120, brightness: 85 },
+        overlay: { enabled: true, radius: 4, saturation: 110, brightness: 92 },
+        card: { enabled: true, radius: 2, saturation: 108, brightness: 96 }
+      },
+      particles: {
+        enabled: true,
+        type: 'fog',
+        count: 24,
+        speed: 0.1,
+        size: { min: 50, max: 120 },
+        color: color(265, 100, 50),
+        opacity: { min: 0.02, max: 0.06 },
+        direction: 0,
+        wind: 0.015
+      },
+      animations: commonAnimations,
+      gradients: {
+        primary: { type: 'linear', angle: 135, stops: [{ color: color(265, 100, 50), position: 0 }, { color: color(265, 100, 45), position: 100 }] },
+        secondary: { type: 'linear', angle: 90, stops: [{ color: color(233, 20, 6), position: 0 }, { color: color(233, 20, 10), position: 100 }] },
+        hero: { type: 'linear', angle: 180, stops: [{ color: color(233, 20, 5), position: 0 }, { color: color(233, 20, 10), position: 100 }] },
+        card: { type: 'linear', angle: 145, stops: [{ color: color(233, 20, 8), position: 0 }, { color: color(233, 20, 12), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(265, 100, 50), position: 0 }, { color: color(265, 100, 45), position: 100 }] },
+        border: { type: 'linear', angle: 0, stops: [{ color: color(265, 100, 50, 0.4), position: 0 }, { color: color(196, 88, 63, 0.4), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'image',
+      source: '/hero-bg.jpg',
+      position: 'center',
+      size: 'cover',
+      overlay: { color: color(265, 100, 50), opacity: 0.1, blendMode: 'screen' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'high'
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['tech', 'darkzone', 'uv', 'purple'],
+    featured: true,
+    public: true
+  },
 ];
