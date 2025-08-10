@@ -54,7 +54,9 @@ export const BUSINESS_PROFILE: BusinessProfile = {
     arrowCost: 15,
     crosswalkCost: 60,
     paintColors: ["white", "yellow", "blue"],
-    paintColorCostDelta: { blue: 0.05 }
+    paintColorCostDelta: { blue: 0.05 },
+    patchingHotPerSqft: 3.5,
+    patchingColdPerSqft: 3.0,
   },
   fuel: {
     c30MpgLoaded: 12,

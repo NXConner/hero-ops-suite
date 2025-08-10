@@ -18,6 +18,11 @@ export interface EstimateInput {
   // Site conditions
   oilSpotSquareFeet?: number; // area needing Prep Seal
   surfacePorosityFactor?: number; // 1.0 normal, >1 increases usage
+  // Patching detail
+  patchThicknessInches?: number; // default 2
+  patchMaterial?: 'hot' | 'cold';
+  // Crack detail
+  deepCrackPrefillPct?: number; // 0..1 portion needing sand prefill
   // Crew & labor
   numFullTime: number; // e.g., 2
   numPartTime: number; // e.g., 1
@@ -192,9 +197,20 @@ export function computeCrackFill(
 
 export function computePatching(
   squareFeet: number,
-  unitSellPricePerSqft: number
+  unitSellPricePerSqft: number,
+  thicknessInches = 2,
+  material: 'hot' | 'cold' = 'hot'
 ) {
-  const sellPrice = roundToTwo(squareFeet * unitSellPricePerSqft);
+  let base = unitSellPricePerSqft;
+  // Adjust base for material if provided
+  if (material === 'cold' && BUSINESS_PROFILE.pricing.patchingColdPerSqft) {
+    base = BUSINESS_PROFILE.pricing.patchingColdPerSqft;
+  } else if (material === 'hot' && BUSINESS_PROFILE.pricing.patchingHotPerSqft) {
+    base = BUSINESS_PROFILE.pricing.patchingHotPerSqft;
+  }
+  // Scale price roughly linearly with thickness relative to 2"
+  const thicknessFactor = thicknessInches / 2;
+  const sellPrice = roundToTwo(squareFeet * base * thicknessFactor);
   return { sellPrice };
 }
 
@@ -340,24 +356,31 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
     laborHours += Math.max(2, sqft / 3000);
   }
 
+  if (input.serviceType === 'patching' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
+    const patchSqft = input.patchSquareFeet || 0;
+    if (patchSqft > 0) {
+      const patch = computePatching(patchSqft, DEFAULTS.patchingPerSqft, input.patchThicknessInches ?? 2, (input.patchMaterial as any) ?? 'hot');
+      baseSellFromTasks += patch.sellPrice;
+      projectDescription += `Patching ${patchSqft} sq ft @ ${input.patchThicknessInches ?? 2}\" ${input.patchMaterial ?? 'hot'}-mix. `;
+      laborHours += Math.max(1, patchSqft / 400);
+    }
+  }
+
   if (input.serviceType === 'crack_filling' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
     const lf = input.crackLinearFeet || 0;
     if (lf > 0) {
       const crack = computeCrackFill(lf, { crackBox: input.crackBoxPricePer30lb, propaneTank: input.propanePerTank }, DEFAULTS.crackFillRatePerFoot);
       materials = materials.concat(crack.items);
       baseSellFromTasks += crack.sellPrice;
+      const deepPct = input.deepCrackPrefillPct ?? 0;
+      if (deepPct > 0) {
+        const sandBagsPrefill = Math.ceil((lf * deepPct) / 100); // rough: 1 bag per 100 ft deep cracks
+        if (sandBagsPrefill > 0) {
+          materials.push({ label: 'Sand (deep crack prefill)', quantity: sandBagsPrefill, unit: 'bag', unitCost: input.sandPricePer50lbBag, cost: roundToTwo(sandBagsPrefill * input.sandPricePer50lbBag) });
+        }
+      }
       projectDescription += `Crack filling ${lf} linear ft. `;
       laborHours += Math.max(1, lf / 100);
-    }
-  }
-
-  if (input.serviceType === 'patching' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
-    const patchSqft = input.patchSquareFeet || 0;
-    if (patchSqft > 0) {
-      const patch = computePatching(patchSqft, DEFAULTS.patchingPerSqft);
-      baseSellFromTasks += patch.sellPrice;
-      projectDescription += `Patching ${patchSqft} sq ft. `;
-      laborHours += Math.max(1, patchSqft / 400);
     }
   }
 

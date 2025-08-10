@@ -50,6 +50,8 @@ export interface PricingBaselines {
   crosswalkCost?: number; // e.g., 60
   paintColors?: string[]; // optional available paint colors
   paintColorCostDelta?: Record<string, number>; // per-color cost delta per LF
+  patchingHotPerSqft?: number; // baseline at 2"
+  patchingColdPerSqft?: number; // baseline at 2"
 }
 
 export interface FuelAssumptions {
