@@ -27,6 +27,7 @@ interface NavItemConfig {
   icon: string; // icon key
   hidden?: boolean;
   badge?: string;
+  parent?: string | null;
 }
 
 const iconMap: Record<string, any> = {
@@ -79,6 +80,9 @@ const Sidebar = () => {
 
   const navigation = useMemo(() => config.filter(i => !i.hidden), [config]);
 
+  const topLevel = navigation.filter(n => !n.parent);
+  const childrenOf = (parentHref: string) => navigation.filter(n => n.parent === parentHref);
+
   return (
     <div className={cn(
       "fixed left-0 top-0 z-40 h-screen bg-card/50 backdrop-blur-sm border-r border-border transition-all duration-300",
@@ -107,32 +111,51 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-2">
-          {navigation.map((item) => {
+          {topLevel.map((item) => {
             const Icon = iconMap[item.icon] || LayoutDashboard;
             const current = location.pathname === item.href;
+            const children = childrenOf(item.href);
             return (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group",
-                  current
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              <div key={item.href}>
+                <Link
+                  to={item.href}
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group",
+                    current
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  )}
+                >
+                  <Icon className="h-5 w-5 shrink-0" />
+                  {!isCollapsed && (
+                    <>
+                      <span className="ml-3">{item.name}</span>
+                      {item.badge && (
+                        <Badge variant="secondary" className="ml-auto">
+                          {item.badge}
+                        </Badge>
+                      )}
+                    </>
+                  )}
+                </Link>
+                {!isCollapsed && children.length > 0 && (
+                  <div className="ml-6 mt-1 space-y-1">
+                    {children.map((child) => {
+                      const CIcon = iconMap[child.icon] || LayoutDashboard;
+                      const isCurrent = location.pathname === child.href;
+                      return (
+                        <Link key={child.href} to={child.href} className={cn(
+                          "flex items-center px-3 py-1.5 text-xs rounded-md",
+                          isCurrent ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )}>
+                          <CIcon className="h-4 w-4" />
+                          <span className="ml-2">{child.name}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                {!isCollapsed && (
-                  <>
-                    <span className="ml-3">{item.name}</span>
-                    {item.badge && (
-                      <Badge variant="secondary" className="ml-auto">
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </>
-                )}
-              </Link>
+              </div>
             );
           })}
         </nav>

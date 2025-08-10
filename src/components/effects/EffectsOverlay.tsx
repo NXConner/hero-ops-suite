@@ -9,6 +9,9 @@ interface EffectSettings {
   radarSweep: boolean;
   vignette: boolean;
   glitch: boolean;
+  uvVignette?: boolean;
+  ticker?: boolean;
+  minimal?: boolean;
 }
 
 const defaultSettings: EffectSettings = {
@@ -18,6 +21,9 @@ const defaultSettings: EffectSettings = {
   radarSweep: false,
   vignette: true,
   glitch: false,
+  uvVignette: false,
+  ticker: false,
+  minimal: false,
 };
 
 function useEffectSettings() {
@@ -65,7 +71,7 @@ export default function EffectsOverlay() {
   const isLowPower = currentTheme?.performance.quality === 'low';
   const enableVisuals = currentTheme?.performance.enableAnimations !== false && !isLowPower && !reducedMotion;
 
-  if (!enableVisuals) return null;
+  if (!enableVisuals || settings.minimal) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[5]">
@@ -129,9 +135,23 @@ export default function EffectsOverlay() {
         />
       )}
 
+      {/* UV Vignette */}
+      {settings.uvVignette && (
+        <div aria-hidden className="absolute inset-0" style={{ boxShadow: 'inset 0 0 260px rgba(122,0,255,0.35)' }} />
+      )}
+
       {/* Simple glitch */}
       {settings.glitch && (
         <div aria-hidden className="absolute inset-0 mix-blend-screen" style={{ animation: 'ow-glitch 2.5s steps(1,end) infinite' }} />
+      )}
+
+      {/* Telemetry ticker */}
+      {settings.ticker && (
+        <div aria-hidden className="absolute bottom-0 left-0 right-0 text-[10px] text-cyan-300/80 tracking-wider">
+          <div className="whitespace-nowrap" style={{ animation: 'ow-ticker 20s linear infinite' }}>
+            ▷ ISAC SYSTEM ONLINE ▷ LINK STABLE ▷ TELEMETRY: OK ▷ SCANLNS: ON ▷ RADAR: STBY ▷ EFFECTS: OPT ▷ 
+          </div>
+        </div>
       )}
 
       {/* keyframes */}
@@ -154,6 +174,10 @@ export default function EffectsOverlay() {
           20% { clip-path: inset(10% 0 82% 0); transform: translateX(1px); }
           25% { clip-path: inset(80% 0 5% 0); transform: translateX(-1px); }
           35% { clip-path: inset(50% 0 40% 0); transform: translateX(2px); }
+        }
+        @keyframes ow-ticker {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
         }
       `}</style>
     </div>

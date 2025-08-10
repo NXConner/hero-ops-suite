@@ -620,11 +620,15 @@ const Settings = () => {
                   <div className="space-y-3">
                     <div className="text-sm font-medium">HUD Effects</div>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ minimal: true })}>Minimal Mode</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ minimal: false })}>Full Mode</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.set({ scanlines: true })}>Scanlines On</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.set({ scanlines: false })}>Scanlines Off</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.set({ refreshBarH: true })}>Refresh H</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.set({ refreshBarV: true })}>Refresh V</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.set({ radarSweep: true })}>Radar</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ uvVignette: true })}>UV Vignette</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ ticker: true })}>Ticker</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.set({ vignette: true })}>Vignette</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.set({ glitch: true })}>Glitch</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.reset?.()}>Reset</Button>

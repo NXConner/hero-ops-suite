@@ -1,15 +1,23 @@
 // @ts-nocheck
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import WidgetLibrary, { LibraryWidget } from '@/components/builder/WidgetLibrary';
 import PageCanvas from '@/components/builder/PageCanvas';
 import Toolbar from '@/components/builder/Toolbar';
 import { Users, Cloud, Activity, Target } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function Builder() {
   const [isEditing, setIsEditing] = useState(false);
-  const pageId = 'custom-default';
+  const [pages, setPages] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('builder-pages') || '[]') || ['default']; } catch { return ['default']; }
+  });
+  const [pageId, setPageId] = useState<string>(() => pages[0] || 'default');
+
+  useEffect(() => { try { localStorage.setItem('builder-pages', JSON.stringify(pages)); } catch {} }, [pages]);
 
   const library: LibraryWidget[] = [
     { id: 'fleet', name: 'Fleet/Follow', icon: <Users className="h-4 w-4" /> },
@@ -26,7 +34,6 @@ export default function Builder() {
   }), []);
 
   function handleAddWidget(id: string) {
-    // seed a basic layout entry if none exists
     const key = `builder-layout-${pageId}`;
     const raw = localStorage.getItem(key);
     const layout = raw ? JSON.parse(raw) : [];
@@ -52,12 +59,42 @@ export default function Builder() {
     } catch {}
   }
 
+  function handleCreatePage() {
+    const input = document.getElementById('new-page-name') as HTMLInputElement;
+    const name = input?.value?.trim();
+    if (!name || pages.includes(name)) return;
+    setPages(prev => [...prev, name]);
+    setPageId(name);
+    input.value = '';
+  }
+
+  function handleDeletePage() {
+    if (pages.length <= 1) return;
+    const idx = pages.indexOf(pageId);
+    const nextPages = pages.filter(p => p !== pageId);
+    setPages(nextPages);
+    setPageId(nextPages[Math.max(0, idx - 1)] || 'default');
+  }
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
       <div className="flex-1 overflow-auto p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Page Builder</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">Page Builder</h1>
+            <Select value={pageId} onValueChange={setPageId}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {pages.map(p => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
+              </SelectContent>
+            </Select>
+            <Input id="new-page-name" placeholder="New page name" className="w-40" />
+            <Button variant="outline" onClick={handleCreatePage}>Create</Button>
+            <Button variant="ghost" onClick={handleDeletePage} disabled={pages.length<=1}>Delete</Button>
+          </div>
           <Toolbar isEditing={isEditing} onToggleEdit={() => setIsEditing(!isEditing)} onExport={handleExport} onImport={handleImport} />
         </div>
         <div className="grid grid-cols-12 gap-4">

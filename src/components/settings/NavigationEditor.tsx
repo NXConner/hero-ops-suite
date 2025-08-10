@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { GripVertical, RefreshCw } from 'lucide-react';
+import { GripVertical, RefreshCw, ArrowLeftToLine, ArrowRightToLine } from 'lucide-react';
 
 interface NavItemConfig {
   name: string;
@@ -15,6 +15,7 @@ interface NavItemConfig {
   icon: string;
   hidden?: boolean;
   badge?: string;
+  parent?: string | null;
 }
 
 const iconOptions = [
@@ -64,9 +65,21 @@ export default function NavigationEditor() {
     setDragIndex(index);
   }
 
+  function indent(index: number) {
+    setItems(prev => prev.map((it, i) => i === index ? { ...it, parent: prev[i-1]?.href || null } : it));
+  }
+
+  function outdent(index: number) {
+    setItems(prev => prev.map((it, i) => i === index ? { ...it, parent: null } : it));
+  }
+
   function resetToDefault() {
     try { localStorage.removeItem('sidebar-nav-config'); } catch {}
     window.location.reload();
+  }
+
+  function level(item: NavItemConfig) {
+    return item.parent ? 1 : 0;
   }
 
   if (!items.length) {
@@ -101,7 +114,7 @@ export default function NavigationEditor() {
             onDragOver={(e) => onDragOver(e, index)}
           >
             <GripVertical className="h-4 w-4 text-muted-foreground" />
-            <div className="grid grid-cols-12 gap-2 flex-1 items-center">
+            <div className="grid grid-cols-12 gap-2 flex-1 items-center" style={{ paddingLeft: `${level(item) * 16}px` }}>
               <div className="col-span-4">
                 <Label className="text-xs">Label</Label>
                 <Input
@@ -109,7 +122,7 @@ export default function NavigationEditor() {
                   onChange={(e) => setItems(prev => prev.map((it, i) => i === index ? { ...it, name: e.target.value } : it))}
                 />
               </div>
-              <div className="col-span-4">
+              <div className="col-span-3">
                 <Label className="text-xs">Path</Label>
                 <Input
                   value={item.href}
@@ -138,6 +151,10 @@ export default function NavigationEditor() {
                   checked={!!item.hidden}
                   onCheckedChange={(hidden) => setItems(prev => prev.map((it, i) => i === index ? { ...it, hidden } : it))}
                 />
+              </div>
+              <div className="col-span-1 flex items-end justify-end gap-1">
+                <Button size="sm" variant="ghost" onClick={() => indent(index)}><ArrowRightToLine className="h-4 w-4" /></Button>
+                <Button size="sm" variant="ghost" onClick={() => outdent(index)}><ArrowLeftToLine className="h-4 w-4" /></Button>
               </div>
             </div>
           </div>
