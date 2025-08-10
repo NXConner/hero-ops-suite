@@ -633,6 +633,16 @@ const Settings = () => {
                       <Button variant="outline" onClick={() => (window as any).owEffects?.set({ glitch: true })}>Glitch</Button>
                       <Button variant="outline" onClick={() => (window as any).owEffects?.reset?.()}>Reset</Button>
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Scanline Spacing</Label>
+                        <input type="range" min={2} max={10} step={1} defaultValue={3} onChange={(e) => (window as any).owEffects?.set({ scanlineSpacing: parseInt(e.target.value, 10) })} className="w-full" />
+                      </div>
+                      <div>
+                        <Label>Glitch Intensity</Label>
+                        <input type="range" min={0} max={1} step={0.05} defaultValue={0.3} onChange={(e) => (window as any).owEffects?.set({ glitchLevel: parseFloat(e.target.value) })} className="w-full" />
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

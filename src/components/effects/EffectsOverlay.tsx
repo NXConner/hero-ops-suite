@@ -12,6 +12,8 @@ interface EffectSettings {
   uvVignette?: boolean;
   ticker?: boolean;
   minimal?: boolean;
+  scanlineSpacing?: number; // px
+  glitchLevel?: number; // 0-1
 }
 
 const defaultSettings: EffectSettings = {
@@ -24,6 +26,8 @@ const defaultSettings: EffectSettings = {
   uvVignette: false,
   ticker: false,
   minimal: false,
+  scanlineSpacing: 3,
+  glitchLevel: 0.3,
 };
 
 function useEffectSettings() {
@@ -58,7 +62,6 @@ export default function EffectsOverlay() {
   const { currentTheme } = useAdvancedTheme();
   const { settings } = useEffectSettings();
 
-  // Reduced motion media query
   const [reducedMotion, setReducedMotion] = useState(false);
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -73,6 +76,9 @@ export default function EffectsOverlay() {
 
   if (!enableVisuals || settings.minimal) return null;
 
+  const spacing = Math.max(2, Math.min(10, settings.scanlineSpacing || 3));
+  const glitchDur = 2500 - Math.floor((settings.glitchLevel || 0) * 2000);
+
   return (
     <div className="pointer-events-none fixed inset-0 z-[5]">
       {/* Scanlines */}
@@ -81,8 +87,8 @@ export default function EffectsOverlay() {
           aria-hidden
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(rgba(0,0,0,0.08) 1px, rgba(0,0,0,0) 2px)` ,
-            backgroundSize: '100% 3px',
+            background: `linear-gradient(rgba(0,0,0,0.08) 1px, rgba(0,0,0,0) ${spacing-1}px)` ,
+            backgroundSize: `100% ${spacing}px`,
             mixBlendMode: 'multiply'
           }}
         />
@@ -126,13 +132,7 @@ export default function EffectsOverlay() {
 
       {/* Vignette */}
       {settings.vignette && (
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            boxShadow: 'inset 0 0 200px rgba(0,0,0,0.6)'
-          }}
-        />
+        <div aria-hidden className="absolute inset-0" style={{ boxShadow: 'inset 0 0 200px rgba(0,0,0,0.6)' }} />
       )}
 
       {/* UV Vignette */}
@@ -142,7 +142,7 @@ export default function EffectsOverlay() {
 
       {/* Simple glitch */}
       {settings.glitch && (
-        <div aria-hidden className="absolute inset-0 mix-blend-screen" style={{ animation: 'ow-glitch 2.5s steps(1,end) infinite' }} />
+        <div aria-hidden className="absolute inset-0 mix-blend-screen" style={{ animation: `ow-glitch ${glitchDur}ms steps(1,end) infinite` }} />
       )}
 
       {/* Telemetry ticker */}
@@ -154,20 +154,10 @@ export default function EffectsOverlay() {
         </div>
       )}
 
-      {/* keyframes */}
       <style>{`
-        @keyframes ow-refresh-bar {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(110vh); }
-        }
-        @keyframes ow-refresh-bar-v {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(110vw); }
-        }
-        @keyframes ow-radar-sweep {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
+        @keyframes ow-refresh-bar { 0% { transform: translateY(0);} 100% { transform: translateY(110vh);} }
+        @keyframes ow-refresh-bar-v { 0% { transform: translateX(0);} 100% { transform: translateX(110vw);} }
+        @keyframes ow-radar-sweep { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
         @keyframes ow-glitch {
           0%, 97%, 100% { filter: none; }
           5% { filter: url('#'); }
@@ -175,10 +165,7 @@ export default function EffectsOverlay() {
           25% { clip-path: inset(80% 0 5% 0); transform: translateX(-1px); }
           35% { clip-path: inset(50% 0 40% 0); transform: translateX(2px); }
         }
-        @keyframes ow-ticker {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(-100%); }
-        }
+        @keyframes ow-ticker { 0% { transform: translateX(100%);} 100% { transform: translateX(-100%);} }
       `}</style>
     </div>
   );
