@@ -59,7 +59,8 @@ const Settings = () => {
     globalWallpaperOverride,
     isGlobalWallpaperEnabled,
     setGlobalWallpaperOverride,
-    setIsGlobalWallpaperEnabled
+    setIsGlobalWallpaperEnabled,
+    setLowPower
   , wallpaperProfiles, saveWallpaperProfile, applyWallpaperProfile, deleteWallpaperProfile } = useAdvancedTheme();
 
   return (
@@ -612,6 +613,16 @@ const Settings = () => {
                           </div>
                         </div>
                         <Switch />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <div className="text-sm font-medium">Low Power Mode</div>
+                          <div className="text-sm text-muted-foreground">
+                            Disables heavy visuals (particles/blur/shadows)
+                          </div>
+                        </div>
+                        <Switch onCheckedChange={(enabled) => setLowPower(enabled)} />
                       </div>
                     </div>
                   </div>

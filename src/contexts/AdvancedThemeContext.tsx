@@ -36,6 +36,11 @@ export function AdvancedThemeProvider({
   const [isGlobalWallpaperEnabled, setIsGlobalWallpaperEnabledState] = useState<boolean>(false);
   const [wallpaperProfiles, setWallpaperProfiles] = useState<{ name: string; wallpaper: ThemeWallpaper }[]>([]);
 
+  // Low power override
+  const [lowPowerMode, setLowPowerMode] = useState<boolean>(() => {
+    try { return localStorage.getItem('low-power-mode') === '1'; } catch { return false; }
+  });
+
   // Load themes and wallpaper settings from storage
   useEffect(() => {
     try {
@@ -93,19 +98,13 @@ export function AdvancedThemeProvider({
     const initializeThemes = async () => {
       try {
         setIsLoading(true);
-        
-        // Import default themes
         const { getDefaultThemes } = await import('@/data/default-themes');
         const defaultThemes = getDefaultThemes();
-        
         setAvailableThemes(defaultThemes);
-        
-        // Set initial theme
         const initialTheme = defaultThemes.find(t => t.id === defaultTheme) || defaultThemes[0];
         if (initialTheme) {
           await applyTheme(initialTheme);
         }
-        
         setIsLoading(false);
       } catch (err) {
         setError('Failed to initialize themes');
@@ -113,7 +112,6 @@ export function AdvancedThemeProvider({
         console.error(err);
       }
     };
-
     initializeThemes();
   }, [defaultTheme]);
 
@@ -121,76 +119,64 @@ export function AdvancedThemeProvider({
   const applyTheme = useCallback(async (theme: Theme) => {
     try {
       setError(null);
-      
-      // Validate theme
       const errors = validateTheme(theme);
       if (errors.length > 0) {
         throw new Error(`Invalid theme: ${errors.join(', ')}`);
       }
 
-      // Auto-adjust performance based on device
       const performanceLevel = getPerformanceLevel();
       const deviceType = getDeviceType();
       const timeVariant = getCurrentTimeVariant();
 
-      // Apply responsive variant if available
       let activeTheme = { ...theme } as Theme;
       if (theme.variants && theme.variants[deviceType]) {
         activeTheme = mergeThemes(activeTheme, theme.variants[deviceType]);
       }
-
-      // Apply time-based variant if available
       if (theme.timeVariants && theme.timeVariants[timeVariant]) {
         activeTheme = mergeThemes(activeTheme, theme.timeVariants[timeVariant]);
       }
 
-      // Adjust performance settings
-      activeTheme.performance = {
+      // Adjust performance settings and apply low-power override
+      const derived = {
         ...activeTheme.performance,
         quality: performanceLevel,
         enableParticles: activeTheme.performance.enableParticles && performanceLevel !== 'low',
         enableBlur: activeTheme.performance.enableBlur && performanceLevel !== 'low',
         enableShadows: activeTheme.performance.enableShadows && performanceLevel !== 'low'
       };
+      if (lowPowerMode) {
+        derived.quality = 'low';
+        derived.enableParticles = false;
+        derived.enableBlur = false;
+        derived.enableShadows = false;
+      }
+      activeTheme.performance = derived;
 
-      // Apply global wallpaper override if enabled
       const effectiveTheme: Theme = isGlobalWallpaperEnabled && globalWallpaperOverride
         ? { ...activeTheme, wallpaper: globalWallpaperOverride }
         : activeTheme;
 
-      // Generate and inject CSS
       const themeCSS = generateThemeCSS(effectiveTheme);
       const wallpaperCSS = generateWallpaperCSS(effectiveTheme);
-      
-      // Remove existing theme styles
-      const existingStyle = document.getElementById('advanced-theme-styles');
-      if (existingStyle) {
-        existingStyle.remove();
-      }
 
-      // Inject new theme styles
+      const existingStyle = document.getElementById('advanced-theme-styles');
+      if (existingStyle) existingStyle.remove();
+
       const styleElement = document.createElement('style');
       styleElement.id = 'advanced-theme-styles';
       styleElement.textContent = `
         ${themeCSS}
-        
-        body {
-          ${wallpaperCSS}
-        }
-        
+        body { ${wallpaperCSS} }
         ${effectiveTheme.customCSS || ''}
       `;
       document.head.appendChild(styleElement);
 
-      // Set theme data attribute
       document.documentElement.setAttribute('data-theme', effectiveTheme.id);
       document.documentElement.setAttribute('data-performance', effectiveTheme.performance.quality);
-      
-      // Apply accessibility settings
+
       if (effectiveTheme.accessibility.reducedMotion) {
         document.documentElement.style.setProperty('--animation-duration', '0.01ms');
       }
-      
       if (effectiveTheme.accessibility.highContrast) {
         document.documentElement.classList.add('high-contrast');
       } else {
@@ -198,11 +184,8 @@ export function AdvancedThemeProvider({
       }
 
       setCurrentTheme(effectiveTheme);
-      
-      // Save current theme to localStorage
       localStorage.setItem('current-theme-id', effectiveTheme.id);
 
-      // Map theme to sound preset (best-effort)
       try {
         const preset = effectiveTheme.id.includes('isac')
           ? 'isac'
@@ -213,14 +196,13 @@ export function AdvancedThemeProvider({
           : 'none';
         (window as any).owSounds?.setPreset?.(preset);
       } catch {}
-      
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply theme');
       console.error('Theme application error:', err);
     }
-  }, [globalWallpaperOverride, isGlobalWallpaperEnabled]);
+  }, [globalWallpaperOverride, isGlobalWallpaperEnabled, lowPowerMode]);
 
-  // Theme management functions
   const setTheme = useCallback((themeId: string) => {
     const theme = [...availableThemes, ...customThemes].find(t => t.id === themeId);
     if (theme) {
@@ -421,6 +403,12 @@ export function AdvancedThemeProvider({
     return () => clearInterval(interval);
   }, [currentTheme, applyTheme]);
 
+  const setLowPower = useCallback((enabled: boolean) => {
+    setLowPowerMode(enabled);
+    try { localStorage.setItem('low-power-mode', enabled ? '1' : '0'); } catch {}
+    if (currentTheme) applyTheme(currentTheme);
+  }, [currentTheme, applyTheme]);
+
   const contextValue = useMemo(() => ({
     currentTheme: currentTheme!,
     availableThemes,
@@ -445,7 +433,10 @@ export function AdvancedThemeProvider({
     wallpaperProfiles,
     saveWallpaperProfile,
     applyWallpaperProfile,
-    deleteWallpaperProfile
+    deleteWallpaperProfile,
+    // Low power
+    setLowPower,
+    lowPowerMode
   }), [
     currentTheme,
     availableThemes,
@@ -468,7 +459,9 @@ export function AdvancedThemeProvider({
     wallpaperProfiles,
     saveWallpaperProfile,
     applyWallpaperProfile,
-    deleteWallpaperProfile
+    deleteWallpaperProfile,
+    setLowPower,
+    lowPowerMode
   ]);
 
   return (
