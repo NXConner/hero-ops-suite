@@ -34,14 +34,19 @@ interface WidgetControlsProps {
   onMinimize: (id: string) => void;
   onClose: (id: string) => void;
   onStartDrag: (id: string) => void;
+  visible: boolean;
 }
+
+const STORAGE_KEY = 'overwatch-widgets-layout';
 
 const WidgetControls: React.FC<WidgetControlsProps> = ({ 
   widget, 
   onMinimize, 
   onClose, 
-  onStartDrag 
+  onStartDrag,
+  visible
 }) => {
+  if (!visible) return null;
   return (
     <div className="flex items-center gap-1">
       <Button
@@ -76,71 +81,79 @@ interface DraggableWidgetsProps {
   isVisible?: boolean;
   terminologyMode?: 'military' | 'civilian' | 'both';
   onLayoutChange?: (layout: any) => void;
+  editMode?: boolean;
 }
 
 const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
   isVisible = true,
   terminologyMode = 'military',
-  onLayoutChange
+  onLayoutChange,
+  editMode = false
 }) => {
-  const [widgets, setWidgets] = useState<Widget[]>([
-    {
-      id: 'comms',
-      title: 'Communications',
-      content: (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-400">Active Channels</span>
-            <Badge variant="outline" className="text-green-400 border-green-500/30">
-              SECURE
-            </Badge>
+  const [widgets, setWidgets] = useState<Widget[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return [
+      {
+        id: 'comms',
+        title: 'Communications',
+        content: (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">Active Channels</span>
+              <Badge variant="outline" className="text-green-400 border-green-500/30">
+                SECURE
+              </Badge>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-xs">
+                <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                <span>Alpha Team</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                <span>Bravo Team</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                <span>Command</span>
+              </div>
+            </div>
           </div>
-          <div className="space-y-1">
+        ),
+        position: { x: 20, y: 100 },
+        size: { width: 200, height: 150 },
+        isMinimized: false,
+        isDragging: false
+      },
+      {
+        id: 'intel',
+        title: 'Intelligence Feed',
+        content: (
+          <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-2 h-2 rounded-full bg-green-400"></div>
-              <span>Alpha Team</span>
+              <AlertTriangle className="w-3 h-3 text-yellow-400" />
+              <span className="text-slate-300">New threat detected</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
-              <span>Bravo Team</span>
+              <Shield className="w-3 h-3 text-blue-400" />
+              <span className="text-slate-300">Perimeter secure</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-2 h-2 rounded-full bg-red-400"></div>
-              <span>Command</span>
+              <Signal className="w-3 h-3 text-green-400" />
+              <span className="text-slate-300">Sat link established</span>
             </div>
           </div>
-        </div>
-      ),
-      position: { x: 20, y: 100 },
-      size: { width: 200, height: 150 },
-      isMinimized: false,
-      isDragging: false
-    },
-    {
-      id: 'intel',
-      title: 'Intelligence Feed',
-      content: (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-xs">
-            <AlertTriangle className="w-3 h-3 text-yellow-400" />
-            <span className="text-slate-300">New threat detected</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <Shield className="w-3 h-3 text-blue-400" />
-            <span className="text-slate-300">Perimeter secure</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <Signal className="w-3 h-3 text-green-400" />
-            <span className="text-slate-300">Sat link established</span>
-          </div>
-        </div>
-      ),
-      position: { x: 240, y: 120 },
-      size: { width: 220, height: 140 },
-      isMinimized: false,
-      isDragging: false
-    }
-  ]);
+        ),
+        position: { x: 240, y: 120 },
+        size: { width: 220, height: 140 },
+        isMinimized: false,
+        isDragging: false
+      }
+    ];
+  });
 
   const [dragState, setDragState] = useState({
     isDragging: false,
@@ -149,6 +162,7 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
   });
 
   const handleStartDrag = (id: string) => {
+    if (!editMode) return;
     setDragState({
       isDragging: true,
       draggedWidget: id,
@@ -206,6 +220,7 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
 
   useEffect(() => {
     onLayoutChange?.(widgets);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets)); } catch {}
   }, [widgets, onLayoutChange]);
 
   if (!isVisible) return null;
@@ -221,7 +236,7 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
             top: widget.position.y,
             width: widget.size.width,
             height: widget.isMinimized ? 'auto' : widget.size.height,
-            cursor: dragState.draggedWidget === widget.id ? 'grabbing' : 'default'
+            cursor: dragState.draggedWidget === widget.id ? 'grabbing' : (editMode ? 'grab' : 'default')
           }}
         >
           <CardHeader className="pb-2">
@@ -234,6 +249,7 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
                 onMinimize={handleMinimize}
                 onClose={handleClose}
                 onStartDrag={handleStartDrag}
+                visible={editMode}
               />
             </div>
           </CardHeader>

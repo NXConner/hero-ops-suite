@@ -527,6 +527,7 @@ const OverWatch: React.FC = () => {
           <DraggableWidgets 
             terminologyMode={terminologyMode}
             isVisible={showWidgets}
+            editMode={showWidgets}
             onLayoutChange={(layout) => console.log('Layout changed:', layout)}
           />
 
