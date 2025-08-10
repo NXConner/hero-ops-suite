@@ -54,6 +54,7 @@ export const BUSINESS_PROFILE: BusinessProfile = {
     arrowCost: 15,
     crosswalkCost: 60,
     paintColors: ["white", "yellow", "blue"],
+    paintColorCostDelta: { blue: 0.05 }
   },
   fuel: {
     c30MpgLoaded: 12,
@@ -61,6 +62,7 @@ export const BUSINESS_PROFILE: BusinessProfile = {
     equipmentActiveFuelGph: 2,
     excessiveIdleCostPerHour: 50,
     defaultFuelPricePerGallon: 3.14,
+    mpgDegradeLoadedPct: 0.1,
   },
   vehicles: {
     c30: {

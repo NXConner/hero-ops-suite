@@ -28,7 +28,7 @@ export async function geocodeAddress(address: string): Promise<LatLng | null> {
   const cache = loadCache(GEOCODE_CACHE_KEY);
   if (cache[key]) return cache[key];
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(address)}`;
-  const resp = await fetch(url, { headers: { "Accept": "application/json" } });
+  const resp = await fetch(url, { headers: { "Accept": "application/json", "User-Agent": "OverWatch-Estimator/1.0" } });
   if (!resp.ok) return null;
   const data = await resp.json();
   if (!Array.isArray(data) || data.length === 0) return null;
@@ -46,7 +46,7 @@ export async function reverseGeocode(lat: number, lon: number): Promise<string |
   const cache = loadCache(REVERSE_CACHE_KEY);
   if (cache[key]) return cache[key];
   const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
-  const resp = await fetch(url, { headers: { "Accept": "application/json" } });
+  const resp = await fetch(url, { headers: { "Accept": "application/json", "User-Agent": "OverWatch-Estimator/1.0" } });
   if (!resp.ok) return null;
   const data = await resp.json();
   const disp = data?.display_name as string | undefined;

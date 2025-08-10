@@ -117,6 +117,7 @@ export function computeSealcoatMaterials(
   const fastDryBuckets5Gal = Math.ceil(fastDryGallons / 5);
   const prepSealGallons = oilSpotSqft > 0 ? oilSpotSqft / DEFAULTS.prepSealCoverageSqftPerGal : 0;
   const prepSealBuckets5Gal = Math.ceil(prepSealGallons / 5);
+  const waterGallons = concentrateGallons * DEFAULTS.waterPercent;
 
   const materials: EstimateBreakdownItem[] = [];
 
@@ -160,7 +161,7 @@ export function computeSealcoatMaterials(
     });
   }
 
-  return { materials, concentrateGallons };
+  return { materials, concentrateGallons, sandBags: Math.ceil(sandBags), waterGallons: roundToTwo(waterGallons) };
 }
 
 export function computeCrackFill(
@@ -204,6 +205,8 @@ export function computeStriping(
     numHandicapSpots: number;
     hasCrosswalks: boolean;
     numArrows: number;
+    numCrosswalks?: number;
+    paintColor?: string;
   },
   unitCostPerLinearFoot: number
 ) {
@@ -215,15 +218,21 @@ export function computeStriping(
     const hc = BUSINESS_PROFILE.pricing.handicapSymbolCost ?? 40;
     extras += params.numHandicapSpots * hc;
   }
-  if (params.hasCrosswalks) {
+  const crosswalks = params.numCrosswalks ?? (params.hasCrosswalks ? 1 : 0);
+  if (crosswalks > 0) {
     const cx = BUSINESS_PROFILE.pricing.crosswalkCost ?? 60;
-    extras += cx;
+    extras += crosswalks * cx;
   }
   if (params.numArrows > 0) {
     const ar = BUSINESS_PROFILE.pricing.arrowCost ?? 15;
     extras += params.numArrows * ar;
   }
-  const linePrice = roundToTwo(lfStalls * unitCostPerLinearFoot + extras);
+  let colorDelta = 0;
+  if (params.paintColor) {
+    const delta = BUSINESS_PROFILE.pricing.paintColorCostDelta?.[params.paintColor] ?? 0;
+    colorDelta = delta * lfStalls;
+  }
+  const linePrice = roundToTwo(lfStalls * unitCostPerLinearFoot + extras + colorDelta);
   return { linearFeet: lfStalls, sellPrice: linePrice };
 }
 
@@ -231,13 +240,15 @@ export function computeFuelAndEquipment(
   input: EstimateInput,
   concentrateGallonsUsed?: number
 ) {
-  const c30Mpg = input.c30MpgLoaded ?? DEFAULTS.c30MpgLoaded;
+  const c30MpgBase = input.c30MpgLoaded ?? DEFAULTS.c30MpgLoaded;
   const dakotaMpg = input.dakotaMpg ?? DEFAULTS.dakotaMpg;
   const fuelRate = input.fuelPricePerGallon;
+  const degrade = BUSINESS_PROFILE.fuel.mpgDegradeLoadedPct ?? 0;
 
   const c30Miles = input.roundTripMilesSupplier + input.roundTripMilesJob;
   const dakotaMiles = input.roundTripMilesJob;
-  const c30Fuel = c30Miles / c30Mpg;
+  const c30MpgEffective = c30Miles > 0 ? c30MpgBase * (1 - degrade) : c30MpgBase;
+  const c30Fuel = c30Miles / c30MpgEffective;
   const dakotaFuel = dakotaMiles / dakotaMpg;
   const travelFuelGallons = c30Fuel + dakotaFuel;
   const travelFuelCost = roundToTwo(travelFuelGallons * fuelRate);
@@ -276,20 +287,21 @@ export function computeLabor(
   return { item, hours, crewSize, hourly };
 }
 
-export function computeTransportLoad(concentrateGallons: number) {
+export function computeTransportLoad(concentrateGallons: number, sandBags: number, waterGallons: number) {
   const unitEmptyLbs = BUSINESS_PROFILE.equipment.sealmasterSk550.emptyWeightLbs ?? 1865;
   const sealerLbsPerGal = BUSINESS_PROFILE.equipment.sealmasterSk550.sealerWeightPerGallonLbs ?? 10;
-  const tankLoadLbs = concentrateGallons * sealerLbsPerGal;
-  const totalWeight = unitEmptyLbs + tankLoadLbs;
+  const tankLoadLbs = (concentrateGallons + waterGallons) * sealerLbsPerGal;
+  const sandLbs = sandBags * 50;
+  const totalWeight = unitEmptyLbs + tankLoadLbs + sandLbs;
   const truckCurb = BUSINESS_PROFILE.vehicles.c30.curbWeightLbs ?? 4300;
   const combined = totalWeight + truckCurb;
   const likelyGvwrMin = BUSINESS_PROFILE.vehicles.c30.gvwrMinLbs ?? 10000;
   const exceeds = combined > likelyGvwrMin;
-  const notes = `Unit ${unitEmptyLbs} lbs + sealer ${Math.round(tankLoadLbs)} lbs + truck ${truckCurb} lbs = ${Math.round(combined)} lbs.`;
+  const notes = `Unit ${unitEmptyLbs} lbs + sealer ${Math.round(tankLoadLbs)} lbs + sand ${sandLbs} lbs + truck ${truckCurb} lbs = ${Math.round(combined)} lbs.`;
   return { totalWeightLbs: Math.round(combined), notes, exceedsLikelyGvwr: exceeds };
 }
 
-export function buildEstimate(input: EstimateInput): any /* EstimateOutput */ {
+export function buildEstimate(input: EstimateInput): EstimateOutput {
   const notes: string[] = [];
   let materials: EstimateBreakdownItem[] = [];
   const labor: EstimateBreakdownItem[] = [];
@@ -306,6 +318,7 @@ export function buildEstimate(input: EstimateInput): any /* EstimateOutput */ {
 
   const porosity = input.surfacePorosityFactor ?? 1;
 
+  let scContext: {concentrateGallons: number; sandBags: number; waterGallons: number} | null = null;
   if (input.serviceType === 'sealcoating' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
     const sqft = input.sealcoatSquareFeet || 0;
     const oilSqft = input.oilSpotSquareFeet || 0;
@@ -321,6 +334,7 @@ export function buildEstimate(input: EstimateInput): any /* EstimateOutput */ {
       oilSqft
     );
     concentrateGallons = sc.concentrateGallons;
+    scContext = { concentrateGallons: sc.concentrateGallons, sandBags: sc.sandBags, waterGallons: sc.waterGallons } as any;
     materials = materials.concat(sc.materials);
     projectDescription += `Sealcoating ${sqft} sq ft. `;
     laborHours += Math.max(2, sqft / 3000);
@@ -353,7 +367,9 @@ export function buildEstimate(input: EstimateInput): any /* EstimateOutput */ {
       numDoubleStalls: input.numDoubleStalls || 0,
       numHandicapSpots: input.numHandicapSpots || 0,
       hasCrosswalks: input.hasCrosswalks || false,
-      numArrows: input.numArrows || 0
+      numArrows: input.numArrows || 0,
+      numCrosswalks: (input as any).numCrosswalks || 0,
+      paintColor: (input as any).paintColor || undefined,
     };
     const strip = computeStriping(params, DEFAULTS.lineCostPerLinearFoot);
     baseSellFromTasks += strip.sellPrice;
@@ -385,8 +401,8 @@ export function buildEstimate(input: EstimateInput): any /* EstimateOutput */ {
   const roundedPlus25Pct = Math.ceil((roundedTotal * 1.25) / 10) * 10;
 
   let transportLoad: EstimateOutput['transportLoad'];
-  if (input.includeTransportWeightCheck && concentrateGallons > 0) {
-    transportLoad = computeTransportLoad(concentrateGallons);
+  if (input.includeTransportWeightCheck && scContext) {
+    transportLoad = computeTransportLoad(scContext.concentrateGallons, scContext.sandBags, scContext.waterGallons);
   }
 
   notes.push('Estimate valid for 30 days. Subject to site inspection.');

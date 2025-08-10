@@ -49,6 +49,7 @@ export interface PricingBaselines {
   arrowCost?: number; // e.g., 15
   crosswalkCost?: number; // e.g., 60
   paintColors?: string[]; // optional available paint colors
+  paintColorCostDelta?: Record<string, number>; // per-color cost delta per LF
 }
 
 export interface FuelAssumptions {
@@ -57,6 +58,7 @@ export interface FuelAssumptions {
   equipmentActiveFuelGph: number; // e.g., 2
   excessiveIdleCostPerHour: number; // e.g., 50
   defaultFuelPricePerGallon: number; // e.g., 3.14
+  mpgDegradeLoadedPct?: number; // e.g., 0.1 reduce mpg by 10% when towing/loaded
 }
 
 export interface VehicleSpec {
