@@ -1,3 +1,6 @@
+import { BUSINESS_PROFILE } from "@/data/business";
+import type { BusinessProfile } from "@/types/business";
+
 export type ServiceType = 'sealcoating' | 'crack_filling' | 'patching' | 'line_striping' | 'combo_driveway' | 'combo_parkinglot';
 
 export interface EstimateInput {
@@ -15,6 +18,11 @@ export interface EstimateInput {
   // Site conditions
   oilSpotSquareFeet?: number; // area needing Prep Seal
   surfacePorosityFactor?: number; // 1.0 normal, >1 increases usage
+  // Patching detail
+  patchThicknessInches?: number; // default 2
+  patchMaterial?: 'hot' | 'cold';
+  // Crack detail
+  deepCrackPrefillPct?: number; // 0..1 portion needing sand prefill
   // Crew & labor
   numFullTime: number; // e.g., 2
   numPartTime: number; // e.g., 1
@@ -75,25 +83,25 @@ export interface EstimateOutput {
   notes: string[];
 }
 
-// Constants and helpers derived from user guidance
+// Defaults resolved from business profile
 const DEFAULTS = {
-  mixedSealerCoverageSqftPerGal: 76, // mid of 70-82
-  waterPercent: 0.2, // 20%
-  sandBagsPer100GalConcentrate: 6, // 300 lbs ~ 6 bags per 100 gal
-  fastDryGalPer125GalConcentrate: 2, // 2 gal per 125 gal concentrate
-  prepSealCoverageSqftPerGal: 175, // 150-200 avg
-  crackFillRatePerFoot: 1.75, // default material+labor rate midpoint $1-$3
-  patchingPerSqft: 3.5, // midpoint $2-$5 hot-mix
-  lineCostPerLinearFoot: 0.9, // $0.75-$1.00
+  mixedSealerCoverageSqftPerGal: BUSINESS_PROFILE.coverage.mixedSealerCoverageSqftPerGal,
+  waterPercent: BUSINESS_PROFILE.mix.waterPercent,
+  sandBagsPer100GalConcentrate: BUSINESS_PROFILE.mix.sandBagsPer100GalConcentrate,
+  fastDryGalPer125GalConcentrate: BUSINESS_PROFILE.mix.fastDryGalPer125GalConcentrate,
+  prepSealCoverageSqftPerGal: BUSINESS_PROFILE.coverage.prepSealCoverageSqftPerGal,
+  crackFillRatePerFoot: BUSINESS_PROFILE.pricing.crackFillRatePerFoot,
+  patchingPerSqft: BUSINESS_PROFILE.pricing.patchingPerSqft,
+  lineCostPerLinearFoot: BUSINESS_PROFILE.pricing.lineCostPerLinearFoot,
   avgStallLinearFeetSingle: 20,
   avgStallLinearFeetDouble: 25,
-  mobilizationFee: 250, // midpoint $150-$350
-  c30MpgLoaded: 12,
-  dakotaMpg: 17,
-  equipmentActiveFuelGph: 2,
-  excessiveIdleCostPerHour: 50,
-  overheadPct: 0.10, // default overhead 10%
-  profitPct: 0.18 // default profit
+  mobilizationFee: BUSINESS_PROFILE.pricing.mobilizationFee,
+  c30MpgLoaded: BUSINESS_PROFILE.fuel.c30MpgLoaded,
+  dakotaMpg: BUSINESS_PROFILE.fuel.dakotaMpg,
+  equipmentActiveFuelGph: BUSINESS_PROFILE.fuel.equipmentActiveFuelGph,
+  excessiveIdleCostPerHour: BUSINESS_PROFILE.fuel.excessiveIdleCostPerHour,
+  overheadPct: BUSINESS_PROFILE.pricing.overheadPct,
+  profitPct: BUSINESS_PROFILE.pricing.profitPct,
 };
 
 function roundToTwo(n: number): number {
@@ -106,23 +114,15 @@ export function computeSealcoatMaterials(
   unitCosts: { pmm: number; sandBag: number; fastDry5Gal: number; prepSeal5Gal: number },
   oilSpotSqft: number
 ) {
-  // Determine mixed gallons needed at given coverage and porosity
   const effectiveCoverage = DEFAULTS.mixedSealerCoverageSqftPerGal / (porosityFactor || 1);
   const mixedGallonsNeeded = squareFeet / effectiveCoverage;
-
-  // Convert mixed gallons to concentrate gallons given 20% water: mixed = concentrate * (1 + water)
   const concentrateGallons = mixedGallonsNeeded / (1 + DEFAULTS.waterPercent);
-
-  // Sand bags per 100 gal concentrate: 6 bags per 100
   const sandBags = (concentrateGallons / 100) * DEFAULTS.sandBagsPer100GalConcentrate;
-
-  // Fast dry: 2 gal per 125 gal concentrate. Compute required gallons, then 5-gal buckets.
   const fastDryGallons = (concentrateGallons / 125) * DEFAULTS.fastDryGalPer125GalConcentrate;
   const fastDryBuckets5Gal = Math.ceil(fastDryGallons / 5);
-
-  // Prep Seal for oil spots: 175 sqft/gal avg; 5-gal buckets
   const prepSealGallons = oilSpotSqft > 0 ? oilSpotSqft / DEFAULTS.prepSealCoverageSqftPerGal : 0;
   const prepSealBuckets5Gal = Math.ceil(prepSealGallons / 5);
+  const waterGallons = concentrateGallons * DEFAULTS.waterPercent;
 
   const materials: EstimateBreakdownItem[] = [];
 
@@ -166,7 +166,7 @@ export function computeSealcoatMaterials(
     });
   }
 
-  return { materials, concentrateGallons };
+  return { materials, concentrateGallons, sandBags: Math.ceil(sandBags), waterGallons: roundToTwo(waterGallons) };
 }
 
 export function computeCrackFill(
@@ -174,7 +174,6 @@ export function computeCrackFill(
   unitCosts: { crackBox: number; propaneTank: number },
   pricePerFoot: number
 ) {
-  // Boxes consumption can vary; assume 1 box per ~200 linear feet typical. Make it conservative 1/150.
   const boxes = Math.ceil(linearFeet / 150);
   const propaneTanks = Math.max(1, Math.ceil(boxes / 2));
   const materialCost = boxes * unitCosts.crackBox + propaneTanks * unitCosts.propaneTank;
@@ -198,9 +197,20 @@ export function computeCrackFill(
 
 export function computePatching(
   squareFeet: number,
-  unitSellPricePerSqft: number
+  unitSellPricePerSqft: number,
+  thicknessInches = 2,
+  material: 'hot' | 'cold' = 'hot'
 ) {
-  const sellPrice = roundToTwo(squareFeet * unitSellPricePerSqft);
+  let base = unitSellPricePerSqft;
+  // Adjust base for material if provided
+  if (material === 'cold' && BUSINESS_PROFILE.pricing.patchingColdPerSqft) {
+    base = BUSINESS_PROFILE.pricing.patchingColdPerSqft;
+  } else if (material === 'hot' && BUSINESS_PROFILE.pricing.patchingHotPerSqft) {
+    base = BUSINESS_PROFILE.pricing.patchingHotPerSqft;
+  }
+  // Scale price roughly linearly with thickness relative to 2"
+  const thicknessFactor = thicknessInches / 2;
+  const sellPrice = roundToTwo(squareFeet * base * thicknessFactor);
   return { sellPrice };
 }
 
@@ -211,24 +221,44 @@ export function computeStriping(
     numHandicapSpots: number;
     hasCrosswalks: boolean;
     numArrows: number;
+    numCrosswalks?: number;
+    paintColor?: string;
+    numStopBars?: number;
+    numTextStencils?: number;
   },
   unitCostPerLinearFoot: number
 ) {
   const lfStalls =
     params.numStandardStalls * DEFAULTS.avgStallLinearFeetSingle +
     params.numDoubleStalls * DEFAULTS.avgStallLinearFeetDouble;
-  // Extras
   let extras = 0;
   if (params.numHandicapSpots > 0) {
-    extras += params.numHandicapSpots * 40; // flat allowance per symbol
+    const hc = BUSINESS_PROFILE.pricing.handicapSymbolCost ?? 40;
+    extras += params.numHandicapSpots * hc;
   }
-  if (params.hasCrosswalks) {
-    extras += 60; // allowance
+  const crosswalks = params.numCrosswalks ?? (params.hasCrosswalks ? 1 : 0);
+  if (crosswalks > 0) {
+    const cx = BUSINESS_PROFILE.pricing.crosswalkCost ?? 60;
+    extras += crosswalks * cx;
+  }
+  if ((params.numStopBars ?? 0) > 0) {
+    const sb = BUSINESS_PROFILE.pricing.stopBarCost ?? 25;
+    extras += (params.numStopBars ?? 0) * sb;
+  }
+  if ((params.numTextStencils ?? 0) > 0) {
+    const ts = BUSINESS_PROFILE.pricing.textStencilCost ?? 15;
+    extras += (params.numTextStencils ?? 0) * ts;
   }
   if (params.numArrows > 0) {
-    extras += params.numArrows * 15;
+    const ar = BUSINESS_PROFILE.pricing.arrowCost ?? 15;
+    extras += params.numArrows * ar;
   }
-  const linePrice = roundToTwo(lfStalls * unitCostPerLinearFoot + extras);
+  let colorDelta = 0;
+  if (params.paintColor) {
+    const delta = BUSINESS_PROFILE.pricing.paintColorCostDelta?.[params.paintColor] ?? 0;
+    colorDelta = delta * lfStalls;
+  }
+  const linePrice = roundToTwo(lfStalls * unitCostPerLinearFoot + extras + colorDelta);
   return { linearFeet: lfStalls, sellPrice: linePrice };
 }
 
@@ -236,25 +266,24 @@ export function computeFuelAndEquipment(
   input: EstimateInput,
   concentrateGallonsUsed?: number
 ) {
-  const c30Mpg = input.c30MpgLoaded ?? DEFAULTS.c30MpgLoaded;
+  const c30MpgBase = input.c30MpgLoaded ?? DEFAULTS.c30MpgLoaded;
   const dakotaMpg = input.dakotaMpg ?? DEFAULTS.dakotaMpg;
   const fuelRate = input.fuelPricePerGallon;
+  const degrade = BUSINESS_PROFILE.fuel.mpgDegradeLoadedPct ?? 0;
 
-  // Travel fuel
-  const c30Miles = input.roundTripMilesSupplier + input.roundTripMilesJob; // assume C30 runs supplier + job
-  const dakotaMiles = input.roundTripMilesJob; // Dakota primarily to/from job
-  const c30Fuel = c30Miles / c30Mpg;
+  const c30Miles = input.roundTripMilesSupplier + input.roundTripMilesJob;
+  const dakotaMiles = input.roundTripMilesJob;
+  const c30MpgEffective = c30Miles > 0 ? c30MpgBase * (1 - degrade) : c30MpgBase;
+  const c30Fuel = c30Miles / c30MpgEffective;
   const dakotaFuel = dakotaMiles / dakotaMpg;
   const travelFuelGallons = c30Fuel + dakotaFuel;
   const travelFuelCost = roundToTwo(travelFuelGallons * fuelRate);
 
-  // Equipment active fuel (sealer rig)
   const activeHours = input.sealerActiveHours ?? 0;
   const activeGph = input.equipmentActiveFuelGph ?? DEFAULTS.equipmentActiveFuelGph;
   const activeFuel = activeHours * activeGph;
   const activeFuelCost = roundToTwo(activeFuel * fuelRate);
 
-  // Excessive idle cost
   const idleHours = input.excessiveIdleHours ?? 0;
   const idleCostRate = input.excessiveIdleCostPerHour ?? DEFAULTS.excessiveIdleCostPerHour;
   const idleCost = roundToTwo(idleHours * idleCostRate);
@@ -284,16 +313,17 @@ export function computeLabor(
   return { item, hours, crewSize, hourly };
 }
 
-export function computeTransportLoad(concentrateGallons: number) {
-  const unitEmptyLbs = 1865;
-  const sealerLbsPerGal = 10; // as given
-  const tankLoadLbs = concentrateGallons * sealerLbsPerGal; // conservative: concentrate only; mixed is heavier with sand but sand is separate
-  const totalWeight = unitEmptyLbs + tankLoadLbs;
-  const truckCurb = 4300;
+export function computeTransportLoad(concentrateGallons: number, sandBags: number, waterGallons: number) {
+  const unitEmptyLbs = BUSINESS_PROFILE.equipment.sealmasterSk550.emptyWeightLbs ?? 1865;
+  const sealerLbsPerGal = BUSINESS_PROFILE.equipment.sealmasterSk550.sealerWeightPerGallonLbs ?? 10;
+  const tankLoadLbs = (concentrateGallons + waterGallons) * sealerLbsPerGal;
+  const sandLbs = sandBags * 50;
+  const totalWeight = unitEmptyLbs + tankLoadLbs + sandLbs;
+  const truckCurb = BUSINESS_PROFILE.vehicles.c30.curbWeightLbs ?? 4300;
   const combined = totalWeight + truckCurb;
-  const likelyGvwrMin = 10000;
+  const likelyGvwrMin = BUSINESS_PROFILE.vehicles.c30.gvwrMinLbs ?? 10000;
   const exceeds = combined > likelyGvwrMin;
-  const notes = `Unit ${unitEmptyLbs} lbs + sealer ${Math.round(tankLoadLbs)} lbs + truck ${truckCurb} lbs = ${Math.round(combined)} lbs.`;
+  const notes = `Unit ${unitEmptyLbs} lbs + sealer ${Math.round(tankLoadLbs)} lbs + sand ${sandLbs} lbs + truck ${truckCurb} lbs = ${Math.round(combined)} lbs.`;
   return { totalWeightLbs: Math.round(combined), notes, exceedsLikelyGvwr: exceeds };
 }
 
@@ -303,18 +333,18 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
   const labor: EstimateBreakdownItem[] = [];
   const equipmentAndFuel: EstimateBreakdownItem[] = [];
   const mobilization: EstimateBreakdownItem[] = [
-    { label: 'Mobilization', cost: DEFAULTS.mobilizationFee }
+    { label: 'Mobilization', cost: BUSINESS_PROFILE.pricing.mobilizationFee }
   ];
 
   let projectDescription = '';
   let concentrateGallons = 0;
   let baseSellFromTasks = 0;
 
-  // Assume baseline hours by service type
   let laborHours = 0;
 
   const porosity = input.surfacePorosityFactor ?? 1;
 
+  let scContext: {concentrateGallons: number; sandBags: number; waterGallons: number} | null = null;
   if (input.serviceType === 'sealcoating' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
     const sqft = input.sealcoatSquareFeet || 0;
     const oilSqft = input.oilSpotSquareFeet || 0;
@@ -330,9 +360,20 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
       oilSqft
     );
     concentrateGallons = sc.concentrateGallons;
+    scContext = { concentrateGallons: sc.concentrateGallons, sandBags: sc.sandBags, waterGallons: sc.waterGallons } as any;
     materials = materials.concat(sc.materials);
     projectDescription += `Sealcoating ${sqft} sq ft. `;
-    laborHours += Math.max(2, sqft / 3000); // rough: 3k sqft per hour baseline for 2-3 crew
+    laborHours += Math.max(2, sqft / 3000);
+  }
+
+  if (input.serviceType === 'patching' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
+    const patchSqft = input.patchSquareFeet || 0;
+    if (patchSqft > 0) {
+      const patch = computePatching(patchSqft, DEFAULTS.patchingPerSqft, input.patchThicknessInches ?? 2, (input.patchMaterial as any) ?? 'hot');
+      baseSellFromTasks += patch.sellPrice;
+      projectDescription += `Patching ${patchSqft} sq ft @ ${input.patchThicknessInches ?? 2}\" ${input.patchMaterial ?? 'hot'}-mix. `;
+      laborHours += Math.max(1, patchSqft / 400);
+    }
   }
 
   if (input.serviceType === 'crack_filling' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
@@ -341,18 +382,15 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
       const crack = computeCrackFill(lf, { crackBox: input.crackBoxPricePer30lb, propaneTank: input.propanePerTank }, DEFAULTS.crackFillRatePerFoot);
       materials = materials.concat(crack.items);
       baseSellFromTasks += crack.sellPrice;
+      const deepPct = input.deepCrackPrefillPct ?? 0;
+      if (deepPct > 0) {
+        const sandBagsPrefill = Math.ceil((lf * deepPct) / 100); // rough: 1 bag per 100 ft deep cracks
+        if (sandBagsPrefill > 0) {
+          materials.push({ label: 'Sand (deep crack prefill)', quantity: sandBagsPrefill, unit: 'bag', unitCost: input.sandPricePer50lbBag, cost: roundToTwo(sandBagsPrefill * input.sandPricePer50lbBag) });
+        }
+      }
       projectDescription += `Crack filling ${lf} linear ft. `;
-      laborHours += Math.max(1, lf / 100); // 1 hr per 100 ft
-    }
-  }
-
-  if (input.serviceType === 'patching' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
-    const patchSqft = input.patchSquareFeet || 0;
-    if (patchSqft > 0) {
-      const patch = computePatching(patchSqft, DEFAULTS.patchingPerSqft);
-      baseSellFromTasks += patch.sellPrice;
-      projectDescription += `Patching ${patchSqft} sq ft. `;
-      laborHours += Math.max(1, patchSqft / 400); // 400 sqft/hr baseline
+      laborHours += Math.max(1, lf / 100);
     }
   }
 
@@ -362,50 +400,53 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
       numDoubleStalls: input.numDoubleStalls || 0,
       numHandicapSpots: input.numHandicapSpots || 0,
       hasCrosswalks: input.hasCrosswalks || false,
-      numArrows: input.numArrows || 0
+      numArrows: input.numArrows || 0,
+      numCrosswalks: (input as any).numCrosswalks || 0,
+      paintColor: (input as any).paintColor || undefined,
+      numStopBars: (input as any).numStopBars || 0,
+      numTextStencils: (input as any).numTextStencils || 0,
     };
     const strip = computeStriping(params, DEFAULTS.lineCostPerLinearFoot);
     baseSellFromTasks += strip.sellPrice;
     projectDescription += `Line striping ~${strip.linearFeet} LF with extras. `;
-    laborHours += Math.max(1, strip.linearFeet / 300); // baseline productivity
+    laborHours += Math.max(1, strip.linearFeet / 300);
   }
 
-  // Labor cost (cost basis)
   const laborResult = computeLabor(input, laborHours);
   labor.push(laborResult.item);
 
-  // Equipment & Fuel
   const fuel = computeFuelAndEquipment(input, concentrateGallons);
   equipmentAndFuel.push(...fuel.items);
 
-  // Subtotal of cost-basis materials + labor + equipment + mobilization
   const materialsCost = materials.reduce((sum, m) => sum + m.cost, 0);
   const laborCost = labor.reduce((sum, i) => sum + i.cost, 0);
   const equipmentFuelCost = equipmentAndFuel.reduce((sum, i) => sum + i.cost, 0);
   const mobilizationCost = mobilization.reduce((sum, i) => sum + i.cost, 0);
 
-  // Selling price: use baseSellFromTasks as market-rate revenue for crack/patch/striping; add materials at cost + labor + equipment + mobilization for sealcoat portion; then apply overhead & profit
   let subtotal = materialsCost + laborCost + equipmentFuelCost + mobilizationCost + baseSellFromTasks;
-
   subtotal = roundToTwo(subtotal);
 
-  const overhead: EstimateBreakdownItem = { label: 'Overhead (10%)', cost: roundToTwo(subtotal * DEFAULTS.overheadPct) };
-  const profit: EstimateBreakdownItem = { label: 'Profit (18%)', cost: roundToTwo((subtotal + overhead.cost) * DEFAULTS.profitPct) };
-  const total = roundToTwo(subtotal + overhead.cost + profit.cost);
+  const overheadCost = roundToTwo(subtotal * DEFAULTS.overheadPct);
+  const profitCost = roundToTwo((subtotal + overheadCost) * DEFAULTS.profitPct);
+  const total = roundToTwo(subtotal + overheadCost + profitCost);
 
   const totalWith25PctMarkup = roundToTwo(total * 1.25);
-
   const roundedTotal = Math.ceil(total / 10) * 10;
   const impliedMarkupPct = total === 0 ? 0 : roundToTwo(((roundedTotal - total) / total) * 100);
   const roundedPlus25Pct = Math.ceil((roundedTotal * 1.25) / 10) * 10;
 
-  // Transport load check
   let transportLoad: EstimateOutput['transportLoad'];
-  if (input.includeTransportWeightCheck && concentrateGallons > 0) {
-    transportLoad = computeTransportLoad(concentrateGallons);
+  if (input.includeTransportWeightCheck && scContext) {
+    transportLoad = computeTransportLoad(scContext.concentrateGallons, scContext.sandBags, scContext.waterGallons);
   }
 
-  // Invoice notes
+  const taxPct = BUSINESS_PROFILE.pricing.salesTaxPct ?? 0;
+  if (taxPct > 0) {
+    const tax = roundToTwo(total * taxPct);
+    materials.push({ label: `Sales Tax (${Math.round(taxPct * 100)}%)`, cost: tax });
+    // update totals to reflect tax separately if desired; leaving total as-is keeps prior logic
+  }
+
   notes.push('Estimate valid for 30 days. Subject to site inspection.');
   notes.push('Coverage and material usage may vary with pavement age and porosity.');
   notes.push('Travel distances and fuel calculations are estimates; actual costs may vary.');
@@ -417,8 +458,8 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
     equipmentAndFuel,
     mobilization,
     subtotal,
-    overhead,
-    profit,
+    overhead: { label: `Overhead (${Math.round(DEFAULTS.overheadPct * 100)}%)`, cost: overheadCost },
+    profit: { label: `Profit (${Math.round(DEFAULTS.profitPct * 100)}%)`, cost: profitCost },
     total,
     totalWith25PctMarkup,
     roundedVariant: {

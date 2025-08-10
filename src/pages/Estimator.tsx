@@ -8,10 +8,17 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Textarea } from '@/components/ui/textarea';
 import type { EstimateInput, ServiceType } from '@/lib/estimator';
 import { buildEstimate } from '@/lib/estimator';
+import { BUSINESS_PROFILE } from '@/data/business';
+import { useBusinessProfile } from '@/hooks/useBusinessProfile';
+import { computeRoundTripMilesBetween } from '@/lib/geo';
+import { saveJob, listJobs, type StoredJob } from '@/services/jobs';
+import { listCustomers, saveCustomer, type Customer } from '@/services/customers';
+import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile } from '@/services/exporters';
 
-const DEFAULT_FUEL_PRICE = 3.50; // will be editable
+const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
 const Estimator = () => {
+  const { profile } = useBusinessProfile();
   const [serviceType, setServiceType] = useState<ServiceType>('sealcoating');
   const [params, setParams] = useState({
     sealcoatSquareFeet: 0,
@@ -24,20 +31,39 @@ const Estimator = () => {
     numArrows: 0,
     oilSpotSquareFeet: 0,
     surfacePorosityFactor: 1,
+    numCrosswalks: 0,
+    paintColor: 'yellow',
   });
-  const [jobAddress, setJobAddress] = useState('337 Ayers Orchard Road, Stuart, VA 24171');
-  const [roundTripMilesSupplier, setRoundTripMilesSupplier] = useState(96); // Stuart, VA ↔ Madison, NC approx
+  const [jobAddress, setJobAddress] = useState(BUSINESS_PROFILE.address.full);
+  const [roundTripMilesSupplier, setRoundTripMilesSupplier] = useState(BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier); // Stuart, VA ↔ Madison, NC approx
   const [roundTripMilesJob, setRoundTripMilesJob] = useState(0); // default same as business if unknown
   const [fuelPrice, setFuelPrice] = useState(DEFAULT_FUEL_PRICE);
 
-  const [laborRate, setLaborRate] = useState(12);
-  const [numFullTime, setNumFullTime] = useState(2);
-  const [numPartTime, setNumPartTime] = useState(1);
+  const [laborRate, setLaborRate] = useState(BUSINESS_PROFILE.crew.hourlyRatePerPerson);
+  const [numFullTime, setNumFullTime] = useState(BUSINESS_PROFILE.crew.numFullTime);
+  const [numPartTime, setNumPartTime] = useState(BUSINESS_PROFILE.crew.numPartTime);
 
   const [sealerActiveHours, setSealerActiveHours] = useState(0);
   const [excessiveIdleHours, setExcessiveIdleHours] = useState(0);
+  const [includeWeightCheck, setIncludeWeightCheck] = useState(true);
+
+  const [pmmPrice, setPmmPrice] = useState(BUSINESS_PROFILE.materials.pmmPricePerGallon);
 
   const [notes, setNotes] = useState('');
+
+  const [jobs, setJobs] = useState<StoredJob[]>(listJobs());
+  const [jobName, setJobName] = useState('');
+  const [customers, setCustomers] = useState<Customer[]>(listCustomers());
+  const [customerName, setCustomerName] = useState('');
+
+  // React to business profile changes
+  useMemo(() => {
+    setRoundTripMilesSupplier(profile.travelDefaults.roundTripMilesSupplier);
+    setLaborRate(profile.crew.hourlyRatePerPerson);
+    setNumFullTime(profile.crew.numFullTime);
+    setNumPartTime(profile.crew.numPartTime);
+    setPmmPrice(profile.materials.pmmPricePerGallon);
+  }, [profile]);
 
   const estimateInput: EstimateInput = useMemo(() => ({
     serviceType,
@@ -47,7 +73,7 @@ const Estimator = () => {
     numStandardStalls: Number(params.numStandardStalls) || 0,
     numDoubleStalls: Number(params.numDoubleStalls) || 0,
     numHandicapSpots: Number(params.numHandicapSpots) || 0,
-    hasCrosswalks: params.hasCrosswalks,
+    hasCrosswalks: params.hasCrosswalks || (Number(params.numCrosswalks) || 0) > 0,
     numArrows: Number(params.numArrows) || 0,
     oilSpotSquareFeet: Number(params.oilSpotSquareFeet) || 0,
     surfacePorosityFactor: Number(params.surfacePorosityFactor) || 1,
@@ -59,14 +85,14 @@ const Estimator = () => {
     fuelPricePerGallon: Number(fuelPrice) || DEFAULT_FUEL_PRICE,
     sealerActiveHours: Number(sealerActiveHours) || 0,
     excessiveIdleHours: Number(excessiveIdleHours) || 0,
-    pmmPricePerGallon: 3.65,
-    sandPricePer50lbBag: 10,
-    fastDryPricePer5Gal: 50,
-    prepSealPricePer5Gal: 50,
-    crackBoxPricePer30lb: 44.99,
-    propanePerTank: 10,
-    includeTransportWeightCheck: true
-  }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, sealerActiveHours, excessiveIdleHours]);
+    pmmPricePerGallon: Number(pmmPrice) || BUSINESS_PROFILE.materials.pmmPricePerGallon,
+    sandPricePer50lbBag: BUSINESS_PROFILE.materials.sandPricePer50lbBag,
+    fastDryPricePer5Gal: BUSINESS_PROFILE.materials.fastDryPricePer5Gal,
+    prepSealPricePer5Gal: BUSINESS_PROFILE.materials.prepSealPricePer5Gal,
+    crackBoxPricePer30lb: BUSINESS_PROFILE.materials.crackBoxPricePer30lb,
+    propanePerTank: BUSINESS_PROFILE.materials.propanePerTank,
+    includeTransportWeightCheck: includeWeightCheck
+  }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, pmmPrice, includeWeightCheck, sealerActiveHours, excessiveIdleHours]);
 
   const result = useMemo(() => buildEstimate(estimateInput), [estimateInput]);
 
@@ -120,6 +146,87 @@ const Estimator = () => {
     return `Rounded total to nearest $10: ${formatMoney(result.roundedVariant.roundedTotal)}\nImplied markup: ${result.roundedVariant.impliedMarkupPct}%\nRounded + 25%: ${formatMoney(result.roundedVariant.roundedPlus25Pct)}`;
   }, [result]);
 
+  // Auto-compute supplier RT miles based on business->supplier addresses
+  const handleComputeSupplierMiles = async () => {
+    const miles = await computeRoundTripMilesBetween(BUSINESS_PROFILE.address.full, BUSINESS_PROFILE.supplier.address.full);
+    if (miles && Number.isFinite(miles)) setRoundTripMilesSupplier(miles);
+  };
+
+  const handleComputeJobMiles = async () => {
+    const miles = await computeRoundTripMilesBetween(BUSINESS_PROFILE.address.full, jobAddress);
+    if (miles && Number.isFinite(miles)) setRoundTripMilesJob(miles);
+  };
+
+  const handleSaveJob = () => {
+    const record = saveJob({
+      name: jobName || `Job ${new Date().toLocaleString()}`,
+      address: jobAddress,
+      serviceType,
+      params: {
+        ...params,
+        roundTripMilesSupplier,
+        roundTripMilesJob,
+        fuelPrice,
+        laborRate,
+        numFullTime,
+        numPartTime,
+        sealerActiveHours,
+        excessiveIdleHours,
+        includeWeightCheck,
+        pmmPrice,
+        notes,
+      },
+    });
+    setJobs(listJobs());
+    setJobName(record.name);
+  };
+
+  const handleLoadJob = (j: StoredJob) => {
+    setJobName(j.name);
+    setJobAddress(j.address);
+    setServiceType(j.serviceType as ServiceType);
+    setParams(p => ({
+      ...p,
+      sealcoatSquareFeet: j.params.sealcoatSquareFeet ?? 0,
+      patchSquareFeet: j.params.patchSquareFeet ?? 0,
+      crackLinearFeet: j.params.crackLinearFeet ?? 0,
+      numStandardStalls: j.params.numStandardStalls ?? 0,
+      numDoubleStalls: j.params.numDoubleStalls ?? 0,
+      numHandicapSpots: j.params.numHandicapSpots ?? 0,
+      hasCrosswalks: j.params.hasCrosswalks ?? false,
+      numArrows: j.params.numArrows ?? 0,
+      oilSpotSquareFeet: j.params.oilSpotSquareFeet ?? 0,
+      surfacePorosityFactor: j.params.surfacePorosityFactor ?? 1,
+      numCrosswalks: j.params.numCrosswalks ?? 0,
+      paintColor: j.params.paintColor ?? 'yellow',
+    }));
+    setRoundTripMilesSupplier(j.params.roundTripMilesSupplier ?? BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier);
+    setRoundTripMilesJob(j.params.roundTripMilesJob ?? 0);
+    setFuelPrice(j.params.fuelPrice ?? DEFAULT_FUEL_PRICE);
+    setLaborRate(j.params.laborRate ?? BUSINESS_PROFILE.crew.hourlyRatePerPerson);
+    setNumFullTime(j.params.numFullTime ?? BUSINESS_PROFILE.crew.numFullTime);
+    setNumPartTime(j.params.numPartTime ?? BUSINESS_PROFILE.crew.numPartTime);
+    setSealerActiveHours(j.params.sealerActiveHours ?? 0);
+    setExcessiveIdleHours(j.params.excessiveIdleHours ?? 0);
+    setIncludeWeightCheck(!!j.params.includeWeightCheck);
+    setPmmPrice(j.params.pmmPrice ?? BUSINESS_PROFILE.materials.pmmPricePerGallon);
+    setNotes(j.params.notes ?? '');
+  };
+
+  const handleUseMyLocation = async () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const addr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+      if (addr) setJobAddress(addr);
+    });
+  };
+
+  const handleSaveCustomer = () => {
+    if (!customerName || !jobAddress) return;
+    saveCustomer({ name: customerName, address: jobAddress, notes: '' });
+    setCustomers(listCustomers());
+  };
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
@@ -144,6 +251,30 @@ const Estimator = () => {
               <CardDescription>Enter project details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <div>
+                  <Label>Job name</Label>
+                  <Input value={jobName} onChange={e => setJobName(e.target.value)} placeholder="Customer/Location" />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button type="button" variant="outline" onClick={handleSaveJob}>Save Job</Button>
+                  <Button type="button" onClick={() => navigator.clipboard.writeText(textInvoice)}>Copy Invoice</Button>
+                  <Button type="button" variant="outline" onClick={() => {
+                    const all = `${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`;
+                    navigator.clipboard.writeText(all);
+                  }}>Copy All</Button>
+                  <Button type="button" variant="outline" onClick={() => {
+                    const all = `${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`;
+                    const blob = new Blob([all], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${jobName || 'invoice'}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}>Download .txt</Button>
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Service</Label>
@@ -164,27 +295,48 @@ const Estimator = () => {
                 </div>
                 <div>
                   <Label>Job address</Label>
-                  <Input value={jobAddress} onChange={e => setJobAddress(e.target.value)} />
+                  <div className="flex gap-2">
+                    <Input value={jobAddress} onChange={e => setJobAddress(e.target.value)} />
+                    <Button type="button" variant="outline" onClick={handleUseMyLocation}>Use my location</Button>
+                  </div>
                 </div>
                 <div>
                   <Label>Sealcoat sq ft</Label>
-                  <Input type="number" value={params.sealcoatSquareFeet} onChange={e => setParams(p => ({ ...p, sealcoatSquareFeet: Number(e.target.value) }))} />
+                  <Input type="number" min={0} value={params.sealcoatSquareFeet} onChange={e => setParams(p => ({ ...p, sealcoatSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
                   <Label>Patch sq ft</Label>
-                  <Input type="number" value={params.patchSquareFeet} onChange={e => setParams(p => ({ ...p, patchSquareFeet: Number(e.target.value) }))} />
+                  <Input type="number" min={0} value={params.patchSquareFeet} onChange={e => setParams(p => ({ ...p, patchSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
+                </div>
+                <div>
+                  <Label>Patch thickness (in)</Label>
+                  <Input type="number" step="0.5" min={1} max={6} onChange={e => (null)} onBlur={e => setParams(p => ({ ...p, patchThicknessInches: Math.min(6, Math.max(1, Number(e.currentTarget.value) || 2)) }))} placeholder="2" />
+                </div>
+                <div>
+                  <Label>Patch material</Label>
+                  <Select onValueChange={(v) => setParams(p => ({ ...p, patchMaterial: v as any }))}>
+                    <SelectTrigger><SelectValue placeholder="hot" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hot">Hot mix</SelectItem>
+                      <SelectItem value="cold">Cold patch</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label>Crack feet</Label>
-                  <Input type="number" value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Number(e.target.value) }))} />
+                  <Input type="number" min={0} value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Math.max(0, Number(e.target.value) || 0) }))} />
+                </div>
+                <div>
+                  <Label>Deep crack prefill (%)</Label>
+                  <Input type="number" step="5" min={0} max={100} onChange={e => (null)} onBlur={e => setParams(p => ({ ...p, deepCrackPrefillPct: Math.min(100, Math.max(0, Number(e.currentTarget.value) || 0)) }))} placeholder="0" />
                 </div>
                 <div>
                   <Label>Oil spots sq ft</Label>
-                  <Input type="number" value={params.oilSpotSquareFeet} onChange={e => setParams(p => ({ ...p, oilSpotSquareFeet: Number(e.target.value) }))} />
+                  <Input type="number" min={0} value={params.oilSpotSquareFeet} onChange={e => setParams(p => ({ ...p, oilSpotSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
                   <Label>Porosity factor</Label>
-                  <Input type="number" step="0.1" value={params.surfacePorosityFactor} onChange={e => setParams(p => ({ ...p, surfacePorosityFactor: Number(e.target.value) }))} />
+                  <Input type="number" step="0.1" min={0.5} max={2.5} value={params.surfacePorosityFactor} onChange={e => setParams(p => ({ ...p, surfacePorosityFactor: Math.min(2.5, Math.max(0.5, Number(e.target.value) || 1)) }))} />
                 </div>
                 <div>
                   <Label>Stalls (single)</Label>
@@ -203,12 +355,25 @@ const Estimator = () => {
                   <Input type="number" value={params.numArrows} onChange={e => setParams(p => ({ ...p, numArrows: Number(e.target.value) }))} />
                 </div>
                 <div>
-                  <Label>Crosswalks?</Label>
-                  <Select value={params.hasCrosswalks ? 'yes' : 'no'} onValueChange={v => setParams(p => ({ ...p, hasCrosswalks: v === 'yes' }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                  <Label>Crosswalks count</Label>
+                  <Input type="number" value={params.numCrosswalks} onChange={e => setParams(p => ({ ...p, numCrosswalks: Number(e.target.value) }))} />
+                </div>
+                <div>
+                  <Label>Stop bars</Label>
+                  <Input type="number" min={0} onChange={e => setParams(p => ({ ...p, numStopBars: Math.max(0, Number(e.target.value) || 0) }))} />
+                </div>
+                <div>
+                  <Label>Text stencils</Label>
+                  <Input type="number" min={0} onChange={e => setParams(p => ({ ...p, numTextStencils: Math.max(0, Number(e.target.value) || 0) }))} />
+                </div>
+                <div>
+                  <Label>Paint color</Label>
+                  <Select value={params.paintColor} onValueChange={(v) => setParams(p => ({ ...p, paintColor: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Color" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="no">No</SelectItem>
-                      <SelectItem value="yes">Yes</SelectItem>
+                      {(BUSINESS_PROFILE.pricing.paintColors ?? ['yellow','white','blue']).map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -217,15 +382,34 @@ const Estimator = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <div>
                   <Label>Round trip miles (supplier)</Label>
-                  <Input type="number" value={roundTripMilesSupplier} onChange={e => setRoundTripMilesSupplier(Number(e.target.value))} />
+                  <div className="flex gap-2">
+                    <Input type="number" min={0} value={roundTripMilesSupplier} onChange={e => setRoundTripMilesSupplier(Math.max(0, Number(e.target.value) || 0))} />
+                    <Button type="button" variant="outline" onClick={handleComputeSupplierMiles}>Auto</Button>
+                  </div>
                 </div>
                 <div>
                   <Label>Round trip miles (job)</Label>
-                  <Input type="number" value={roundTripMilesJob} onChange={e => setRoundTripMilesJob(Number(e.target.value))} />
+                  <div className="flex gap-2">
+                    <Input type="number" min={0} value={roundTripMilesJob} onChange={e => setRoundTripMilesJob(Math.max(0, Number(e.target.value) || 0))} />
+                    <Button type="button" variant="outline" onClick={handleComputeJobMiles}>Auto</Button>
+                  </div>
                 </div>
                 <div>
                   <Label>Fuel price $/gal</Label>
-                  <Input type="number" step="0.01" value={fuelPrice} onChange={e => setFuelPrice(Number(e.target.value))} />
+                  <Input type="number" step="0.01" min={0} value={fuelPrice} onChange={e => setFuelPrice(Math.max(0, Number(e.target.value) || 0))} />
+                </div>
+                <div>
+                  <Label>PMM price $/gal</Label>
+                  <div className="flex gap-2">
+                    <Input type="number" step="0.01" value={pmmPrice} onChange={e => setPmmPrice(Number(e.target.value))} />
+                    <Select onValueChange={(v) => setPmmPrice(v === 'bulk' ? BUSINESS_PROFILE.materials.pmmBulkPricePerGallon : BUSINESS_PROFILE.materials.pmmPricePerGallon)}>
+                      <SelectTrigger className="w-[140px]"><SelectValue placeholder="Preset" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default ${BUSINESS_PROFILE.materials.pmmPricePerGallon.toFixed(2)}</SelectItem>
+                        <SelectItem value="bulk">Bulk ${BUSINESS_PROFILE.materials.pmmBulkPricePerGallon.toFixed(2)}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div>
                   <Label>Labor rate $/hr per person</Label>
@@ -247,6 +431,16 @@ const Estimator = () => {
                   <Label>Excessive idle hours</Label>
                   <Input type="number" step="0.5" value={excessiveIdleHours} onChange={e => setExcessiveIdleHours(Number(e.target.value))} />
                 </div>
+                <div>
+                  <Label>Transport weight check</Label>
+                  <Select value={includeWeightCheck ? 'yes' : 'no'} onValueChange={(v) => setIncludeWeightCheck(v === 'yes')}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Include</SelectItem>
+                      <SelectItem value="no">Exclude</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div>
@@ -254,9 +448,14 @@ const Estimator = () => {
                 <Textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} />
               </div>
 
-              <div className="flex gap-2">
-                <Button onClick={() => navigator.clipboard.writeText(textInvoice)}>Copy Invoice</Button>
-                <Button variant="outline" onClick={() => navigator.clipboard.writeText(textInvoice + '\n\n' + textInvoice25 + '\n' + textInvoiceRounded)}>Copy All Variants</Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <div>
+                  <Label>Customer name</Label>
+                  <Input value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="Customer name" />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button type="button" variant="outline" onClick={handleSaveCustomer}>Save to address book</Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -274,6 +473,45 @@ ${textInvoice25}
 
 ${textInvoiceRounded}`}
               </pre>
+              <div className="mt-3 flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={() => exportInvoicePDF(`${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`, jobName || 'invoice')}>Export PDF</Button>
+                <Button type="button" variant="outline" onClick={() => downloadTextFile(exportJobsCSV(jobs), 'jobs.csv', 'text/csv')}>Jobs CSV</Button>
+                <Button type="button" variant="outline" onClick={() => downloadTextFile(exportCustomersCSV(customers), 'customers.csv', 'text/csv')}>Customers CSV</Button>
+              </div>
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label>Recent Jobs</Label>
+                  <div className="mt-2 space-y-2 max-h-64 overflow-auto">
+                    {jobs.map(j => (
+                      <div key={j.id} className="flex items-center justify-between p-2 rounded border border-border/30">
+                        <div className="text-sm">
+                          <div className="font-medium">{j.name}</div>
+                          <div className="text-muted-foreground">{new Date(j.updatedAt).toLocaleString()}</div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" size="sm" onClick={() => handleLoadJob(j)}>Load</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label>Address Book</Label>
+                  <div className="mt-2 space-y-2 max-h-64 overflow-auto">
+                    {customers.map(c => (
+                      <div key={c.id} className="flex items-center justify-between p-2 rounded border border-border/30">
+                        <div className="text-sm">
+                          <div className="font-medium">{c.name}</div>
+                          <div className="text-muted-foreground">{c.address}</div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" size="sm" onClick={() => setJobAddress(c.address)}>Use</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

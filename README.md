@@ -71,3 +71,13 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Asphalt Estimator Business Configuration
+
+- Defaults are centralized in `src/data/business.ts` as `BUSINESS_PROFILE`.
+- Types for business data live in `src/types/business.ts`.
+- The estimator UI (`src/pages/Estimator.tsx`) and engine (`src/lib/estimator.ts`) read from this profile so updates to materials, labor, vehicles, equipment, and pricing take effect app-wide.
+- Supplier default: SealMaster, 703 West Decatur Street, Madison, NC 27025
+- Business address default: 337 Ayers Orchard Road, Stuart, VA 24171
+
+To update prices or assumptions, edit `BUSINESS_PROFILE` and rebuild.
