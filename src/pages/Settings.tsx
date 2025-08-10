@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Sidebar from "@/components/Sidebar";
+import NavigationEditor from "@/components/settings/NavigationEditor";
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -30,10 +31,15 @@ import {
   CheckCircle,
   Key,
   Globe,
-  Smartphone
+  Smartphone,
+  Image as ImageIcon,
+  Waves as WavesIcon,
+  ListTree
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
+import ColorPicker from "@/components/theme/ColorPicker";
 
 const Settings = () => {
   const { profile, save, reset } = useBusinessProfile();
@@ -51,6 +57,14 @@ const Settings = () => {
     unit: "Special Operations Command",
     avatar: "/avatars/commander.jpg"
   };
+
+  const {
+    globalWallpaperOverride,
+    isGlobalWallpaperEnabled,
+    setGlobalWallpaperOverride,
+    setIsGlobalWallpaperEnabled,
+    setLowPower
+  , wallpaperProfiles, saveWallpaperProfile, applyWallpaperProfile, deleteWallpaperProfile } = useAdvancedTheme();
 
   return (
     <div className="flex h-screen bg-background">
@@ -93,14 +107,13 @@ const Settings = () => {
 
         <div className="container mx-auto px-6 py-8">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full lg:w-auto lg:grid-cols-7">
+
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
               <TabsTrigger value="display">Display</TabsTrigger>
-              <TabsTrigger value="backup">Backup</TabsTrigger>
-<TabsTrigger value="business">Business</TabsTrigger>
+
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
@@ -602,10 +615,320 @@ const Settings = () => {
                         </div>
                         <Switch />
                       </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <div className="text-sm font-medium">Low Power Mode</div>
+                          <div className="text-sm text-muted-foreground">
+                            Disables heavy visuals (particles/blur/shadows)
+                          </div>
+                        </div>
+                        <Switch onCheckedChange={(enabled) => setLowPower(enabled)} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium">HUD Effects</div>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ minimal: true })}>Minimal Mode</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ minimal: false })}>Full Mode</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ scanlines: true })}>Scanlines On</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ scanlines: false })}>Scanlines Off</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ refreshBarH: true })}>Refresh H</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ refreshBarV: true })}>Refresh V</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ radarSweep: true })}>Radar</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ uvVignette: true })}>UV Vignette</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ ticker: true })}>Ticker</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ vignette: true })}>Vignette</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ glitch: true })}>Glitch</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.reset?.()}>Reset</Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Scanline Spacing</Label>
+                        <input type="range" min={2} max={10} step={1} defaultValue={3} onChange={(e) => (window as any).owEffects?.set({ scanlineSpacing: parseInt(e.target.value, 10) })} className="w-full" />
+                      </div>
+                      <div>
+                        <Label>Glitch Intensity</Label>
+                        <input type="range" min={0} max={1} step={0.05} defaultValue={0.3} onChange={(e) => (window as any).owEffects?.set({ glitchLevel: parseFloat(e.target.value) })} className="w-full" />
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="wallpapers" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ImageIcon className="h-5 w-5 text-primary" />
+                    Wallpapers
+                  </CardTitle>
+                  <CardDescription>Use any wallpaper with any theme. Configure a global override.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">Use Global Wallpaper</div>
+                      <div className="text-sm text-muted-foreground">Overrides the active theme wallpaper
+                      </div>
+                    </div>
+                    <Switch
+                      checked={isGlobalWallpaperEnabled}
+                      onCheckedChange={(enabled) => setIsGlobalWallpaperEnabled(enabled)}
+                    />
+                  </div>
+
+                  <Separator />
+
+                  {/* Profiles */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium">Profiles</div>
+                      <div className="flex items-center gap-2">
+                        <Input placeholder="Profile name" id="wp-profile-name" className="w-48" />
+                        <Button size="sm" onClick={() => {
+                          const name = (document.getElementById('wp-profile-name') as HTMLInputElement)?.value?.trim();
+                          if (!name) return;
+                          // @ts-ignore
+                          saveWallpaperProfile(name);
+                        }}>Save Profile</Button>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {wallpaperProfiles?.map((p) => (
+                        <div key={p.name} className="flex items-center gap-2 border rounded px-2 py-1">
+                          <span className="text-sm">{p.name}</span>
+                          <Button size="sm" variant="outline" onClick={() => applyWallpaperProfile(p.name)}>Apply</Button>
+                          <Button size="sm" variant="ghost" onClick={() => deleteWallpaperProfile(p.name)}>Delete</Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <Label>Wallpaper Type</Label>
+                      <Select
+                        value={globalWallpaperOverride?.type || 'color'}
+                        onValueChange={(type: any) => {
+                          const next = { ...(globalWallpaperOverride || { type: 'color' }), type } as any;
+                          setGlobalWallpaperOverride(next);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="color">Color</SelectItem>
+                          <SelectItem value="gradient">Gradient</SelectItem>
+                          <SelectItem value="image">Image</SelectItem>
+                          <SelectItem value="video">Video</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      {(globalWallpaperOverride?.type === 'image' || globalWallpaperOverride?.type === 'video') && (
+                        <div className="space-y-2">
+                          <Label>Source URL</Label>
+                          <Input
+                            placeholder="/hero-bg.jpg or https://..."
+                            value={globalWallpaperOverride?.source || ''}
+                            onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride || { type: 'image' }), source: e.target.value })}
+                          />
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <input type="file" accept={globalWallpaperOverride?.type === 'video' ? 'video/*' : 'image/*'} onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const url = URL.createObjectURL(file);
+                              setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), source: url });
+                            }} />
+                            <span>(Local uploads use temporary URLs; not persisted across reloads)</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {globalWallpaperOverride?.type === 'color' && (
+                        <ColorPicker
+                          color={globalWallpaperOverride?.color || { h: 215, s: 20, l: 8 }}
+                          onChange={(color) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), color })}
+                          label="Background Color"
+                        />
+                      )}
+
+                      {globalWallpaperOverride?.type === 'gradient' && (
+                        <div className="space-y-4">
+                          <Label>Gradient Angle</Label>
+                          <input type="range" min={0} max={360} step={1} value={globalWallpaperOverride?.gradient?.angle || 135} onChange={(e) => {
+                            const angle = parseInt(e.target.value, 10);
+                            const grad = globalWallpaperOverride?.gradient || { type: 'linear', stops: [{ color: { h: 220, s: 100, l: 3 }, position: 0 }, { color: { h: 240, s: 6, l: 8 }, position: 100 }] };
+                            setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, angle } });
+                          }} className="w-full" />
+                          <div className="grid grid-cols-2 gap-2">
+                            <ColorPicker
+                              color={globalWallpaperOverride?.gradient?.stops?.[0]?.color || { h: 220, s: 100, l: 3 }}
+                              onChange={(color) => {
+                                const grad = globalWallpaperOverride?.gradient || { type: 'linear', angle: 135, stops: [{ color, position: 0 }, { color, position: 100 }] };
+                                const stops = [...(grad.stops || [])];
+                                stops[0] = { ...(stops[0] || { position: 0 }), color };
+                                setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, stops } });
+                              }}
+                              label="Stop 1"
+                            />
+                            <ColorPicker
+                              color={globalWallpaperOverride?.gradient?.stops?.[1]?.color || { h: 240, s: 6, l: 8 }}
+                              onChange={(color) => {
+                                const grad = globalWallpaperOverride?.gradient || { type: 'linear', angle: 135, stops: [{ color, position: 0 }, { color, position: 100 }] };
+                                const stops = [...(grad.stops || [])];
+                                stops[1] = { ...(stops[1] || { position: 100 }), color };
+                                setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, stops } });
+                              }}
+                              label="Stop 2"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <Label>Overlay</Label>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Enable Overlay</span>
+                        <Switch
+                          checked={!!globalWallpaperOverride?.overlay}
+                          onCheckedChange={(enabled) => {
+                            if (!globalWallpaperOverride) return;
+                            const next = { ...globalWallpaperOverride } as any;
+                            next.overlay = enabled ? (next.overlay || { color: { h: 0, s: 0, l: 0, a: 0.3 }, opacity: 0.3, blendMode: 'multiply' }) : undefined;
+                            setGlobalWallpaperOverride(next);
+                          }}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label>Blend Mode</Label>
+                          <Select
+                            value={globalWallpaperOverride?.overlay?.blendMode || 'multiply'}
+                            onValueChange={(blendMode) => globalWallpaperOverride && setGlobalWallpaperOverride({ ...globalWallpaperOverride, overlay: { ...(globalWallpaperOverride.overlay as any), blendMode } })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="multiply">multiply</SelectItem>
+                              <SelectItem value="overlay">overlay</SelectItem>
+                              <SelectItem value="screen">screen</SelectItem>
+                              <SelectItem value="soft-light">soft-light</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Opacity</Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            value={globalWallpaperOverride?.overlay?.opacity ?? 0.3}
+                            onChange={(e) => globalWallpaperOverride && setGlobalWallpaperOverride({ ...globalWallpaperOverride, overlay: { ...(globalWallpaperOverride.overlay as any), opacity: parseFloat(e.target.value) } })}
+                          />
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <Label>Positioning</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label>Position</Label>
+                          <Input placeholder="center" value={globalWallpaperOverride?.position || 'center'} onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), position: e.target.value })} />
+                        </div>
+                        <div>
+                          <Label>Size</Label>
+                          <Input placeholder="cover" value={globalWallpaperOverride?.size || 'cover'} onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), size: e.target.value })} />
+                        </div>
+                        <div>
+                          <Label>Tiling</Label>
+                          <Select value={globalWallpaperOverride?.tiling || 'no-repeat'} onValueChange={(tiling: any) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), tiling })}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="no-repeat">no-repeat</SelectItem>
+                              <SelectItem value="repeat">repeat</SelectItem>
+                              <SelectItem value="repeat-x">repeat-x</SelectItem>
+                              <SelectItem value="repeat-y">repeat-y</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch checked={!!globalWallpaperOverride?.parallax} onCheckedChange={(parallax) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), parallax })} />
+                          <span className="text-sm">Parallax</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="audio" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <WavesIcon className="h-5 w-5 text-primary" />
+                    Audio & UI Sounds
+                  </CardTitle>
+                  <CardDescription>Control UI sounds. Test basic cues.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">Mute All</div>
+                      <div className="text-sm text-muted-foreground">Disable all UI audio cues</div>
+                    </div>
+                    <Switch onCheckedChange={(m) => (window as any).owSounds?.setMuted(m)} />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                    <div className="md:col-span-2">
+                      <Label>Volume</Label>
+                      <input type="range" min={0} max={1} step={0.05} defaultValue={0.5} onChange={(e) => (window as any).owSounds?.setVolume?.(parseFloat(e.target.value))} className="w-full" />
+                    </div>
+                    <div>
+                      <Label>Preset</Label>
+                      <Select defaultValue="none" onValueChange={(v: any) => (window as any).owSounds?.setPreset?.(v)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="isac">ISAC</SelectItem>
+                          <SelectItem value="disavowed">Disavowed</SelectItem>
+                          <SelectItem value="darkzone">Darkzone</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    <Button variant="outline" onClick={() => (window as any).owSounds?.ui.hover?.()}>Hover</Button>
+                    <Button variant="outline" onClick={() => (window as any).owSounds?.ui.select?.()}>Select</Button>
+                    <Button variant="outline" onClick={() => (window as any).owSounds?.ui.confirm?.()}>Confirm</Button>
+                    <Button variant="outline" onClick={() => (window as any).owSounds?.ui.error?.()}>Error</Button>
+                    <Button variant="outline" onClick={() => (window as any).owSounds?.scanner.ping?.()}>Scan Ping</Button>
+                    <Button variant="outline" onClick={() => (window as any).owSounds?.rogue.engaged?.()}>Rogue</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="navigation" className="space-y-6">
+              <NavigationEditor />
             </TabsContent>
 
             <TabsContent value="backup" className="space-y-6">

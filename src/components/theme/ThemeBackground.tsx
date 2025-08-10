@@ -3,11 +3,15 @@ import { useAdvancedTheme } from '@/contexts/AdvancedThemeContext';
 import ParticleSystem from '@/components/effects/ParticleSystem';
 
 export function ThemeBackground() {
-  const { currentTheme, isLoading } = useAdvancedTheme();
+  const { currentTheme, isLoading, globalWallpaperOverride, isGlobalWallpaperEnabled } = useAdvancedTheme();
 
   if (isLoading || !currentTheme) {
     return null;
   }
+
+  const effectiveWallpaper = isGlobalWallpaperEnabled && globalWallpaperOverride
+    ? globalWallpaperOverride
+    : currentTheme.wallpaper;
 
   return (
     <>
@@ -21,7 +25,7 @@ export function ThemeBackground() {
       )}
       
       {/* Dynamic Background */}
-      {currentTheme.wallpaper.type === 'video' && currentTheme.wallpaper.source && (
+      {effectiveWallpaper.type === 'video' && effectiveWallpaper.source && (
         <video
           className="fixed inset-0 w-full h-full object-cover -z-10 opacity-30"
           autoPlay
@@ -29,7 +33,7 @@ export function ThemeBackground() {
           muted
           playsInline
         >
-          <source src={currentTheme.wallpaper.source} type="video/mp4" />
+          <source src={effectiveWallpaper.source} type="video/mp4" />
         </video>
       )}
       

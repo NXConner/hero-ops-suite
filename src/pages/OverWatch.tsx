@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import Sidebar from '@/components/Sidebar';
 import { Radar, Map, Layers, Navigation, Crosshair, Ruler, Camera, Users, Truck, Cloud, Thermometer, Eye, Settings, Target, RadioIcon as Radio, Activity, AlertTriangle, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import MapTools from '@/components/map/MapTools';
 import FleetTracking from '@/components/map/FleetTracking';
@@ -382,6 +383,12 @@ const OverWatch: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              <Link to="/builder">
+                <Button variant="outline" size="sm" className="bg-slate-800 border-slate-600 text-xs">
+                  Edit Layout
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -520,6 +527,7 @@ const OverWatch: React.FC = () => {
           <DraggableWidgets 
             terminologyMode={terminologyMode}
             isVisible={showWidgets}
+            editMode={showWidgets}
             onLayoutChange={(layout) => console.log('Layout changed:', layout)}
           />
 

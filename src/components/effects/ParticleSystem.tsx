@@ -65,6 +65,13 @@ export function ParticleSystem({
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Add mild blur for fog effect
+      if (effect.type === 'fog') {
+        ctx.filter = 'blur(8px)';
+      } else {
+        ctx.filter = 'none';
+      }
+
       // Update and draw particles
       particlesRef.current.forEach((particle, index) => {
         updateParticle(particle, deltaTime, effect, containerWidth, containerHeight);
@@ -97,7 +104,7 @@ export function ParticleSystem({
       style={{ 
         width: containerWidth, 
         height: containerHeight,
-        opacity: 0.8
+        opacity: effect.type === 'fog' ? 0.35 : 0.8
       }}
     />
   );
@@ -106,7 +113,7 @@ export function ParticleSystem({
 function createParticle(effect: ParticleEffect, width: number, height: number): Particle {
   const size = Math.random() * (effect.size.max - effect.size.min) + effect.size.min;
   const opacity = Math.random() * (effect.opacity.max - effect.opacity.min) + effect.opacity.min;
-  const life = Math.random() * 5000 + 2000; // 2-7 seconds
+  const life = effect.type === 'fog' ? Math.random() * 15000 + 10000 : Math.random() * 5000 + 2000;
 
   // Convert direction from degrees to radians
   const directionRad = (effect.direction * Math.PI) / 180;
@@ -148,6 +155,13 @@ function createParticle(effect: ParticleEffect, width: number, height: number): 
       y = Math.random() * height;
       vx = Math.sin(directionRad) * speed + (Math.random() - 0.5) * 0.5;
       vy = Math.cos(directionRad) * speed + (Math.random() - 0.5) * 0.5;
+      break;
+
+    case 'fog':
+      x = Math.random() * width;
+      y = Math.random() * height;
+      vx = (Math.random() - 0.5) * speed * 0.2 + effect.wind * 0.05;
+      vy = (Math.random() - 0.5) * speed * 0.2;
       break;
     
     default:
@@ -228,6 +242,12 @@ function updateParticle(
       particle.x = centerX + Math.cos(newAngle) * radius;
       particle.y = centerY + Math.sin(newAngle) * radius;
       break;
+
+    case 'fog':
+      // Slow drift
+      particle.vx *= 0.9995;
+      particle.vy *= 0.9995;
+      break;
   }
 
   // Wrap around screen boundaries
@@ -256,7 +276,7 @@ function updateParticle(
 function drawParticle(ctx: CanvasRenderingContext2D, particle: Particle, effect: ParticleEffect) {
   ctx.save();
   
-  ctx.globalAlpha = particle.opacity;
+  ctx.globalAlpha = effect.type === 'fog' ? particle.opacity * 0.5 : particle.opacity;
   ctx.translate(particle.x, particle.y);
   ctx.rotate(particle.rotation);
 
@@ -318,6 +338,16 @@ function drawParticle(ctx: CanvasRenderingContext2D, particle: Particle, effect:
       }
       ctx.closePath();
       ctx.stroke();
+      break;
+
+    case 'fog':
+      const radial = ctx.createRadialGradient(0, 0, 0, 0, 0, particle.size * 4);
+      radial.addColorStop(0, hslToString({ ...particle.color, a: 0.08 }));
+      radial.addColorStop(1, hslToString({ ...particle.color, a: 0 }));
+      ctx.fillStyle = radial;
+      ctx.beginPath();
+      ctx.arc(0, 0, particle.size * 4, 0, Math.PI * 2);
+      ctx.fill();
       break;
     
     default:

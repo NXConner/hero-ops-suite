@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
-import { Theme, ThemeContext, ThemePreset } from '@/types/theme';
+import { Theme, ThemeContext, ThemePreset, ThemeWallpaper } from '@/types/theme';
 import { 
   generateThemeCSS, 
   generateWallpaperCSS, 
@@ -31,7 +31,17 @@ export function AdvancedThemeProvider({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load themes from storage
+  // Global wallpaper override
+  const [globalWallpaperOverride, setGlobalWallpaperOverrideState] = useState<ThemeWallpaper | null>(null);
+  const [isGlobalWallpaperEnabled, setIsGlobalWallpaperEnabledState] = useState<boolean>(false);
+  const [wallpaperProfiles, setWallpaperProfiles] = useState<{ name: string; wallpaper: ThemeWallpaper }[]>([]);
+
+  // Low power override
+  const [lowPowerMode, setLowPowerMode] = useState<boolean>(() => {
+    try { return localStorage.getItem('low-power-mode') === '1'; } catch { return false; }
+  });
+
+  // Load themes and wallpaper settings from storage
   useEffect(() => {
     try {
       const stored = localStorage.getItem(storageKey);
@@ -40,10 +50,26 @@ export function AdvancedThemeProvider({
         setCustomThemes(config.customThemes || []);
         setPresets(config.presets || []);
       }
+
+      const globalWpStr = localStorage.getItem('global-wallpaper-config');
+      if (globalWpStr) {
+        const parsed = JSON.parse(globalWpStr);
+        setGlobalWallpaperOverrideState(parsed.wallpaper || null);
+        setIsGlobalWallpaperEnabledState(!!parsed.enabled);
+      }
+
+      const profilesStr = localStorage.getItem('global-wallpaper-profiles');
+      if (profilesStr) {
+        setWallpaperProfiles(JSON.parse(profilesStr));
+      }
     } catch (err) {
       console.error('Failed to load theme config:', err);
     }
   }, [storageKey]);
+
+  const persistProfiles = useCallback((profiles: { name: string; wallpaper: ThemeWallpaper }[]) => {
+    try { localStorage.setItem('global-wallpaper-profiles', JSON.stringify(profiles)); } catch {}
+  }, []);
 
   // Save themes to storage
   const saveToStorage = useCallback((themes: Theme[], presetsData: ThemePreset[]) => {
@@ -59,24 +85,26 @@ export function AdvancedThemeProvider({
     }
   }, [storageKey]);
 
+  const saveGlobalWallpaper = useCallback((wallpaper: ThemeWallpaper | null, enabled: boolean) => {
+    try {
+      localStorage.setItem('global-wallpaper-config', JSON.stringify({ wallpaper, enabled }));
+    } catch (err) {
+      console.error('Failed to save global wallpaper:', err);
+    }
+  }, []);
+
   // Initialize with default themes
   useEffect(() => {
     const initializeThemes = async () => {
       try {
         setIsLoading(true);
-        
-        // Import default themes
         const { getDefaultThemes } = await import('@/data/default-themes');
         const defaultThemes = getDefaultThemes();
-        
         setAvailableThemes(defaultThemes);
-        
-        // Set initial theme
         const initialTheme = defaultThemes.find(t => t.id === defaultTheme) || defaultThemes[0];
         if (initialTheme) {
           await applyTheme(initialTheme);
         }
-        
         setIsLoading(false);
       } catch (err) {
         setError('Failed to initialize themes');
@@ -84,7 +112,6 @@ export function AdvancedThemeProvider({
         console.error(err);
       }
     };
-
     initializeThemes();
   }, [defaultTheme]);
 
@@ -92,89 +119,90 @@ export function AdvancedThemeProvider({
   const applyTheme = useCallback(async (theme: Theme) => {
     try {
       setError(null);
-      
-      // Validate theme
       const errors = validateTheme(theme);
       if (errors.length > 0) {
         throw new Error(`Invalid theme: ${errors.join(', ')}`);
       }
 
-      // Auto-adjust performance based on device
       const performanceLevel = getPerformanceLevel();
       const deviceType = getDeviceType();
       const timeVariant = getCurrentTimeVariant();
 
-      // Apply responsive variant if available
-      let activeTheme = { ...theme };
+      let activeTheme = { ...theme } as Theme;
       if (theme.variants && theme.variants[deviceType]) {
         activeTheme = mergeThemes(activeTheme, theme.variants[deviceType]);
       }
-
-      // Apply time-based variant if available
       if (theme.timeVariants && theme.timeVariants[timeVariant]) {
         activeTheme = mergeThemes(activeTheme, theme.timeVariants[timeVariant]);
       }
 
-      // Adjust performance settings
-      activeTheme.performance = {
+      // Adjust performance settings and apply low-power override
+      const derived = {
         ...activeTheme.performance,
         quality: performanceLevel,
         enableParticles: activeTheme.performance.enableParticles && performanceLevel !== 'low',
         enableBlur: activeTheme.performance.enableBlur && performanceLevel !== 'low',
         enableShadows: activeTheme.performance.enableShadows && performanceLevel !== 'low'
       };
-
-      // Generate and inject CSS
-      const themeCSS = generateThemeCSS(activeTheme);
-      const wallpaperCSS = generateWallpaperCSS(activeTheme);
-      
-      // Remove existing theme styles
-      const existingStyle = document.getElementById('advanced-theme-styles');
-      if (existingStyle) {
-        existingStyle.remove();
+      if (lowPowerMode) {
+        derived.quality = 'low';
+        derived.enableParticles = false;
+        derived.enableBlur = false;
+        derived.enableShadows = false;
       }
+      activeTheme.performance = derived;
 
-      // Inject new theme styles
+      const effectiveTheme: Theme = isGlobalWallpaperEnabled && globalWallpaperOverride
+        ? { ...activeTheme, wallpaper: globalWallpaperOverride }
+        : activeTheme;
+
+      const themeCSS = generateThemeCSS(effectiveTheme);
+      const wallpaperCSS = generateWallpaperCSS(effectiveTheme);
+
+      const existingStyle = document.getElementById('advanced-theme-styles');
+      if (existingStyle) existingStyle.remove();
+
       const styleElement = document.createElement('style');
       styleElement.id = 'advanced-theme-styles';
       styleElement.textContent = `
         ${themeCSS}
-        
-        body {
-          ${wallpaperCSS}
-        }
-        
-        ${activeTheme.customCSS || ''}
+        body { ${wallpaperCSS} }
+        ${effectiveTheme.customCSS || ''}
       `;
       document.head.appendChild(styleElement);
 
-      // Set theme data attribute
-      document.documentElement.setAttribute('data-theme', activeTheme.id);
-      document.documentElement.setAttribute('data-performance', activeTheme.performance.quality);
-      
-      // Apply accessibility settings
-      if (activeTheme.accessibility.reducedMotion) {
+      document.documentElement.setAttribute('data-theme', effectiveTheme.id);
+      document.documentElement.setAttribute('data-performance', effectiveTheme.performance.quality);
+
+      if (effectiveTheme.accessibility.reducedMotion) {
         document.documentElement.style.setProperty('--animation-duration', '0.01ms');
       }
-      
-      if (activeTheme.accessibility.highContrast) {
+      if (effectiveTheme.accessibility.highContrast) {
         document.documentElement.classList.add('high-contrast');
       } else {
         document.documentElement.classList.remove('high-contrast');
       }
 
-      setCurrentTheme(activeTheme);
-      
-      // Save current theme to localStorage
-      localStorage.setItem('current-theme-id', activeTheme.id);
-      
+      setCurrentTheme(effectiveTheme);
+      localStorage.setItem('current-theme-id', effectiveTheme.id);
+
+      try {
+        const preset = effectiveTheme.id.includes('isac')
+          ? 'isac'
+          : effectiveTheme.id.includes('disavowed')
+          ? 'disavowed'
+          : effectiveTheme.id.includes('darkzone')
+          ? 'darkzone'
+          : 'none';
+        (window as any).owSounds?.setPreset?.(preset);
+      } catch {}
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply theme');
       console.error('Theme application error:', err);
     }
-  }, []);
+  }, [globalWallpaperOverride, isGlobalWallpaperEnabled, lowPowerMode]);
 
-  // Theme management functions
   const setTheme = useCallback((themeId: string) => {
     const theme = [...availableThemes, ...customThemes].find(t => t.id === themeId);
     if (theme) {
@@ -314,6 +342,42 @@ export function AdvancedThemeProvider({
     }
   }, [presets, applyTheme]);
 
+  // Global wallpaper API (exposed)
+  const setGlobalWallpaperOverride = useCallback((wallpaper: ThemeWallpaper | null) => {
+    setGlobalWallpaperOverrideState(wallpaper);
+    saveGlobalWallpaper(wallpaper, isGlobalWallpaperEnabled);
+    if (currentTheme) applyTheme(currentTheme);
+  }, [isGlobalWallpaperEnabled, currentTheme, applyTheme, saveGlobalWallpaper]);
+
+  const setIsGlobalWallpaperEnabled = useCallback((enabled: boolean) => {
+    setIsGlobalWallpaperEnabledState(enabled);
+    saveGlobalWallpaper(globalWallpaperOverride, enabled);
+    if (currentTheme) applyTheme(currentTheme);
+  }, [globalWallpaperOverride, currentTheme, applyTheme, saveGlobalWallpaper]);
+
+  // Wallpaper profiles API
+  const saveWallpaperProfile = useCallback((name: string, wallpaper?: ThemeWallpaper | null) => {
+    const wp = wallpaper ?? globalWallpaperOverride;
+    if (!wp) return;
+    const updated = [...wallpaperProfiles.filter(p => p.name !== name), { name, wallpaper: wp }];
+    setWallpaperProfiles(updated);
+    persistProfiles(updated);
+  }, [globalWallpaperOverride, wallpaperProfiles, persistProfiles]);
+
+  const applyWallpaperProfile = useCallback((name: string) => {
+    const profile = wallpaperProfiles.find(p => p.name === name);
+    if (profile) {
+      setGlobalWallpaperOverride(profile.wallpaper);
+      setIsGlobalWallpaperEnabled(true);
+    }
+  }, [wallpaperProfiles, setGlobalWallpaperOverride, setIsGlobalWallpaperEnabled]);
+
+  const deleteWallpaperProfile = useCallback((name: string) => {
+    const updated = wallpaperProfiles.filter(p => p.name !== name);
+    setWallpaperProfiles(updated);
+    persistProfiles(updated);
+  }, [wallpaperProfiles, persistProfiles]);
+
   // Handle window resize for responsive themes
   useEffect(() => {
     const handleResize = () => {
@@ -339,6 +403,12 @@ export function AdvancedThemeProvider({
     return () => clearInterval(interval);
   }, [currentTheme, applyTheme]);
 
+  const setLowPower = useCallback((enabled: boolean) => {
+    setLowPowerMode(enabled);
+    try { localStorage.setItem('low-power-mode', enabled ? '1' : '0'); } catch {}
+    if (currentTheme) applyTheme(currentTheme);
+  }, [currentTheme, applyTheme]);
+
   const contextValue = useMemo(() => ({
     currentTheme: currentTheme!,
     availableThemes,
@@ -353,7 +423,20 @@ export function AdvancedThemeProvider({
     resetTheme,
     applyPreset,
     isLoading,
-    error
+    error,
+    // Global wallpaper
+    globalWallpaperOverride,
+    isGlobalWallpaperEnabled,
+    setGlobalWallpaperOverride,
+    setIsGlobalWallpaperEnabled,
+    // Profiles
+    wallpaperProfiles,
+    saveWallpaperProfile,
+    applyWallpaperProfile,
+    deleteWallpaperProfile,
+    // Low power
+    setLowPower,
+    lowPowerMode
   }), [
     currentTheme,
     availableThemes,
@@ -368,7 +451,17 @@ export function AdvancedThemeProvider({
     resetTheme,
     applyPreset,
     isLoading,
-    error
+    error,
+    globalWallpaperOverride,
+    isGlobalWallpaperEnabled,
+    setGlobalWallpaperOverride,
+    setIsGlobalWallpaperEnabled,
+    wallpaperProfiles,
+    saveWallpaperProfile,
+    applyWallpaperProfile,
+    deleteWallpaperProfile,
+    setLowPower,
+    lowPowerMode
   ]);
 
   return (
