@@ -191,6 +191,18 @@ export function AdvancedThemeProvider({
       
       // Save current theme to localStorage
       localStorage.setItem('current-theme-id', effectiveTheme.id);
+
+      // Map theme to sound preset (best-effort)
+      try {
+        const preset = effectiveTheme.id.includes('isac')
+          ? 'isac'
+          : effectiveTheme.id.includes('disavowed')
+          ? 'disavowed'
+          : effectiveTheme.id.includes('darkzone')
+          ? 'darkzone'
+          : 'none';
+        (window as any).owSounds?.setPreset?.(preset);
+      } catch {}
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply theme');
