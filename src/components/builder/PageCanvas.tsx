@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import GridLayout, { Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -15,9 +15,21 @@ interface CanvasWidget {
 interface PageCanvasProps {
   pageId: string;
   widgets: Record<string, CanvasWidget>;
+  isEditing?: boolean;
 }
 
-export default function PageCanvas({ pageId, widgets }: PageCanvasProps) {
+export default function PageCanvas({ pageId, widgets, isEditing = true }: PageCanvasProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(1200);
+  useEffect(() => {
+    const onResize = () => {
+      if (containerRef.current) setWidth(containerRef.current.clientWidth);
+    };
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const storageKey = `builder-layout-${pageId}`;
   const [layout, setLayout] = useState<Layout[]>(() => {
     try {
@@ -35,14 +47,14 @@ export default function PageCanvas({ pageId, widgets }: PageCanvasProps) {
   const initialLayout = useMemo(() => layout, []);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full" ref={containerRef}>
       <GridLayout
         className="layout"
         cols={12}
         rowHeight={30}
-        width={1200}
-        isDraggable
-        isResizable
+        width={width}
+        isDraggable={isEditing}
+        isResizable={isEditing}
         layout={initialLayout}
         onLayoutChange={(l) => setLayout(l)}
       >

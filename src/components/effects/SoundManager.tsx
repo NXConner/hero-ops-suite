@@ -35,7 +35,12 @@ export default function SoundManager() {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = type;
-      osc.frequency.value = frequency;
+      // Adjust by preset
+      let f = frequency;
+      if (settings.themePreset === 'isac') f *= 1.0;
+      if (settings.themePreset === 'disavowed') f *= 0.9;
+      if (settings.themePreset === 'darkzone') f *= 0.75;
+      osc.frequency.value = f;
       gain.gain.value = settings.volume * 0.2;
       osc.connect(gain);
       gain.connect(ctx.destination);
@@ -73,7 +78,7 @@ export default function SoundManager() {
     return () => {
       delete (window as any).owSounds;
     };
-  }, [settings.muted, settings.volume]);
+  }, [settings.muted, settings.volume, settings.themePreset]);
 
   return null;
 }

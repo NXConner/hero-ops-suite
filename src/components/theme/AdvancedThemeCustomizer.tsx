@@ -870,9 +870,16 @@ export function AdvancedThemeCustomizer() {
 
                 {isTargetsMode && (
                   <>
+                    {/* Card */}
                     <button onClick={() => openInspector('colors.card')} className="absolute inset-x-4 top-[92px] h-16 rounded-md ring-2 ring-accent/60 bg-accent/10" />
+                    {/* Primary Button */}
                     <button onClick={() => openInspector('colors.primary')} className="absolute left-4 top-4 h-10 w-40 rounded ring-2 ring-primary/60 bg-primary/10" />
+                    {/* Input */}
                     <button onClick={() => openInspector('colors.input')} className="absolute left-4 bottom-4 h-10 w-[calc(100%-2rem)] rounded ring-2 ring-foreground/40" />
+                    {/* Header (use popover/bg) */}
+                    <button onClick={() => openInspector('colors.background')} className="absolute inset-x-0 -top-3 h-8 ring-2 ring-secondary/50" />
+                    {/* Sidebar/nav (use sidebar color) */}
+                    <button onClick={() => openInspector('colors.sidebar')} className="absolute -left-3 inset-y-8 w-3 ring-2 ring-sidebar/50" />
                   </>
                 )}
               </div>

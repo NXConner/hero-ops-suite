@@ -5,15 +5,19 @@ import { useAdvancedTheme } from '@/contexts/AdvancedThemeContext';
 interface EffectSettings {
   scanlines: boolean;
   refreshBarH: boolean;
+  refreshBarV: boolean;
   radarSweep: boolean;
   vignette: boolean;
+  glitch: boolean;
 }
 
 const defaultSettings: EffectSettings = {
   scanlines: true,
   refreshBarH: true,
+  refreshBarV: false,
   radarSweep: false,
   vignette: true,
+  glitch: false,
 };
 
 function useEffectSettings() {
@@ -32,6 +36,15 @@ function useEffectSettings() {
     } catch {}
   }, [settings]);
 
+  useEffect(() => {
+    (window as any).owEffects = {
+      get: () => settings,
+      set: (s: Partial<EffectSettings>) => setSettings(prev => ({ ...prev, ...s })),
+      reset: () => setSettings(defaultSettings)
+    };
+    return () => { delete (window as any).owEffects; };
+  }, [settings]);
+
   return { settings, setSettings } as const;
 }
 
@@ -39,8 +52,18 @@ export default function EffectsOverlay() {
   const { currentTheme } = useAdvancedTheme();
   const { settings } = useEffectSettings();
 
+  // Reduced motion media query
+  const [reducedMotion, setReducedMotion] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = () => setReducedMotion(media.matches);
+    onChange();
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
+
   const isLowPower = currentTheme?.performance.quality === 'low';
-  const enableVisuals = currentTheme?.performance.enableAnimations !== false && !isLowPower;
+  const enableVisuals = currentTheme?.performance.enableAnimations !== false && !isLowPower && !reducedMotion;
 
   if (!enableVisuals) return null;
 
@@ -72,6 +95,19 @@ export default function EffectsOverlay() {
         />
       )}
 
+      {/* Vertical refresh bar */}
+      {settings.refreshBarV && (
+        <div
+          aria-hidden
+          className="absolute inset-y-0 w-12 opacity-10"
+          style={{
+            left: '-48px',
+            background: 'linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%)',
+            animation: 'ow-refresh-bar-v 8s linear infinite'
+          }}
+        />
+      )}
+
       {/* Radar sweep */}
       {settings.radarSweep && (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -93,15 +129,31 @@ export default function EffectsOverlay() {
         />
       )}
 
+      {/* Simple glitch */}
+      {settings.glitch && (
+        <div aria-hidden className="absolute inset-0 mix-blend-screen" style={{ animation: 'ow-glitch 2.5s steps(1,end) infinite' }} />
+      )}
+
       {/* keyframes */}
       <style>{`
         @keyframes ow-refresh-bar {
           0% { transform: translateY(0); }
           100% { transform: translateY(110vh); }
         }
+        @keyframes ow-refresh-bar-v {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(110vw); }
+        }
         @keyframes ow-radar-sweep {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        @keyframes ow-glitch {
+          0%, 97%, 100% { filter: none; }
+          5% { filter: url('#'); }
+          20% { clip-path: inset(10% 0 82% 0); transform: translateX(1px); }
+          25% { clip-path: inset(80% 0 5% 0); transform: translateX(-1px); }
+          35% { clip-path: inset(50% 0 40% 0); transform: translateX(2px); }
         }
       `}</style>
     </div>

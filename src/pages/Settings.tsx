@@ -614,6 +614,22 @@ const Settings = () => {
                       </div>
                     </div>
                   </div>
+
+                  <Separator />
+
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium">HUD Effects</div>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ scanlines: true })}>Scanlines On</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ scanlines: false })}>Scanlines Off</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ refreshBarH: true })}>Refresh H</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ refreshBarV: true })}>Refresh V</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ radarSweep: true })}>Radar</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ vignette: true })}>Vignette</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ glitch: true })}>Glitch</Button>
+                      <Button variant="outline" onClick={() => (window as any).owEffects?.reset?.()}>Reset</Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -755,7 +771,29 @@ const Settings = () => {
                     </div>
                     <Switch onCheckedChange={(m) => (window as any).owSounds?.setMuted(m)} />
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                    <div className="md:col-span-2">
+                      <Label>Volume</Label>
+                      <input type="range" min={0} max={1} step={0.05} defaultValue={0.5} onChange={(e) => (window as any).owSounds?.setVolume?.(parseFloat(e.target.value))} className="w-full" />
+                    </div>
+                    <div>
+                      <Label>Preset</Label>
+                      <Select defaultValue="none" onValueChange={(v: any) => (window as any).owSounds?.setPreset?.(v)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="isac">ISAC</SelectItem>
+                          <SelectItem value="disavowed">Disavowed</SelectItem>
+                          <SelectItem value="darkzone">Darkzone</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     <Button variant="outline" onClick={() => (window as any).owSounds?.ui.hover?.()}>Hover</Button>
                     <Button variant="outline" onClick={() => (window as any).owSounds?.ui.select?.()}>Select</Button>
                     <Button variant="outline" onClick={() => (window as any).owSounds?.ui.confirm?.()}>Confirm</Button>

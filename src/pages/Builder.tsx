@@ -70,7 +70,7 @@ export default function Builder() {
                 <CardTitle>Canvas</CardTitle>
               </CardHeader>
               <CardContent>
-                <PageCanvas pageId={pageId} widgets={widgets} />
+                <PageCanvas pageId={pageId} widgets={widgets} isEditing={isEditing} />
               </CardContent>
             </Card>
           </div>
