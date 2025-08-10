@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,9 @@ import {
   adjustHue, 
   adjustSaturation, 
   adjustLightness,
-  generateColorScheme 
+  generateColorScheme,
+  generateThemeCSS,
+  generateWallpaperCSS
 } from '@/lib/theme-utils';
 import ParticleSystem from '@/components/effects/ParticleSystem';
 import { 
@@ -36,7 +38,8 @@ import {
   Tv,
   Gauge,
   Accessibility,
-  Target
+  Target,
+  Check
 } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
@@ -177,13 +180,38 @@ function ParticleControls({ particles, onChange }: ParticleControlsProps) {
 }
 
 export function AdvancedThemeCustomizer() {
-  const { currentTheme, updateTheme, createTheme, exportTheme, importTheme } = useAdvancedTheme();
+  const { currentTheme, updateTheme, createTheme, exportTheme, importTheme, setTheme } = useAdvancedTheme();
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [customTheme, setCustomTheme] = useState<Theme>(currentTheme);
   const [selectedDevice, setSelectedDevice] = useState<'mobile' | 'tablet' | 'desktop' | 'tv'>('desktop');
   const [isTargetsMode, setIsTargetsMode] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [inspectorPath, setInspectorPath] = useState<string>('colors.card');
+
+  // Inject/remove preview CSS
+  useEffect(() => {
+    if (!isPreviewMode) {
+      const prev = document.getElementById('preview-theme-styles');
+      if (prev) prev.remove();
+      document.documentElement.setAttribute('data-theme', currentTheme.id);
+      return;
+    }
+    try {
+      const css = generateThemeCSS(customTheme);
+      const wp = generateWallpaperCSS(customTheme);
+      const style = document.createElement('style');
+      style.id = 'preview-theme-styles';
+      style.textContent = `
+        ${css}
+        body { ${wp} }
+      `;
+      // remove existing first
+      const prev = document.getElementById('preview-theme-styles');
+      if (prev) prev.remove();
+      document.head.appendChild(style);
+      document.documentElement.setAttribute('data-theme', customTheme.id);
+    } catch (e) {}
+  }, [isPreviewMode, customTheme, currentTheme]);
 
   // Real-time preview theme
   const previewTheme = useMemo(() => {
@@ -207,6 +235,16 @@ export function AdvancedThemeCustomizer() {
   const openInspector = (path: string) => {
     setInspectorPath(path);
     setInspectorOpen(true);
+  };
+
+  const handleApplyToCurrent = () => {
+    // If current theme is custom, try update; otherwise save a new theme and switch
+    try {
+      updateTheme(currentTheme.id, customTheme);
+    } catch {
+      const newTheme = createTheme({ ...customTheme, name: `${currentTheme.name} Variant` });
+      if (newTheme) setTheme(newTheme.id);
+    }
   };
 
   const generateScheme = (baseColor: ThemeColor, type: 'monochromatic' | 'complementary' | 'triadic' | 'analogous') => {
@@ -292,6 +330,10 @@ export function AdvancedThemeCustomizer() {
               >
                 <Eye className="h-4 w-4" />
                 {isPreviewMode ? "Exit Preview" : "Preview Mode"}
+              </Button>
+              <Button onClick={handleApplyToCurrent} variant="outline" className="flex items-center gap-2">
+                <Check className="h-4 w-4" />
+                Apply to Current
               </Button>
               <Button onClick={handleSaveTheme} className="flex items-center gap-2">
                 <Wand2 className="h-4 w-4" />
