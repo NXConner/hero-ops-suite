@@ -271,4 +271,9 @@ export interface ThemeContext {
   isGlobalWallpaperEnabled: boolean;
   setGlobalWallpaperOverride: (wallpaper: ThemeWallpaper | null) => void;
   setIsGlobalWallpaperEnabled: (enabled: boolean) => void;
+  // Wallpaper profiles
+  wallpaperProfiles: { name: string; wallpaper: ThemeWallpaper }[];
+  saveWallpaperProfile: (name: string, wallpaper?: ThemeWallpaper | null) => void;
+  applyWallpaperProfile: (name: string) => void;
+  deleteWallpaperProfile: (name: string) => void;
 }

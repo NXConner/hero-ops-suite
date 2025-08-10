@@ -34,8 +34,9 @@ export function AdvancedThemeProvider({
   // Global wallpaper override
   const [globalWallpaperOverride, setGlobalWallpaperOverrideState] = useState<ThemeWallpaper | null>(null);
   const [isGlobalWallpaperEnabled, setIsGlobalWallpaperEnabledState] = useState<boolean>(false);
+  const [wallpaperProfiles, setWallpaperProfiles] = useState<{ name: string; wallpaper: ThemeWallpaper }[]>([]);
 
-  // Load themes from storage
+  // Load themes and wallpaper settings from storage
   useEffect(() => {
     try {
       const stored = localStorage.getItem(storageKey);
@@ -51,10 +52,19 @@ export function AdvancedThemeProvider({
         setGlobalWallpaperOverrideState(parsed.wallpaper || null);
         setIsGlobalWallpaperEnabledState(!!parsed.enabled);
       }
+
+      const profilesStr = localStorage.getItem('global-wallpaper-profiles');
+      if (profilesStr) {
+        setWallpaperProfiles(JSON.parse(profilesStr));
+      }
     } catch (err) {
       console.error('Failed to load theme config:', err);
     }
   }, [storageKey]);
+
+  const persistProfiles = useCallback((profiles: { name: string; wallpaper: ThemeWallpaper }[]) => {
+    try { localStorage.setItem('global-wallpaper-profiles', JSON.stringify(profiles)); } catch {}
+  }, []);
 
   // Save themes to storage
   const saveToStorage = useCallback((themes: Theme[], presetsData: ThemePreset[]) => {
@@ -363,6 +373,29 @@ export function AdvancedThemeProvider({
     if (currentTheme) applyTheme(currentTheme);
   }, [globalWallpaperOverride, currentTheme, applyTheme, saveGlobalWallpaper]);
 
+  // Wallpaper profiles API
+  const saveWallpaperProfile = useCallback((name: string, wallpaper?: ThemeWallpaper | null) => {
+    const wp = wallpaper ?? globalWallpaperOverride;
+    if (!wp) return;
+    const updated = [...wallpaperProfiles.filter(p => p.name !== name), { name, wallpaper: wp }];
+    setWallpaperProfiles(updated);
+    persistProfiles(updated);
+  }, [globalWallpaperOverride, wallpaperProfiles, persistProfiles]);
+
+  const applyWallpaperProfile = useCallback((name: string) => {
+    const profile = wallpaperProfiles.find(p => p.name === name);
+    if (profile) {
+      setGlobalWallpaperOverride(profile.wallpaper);
+      setIsGlobalWallpaperEnabled(true);
+    }
+  }, [wallpaperProfiles, setGlobalWallpaperOverride, setIsGlobalWallpaperEnabled]);
+
+  const deleteWallpaperProfile = useCallback((name: string) => {
+    const updated = wallpaperProfiles.filter(p => p.name !== name);
+    setWallpaperProfiles(updated);
+    persistProfiles(updated);
+  }, [wallpaperProfiles, persistProfiles]);
+
   // Handle window resize for responsive themes
   useEffect(() => {
     const handleResize = () => {
@@ -407,7 +440,12 @@ export function AdvancedThemeProvider({
     globalWallpaperOverride,
     isGlobalWallpaperEnabled,
     setGlobalWallpaperOverride,
-    setIsGlobalWallpaperEnabled
+    setIsGlobalWallpaperEnabled,
+    // Profiles
+    wallpaperProfiles,
+    saveWallpaperProfile,
+    applyWallpaperProfile,
+    deleteWallpaperProfile
   }), [
     currentTheme,
     availableThemes,
@@ -426,7 +464,11 @@ export function AdvancedThemeProvider({
     globalWallpaperOverride,
     isGlobalWallpaperEnabled,
     setGlobalWallpaperOverride,
-    setIsGlobalWallpaperEnabled
+    setIsGlobalWallpaperEnabled,
+    wallpaperProfiles,
+    saveWallpaperProfile,
+    applyWallpaperProfile,
+    deleteWallpaperProfile
   ]);
 
   return (

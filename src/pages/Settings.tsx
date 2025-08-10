@@ -59,7 +59,7 @@ const Settings = () => {
     isGlobalWallpaperEnabled,
     setGlobalWallpaperOverride,
     setIsGlobalWallpaperEnabled
-  } = useAdvancedTheme();
+  , wallpaperProfiles, saveWallpaperProfile, applyWallpaperProfile, deleteWallpaperProfile } = useAdvancedTheme();
 
   return (
     <div className="flex h-screen bg-background">
@@ -657,6 +657,31 @@ const Settings = () => {
                   </div>
 
                   <Separator />
+
+                  {/* Profiles */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium">Profiles</div>
+                      <div className="flex items-center gap-2">
+                        <Input placeholder="Profile name" id="wp-profile-name" className="w-48" />
+                        <Button size="sm" onClick={() => {
+                          const name = (document.getElementById('wp-profile-name') as HTMLInputElement)?.value?.trim();
+                          if (!name) return;
+                          // @ts-ignore
+                          saveWallpaperProfile(name);
+                        }}>Save Profile</Button>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {wallpaperProfiles?.map((p) => (
+                        <div key={p.name} className="flex items-center gap-2 border rounded px-2 py-1">
+                          <span className="text-sm">{p.name}</span>
+                          <Button size="sm" variant="outline" onClick={() => applyWallpaperProfile(p.name)}>Apply</Button>
+                          <Button size="sm" variant="ghost" onClick={() => deleteWallpaperProfile(p.name)}>Delete</Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
