@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useBusinessProfile } from "@/hooks/useBusinessProfile";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,6 +35,7 @@ import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Settings = () => {
+  const { profile, save, reset } = useBusinessProfile();
   const [activeAlerts, setActiveAlerts] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
@@ -722,48 +724,93 @@ const Settings = () => {
                     </CardTitle>
                     <CardDescription>Defaults used by the Asphalt Estimator</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4 text-sm">
+                  <CardContent className="space-y-6 text-sm">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Business Address</Label>
-                        <div className="mt-1 text-muted-foreground">337 Ayers Orchard Road, Stuart, VA 24171</div>
+                        <Input defaultValue={profile.address.full} onBlur={(e) => save({ address: { ...profile.address, full: e.target.value } })} />
                       </div>
                       <div>
                         <Label>Supplier</Label>
-                        <div className="mt-1 text-muted-foreground">SealMaster, 703 West Decatur Street, Madison, NC 27025</div>
+                        <Input defaultValue={`${profile.supplier.name}, ${profile.supplier.address.full}`} onBlur={(e) => {
+                          const val = e.target.value;
+                          const [name, ...rest] = val.split(',');
+                          save({ supplier: { name: name?.trim() || profile.supplier.name, address: { ...profile.supplier.address, full: rest.join(',').trim() || profile.supplier.address.full } } });
+                        }} />
                       </div>
                       <div>
                         <Label>Crew (FT / PT)</Label>
-                        <div className="mt-1 text-muted-foreground">2 FT, 1 PT @ $12/hr per person</div>
+                        <div className="flex gap-2">
+                          <Input type="number" defaultValue={profile.crew.numFullTime} onBlur={(e) => save({ crew: { ...profile.crew, numFullTime: Number(e.target.value) } })} />
+                          <Input type="number" defaultValue={profile.crew.numPartTime} onBlur={(e) => save({ crew: { ...profile.crew, numPartTime: Number(e.target.value) } })} />
+                          <Input type="number" step="0.5" defaultValue={profile.crew.hourlyRatePerPerson} onBlur={(e) => save({ crew: { ...profile.crew, hourlyRatePerPerson: Number(e.target.value) } })} />
+                        </div>
                       </div>
                       <div>
                         <Label>Travel (supplier RT miles)</Label>
-                        <div className="mt-1 text-muted-foreground">~96 miles</div>
+                        <Input type="number" defaultValue={profile.travelDefaults.roundTripMilesSupplier} onBlur={(e) => save({ travelDefaults: { roundTripMilesSupplier: Number(e.target.value) } })} />
                       </div>
                     </div>
 
                     <Separator />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
+                      <div className="space-y-2">
                         <Label>Materials</Label>
-                        <div className="mt-1 text-muted-foreground space-y-1">
-                          <div>PMM: $3.65/gal (bulk ref $3.79)</div>
-                          <div>Sand 50lb: $10</div>
-                          <div>Prep Seal 5gal: $50</div>
-                          <div>Fast Dry 5gal: $50</div>
-                          <div>CrackMaster 30lb: $44.99</div>
-                          <div>Propane tank: $10</div>
+                        <div className="grid grid-cols-1 gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">PMM $/gal</span>
+                            <Input type="number" step="0.01" defaultValue={profile.materials.pmmPricePerGallon} onBlur={(e) => save({ materials: { ...profile.materials, pmmPricePerGallon: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">PMM bulk $/gal</span>
+                            <Input type="number" step="0.01" defaultValue={profile.materials.pmmBulkPricePerGallon} onBlur={(e) => save({ materials: { ...profile.materials, pmmBulkPricePerGallon: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Sand (50lb)</span>
+                            <Input type="number" step="0.01" defaultValue={profile.materials.sandPricePer50lbBag} onBlur={(e) => save({ materials: { ...profile.materials, sandPricePer50lbBag: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Prep Seal 5gal</span>
+                            <Input type="number" step="0.01" defaultValue={profile.materials.prepSealPricePer5Gal} onBlur={(e) => save({ materials: { ...profile.materials, prepSealPricePer5Gal: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Fast Dry 5gal</span>
+                            <Input type="number" step="0.01" defaultValue={profile.materials.fastDryPricePer5Gal} onBlur={(e) => save({ materials: { ...profile.materials, fastDryPricePer5Gal: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">CrackMaster 30lb</span>
+                            <Input type="number" step="0.01" defaultValue={profile.materials.crackBoxPricePer30lb} onBlur={(e) => save({ materials: { ...profile.materials, crackBoxPricePer30lb: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Propane tank</span>
+                            <Input type="number" step="0.01" defaultValue={profile.materials.propanePerTank} onBlur={(e) => save({ materials: { ...profile.materials, propanePerTank: Number(e.target.value) } })} />
+                          </div>
                         </div>
                       </div>
-                      <div>
+                      <div className="space-y-2">
                         <Label>Mix & Coverage</Label>
-                        <div className="mt-1 text-muted-foreground space-y-1">
-                          <div>Water: 20% of concentrate</div>
-                          <div>Sand: 6 bags / 100 gal concentrate</div>
-                          <div>FastDry: 2 gal / 125 gal concentrate</div>
-                          <div>Mixed coverage: 76 sqft/gal</div>
-                          <div>Prep Seal: ~175 sqft/gal</div>
+                        <div className="grid grid-cols-1 gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Water %</span>
+                            <Input type="number" step="0.01" defaultValue={profile.mix.waterPercent} onBlur={(e) => save({ mix: { ...profile.mix, waterPercent: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Sand bags /100 gal</span>
+                            <Input type="number" step="1" defaultValue={profile.mix.sandBagsPer100GalConcentrate} onBlur={(e) => save({ mix: { ...profile.mix, sandBagsPer100GalConcentrate: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">FastDry gal /125 gal</span>
+                            <Input type="number" step="0.1" defaultValue={profile.mix.fastDryGalPer125GalConcentrate} onBlur={(e) => save({ mix: { ...profile.mix, fastDryGalPer125GalConcentrate: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Mixed cov sqft/gal</span>
+                            <Input type="number" step="1" defaultValue={profile.coverage.mixedSealerCoverageSqftPerGal} onBlur={(e) => save({ coverage: { ...profile.coverage, mixedSealerCoverageSqftPerGal: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">PrepSeal sqft/gal</span>
+                            <Input type="number" step="1" defaultValue={profile.coverage.prepSealCoverageSqftPerGal} onBlur={(e) => save({ coverage: { ...profile.coverage, prepSealCoverageSqftPerGal: Number(e.target.value) } })} />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -771,26 +818,61 @@ const Settings = () => {
                     <Separator />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
+                      <div className="space-y-2">
                         <Label>Pricing Baselines</Label>
-                        <div className="mt-1 text-muted-foreground space-y-1">
-                          <div>Crack fill: $1.75/lf</div>
-                          <div>Patching: $3.50/sqft</div>
-                          <div>Striping: $0.90/lf + extras</div>
-                          <div>Mobilization: $250</div>
-                          <div>Overhead: 10%</div>
-                          <div>Profit: 18%</div>
+                        <div className="grid grid-cols-1 gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Crack fill $/lf</span>
+                            <Input type="number" step="0.01" defaultValue={profile.pricing.crackFillRatePerFoot} onBlur={(e) => save({ pricing: { ...profile.pricing, crackFillRatePerFoot: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Patching $/sqft</span>
+                            <Input type="number" step="0.01" defaultValue={profile.pricing.patchingPerSqft} onBlur={(e) => save({ pricing: { ...profile.pricing, patchingPerSqft: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Striping $/lf</span>
+                            <Input type="number" step="0.01" defaultValue={profile.pricing.lineCostPerLinearFoot} onBlur={(e) => save({ pricing: { ...profile.pricing, lineCostPerLinearFoot: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Mobilization $</span>
+                            <Input type="number" step="1" defaultValue={profile.pricing.mobilizationFee} onBlur={(e) => save({ pricing: { ...profile.pricing, mobilizationFee: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Overhead %</span>
+                            <Input type="number" step="0.01" defaultValue={profile.pricing.overheadPct} onBlur={(e) => save({ pricing: { ...profile.pricing, overheadPct: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Profit %</span>
+                            <Input type="number" step="0.01" defaultValue={profile.pricing.profitPct} onBlur={(e) => save({ pricing: { ...profile.pricing, profitPct: Number(e.target.value) } })} />
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <Label>Fleet & Equipment</Label>
-                        <div className="mt-1 text-muted-foreground space-y-1">
-                          <div>C30 curb 4,300 lbs; GVWR ≥ 10,000 lbs; ~12 mpg loaded</div>
-                          <div>Dakota ~17 mpg</div>
-                          <div>SK 550 empty 1,865 lbs; 10 lbs/gal sealer</div>
-                          <div>Trailers: 8ft/10ft utility, 8ft white, 10ft tilt, 12ft heavy-duty</div>
+                      <div className="space-y-2">
+                        <Label>Fleet, Equipment & Fuel</Label>
+                        <div className="grid grid-cols-1 gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">C30 mpg loaded</span>
+                            <Input type="number" step="0.1" defaultValue={profile.fuel.c30MpgLoaded} onBlur={(e) => save({ fuel: { ...profile.fuel, c30MpgLoaded: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Dakota mpg</span>
+                            <Input type="number" step="0.1" defaultValue={profile.fuel.dakotaMpg} onBlur={(e) => save({ fuel: { ...profile.fuel, dakotaMpg: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Active fuel gph</span>
+                            <Input type="number" step="0.1" defaultValue={profile.fuel.equipmentActiveFuelGph} onBlur={(e) => save({ fuel: { ...profile.fuel, equipmentActiveFuelGph: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Idle $/hr</span>
+                            <Input type="number" step="0.1" defaultValue={profile.fuel.excessiveIdleCostPerHour} onBlur={(e) => save({ fuel: { ...profile.fuel, excessiveIdleCostPerHour: Number(e.target.value) } })} />
+                          </div>
                         </div>
                       </div>
+                    </div>
+
+                    <div className="flex gap-2 justify-end pt-2">
+                      <Button variant="outline" onClick={reset}>Reset Defaults</Button>
+                      <Button onClick={() => save({})}>Save Changes</Button>
                     </div>
                   </CardContent>
                 </Card>
