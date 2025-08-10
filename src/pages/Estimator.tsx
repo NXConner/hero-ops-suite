@@ -9,10 +9,13 @@ import { Textarea } from '@/components/ui/textarea';
 import type { EstimateInput, ServiceType } from '@/lib/estimator';
 import { buildEstimate } from '@/lib/estimator';
 import { BUSINESS_PROFILE } from '@/data/business';
+import { useBusinessProfile } from '@/hooks/useBusinessProfile';
+import { computeRoundTripMilesBetween } from '@/lib/geo';
 
 const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
 const Estimator = () => {
+  const { profile } = useBusinessProfile();
   const [serviceType, setServiceType] = useState<ServiceType>('sealcoating');
   const [params, setParams] = useState({
     sealcoatSquareFeet: 0,
@@ -41,6 +44,15 @@ const Estimator = () => {
   const [pmmPrice, setPmmPrice] = useState(BUSINESS_PROFILE.materials.pmmPricePerGallon);
 
   const [notes, setNotes] = useState('');
+
+  // React to business profile changes
+  useMemo(() => {
+    setRoundTripMilesSupplier(profile.travelDefaults.roundTripMilesSupplier);
+    setLaborRate(profile.crew.hourlyRatePerPerson);
+    setNumFullTime(profile.crew.numFullTime);
+    setNumPartTime(profile.crew.numPartTime);
+    setPmmPrice(profile.materials.pmmPricePerGallon);
+  }, [profile]);
 
   const estimateInput: EstimateInput = useMemo(() => ({
     serviceType,
@@ -122,6 +134,17 @@ const Estimator = () => {
   const textInvoiceRounded = useMemo(() => {
     return `Rounded total to nearest $10: ${formatMoney(result.roundedVariant.roundedTotal)}\nImplied markup: ${result.roundedVariant.impliedMarkupPct}%\nRounded + 25%: ${formatMoney(result.roundedVariant.roundedPlus25Pct)}`;
   }, [result]);
+
+  // Auto-compute supplier RT miles based on business->supplier addresses
+  const handleComputeSupplierMiles = async () => {
+    const miles = await computeRoundTripMilesBetween(BUSINESS_PROFILE.address.full, BUSINESS_PROFILE.supplier.address.full);
+    if (miles && Number.isFinite(miles)) setRoundTripMilesSupplier(miles);
+  };
+
+  const handleComputeJobMiles = async () => {
+    const miles = await computeRoundTripMilesBetween(BUSINESS_PROFILE.address.full, jobAddress);
+    if (miles && Number.isFinite(miles)) setRoundTripMilesJob(miles);
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -220,11 +243,17 @@ const Estimator = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <div>
                   <Label>Round trip miles (supplier)</Label>
-                  <Input type="number" value={roundTripMilesSupplier} onChange={e => setRoundTripMilesSupplier(Number(e.target.value))} />
+                  <div className="flex gap-2">
+                    <Input type="number" value={roundTripMilesSupplier} onChange={e => setRoundTripMilesSupplier(Number(e.target.value))} />
+                    <Button type="button" variant="outline" onClick={handleComputeSupplierMiles}>Auto</Button>
+                  </div>
                 </div>
                 <div>
                   <Label>Round trip miles (job)</Label>
-                  <Input type="number" value={roundTripMilesJob} onChange={e => setRoundTripMilesJob(Number(e.target.value))} />
+                  <div className="flex gap-2">
+                    <Input type="number" value={roundTripMilesJob} onChange={e => setRoundTripMilesJob(Number(e.target.value))} />
+                    <Button type="button" variant="outline" onClick={handleComputeJobMiles}>Auto</Button>
+                  </div>
                 </div>
                 <div>
                   <Label>Fuel price $/gal</Label>
