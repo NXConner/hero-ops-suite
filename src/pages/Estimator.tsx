@@ -10,7 +10,7 @@ import type { EstimateInput, ServiceType } from '@/lib/estimator';
 import { buildEstimate } from '@/lib/estimator';
 import { BUSINESS_PROFILE } from '@/data/business';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
-import { computeRoundTripMilesBetween } from '@/lib/geo';
+import { computeRoundTripMilesBetween, reverseGeocode } from '@/lib/geo';
 import { saveJob, listJobs, type StoredJob } from '@/services/jobs';
 import { listCustomers, saveCustomer, type Customer } from '@/services/customers';
 import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile } from '@/services/exporters';
