@@ -4,19 +4,20 @@ export interface LatLng {
 }
 
 const GEOCODE_CACHE_KEY = "geocodeCache";
+const REVERSE_CACHE_KEY = "reverseGeocodeCache";
 
-function loadCache(): Record<string, LatLng> {
+function loadCache(key: string): Record<string, any> {
   try {
-    const raw = localStorage.getItem(GEOCODE_CACHE_KEY);
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
   }
 }
 
-function saveCache(cache: Record<string, LatLng>) {
+function saveCache(key: string, cache: Record<string, any>) {
   try {
-    localStorage.setItem(GEOCODE_CACHE_KEY, JSON.stringify(cache));
+    localStorage.setItem(key, JSON.stringify(cache));
   } catch {
     // ignore
   }
@@ -24,7 +25,7 @@ function saveCache(cache: Record<string, LatLng>) {
 
 export async function geocodeAddress(address: string): Promise<LatLng | null> {
   const key = address.trim().toLowerCase();
-  const cache = loadCache();
+  const cache = loadCache(GEOCODE_CACHE_KEY);
   if (cache[key]) return cache[key];
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(address)}`;
   const resp = await fetch(url, { headers: { "Accept": "application/json" } });
@@ -36,8 +37,23 @@ export async function geocodeAddress(address: string): Promise<LatLng | null> {
   const lon = parseFloat(item.lon);
   const result = { lat, lon };
   cache[key] = result;
-  saveCache(cache);
+  saveCache(GEOCODE_CACHE_KEY, cache);
   return result;
+}
+
+export async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
+  const key = `${lat.toFixed(6)},${lon.toFixed(6)}`;
+  const cache = loadCache(REVERSE_CACHE_KEY);
+  if (cache[key]) return cache[key];
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+  const resp = await fetch(url, { headers: { "Accept": "application/json" } });
+  if (!resp.ok) return null;
+  const data = await resp.json();
+  const disp = data?.display_name as string | undefined;
+  if (!disp) return null;
+  cache[key] = disp;
+  saveCache(REVERSE_CACHE_KEY, cache);
+  return disp;
 }
 
 export function haversineMiles(a: LatLng, b: LatLng): number {
