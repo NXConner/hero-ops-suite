@@ -50,6 +50,10 @@ export const BUSINESS_PROFILE: BusinessProfile = {
     mobilizationFee: 250,
     overheadPct: 0.10,
     profitPct: 0.18,
+    handicapSymbolCost: 40,
+    arrowCost: 15,
+    crosswalkCost: 60,
+    paintColors: ["white", "yellow", "blue"],
   },
   fuel: {
     c30MpgLoaded: 12,

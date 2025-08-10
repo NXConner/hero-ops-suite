@@ -11,6 +11,7 @@ import { buildEstimate } from '@/lib/estimator';
 import { BUSINESS_PROFILE } from '@/data/business';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { computeRoundTripMilesBetween } from '@/lib/geo';
+import { saveJob, listJobs, type StoredJob } from '@/services/jobs';
 
 const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
@@ -44,6 +45,9 @@ const Estimator = () => {
   const [pmmPrice, setPmmPrice] = useState(BUSINESS_PROFILE.materials.pmmPricePerGallon);
 
   const [notes, setNotes] = useState('');
+
+  const [jobs, setJobs] = useState<StoredJob[]>(listJobs());
+  const [jobName, setJobName] = useState('');
 
   // React to business profile changes
   useMemo(() => {
@@ -146,6 +150,58 @@ const Estimator = () => {
     if (miles && Number.isFinite(miles)) setRoundTripMilesJob(miles);
   };
 
+  const handleSaveJob = () => {
+    const record = saveJob({
+      name: jobName || `Job ${new Date().toLocaleString()}`,
+      address: jobAddress,
+      serviceType,
+      params: {
+        ...params,
+        roundTripMilesSupplier,
+        roundTripMilesJob,
+        fuelPrice,
+        laborRate,
+        numFullTime,
+        numPartTime,
+        sealerActiveHours,
+        excessiveIdleHours,
+        pmmPrice,
+        notes,
+      },
+    });
+    setJobs(listJobs());
+    setJobName(record.name);
+  };
+
+  const handleLoadJob = (j: StoredJob) => {
+    setJobName(j.name);
+    setJobAddress(j.address);
+    setServiceType(j.serviceType as ServiceType);
+    setParams(p => ({
+      ...p,
+      sealcoatSquareFeet: j.params.sealcoatSquareFeet ?? 0,
+      patchSquareFeet: j.params.patchSquareFeet ?? 0,
+      crackLinearFeet: j.params.crackLinearFeet ?? 0,
+      numStandardStalls: j.params.numStandardStalls ?? 0,
+      numDoubleStalls: j.params.numDoubleStalls ?? 0,
+      numHandicapSpots: j.params.numHandicapSpots ?? 0,
+      hasCrosswalks: j.params.hasCrosswalks ?? false,
+      numArrows: j.params.numArrows ?? 0,
+      oilSpotSquareFeet: j.params.oilSpotSquareFeet ?? 0,
+      surfacePorosityFactor: j.params.surfacePorosityFactor ?? 1,
+    }));
+    setRoundTripMilesSupplier(j.params.roundTripMilesSupplier ?? BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier);
+    setRoundTripMilesJob(j.params.roundTripMilesJob ?? 0);
+    setFuelPrice(j.params.fuelPrice ?? DEFAULT_FUEL_PRICE);
+    setLaborRate(j.params.laborRate ?? BUSINESS_PROFILE.crew.hourlyRatePerPerson);
+    setNumFullTime(j.params.numFullTime ?? BUSINESS_PROFILE.crew.numFullTime);
+    setNumPartTime(j.params.numPartTime ?? BUSINESS_PROFILE.crew.numPartTime);
+    setSealerActiveHours(j.params.sealerActiveHours ?? 0);
+    setExcessiveIdleHours(j.params.excessiveIdleHours ?? 0);
+    setPmmPrice(j.params.pmmPrice ?? BUSINESS_PROFILE.materials.pmmPricePerGallon);
+    setNotes(j.params.notes ?? '');
+  };
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
@@ -170,6 +226,15 @@ const Estimator = () => {
               <CardDescription>Enter project details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <div>
+                  <Label>Job name</Label>
+                  <Input value={jobName} onChange={e => setJobName(e.target.value)} placeholder="Customer/Location" />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button type="button" variant="outline" onClick={handleSaveJob}>Save Job</Button>
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Service</Label>
@@ -319,6 +384,22 @@ ${textInvoice25}
 
 ${textInvoiceRounded}`}
               </pre>
+              <div className="mt-4">
+                <Label>Recent Jobs</Label>
+                <div className="mt-2 space-y-2 max-h-64 overflow-auto">
+                  {jobs.map(j => (
+                    <div key={j.id} className="flex items-center justify-between p-2 rounded border border-border/30">
+                      <div className="text-sm">
+                        <div className="font-medium">{j.name}</div>
+                        <div className="text-muted-foreground">{new Date(j.updatedAt).toLocaleString()}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button type="button" variant="outline" size="sm" onClick={() => handleLoadJob(j)}>Load</Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

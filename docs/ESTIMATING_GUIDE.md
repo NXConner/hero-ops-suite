@@ -38,3 +38,8 @@ Configuration
 - All defaults are centralized in `src/data/business.ts` as `BUSINESS_PROFILE`.
 - Types are defined in `src/types/business.ts`.
 - Estimator logic pulls from `BUSINESS_PROFILE` so updating that file will flow through the app.
+
+Productivity & UX
+- Business settings are editable in Settings → Business and persist locally.
+- Estimator can auto-compute roundtrip miles: business↔supplier and business↔job address.
+- Estimator supports saving/loading Recent Jobs (local persistence) for quick reuse.

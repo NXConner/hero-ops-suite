@@ -1,4 +1,5 @@
 import { BUSINESS_PROFILE } from "@/data/business";
+import type { BusinessProfile } from "@/types/business";
 
 export type ServiceType = 'sealcoating' | 'crack_filling' | 'patching' | 'line_striping' | 'combo_driveway' | 'combo_parkinglot';
 
@@ -211,13 +212,16 @@ export function computeStriping(
     params.numDoubleStalls * DEFAULTS.avgStallLinearFeetDouble;
   let extras = 0;
   if (params.numHandicapSpots > 0) {
-    extras += params.numHandicapSpots * 40;
+    const hc = BUSINESS_PROFILE.pricing.handicapSymbolCost ?? 40;
+    extras += params.numHandicapSpots * hc;
   }
   if (params.hasCrosswalks) {
-    extras += 60;
+    const cx = BUSINESS_PROFILE.pricing.crosswalkCost ?? 60;
+    extras += cx;
   }
   if (params.numArrows > 0) {
-    extras += params.numArrows * 15;
+    const ar = BUSINESS_PROFILE.pricing.arrowCost ?? 15;
+    extras += params.numArrows * ar;
   }
   const linePrice = roundToTwo(lfStalls * unitCostPerLinearFoot + extras);
   return { linearFeet: lfStalls, sellPrice: linePrice };

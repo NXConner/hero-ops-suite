@@ -45,6 +45,10 @@ export interface PricingBaselines {
   mobilizationFee: number; // e.g., 250
   overheadPct: number; // e.g., 0.10
   profitPct: number; // e.g., 0.18
+  handicapSymbolCost?: number; // e.g., 40
+  arrowCost?: number; // e.g., 15
+  crosswalkCost?: number; // e.g., 60
+  paintColors?: string[]; // optional available paint colors
 }
 
 export interface FuelAssumptions {

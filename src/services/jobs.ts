@@ -1,0 +1,63 @@
+export type StoredJob = {
+  id: string;
+  name: string;
+  createdAt: number;
+  updatedAt: number;
+  address: string;
+  serviceType: string;
+  params: Record<string, any>;
+};
+
+const JOBS_KEY = "recentJobs";
+const MAX_JOBS = 50;
+
+function loadAll(): StoredJob[] {
+  try {
+    const raw = localStorage.getItem(JOBS_KEY);
+    return raw ? (JSON.parse(raw) as StoredJob[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAll(list: StoredJob[]) {
+  try {
+    localStorage.setItem(JOBS_KEY, JSON.stringify(list));
+  } catch {
+    // ignore
+  }
+}
+
+export function saveJob(job: Omit<StoredJob, "id" | "createdAt" | "updatedAt"> & { id?: string }): StoredJob {
+  const list = loadAll();
+  const now = Date.now();
+  const id = job.id ?? crypto.randomUUID?.() ?? `${now}-${Math.random().toString(36).slice(2)}`;
+  const existingIndex = list.findIndex(j => j.id === id);
+  const record: StoredJob = {
+    id,
+    name: job.name,
+    address: job.address,
+    serviceType: job.serviceType,
+    params: job.params,
+    createdAt: existingIndex >= 0 ? list[existingIndex].createdAt : now,
+    updatedAt: now,
+  };
+  if (existingIndex >= 0) list.splice(existingIndex, 1, record);
+  else list.unshift(record);
+  if (list.length > MAX_JOBS) list.pop();
+  saveAll(list);
+  return record;
+}
+
+export function listJobs(): StoredJob[] {
+  return loadAll();
+}
+
+export function getJob(id: string): StoredJob | undefined {
+  return loadAll().find(j => j.id === id);
+}
+
+export function deleteJob(id: string) {
+  const list = loadAll().filter(j => j.id !== id);
+  saveAll(list);
+}
