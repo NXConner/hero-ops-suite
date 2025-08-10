@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,9 @@ import {
   adjustHue, 
   adjustSaturation, 
   adjustLightness,
-  generateColorScheme 
+  generateColorScheme,
+  generateThemeCSS,
+  generateWallpaperCSS
 } from '@/lib/theme-utils';
 import ParticleSystem from '@/components/effects/ParticleSystem';
 import { 
@@ -35,8 +37,11 @@ import {
   Tablet,
   Tv,
   Gauge,
-  Accessibility
+  Accessibility,
+  Target,
+  Check
 } from 'lucide-react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 interface ColorPickerProps {
   color: ThemeColor;
@@ -175,10 +180,38 @@ function ParticleControls({ particles, onChange }: ParticleControlsProps) {
 }
 
 export function AdvancedThemeCustomizer() {
-  const { currentTheme, updateTheme, createTheme, exportTheme, importTheme } = useAdvancedTheme();
+  const { currentTheme, updateTheme, createTheme, exportTheme, importTheme, setTheme } = useAdvancedTheme();
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [customTheme, setCustomTheme] = useState<Theme>(currentTheme);
   const [selectedDevice, setSelectedDevice] = useState<'mobile' | 'tablet' | 'desktop' | 'tv'>('desktop');
+  const [isTargetsMode, setIsTargetsMode] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [inspectorPath, setInspectorPath] = useState<string>('colors.card');
+
+  // Inject/remove preview CSS
+  useEffect(() => {
+    if (!isPreviewMode) {
+      const prev = document.getElementById('preview-theme-styles');
+      if (prev) prev.remove();
+      document.documentElement.setAttribute('data-theme', currentTheme.id);
+      return;
+    }
+    try {
+      const css = generateThemeCSS(customTheme);
+      const wp = generateWallpaperCSS(customTheme);
+      const style = document.createElement('style');
+      style.id = 'preview-theme-styles';
+      style.textContent = `
+        ${css}
+        body { ${wp} }
+      `;
+      // remove existing first
+      const prev = document.getElementById('preview-theme-styles');
+      if (prev) prev.remove();
+      document.head.appendChild(style);
+      document.documentElement.setAttribute('data-theme', customTheme.id);
+    } catch (e) {}
+  }, [isPreviewMode, customTheme, currentTheme]);
 
   // Real-time preview theme
   const previewTheme = useMemo(() => {
@@ -197,6 +230,21 @@ export function AdvancedThemeCustomizer() {
     current[pathParts[pathParts.length - 1]] = color;
     
     setCustomTheme(updatedTheme);
+  };
+
+  const openInspector = (path: string) => {
+    setInspectorPath(path);
+    setInspectorOpen(true);
+  };
+
+  const handleApplyToCurrent = () => {
+    // If current theme is custom, try update; otherwise save a new theme and switch
+    try {
+      updateTheme(currentTheme.id, customTheme);
+    } catch {
+      const newTheme = createTheme({ ...customTheme, name: `${currentTheme.name} Variant` });
+      if (newTheme) setTheme(newTheme.id);
+    }
   };
 
   const generateScheme = (baseColor: ThemeColor, type: 'monochromatic' | 'complementary' | 'triadic' | 'analogous') => {
@@ -268,12 +316,24 @@ export function AdvancedThemeCustomizer() {
             </div>
             <div className="flex items-center gap-2">
               <Button
+                variant={isTargetsMode ? "default" : "outline"}
+                onClick={() => setIsTargetsMode(!isTargetsMode)}
+                className="flex items-center gap-2"
+              >
+                <Target className="h-4 w-4" />
+                {isTargetsMode ? "Targets On" : "Targets Mode"}
+              </Button>
+              <Button
                 variant={isPreviewMode ? "default" : "outline"}
                 onClick={() => setIsPreviewMode(!isPreviewMode)}
                 className="flex items-center gap-2"
               >
                 <Eye className="h-4 w-4" />
                 {isPreviewMode ? "Exit Preview" : "Preview Mode"}
+              </Button>
+              <Button onClick={handleApplyToCurrent} variant="outline" className="flex items-center gap-2">
+                <Check className="h-4 w-4" />
+                Apply to Current
               </Button>
               <Button onClick={handleSaveTheme} className="flex items-center gap-2">
                 <Wand2 className="h-4 w-4" />
@@ -432,6 +492,7 @@ export function AdvancedThemeCustomizer() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Particles (existing) */}
                   <ParticleControls
                     particles={customTheme.effects.particles}
                     onChange={(particles) => 
@@ -444,50 +505,62 @@ export function AdvancedThemeCustomizer() {
 
                   <Separator />
 
-                  <div>
-                    <Label className="text-sm font-medium mb-2 block">Blur Effects</Label>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm">Background Blur</Label>
-                        <Switch 
-                          checked={customTheme.effects.blur.background.enabled}
-                          onCheckedChange={(enabled) => 
-                            setCustomTheme({
-                              ...customTheme,
-                              effects: {
-                                ...customTheme.effects,
-                                blur: {
-                                  ...customTheme.effects.blur,
-                                  background: { ...customTheme.effects.blur.background, enabled }
-                                }
-                              }
-                            })
-                          }
-                        />
+                  {/* Border radius and glow */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Border Radius</Label>
+                      <Slider
+                        value={[parseInt(getComputedStyle(document.documentElement).getPropertyValue('--border-radius') || '8', 10)]}
+                        min={0}
+                        max={24}
+                        step={1}
+                        onValueChange={([v]) => {
+                          const s = document.getElementById('preview-theme-styles');
+                          const style = s || document.createElement('style');
+                          style.id = 'preview-theme-styles';
+                          style.textContent = `:root{ --border-radius: ${v}px; }`;
+                          if (!s) document.head.appendChild(style);
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label>Glow Intensity</Label>
+                      <Slider
+                        value={[Math.round((customTheme.effects.shadows.glow.intensity || 0.3) * 100)]}
+                        min={0}
+                        max={100}
+                        step={5}
+                        onValueChange={([v]) => {
+                          const updated = { ...customTheme };
+                          updated.effects = { ...customTheme.effects, shadows: { ...customTheme.effects.shadows, glow: { ...customTheme.effects.shadows.glow, intensity: v/100 } } } as any;
+                          setCustomTheme(updated);
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Overlay Effects (live) */}
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium">Overlay Effects (Preview)</div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ scanlines: true })}>Scanlines On</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ scanlines: false })}>Scanlines Off</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ radarSweep: true })}>Radar</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ vignette: true })}>Vignette</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ glitch: true })}>Glitch</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.reset?.()}>Reset</Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Scanline Spacing</Label>
+                        <Slider min={2} max={10} step={1} value={[3]} onValueChange={([v]) => (window as any).owEffects?.set?.({ scanlineSpacing: v })} />
                       </div>
-                      {customTheme.effects.blur.background.enabled && (
-                        <div>
-                          <Label className="text-xs">Radius: {customTheme.effects.blur.background.radius}px</Label>
-                          <Slider
-                            value={[customTheme.effects.blur.background.radius]}
-                            onValueChange={([radius]) => 
-                              setCustomTheme({
-                                ...customTheme,
-                                effects: {
-                                  ...customTheme.effects,
-                                  blur: {
-                                    ...customTheme.effects.blur,
-                                    background: { ...customTheme.effects.blur.background, radius }
-                                  }
-                                }
-                              })
-                            }
-                            min={0}
-                            max={20}
-                            step={1}
-                          />
-                        </div>
-                      )}
+                      <div>
+                        <Label>Glitch Intensity</Label>
+                        <Slider min={0} max={1} step={0.05} value={[0.3]} onValueChange={([v]) => (window as any).owEffects?.set?.({ glitchLevel: v })} />
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -833,78 +906,70 @@ export function AdvancedThemeCustomizer() {
           </Card>
         </div>
 
-        {/* Live Preview */}
-        <div className="space-y-6">
-          <Card>
+        {/* Preview Pane with Targets */}
+        <div className="lg:col-span-1">
+          <Card className="relative overflow-hidden">
             <CardHeader>
-              <CardTitle>Live Preview</CardTitle>
-              <CardDescription>
-                See your changes in real-time
-              </CardDescription>
+              <CardTitle className="text-lg">Live Preview</CardTitle>
+              <CardDescription>Click targets to edit their tokens</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Theme info */}
-              <div>
-                <div className="text-lg font-semibold">{customTheme.name}</div>
-                <div className="text-sm text-muted-foreground">{customTheme.description}</div>
-                <div className="flex gap-1 mt-2">
-                  {customTheme.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Color swatches */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">Color Palette</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {Object.entries(customTheme.colors).slice(0, 8).map(([name, color]) => (
-                    <div key={name} className="text-center">
-                      <div 
-                        className="w-full h-12 rounded border border-border mb-1"
-                        style={{ backgroundColor: hslToString(color) }}
-                      />
-                      <div className="text-xs text-muted-foreground capitalize">
-                        {name.replace(/([A-Z])/g, ' $1').trim()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Preview components */}
-              <div className="space-y-2">
-                <Button className="w-full">Primary Button</Button>
-                <Button variant="secondary" className="w-full">Secondary Button</Button>
-                <Card className="p-4">
-                  <div className="text-sm font-medium">Preview Card</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    This shows how cards will look with your theme.
+            <CardContent>
+              <div className="relative rounded-md border border-border p-4 bg-card">
+                <div className="space-y-3">
+                  <Button className="bg-primary text-primary-foreground">Primary Button</Button>
+                  <Button variant="outline">Secondary Button</Button>
+                  <div className="rounded-md p-4 border border-border bg-card">Card</div>
+                  <div className="border rounded">
+                    <div className="px-3 py-2 text-xs text-muted-foreground">Table</div>
+                    <div className="px-3 py-2 border-t border-border/50 text-sm">Row A</div>
+                    <div className="px-3 py-2 border-t border-border/50 text-sm">Row B</div>
                   </div>
-                </Card>
+                  <div className="inline-flex items-center gap-2">
+                    <Badge>Badge</Badge>
+                    <Badge variant="secondary">Secondary</Badge>
+                  </div>
+                </div>
+
+                {isTargetsMode && (
+                  <>
+                    {/* Card */}
+                    <button onClick={() => openInspector('colors.card')} className="absolute inset-x-4 top-[140px] h-14 rounded-md ring-2 ring-accent/60 bg-accent/10" />
+                    {/* Primary Button */}
+                    <button onClick={() => openInspector('colors.primary')} className="absolute left-4 top-4 h-10 w-40 rounded ring-2 ring-primary/60 bg-primary/10" />
+                    {/* Input/Table (use muted/border) */}
+                    <button onClick={() => openInspector('colors.muted')} className="absolute left-4 top-[200px] h-24 w-[calc(100%-2rem)] rounded ring-2 ring-foreground/40" />
+                    {/* Header (use background) */}
+                    <button onClick={() => openInspector('colors.background')} className="absolute inset-x-0 -top-3 h-8 ring-2 ring-secondary/50" />
+                    {/* Sidebar/nav (use sidebar color) */}
+                    <button onClick={() => openInspector('colors.sidebar')} className="absolute -left-3 inset-y-8 w-3 ring-2 ring-sidebar/50" />
+                    {/* Badge (use accent) */}
+                    <button onClick={() => openInspector('colors.accent')} className="absolute right-6 bottom-20 h-6 w-24 rounded ring-2 ring-accent/60" />
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
-
-          {/* Particle Preview */}
-          {customTheme.effects.particles.enabled && (
-            <Card className="relative overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-sm">Particle Preview</CardTitle>
-              </CardHeader>
-              <CardContent className="relative h-32">
-                <ParticleSystem
-                  effect={customTheme.effects.particles}
-                  containerWidth={300}
-                  containerHeight={128}
-                />
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
+
+      <Drawer open={inspectorOpen} onOpenChange={setInspectorOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Inspector: {inspectorPath}</DrawerTitle>
+          </DrawerHeader>
+          <div className="p-4">
+            <ColorPicker
+              color={customTheme.colors[(inspectorPath.split('.')[1]) as keyof typeof customTheme.colors] || customTheme.colors.card}
+              onChange={(color) => updateColor(inspectorPath, color)}
+              label={inspectorPath}
+            />
+            <div className="mt-4 flex items-center gap-2">
+              <Button variant="outline" onClick={() => setInspectorOpen(false)}>Close</Button>
+              <Button onClick={() => setIsPreviewMode(true)}>Preview Changes</Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }
