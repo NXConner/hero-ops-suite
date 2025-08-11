@@ -2,17 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { estimateCosts } from '../utils/costEstimator';
 import { Overlay } from '../types/overlay';
-
-const demoOverlay: Overlay = {
-  scan_id: 'demo',
-  timestamp: new Date().toISOString(),
-  dimensions: { perimeter_ft: 142.5, area_sqft: 1200, bbox_ft: [60, 20] },
-  cracks: [{ id: 'c1', length_ft: 100, severity: 'moderate', coordinates: [] }],
-  potholes: [{ id: 'p1', area_sqft: 5, center: { x: 0, y: 0, z: 0 }, depth_in: 2 }],
-  distress_zones: [{ id: 'd1', type: 'gatoring', area_sqft: 20, polygon: [] }],
-  slope_analysis: { pooling_area_sqft: 50, risk_zones: [], slope_vectors: [] },
-  recommendations: ['Seal cracks', 'Patch pothole']
-};
+import { demoOverlay as defaultOverlay } from '../data/demoOverlay';
 
 const demoPricing = {
   CRACK_SEAL: { item_code: 'CRACK_SEAL', unit: 'ft' as const, unit_cost: 1.5 },
@@ -21,8 +11,9 @@ const demoPricing = {
   REGRADING: { item_code: 'REGRADING', unit: 'sqft' as const, unit_cost: 4 }
 };
 
-export default function EstimateScreen() {
-  const estimate = useMemo(() => estimateCosts(demoOverlay, demoPricing), []);
+export default function EstimateScreen({ route }: any) {
+  const overlay: Overlay = route?.params?.overlay || defaultOverlay;
+  const estimate = useMemo(() => estimateCosts(overlay, demoPricing), [overlay]);
 
   return (
     <View style={styles.container}>

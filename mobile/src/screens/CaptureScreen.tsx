@@ -12,6 +12,8 @@ export default function CaptureScreen({ navigation }: any) {
       <Button title="View Scans" onPress={() => navigation.navigate('Scans')} />
       <View style={{ height: 8 }} />
       <Button title="Settings" onPress={() => navigation.navigate('Settings')} />
+      <View style={{ height: 8 }} />
+      <Button title="Analytics" onPress={() => navigation.navigate('Analytics')} />
 
       <View style={{ marginTop: 16 }}>
         <Text style={styles.hint}>API Base: {CONFIG.API_BASE_URL}</Text>

@@ -1,4 +1,4 @@
-let API_BASE_URL = 'http://localhost:3001';
+let API_BASE_URL = 'http://localhost:3002';
 
 export const CONFIG = {
   get API_BASE_URL() {
