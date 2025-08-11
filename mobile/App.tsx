@@ -9,6 +9,7 @@ import EstimateScreen from './src/screens/EstimateScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import AnalyticsScreen from './src/screens/AnalyticsScreen';
+import PricingScreen from './src/screens/PricingScreen';
 
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ export default function App() {
           <Stack.Screen name="Report" component={ReportScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="Analytics" component={AnalyticsScreen} />
+          <Stack.Screen name="Pricing" component={PricingScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>

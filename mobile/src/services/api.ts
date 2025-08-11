@@ -39,17 +39,30 @@ export async function getReport(scanId: string): Promise<{ pdf_url: string }> {
   return data;
 }
 
-export async function createJob(payload: any): Promise<{ job_id: string }> {
-  const { data } = await api.post('/jobs', payload);
+export async function getPricing(): Promise<Record<string, { item_code: string; unit: string; unit_cost: number }>> {
+  const { data } = await api.get('/config/pricing');
   return data;
 }
 
-export async function createInvoice(payload: any): Promise<{ invoice_id: string }> {
-  const { data } = await api.post('/invoices', payload);
+export async function setPricing(pricing: Record<string, { item_code: string; unit: string; unit_cost: number }>): Promise<void> {
+  await api.put('/config/pricing', pricing);
+}
+
+export async function getBranding(): Promise<{ companyName: string; primary: string; footerDisclaimer: string }> {
+  const { data } = await api.get('/config/branding');
   return data;
+}
+
+export async function setBranding(branding: { companyName: string; primary: string; footerDisclaimer: string }): Promise<void> {
+  await api.put('/config/branding', branding);
 }
 
 export async function getAnalyticsSummary(): Promise<any> {
   const { data } = await api.get('/analytics/summary');
+  return data;
+}
+
+export async function getPrioritized(): Promise<{ rows: Array<{ scan: any; stats: any; priority: number }> }> {
+  const { data } = await api.get('/analytics/prioritized');
   return data;
 }

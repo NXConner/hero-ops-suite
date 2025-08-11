@@ -1,0 +1,22 @@
+{
+  "CRACK_SEAL": {
+    "item_code": "CRACK_SEAL",
+    "unit": "ft",
+    "unit_cost": 1.5
+  },
+  "POTHOLE_PATCH": {
+    "item_code": "POTHOLE_PATCH",
+    "unit": "sqft",
+    "unit_cost": 12
+  },
+  "GATOR_REPAIR": {
+    "item_code": "GATOR_REPAIR",
+    "unit": "sqft",
+    "unit_cost": 6.5
+  },
+  "REGRADING": {
+    "item_code": "REGRADING",
+    "unit": "sqft",
+    "unit_cost": 4
+  }
+}

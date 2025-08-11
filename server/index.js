@@ -14,7 +14,11 @@ app.use(bodyParser.json({ limit: '10mb' }));
 
 const dataDir = path.join(__dirname, 'data');
 const overlaysDir = path.join(dataDir, 'overlays');
+const scansFile = path.join(dataDir, 'scans.json');
+const pricingFile = path.join(dataDir, 'pricing.json');
+const brandingFile = path.join(dataDir, 'branding.json');
 await fs.ensureDir(overlaysDir);
+await fs.ensureDir(dataDir);
 
 const scans = new Map();
 const jobs = new Map();
@@ -24,7 +28,61 @@ function id() {
   return (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)).toLowerCase();
 }
 
+async function loadState() {
+  if (await fs.pathExists(scansFile)) {
+    const list = await fs.readJson(scansFile);
+    for (const s of list) scans.set(s.scan_id, s);
+  }
+  if (!(await fs.pathExists(pricingFile))) {
+    const defaults = {
+      CRACK_SEAL: { item_code: 'CRACK_SEAL', unit: 'ft', unit_cost: 1.5 },
+      POTHOLE_PATCH: { item_code: 'POTHOLE_PATCH', unit: 'sqft', unit_cost: 12 },
+      GATOR_REPAIR: { item_code: 'GATOR_REPAIR', unit: 'sqft', unit_cost: 6.5 },
+      REGRADING: { item_code: 'REGRADING', unit: 'sqft', unit_cost: 4 },
+    };
+    await fs.writeJson(pricingFile, defaults, { spaces: 2 });
+  }
+  if (!(await fs.pathExists(brandingFile))) {
+    const defaults = {
+      companyName: 'Nate Asphalt Co.',
+      primary: '#0b6bcb',
+      footerDisclaimer: 'This report is an engineering aid. Field conditions may vary.',
+    };
+    await fs.writeJson(brandingFile, defaults, { spaces: 2 });
+  }
+}
+
+async function saveScans() {
+  const list = Array.from(scans.values());
+  await fs.writeJson(scansFile, list, { spaces: 2 });
+}
+
+await loadState();
+
 app.get('/health', (req, res) => res.json({ ok: true }));
+
+// Config endpoints
+app.get('/config/pricing', async (req, res) => {
+  const pricing = await fs.readJson(pricingFile);
+  res.json(pricing);
+});
+
+app.put('/config/pricing', async (req, res) => {
+  const pricing = req.body || {};
+  await fs.writeJson(pricingFile, pricing, { spaces: 2 });
+  res.json({ ok: true });
+});
+
+app.get('/config/branding', async (req, res) => {
+  const branding = await fs.readJson(brandingFile);
+  res.json(branding);
+});
+
+app.put('/config/branding', async (req, res) => {
+  const branding = req.body || {};
+  await fs.writeJson(brandingFile, branding, { spaces: 2 });
+  res.json({ ok: true });
+});
 
 // List scans
 app.get('/scans', async (req, res) => {
@@ -44,6 +102,7 @@ app.post('/scans', async (req, res) => {
     mesh_url: req.body.mesh_url || null,
   };
   scans.set(scan_id, scan);
+  await saveScans();
   res.json({ scan_id, upload_urls: {} });
 });
 
@@ -121,6 +180,60 @@ app.get('/analytics/summary', async (req, res) => {
     totals.score += s.score;
   }
   res.json({ totals });
+});
+
+app.get('/analytics/prioritized', async (req, res) => {
+  const rows = [];
+  for (const scan of scans.values()) {
+    const file = path.join(overlaysDir, `${scan.scan_id}.json`);
+    const overlay = (await fs.pathExists(file)) ? await fs.readJson(file) : null;
+    const stats = computeOverlayStats(overlay);
+    const priority = stats.score; // simple prioritization
+    rows.push({ scan, stats, priority });
+  }
+  rows.sort((a, b) => b.priority - a.priority);
+  res.json({ rows });
+});
+
+// Server-side estimate based on saved pricing
+function estimateCosts(overlay, pricing) {
+  const lines = [];
+  const crackLengthFt = (overlay.cracks || []).reduce((acc, c) => acc + (c.length_ft || 0), 0);
+  if (crackLengthFt > 0 && pricing.CRACK_SEAL) {
+    const p = pricing.CRACK_SEAL;
+    lines.push({ item_code: 'CRACK_SEAL', description: 'Crack sealing (hot-pour)', quantity: crackLengthFt, unit: p.unit, unit_cost: p.unit_cost, total: crackLengthFt * p.unit_cost });
+  }
+  const potholeAreaSqft = (overlay.potholes || []).reduce((acc, p) => acc + (p.area_sqft || 0), 0);
+  if (potholeAreaSqft > 0 && pricing.POTHOLE_PATCH) {
+    const p = pricing.POTHOLE_PATCH;
+    lines.push({ item_code: 'POTHOLE_PATCH', description: 'Pothole patch', quantity: potholeAreaSqft, unit: p.unit, unit_cost: p.unit_cost, total: potholeAreaSqft * p.unit_cost });
+  }
+  const gatorAreaSqft = (overlay.distress_zones || []).filter((d) => d.type === 'gatoring').reduce((acc, d) => acc + (d.area_sqft || 0), 0);
+  if (gatorAreaSqft > 0 && pricing.GATOR_REPAIR) {
+    const p = pricing.GATOR_REPAIR;
+    lines.push({ item_code: 'GATOR_REPAIR', description: 'Gatoring repair', quantity: gatorAreaSqft, unit: p.unit, unit_cost: p.unit_cost, total: gatorAreaSqft * p.unit_cost });
+  }
+  const poolingAreaSqft = overlay.slope_analysis?.pooling_area_sqft || 0;
+  if (poolingAreaSqft > 0 && pricing.REGRADING) {
+    const p = pricing.REGRADING;
+    lines.push({ item_code: 'REGRADING', description: 'Regrading/leveling', quantity: poolingAreaSqft, unit: p.unit, unit_cost: p.unit_cost, total: poolingAreaSqft * p.unit_cost });
+  }
+  const mobilization = 250;
+  const contingencyPercent = 0.1;
+  const subtotal = lines.reduce((acc, l) => acc + l.total, 0) + mobilization;
+  const total = subtotal * (1 + contingencyPercent);
+  return { lines, mobilization, contingencyPercent, subtotal, total };
+}
+
+app.post('/estimate/:id', async (req, res) => {
+  const scan_id = req.params.id;
+  if (!scans.has(scan_id)) return res.status(404).json({ error: 'not_found' });
+  const file = path.join(overlaysDir, `${scan_id}.json`);
+  if (!(await fs.pathExists(file))) return res.status(404).json({ error: 'no_overlay' });
+  const overlay = await fs.readJson(file);
+  const pricing = await fs.readJson(pricingFile);
+  const estimate = estimateCosts(overlay, pricing);
+  res.json(estimate);
 });
 
 const port = process.env.PORT || 3001;

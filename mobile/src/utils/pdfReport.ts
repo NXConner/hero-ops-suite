@@ -1,21 +1,24 @@
 import * as Print from 'expo-print';
 import { Overlay } from '../types/overlay';
 import { EstimateResult } from './costEstimator';
-import { BRAND } from '../theme/branding';
+import { BRAND as DEFAULT_BRAND } from '../theme/branding';
+
+type Brand = { companyName: string; primary: string; footerDisclaimer: string };
 
 export async function generatePdfReport(params: {
   overlay: Overlay;
   estimate: EstimateResult;
   siteName?: string;
+  brand?: Brand;
 }): Promise<{ uri: string }> {
-  const { overlay, estimate, siteName } = params;
+  const { overlay, estimate, siteName, brand = DEFAULT_BRAND } = params;
   const html = `
   <html>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <style>
         body { font-family: -apple-system, Roboto, Helvetica, Arial, sans-serif; padding: 24px; }
-        h1 { color: ${BRAND.primary}; }
+        h1 { color: ${brand.primary}; }
         .section { margin-top: 16px; }
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #eee; padding: 8px; text-align: left; }
@@ -24,7 +27,7 @@ export async function generatePdfReport(params: {
       </style>
     </head>
     <body>
-      <h1>${BRAND.companyName} — Asphalt Assessment</h1>
+      <h1>${brand.companyName} — Asphalt Assessment</h1>
       <div>Site: ${siteName || 'N/A'}</div>
       <div>Date: ${new Date(overlay.timestamp).toLocaleString()}</div>
 
@@ -67,7 +70,7 @@ export async function generatePdfReport(params: {
         </ul>
       </div>
 
-      <div class="footer">${BRAND.footerDisclaimer}</div>
+      <div class="footer">${brand.footerDisclaimer}</div>
     </body>
   </html>`;
 
