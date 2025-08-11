@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { getApiBaseUrl } from '@/config/api';
 
 export default function ContractorPortal() {
   const [scanId, setScanId] = useState('');
   const [jobs, setJobs] = useState<any[]>([]);
-  const API = 'http://localhost:3002';
+  const API = getApiBaseUrl();
 
   const load = async () => {
     const j = await fetch(`${API}/jobs${scanId ? `?scan_id=${scanId}` : ''}`).then((r) => r.json());
