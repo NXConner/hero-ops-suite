@@ -106,6 +106,17 @@ app.post('/scans', async (req, res) => {
   res.json({ scan_id, upload_urls: {} });
 });
 
+app.put('/scans/:id', async (req, res) => {
+  const scan_id = req.params.id;
+  const scan = scans.get(scan_id);
+  if (!scan) return res.status(404).json({ error: 'not_found' });
+  const updates = req.body || {};
+  const updated = { ...scan, ...updates };
+  scans.set(scan_id, updated);
+  await saveScans();
+  res.json({ scan: updated });
+});
+
 // Upload overlay
 app.post('/scans/:id/overlay', async (req, res) => {
   const scan_id = req.params.id;

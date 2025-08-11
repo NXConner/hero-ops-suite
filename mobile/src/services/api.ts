@@ -20,6 +20,11 @@ export async function createScan(payload: {
   return data;
 }
 
+export async function updateScan(scanId: string, updates: any): Promise<{ scan: any }> {
+  const { data } = await api.put(`/scans/${scanId}`, updates);
+  return data;
+}
+
 export async function uploadOverlay(scanId: string, overlay: Overlay): Promise<void> {
   await api.post(`/scans/${scanId}/overlay`, overlay);
 }

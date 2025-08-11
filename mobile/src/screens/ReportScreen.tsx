@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { generatePdfReport } from '../utils/pdfReport';
 import { estimateCosts } from '../utils/costEstimator';
 import { Overlay } from '../types/overlay';
 import { demoOverlay as defaultOverlay } from '../data/demoOverlay';
+import { getBranding } from '../services/api';
 
 export default function ReportScreen({ route }: any) {
   const [busy, setBusy] = useState(false);
+  const [brand, setBrand] = useState<{ companyName: string; primary: string; footerDisclaimer: string } | undefined>();
   const overlay: Overlay = route?.params?.overlay || defaultOverlay;
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const b = await getBranding();
+        setBrand(b);
+      } catch {}
+    })();
+  }, []);
 
   const handleGenerate = async () => {
     try {
@@ -18,7 +29,7 @@ export default function ReportScreen({ route }: any) {
         GATOR_REPAIR: { item_code: 'GATOR_REPAIR', unit: 'sqft', unit_cost: 6.5 },
         REGRADING: { item_code: 'REGRADING', unit: 'sqft', unit_cost: 4 }
       });
-      const { uri } = await generatePdfReport({ overlay, estimate, siteName: 'Demo Site' });
+      const { uri } = await generatePdfReport({ overlay, estimate, siteName: 'Demo Site', brand });
       Alert.alert('PDF generated', uri);
     } catch (e: any) {
       Alert.alert('Error', e.message || 'Failed to generate PDF');
