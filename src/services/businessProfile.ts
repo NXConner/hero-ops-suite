@@ -46,6 +46,29 @@ export function clearOverrides(): void {
   }
 }
 
+export async function saveOverridesToCloud(overrides: Partial<BusinessProfile>) {
+  try {
+    const url = (import.meta as any).env?.VITE_SUPABASE_URL;
+    const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
+    if (!url || !key) return;
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(url, key);
+    await supabase.from('business_overrides').upsert({ id: 'default', data: overrides, updated_at: new Date().toISOString() });
+  } catch { /* ignore */ }
+}
+
+export async function loadOverridesFromCloud(): Promise<Partial<BusinessProfile> | null> {
+  try {
+    const url = (import.meta as any).env?.VITE_SUPABASE_URL;
+    const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
+    if (!url || !key) return null;
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(url, key);
+    const { data } = await supabase.from('business_overrides').select('data').eq('id', 'default').single();
+    return (data?.data as Partial<BusinessProfile>) ?? null;
+  } catch { return null; }
+}
+
 export function applyOverridesToGlobal(overrides: Partial<BusinessProfile> | null): void {
   if (!overrides) return;
   // Mutate BUSINESS_PROFILE in place so any module-level imports see fresh values

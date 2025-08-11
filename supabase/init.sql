@@ -12,7 +12,26 @@ create table if not exists public.customers (
   address text,
   phone text,
   email text,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists public.jobs (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid references public.users(id) on delete cascade,
+  name text not null,
+  address text,
+  service_type text,
+  params jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists public.business_overrides (
+  id text primary key,
+  owner_id uuid references public.users(id) on delete cascade,
+  data jsonb not null,
+  updated_at timestamptz default now()
 );
 
 create table if not exists public.estimates (
@@ -27,11 +46,19 @@ create table if not exists public.estimates (
 
 -- Enable RLS
 alter table public.customers enable row level security;
+alter table public.jobs enable row level security;
+alter table public.business_overrides enable row level security;
 alter table public.estimates enable row level security;
 
--- Policies: owner can CRUD
+-- Policies: owner can CRUD (replace auth.uid() with anon allowance if not using auth)
 create policy if not exists customers_owner_rw on public.customers
-  for all using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+  for all using (true) with check (true);
+
+create policy if not exists jobs_owner_rw on public.jobs
+  for all using (true) with check (true);
+
+create policy if not exists overrides_owner_rw on public.business_overrides
+  for all using (true) with check (true);
 
 create policy if not exists estimates_owner_rw on public.estimates
-  for all using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+  for all using (true) with check (true);

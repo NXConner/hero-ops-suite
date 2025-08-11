@@ -21,7 +21,7 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
   - [IP] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas
 - Persistence & Data
   - [IP] Supabase adapters for jobs/customers (best-effort sync, local fallback)
-  - [NS] Supabase schema (users, business profile, price book, jobs, customers)
+  - [IP] Supabase schema tables (users, jobs, customers, business_overrides)
   - [NS] Migration utility from localStorage; conflict resolution UI
 - Exports & Invoicing
   - [NS] Branded PDF invoices (logo, terms, signatures) and email/share workflow
