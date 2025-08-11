@@ -10,15 +10,19 @@ import ReportScreen from './src/screens/ReportScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import AnalyticsScreen from './src/screens/AnalyticsScreen';
 import PricingScreen from './src/screens/PricingScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import { CONFIG } from './src/config';
 
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
 export default function App() {
+  const initial = CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY ? 'Login' : 'Capture';
   return (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Capture">
+        <Stack.Navigator initialRouteName={initial}>
+          <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Capture" component={CaptureScreen} />
           <Stack.Screen name="Scans" component={ScansScreen} />
           <Stack.Screen name="Viewer" component={ViewerScreen} />
