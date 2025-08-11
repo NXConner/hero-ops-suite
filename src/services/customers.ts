@@ -21,7 +21,7 @@ function loadAll(): Customer[] {
 function saveAll(list: Customer[]) {
   try {
     localStorage.setItem(KEY, JSON.stringify(list));
-  } catch {}
+  } catch { /* ignore */ }
 }
 
 export function listCustomers(): Customer[] {

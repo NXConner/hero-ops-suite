@@ -210,8 +210,8 @@ export function AdvancedThemeCustomizer() {
       if (prev) prev.remove();
       document.head.appendChild(style);
       document.documentElement.setAttribute('data-theme', customTheme.id);
-    } catch (e) {}
-  }, [isPreviewMode, customTheme, currentTheme]);
+        } catch (e) { /* ignore */ }
+   }, [isPreviewMode, customTheme, currentTheme]);
 
   // Real-time preview theme
   const previewTheme = useMemo(() => {

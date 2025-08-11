@@ -55,7 +55,9 @@ This document summarizes the Division-inspired theming/effects implementation de
   - `public/hero-bg.jpg` placeholder added.
 
 - Build status
-  - App builds cleanly after all changes.
+  - Lint: 0 errors, 0 warnings (rules aligned to project policy).
+  - Typecheck: clean.
+  - Tests: passing (vitest run mode).
 
 ## What remains to finish (feature gaps)
 
@@ -133,6 +135,13 @@ This document summarizes the Division-inspired theming/effects implementation de
 - Tests/Docs
   - [ ] Add smoke tests for builder, customizer, nav editor, effects toggles.
   - [ ] Update README and short HOWTOs.
+
+## Current plan to finish
+
+- Finalize remaining feature gaps listed above incrementally. Prioritize:
+  1) Effects presets and Minimal Mode shortcut, 2) Customizer non-color tokens, 3) Builder widget settings.
+- Add smoke tests for Settings, Builder, and EffectsOverlay flows.
+- Prepare production assets for wallpapers/effects and verify performance in Low Power Mode.
 
 ## Notes
 

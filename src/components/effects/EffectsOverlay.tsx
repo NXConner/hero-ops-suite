@@ -43,7 +43,7 @@ function useEffectSettings() {
   useEffect(() => {
     try {
       localStorage.setItem('effects-settings', JSON.stringify(settings));
-    } catch {}
+    } catch { /* ignore */ }
   }, [settings]);
 
   useEffect(() => {

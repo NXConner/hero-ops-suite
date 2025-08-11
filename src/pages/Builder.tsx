@@ -17,7 +17,7 @@ export default function Builder() {
   });
   const [pageId, setPageId] = useState<string>(() => pages[0] || 'default');
 
-  useEffect(() => { try { localStorage.setItem('builder-pages', JSON.stringify(pages)); } catch {} }, [pages]);
+  useEffect(() => { try { localStorage.setItem('builder-pages', JSON.stringify(pages)); } catch { /* ignore */ } }, [pages]);
 
   const library: LibraryWidget[] = [
     { id: 'fleet', name: 'Fleet/Follow', icon: <Users className="h-4 w-4" /> },
@@ -56,7 +56,7 @@ export default function Builder() {
       JSON.parse(json); // simple validation
       localStorage.setItem(`builder-layout-${pageId}`, json);
       window.location.reload();
-    } catch {}
+    } catch { /* ignore */ }
   }
 
   function handleCreatePage() {

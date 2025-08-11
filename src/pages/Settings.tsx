@@ -107,13 +107,13 @@ const Settings = () => {
 
         <div className="container mx-auto px-6 py-8">
           <Tabs defaultValue="profile" className="space-y-6">
-
+ 
+            <TabsList>
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
               <TabsTrigger value="display">Display</TabsTrigger>
-
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
@@ -1222,7 +1222,7 @@ const Settings = () => {
                               const json = JSON.parse(text);
                               importAll(json);
                               window.location.reload();
-                            } catch {}
+                            } catch { /* ignore */ }
                           };
                           input.click();
                         }}>Import</Button>

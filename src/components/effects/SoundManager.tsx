@@ -24,7 +24,7 @@ export default function SoundManager() {
   });
 
   useEffect(() => {
-    try { localStorage.setItem('sound-settings', JSON.stringify(settings)); } catch {}
+    try { localStorage.setItem('sound-settings', JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
 
   // Expose a simple window API for triggering sounds

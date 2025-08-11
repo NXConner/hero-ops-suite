@@ -67,7 +67,7 @@ function useNavConfig() {
   });
 
   useEffect(() => {
-    try { localStorage.setItem('sidebar-nav-config', JSON.stringify(config)); } catch {}
+    try { localStorage.setItem('sidebar-nav-config', JSON.stringify(config)); } catch { /* ignore */ }
   }, [config]);
 
   return { config, setConfig } as const;
