@@ -20,7 +20,7 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
 - Striping
   - [IP] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas
 - Persistence & Data
-  - [IP] Supabase adapters for jobs (best-effort sync, local fallback)
+  - [IP] Supabase adapters for jobs/customers (best-effort sync, local fallback)
   - [NS] Supabase schema (users, business profile, price book, jobs, customers)
   - [NS] Migration utility from localStorage; conflict resolution UI
 - Exports & Invoicing

@@ -256,9 +256,9 @@ const Estimator = () => {
     }
   };
 
-  const handleSaveCustomer = () => {
+  const handleSaveCustomer = async () => {
     if (!customerName || !jobAddress) return;
-    saveCustomer({ name: customerName, address: jobAddress, notes: '' });
+    await saveCustomer({ name: customerName, address: jobAddress, notes: '' });
     setCustomers(listCustomers());
   };
 
