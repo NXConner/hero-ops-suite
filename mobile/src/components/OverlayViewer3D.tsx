@@ -55,7 +55,7 @@ export default function OverlayViewer3D({ meshUrl, overlay }: Props) {
             root = cube;
           }
 
-          // Overlay: draw crack lines in XY plane at z=0
+          // Overlay: draw crack lines
           if (overlay?.cracks?.length) {
             const crackMaterial = new THREE.LineBasicMaterial({ color: 0xff3333 });
             overlay.cracks.forEach((c: any) => {
@@ -68,10 +68,41 @@ export default function OverlayViewer3D({ meshUrl, overlay }: Props) {
             });
           }
 
-          const controls = { t: 0 };
+          // Overlay: draw distress polygons (e.g., gatoring)
+          if (overlay?.distress_zones?.length) {
+            overlay.distress_zones.forEach((zone: any) => {
+              const color = zone.type === 'gatoring' ? 0xffaa00 : 0xffff00;
+              const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+              const shape = new THREE.Shape();
+              const vertices = zone.polygon || [];
+              if (vertices.length >= 3) {
+                shape.moveTo(vertices[0].x, vertices[0].y);
+                for (let i = 1; i < vertices.length; i++) {
+                  shape.lineTo(vertices[i].x, vertices[i].y);
+                }
+                const geometry = new THREE.ShapeGeometry(shape);
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.z = vertices[0].z ?? 0.01; // slightly above ground
+                scene.add(mesh);
+              }
+            });
+          }
+
+          // Overlay: slope vectors as arrows
+          if (overlay?.slope_analysis?.slope_vectors?.length) {
+            const arrowColor = 0x33aaff;
+            overlay.slope_analysis.slope_vectors.forEach((vec: any) => {
+              const start = new THREE.Vector3(vec.start.x, vec.start.y, vec.start.z ?? 0);
+              const end = new THREE.Vector3(vec.end.x, vec.end.y, vec.end.z ?? 0);
+              const dir = new THREE.Vector3().subVectors(end, start).normalize();
+              const length = start.distanceTo(end);
+              const arrow = new THREE.ArrowHelper(dir, start, length, arrowColor, 0.1, 0.05);
+              scene.add(arrow);
+            });
+          }
+
           const animate = () => {
             requestRef.current = requestAnimationFrame(animate);
-            controls.t += 0.01;
             if (root) {
               root.rotation.y += 0.003;
             }

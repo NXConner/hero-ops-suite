@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { CONFIG } from '../config';
 
 export type QueuedRequest = {
   id: string;
@@ -34,4 +36,24 @@ export async function readQueue(): Promise<QueuedRequest[]> {
 
 export async function replaceQueue(queue: QueuedRequest[]) {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+}
+
+export async function processQueue(): Promise<{ sent: number; remaining: number }> {
+  const queue = await readQueue();
+  if (queue.length === 0) return { sent: 0, remaining: 0 };
+  const nextQueue: QueuedRequest[] = [];
+  let sent = 0;
+  for (const item of queue) {
+    try {
+      const url = `${CONFIG.API_BASE_URL}${item.url}`;
+      if (item.method === 'POST') await axios.post(url, item.body);
+      else if (item.method === 'PUT') await axios.put(url, item.body);
+      else if (item.method === 'DELETE') await axios.delete(url);
+      sent += 1;
+    } catch (e) {
+      nextQueue.push(item);
+    }
+  }
+  await replaceQueue(nextQueue);
+  return { sent, remaining: nextQueue.length };
 }
