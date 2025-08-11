@@ -617,6 +617,11 @@ export function AdvancedThemeCustomizer() {
                   <div className="space-y-3">
                     <div className="text-sm font-medium">Overlay Effects (Preview)</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('minimal')}>Preset: Minimal</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('isac')}>Preset: ISAC</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('disavowed')}>Preset: Disavowed</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('darkzone')}>Preset: Darkzone</Button>
+                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('vivid')}>Preset: Vivid</Button>
                       <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ scanlines: true })}>Scanlines On</Button>
                       <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ scanlines: false })}>Scanlines Off</Button>
                       <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ radarSweep: true })}>Radar</Button>
