@@ -9,7 +9,7 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
 - Totals & Tax
   - [IP] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
 - Estimator Inputs & UX
-  - [NS] Structured address inputs with autocomplete; route map preview (supplier → job → return)
+  - [IP] Structured address inputs with autocomplete; route map preview (supplier → job → return)
   - [NS] Preset templates (Driveway / Parking Lot)
 - Calculators
   - [NS] Trailer MPG modifiers and leg-based fuel costing

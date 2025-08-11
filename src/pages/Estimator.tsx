@@ -14,6 +14,8 @@ import { computeRoundTripMilesBetween, reverseGeocode } from '@/lib/geo';
 import { saveJob, listJobs, type StoredJob } from '@/services/jobs';
 import { listCustomers, saveCustomer, type Customer } from '@/services/customers';
 import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile } from '@/services/exporters';
+import RealMapComponent from '@/components/map/RealMapComponent';
+import { geocodeAddress } from '@/lib/geo';
 
 const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
@@ -35,6 +37,12 @@ const Estimator = () => {
     paintColor: 'yellow',
   });
   const [jobAddress, setJobAddress] = useState(BUSINESS_PROFILE.address.full);
+  const [jobStreet, setJobStreet] = useState('');
+  const [jobCity, setJobCity] = useState('');
+  const [jobState, setJobState] = useState('');
+  const [jobZip, setJobZip] = useState('');
+  const [jobCoords, setJobCoords] = useState<{lat:number; lon:number} | null>(null);
+  const [supplierCoords, setSupplierCoords] = useState<{lat:number; lon:number} | null>(null);
   const [roundTripMilesSupplier, setRoundTripMilesSupplier] = useState(BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier); // Stuart, VA ↔ Madison, NC approx
   const [roundTripMilesJob, setRoundTripMilesJob] = useState(0); // default same as business if unknown
   const [fuelPrice, setFuelPrice] = useState(DEFAULT_FUEL_PRICE);
@@ -63,6 +71,11 @@ const Estimator = () => {
     setNumFullTime(profile.crew.numFullTime);
     setNumPartTime(profile.crew.numPartTime);
     setPmmPrice(profile.materials.pmmPricePerGallon);
+    // Precompute supplier coords once
+    (async () => {
+      const sup = await geocodeAddress(BUSINESS_PROFILE.supplier.address.full);
+      if (sup) setSupplierCoords(sup);
+    })();
   }, [profile]);
 
   const estimateInput: EstimateInput = useMemo(() => ({
@@ -224,7 +237,23 @@ const Estimator = () => {
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const addr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
       if (addr) setJobAddress(addr);
+      setJobStreet(''); setJobCity(''); setJobState(''); setJobZip('');
+      setJobCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
     });
+  };
+
+  const composeStructuredAddress = () => {
+    const parts = [jobStreet, jobCity, jobState, jobZip].map(s => (s||'').trim()).filter(Boolean);
+    return parts.join(', ');
+  };
+
+  const handleStructuredAddressBlur = async () => {
+    const full = composeStructuredAddress();
+    if (full) {
+      setJobAddress(full);
+      const res = await geocodeAddress(full);
+      setJobCoords(res);
+    }
   };
 
   const handleSaveCustomer = () => {
@@ -281,6 +310,26 @@ const Estimator = () => {
                   }}>Download .txt</Button>
                 </div>
               </div>
+
+              <div>
+                <Label>Address (structured)</Label>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                  <Input placeholder="Street" value={jobStreet} onChange={e => setJobStreet(e.target.value)} onBlur={handleStructuredAddressBlur} />
+                  <Input placeholder="City" value={jobCity} onChange={e => setJobCity(e.target.value)} onBlur={handleStructuredAddressBlur} />
+                  <Input placeholder="State" value={jobState} onChange={e => setJobState(e.target.value)} onBlur={handleStructuredAddressBlur} />
+                  <Input placeholder="ZIP" value={jobZip} onChange={e => setJobZip(e.target.value)} onBlur={handleStructuredAddressBlur} />
+                </div>
+                <div className="mt-2">
+                  <Label className="text-xs text-muted-foreground">Full Address</Label>
+                  <Input value={jobAddress} onChange={e => setJobAddress(e.target.value)} onBlur={async () => { const res = await geocodeAddress(jobAddress); setJobCoords(res); }} />
+                  <div className="text-xs text-muted-foreground mt-1">Use My Location will override structured fields.</div>
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <Button type="button" variant="outline" onClick={handleUseMyLocation}>Use My Location</Button>
+                  <Button type="button" variant="outline" onClick={handleComputeJobMiles}>Auto Miles</Button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Service</Label>
@@ -298,13 +347,6 @@ const Estimator = () => {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                </div>
-                <div>
-                  <Label>Job address</Label>
-                  <div className="flex gap-2">
-                    <Input value={jobAddress} onChange={e => setJobAddress(e.target.value)} />
-                    <Button type="button" variant="outline" onClick={handleUseMyLocation}>Use my location</Button>
-                  </div>
                 </div>
                 <div>
                   <Label>Sealcoat sq ft</Label>
@@ -472,6 +514,49 @@ const Estimator = () => {
                 <div className="flex gap-2 justify-end">
                   <Button type="button" variant="outline" onClick={handleSaveCustomer}>Save to address book</Button>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+            <CardHeader>
+              <CardTitle>Route Preview</CardTitle>
+              <CardDescription>Supplier → Job (approximate straight line)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 w-full rounded overflow-hidden border border-border/30">
+                <RealMapComponent
+                  center={jobCoords ? [jobCoords.lon, jobCoords.lat] : [-74.006, 40.7128]}
+                  zoom={jobCoords ? 10 : 3}
+                  styleUrl={'mapbox://styles/mapbox/streets-v12'}
+                >
+                  {/* Draw simple line using a GeoJSON source if both coords are present */}
+                  {jobCoords && supplierCoords && (
+                    (() => {
+                      const map = (window as any).mapMethods?.getMap?.();
+                      if (map && map.isStyleLoaded()) {
+                        const route = {
+                          type: 'Feature',
+                          geometry: {
+                            type: 'LineString',
+                            coordinates: [
+                              [supplierCoords.lon, supplierCoords.lat],
+                              [jobCoords.lon, jobCoords.lat]
+                            ]
+                          }
+                        } as any;
+                        const srcId = 'route-preview';
+                        if (!map.getSource(srcId)) {
+                          map.addSource(srcId, { type: 'geojson', data: route });
+                          map.addLayer({ id: 'route-line', type: 'line', source: srcId, paint: { 'line-color': '#22d3ee', 'line-width': 3 } });
+                        } else {
+                          (map.getSource(srcId) as any).setData(route);
+                        }
+                      }
+                      return null;
+                    })()
+                  )}
+                </RealMapComponent>
               </div>
             </CardContent>
           </Card>
