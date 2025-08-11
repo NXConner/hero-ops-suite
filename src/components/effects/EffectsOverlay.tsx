@@ -43,14 +43,33 @@ function useEffectSettings() {
   useEffect(() => {
     try {
       localStorage.setItem('effects-settings', JSON.stringify(settings));
-    } catch {}
+    } catch { /* ignore */ }
   }, [settings]);
 
   useEffect(() => {
     (window as any).owEffects = {
       get: () => settings,
       set: (s: Partial<EffectSettings>) => setSettings(prev => ({ ...prev, ...s })),
-      reset: () => setSettings(defaultSettings)
+      reset: () => setSettings(defaultSettings),
+      preset: (name: 'isac' | 'disavowed' | 'darkzone' | 'minimal' | 'vivid') => {
+        switch (name) {
+          case 'minimal':
+            setSettings({ ...defaultSettings, scanlines: false, refreshBarH: false, refreshBarV: false, radarSweep: false, vignette: false, glitch: false, uvVignette: false, ticker: false, minimal: true });
+            break;
+          case 'isac':
+            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: true, refreshBarV: false, radarSweep: false, vignette: true, glitch: false, uvVignette: false, ticker: false, scanlineSpacing: 3, glitchLevel: 0.2 }));
+            break;
+          case 'disavowed':
+            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: false, refreshBarV: true, radarSweep: false, vignette: true, glitch: true, uvVignette: false, ticker: true, scanlineSpacing: 2, glitchLevel: 0.5 }));
+            break;
+          case 'darkzone':
+            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: false, refreshBarV: false, radarSweep: true, vignette: true, glitch: true, uvVignette: true, ticker: true, scanlineSpacing: 3, glitchLevel: 0.4 }));
+            break;
+          case 'vivid':
+            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: true, refreshBarV: true, radarSweep: true, vignette: true, glitch: true, uvVignette: true, ticker: true, scanlineSpacing: 2, glitchLevel: 0.6 }));
+            break;
+        }
+      }
     };
     return () => { delete (window as any).owEffects; };
   }, [settings]);

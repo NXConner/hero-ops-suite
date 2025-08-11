@@ -1222,7 +1222,7 @@ const Settings = () => {
                               const json = JSON.parse(text);
                               importAll(json);
                               window.location.reload();
-                            } catch {}
+                            } catch { /* ignore */ }
                           };
                           input.click();
                         }}>Import</Button>

@@ -46,7 +46,7 @@ export default function NavigationEditor() {
   }, []);
 
   useEffect(() => {
-    try { localStorage.setItem('sidebar-nav-config', JSON.stringify(items)); } catch {}
+    try { localStorage.setItem('sidebar-nav-config', JSON.stringify(items)); } catch { /* ignore */ }
   }, [items]);
 
   function onDragStart(index: number) {
@@ -74,7 +74,7 @@ export default function NavigationEditor() {
   }
 
   function resetToDefault() {
-    try { localStorage.removeItem('sidebar-nav-config'); } catch {}
+    try { localStorage.removeItem('sidebar-nav-config'); } catch { /* ignore */ }
     window.location.reload();
   }
 

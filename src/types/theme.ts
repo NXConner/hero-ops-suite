@@ -251,6 +251,27 @@ export interface ThemePreset {
   defaultTheme: string;
 }
 
+// Optional UI token extensions for per-component radii, borders, and focus rings
+export interface ThemeUIRadius {
+  card?: string;      // e.g., '0.5rem'
+  button?: string;    // e.g., '0.5rem'
+  input?: string;     // e.g., '0.5rem'
+  menu?: string;      // e.g., '0.375rem'
+  popover?: string;   // e.g., '0.375rem'
+  toast?: string;     // e.g., '0.5rem'
+}
+
+export interface ThemeUIBorders {
+  width?: string;       // e.g., '1px'
+  focusRingWidth?: string;   // e.g., '2px'
+  focusRingOffset?: string;  // e.g., '2px'
+}
+
+export interface ThemeUI {
+  radius?: ThemeUIRadius;
+  borders?: ThemeUIBorders;
+}
+
 export interface ThemeContext {
   currentTheme: Theme;
   availableThemes: Theme[];
@@ -276,7 +297,5 @@ export interface ThemeContext {
   saveWallpaperProfile: (name: string, wallpaper?: ThemeWallpaper | null) => void;
   applyWallpaperProfile: (name: string) => void;
   deleteWallpaperProfile: (name: string) => void;
-  // Low power
-  setLowPower: (enabled: boolean) => void;
-  lowPowerMode: boolean;
+  
 }

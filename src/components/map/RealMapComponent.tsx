@@ -89,7 +89,6 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         map.current = null;
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update map center and zoom when props change
@@ -173,7 +172,6 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         getMap: () => map.current
       };
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]);
 
   return (

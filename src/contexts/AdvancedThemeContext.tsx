@@ -68,7 +68,7 @@ export function AdvancedThemeProvider({
   }, [storageKey]);
 
   const persistProfiles = useCallback((profiles: { name: string; wallpaper: ThemeWallpaper }[]) => {
-    try { localStorage.setItem('global-wallpaper-profiles', JSON.stringify(profiles)); } catch {}
+    try { localStorage.setItem('global-wallpaper-profiles', JSON.stringify(profiles)); } catch { /* ignore */ }
   }, []);
 
   // Save themes to storage
@@ -195,7 +195,7 @@ export function AdvancedThemeProvider({
           ? 'darkzone'
           : 'none';
         (window as any).owSounds?.setPreset?.(preset);
-      } catch {}
+      } catch { /* ignore */ }
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply theme');
@@ -405,7 +405,7 @@ export function AdvancedThemeProvider({
 
   const setLowPower = useCallback((enabled: boolean) => {
     setLowPowerMode(enabled);
-    try { localStorage.setItem('low-power-mode', enabled ? '1' : '0'); } catch {}
+    try { localStorage.setItem('low-power-mode', enabled ? '1' : '0'); } catch { /* ignore */ }
     if (currentTheme) applyTheme(currentTheme);
   }, [currentTheme, applyTheme]);
 

@@ -50,11 +50,11 @@ export default function PageCanvas({ pageId, widgets, isEditing = true }: PageCa
   });
 
   useEffect(() => {
-    try { localStorage.setItem(storageKey, JSON.stringify(layout)); } catch {}
+    try { localStorage.setItem(storageKey, JSON.stringify(layout)); } catch { /* ignore */ }
   }, [layout, storageKey]);
 
   useEffect(() => {
-    try { localStorage.setItem(styleKey, JSON.stringify(stylesMap)); } catch {}
+    try { localStorage.setItem(styleKey, JSON.stringify(stylesMap)); } catch { /* ignore */ }
   }, [stylesMap, styleKey]);
 
   const initialLayout = useMemo(() => layout, []);

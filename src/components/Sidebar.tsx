@@ -67,7 +67,7 @@ function useNavConfig() {
   });
 
   useEffect(() => {
-    try { localStorage.setItem('sidebar-nav-config', JSON.stringify(config)); } catch {}
+    try { localStorage.setItem('sidebar-nav-config', JSON.stringify(config)); } catch { /* ignore */ }
   }, [config]);
 
   return { config, setConfig } as const;
@@ -99,14 +99,28 @@ const Sidebar = () => {
               </span>
             </div>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8"
-          >
-            {isCollapsed ? <Menu className="h-4 w-4" /> : <CloseIcon className="h-4 w-4" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden md:inline-flex"
+              onClick={() => (window as any).owEffects?.set?.({ minimal: true })}
+            >Minimal</Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden md:inline-flex"
+              onClick={() => (window as any).owEffects?.set?.({ minimal: false })}
+            >Full</Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="h-8 w-8"
+            >
+              {isCollapsed ? <Menu className="h-4 w-4" /> : <CloseIcon className="h-4 w-4" />}
+            </Button>
+          </div>
         </div>
 
         {/* Navigation */}

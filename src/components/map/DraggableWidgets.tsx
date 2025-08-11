@@ -94,7 +94,7 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) return JSON.parse(raw);
-    } catch {}
+    } catch { /* ignore */ }
     return [
       {
         id: 'comms',
@@ -220,7 +220,7 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
 
   useEffect(() => {
     onLayoutChange?.(widgets);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets)); } catch {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets)); } catch { /* ignore */ }
   }, [widgets, onLayoutChange]);
 
   if (!isVisible) return null;
