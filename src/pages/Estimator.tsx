@@ -397,6 +397,18 @@ const Estimator = () => {
                   <Input type="number" min={0} value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
+                  <Label>Oil spots area (sq ft)</Label>
+                  <div className="flex gap-2">
+                    <Input type="number" min={0} value={params.oilSpotSquareFeet} onChange={e => setParams(p => ({ ...p, oilSpotSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
+                    <Button type="button" variant="outline" onClick={() => {
+                      const m = (window as any).mapMethods;
+                      // If OverWatch map exposes last polygon area in m.lastAreaSqFt, use it
+                      const area = (m?.lastAreaSqFt || 0);
+                      if (area > 0) setParams(p => ({ ...p, oilSpotSquareFeet: Math.round(area) }));
+                    }}>Use map</Button>
+                  </div>
+                </div>
+                <div>
                   <Label>Crack hours</Label>
                   <Input type="number" step="0.5" min={0} onBlur={e => setParams(p => ({ ...p, crackHours: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>

@@ -178,7 +178,8 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         addGeoJSONSource,
         addLayer,
         flyTo,
-        getMap: () => map.current
+        getMap: () => map.current,
+        lastAreaSqFt: (window as any).mapMethods?.lastAreaSqFt || 0,
       };
     }
   }, [mapLoaded]);
