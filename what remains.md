@@ -24,9 +24,9 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
   - [IP] Supabase schema tables (users, jobs, customers, business_overrides)
   - [NS] Migration utility from localStorage; conflict resolution UI
 - Exports & Invoicing
-  - [NS] Branded PDF invoices (logo, terms, signatures) and email/share workflow
-  - [NS] CSV import with mapping, preview, validation
-  - [NS] Estimate → Project conversion and change orders
+  - [IP] Branded PDF invoices (logo, terms, signatures) and email/share
+  - [IP] CSV import with mapping; import preview + validation
+  - [IP] Estimate → Project conversion and change orders
 - QA, CI/CD & Security
   - [NS] Expand unit tests across estimator helpers and edge cases; E2E flows
   - [NS] GitHub Actions (lint, typecheck, test, build)

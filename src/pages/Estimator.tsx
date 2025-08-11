@@ -383,6 +383,14 @@ const Estimator = () => {
                   <Input type="number" min={0} value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
+                  <Label>Crack hours</Label>
+                  <Input type="number" step="0.5" min={0} onBlur={e => setParams(p => ({ ...p, crackHours: Math.max(0, Number(e.target.value) || 0) }))} />
+                </div>
+                <div>
+                  <Label>Propane $/hr</Label>
+                  <Input type="number" step="0.01" min={0} onBlur={e => setParams(p => ({ ...p, propaneCostPerHour: Math.max(0, Number(e.target.value) || 0) }))} />
+                </div>
+                <div>
                   <Label>Standard stalls</Label>
                   <Input type="number" value={params.numStandardStalls} onChange={e => setParams(p => ({ ...p, numStandardStalls: Number(e.target.value) }))} />
                 </div>

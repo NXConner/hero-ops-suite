@@ -25,6 +25,8 @@ export interface EstimateInput {
   additives?: boolean;
   // Crack detail
   deepCrackPrefillPct?: number; // 0..1 portion needing sand prefill
+  crackHours?: number;
+  propaneCostPerHour?: number;
   // Crew & labor
   numFullTime: number; // e.g., 2
   numPartTime: number; // e.g., 1
@@ -180,7 +182,8 @@ export function computeSealcoatMaterials(
 export function computeCrackFill(
   linearFeet: number,
   unitCosts: { crackBox: number; propaneTank: number },
-  pricePerFoot: number
+  pricePerFoot: number,
+  opts?: { crackHours?: number; propaneCostPerHour?: number }
 ) {
   const boxes = Math.ceil(linearFeet / 150);
   const propaneTanks = Math.max(1, Math.ceil(boxes / 2));
@@ -199,8 +202,12 @@ export function computeCrackFill(
     unitCost: unitCosts.propaneTank,
     cost: roundToTwo(propaneTanks * unitCosts.propaneTank)
   };
+  const extraPropaneByHours = Math.max(0, (opts?.crackHours ?? 0) * (opts?.propaneCostPerHour ?? 0));
+  const extraLine: EstimateBreakdownItem | null = extraPropaneByHours > 0 ? { label: 'Propane (hours)', cost: roundToTwo(extraPropaneByHours), notes: `${opts?.crackHours} hr @ $${opts?.propaneCostPerHour}/hr` } : null;
   const sellPrice = roundToTwo(linearFeet * pricePerFoot);
-  return { materialCost: roundToTwo(materialCost), items: [lineItemMaterial, lineItemPropane], sellPrice };
+  const items = [lineItemMaterial, lineItemPropane];
+  if (extraLine) items.push(extraLine);
+  return { materialCost: roundToTwo(materialCost + extraPropaneByHours), items, sellPrice };
 }
 
 export function computePatching(
@@ -411,7 +418,7 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
   if (input.serviceType === 'crack_filling' || input.serviceType === 'combo_driveway' || input.serviceType === 'combo_parkinglot') {
     const lf = input.crackLinearFeet || 0;
     if (lf > 0) {
-      const crack = computeCrackFill(lf, { crackBox: input.crackBoxPricePer30lb, propaneTank: input.propanePerTank }, DEFAULTS.crackFillRatePerFoot);
+      const crack = computeCrackFill(lf, { crackBox: input.crackBoxPricePer30lb, propaneTank: input.propanePerTank }, DEFAULTS.crackFillRatePerFoot, { crackHours: input.crackHours, propaneCostPerHour: input.propaneCostPerHour });
       materials = materials.concat(crack.items);
       baseSellFromTasks += crack.sellPrice;
       const deepPct = input.deepCrackPrefillPct ?? 0;
