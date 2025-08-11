@@ -53,8 +53,8 @@ const defaultNav: NavItemConfig[] = [
   { name: 'Intel Reports', href: '/intel-reports', icon: 'FileText' },
   { name: 'PavementScan Pro', href: '/pavement-scan-pro', icon: 'Scan', badge: 'NEW' },
   { name: 'Estimator', href: '/pavement-estimator', icon: 'Shield', badge: 'BETA' },
-  { name: 'Fleet & Field Ops', href: '/operations-suite', icon: 'LayoutDashboard', badge: 'BETA' },
-  { name: 'Fleet Focus Manager', href: '/operations-suite?app=fleet', icon: 'LayoutDashboard', parent: '/operations-suite' },
+  { name: 'Fleet & Field Ops', href: '/fleet-field-ops', icon: 'LayoutDashboard', badge: 'BETA' },
+  { name: 'Fleet Focus Manager', href: '/fleet-field-ops?app=fleet', icon: 'LayoutDashboard', parent: '/fleet-field-ops' },
   { name: 'Mobile Companion', href: '/mobile-companion', icon: 'LayoutDashboard', badge: 'WEB' },
   { name: 'Settings', href: '/settings', icon: 'Settings' }
 ];

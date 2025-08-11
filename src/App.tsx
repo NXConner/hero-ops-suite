@@ -71,6 +71,7 @@ const App = () => (
                  <Route path="/contractor-portal" element={<ContractorPortal />} />
                                   <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
                    <Route path="/builder" element={<Builder />} />
+                 <Route path="/fleet-field-ops" element={<OperationsSuite />} />
                  <Route path="/operations-suite" element={<OperationsSuite />} />
                  <Route path="/mobile-companion" element={<MobileCompanion />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
