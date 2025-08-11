@@ -113,6 +113,7 @@ const Settings = () => {
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
               <TabsTrigger value="display">Display</TabsTrigger>
+              <TabsTrigger value="data">Data</TabsTrigger>
             </TabsList>
 
 
@@ -1231,6 +1232,54 @@ const Settings = () => {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+
+            <TabsContent value="data" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+                <CardHeader>
+                  <CardTitle>Data Migration & Import</CardTitle>
+                  <CardDescription>Sync local data to Supabase and import CSVs with mapping</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Supabase Sync</Label>
+                    <p className="text-sm text-muted-foreground">Push local Jobs and Customers to Supabase (best-effort)</p>
+                    <Button type="button" onClick={async () => {
+                      const jobs = (await import('@/services/jobs')).listJobs();
+                      const { saveJob } = await import('@/services/jobs');
+                      for (const j of jobs) { await saveJob(j); }
+                      const customers = (await import('@/services/customers')).listCustomers();
+                      const { saveCustomer } = await import('@/services/customers');
+                      for (const c of customers) { await saveCustomer(c); }
+                    }}>Push Local → Supabase</Button>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <Label>CSV Import (Jobs)</Label>
+                    <input type="file" accept=".csv,text/csv" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const text = await file.text();
+                      const { importCSVWithMapping } = await import('@/services/exportImport');
+                      const mapping = { columns: { id: 'id', name: 'name', address: 'address', serviceType: 'serviceType', params: 'params' } };
+                      const result = importCSVWithMapping(text, mapping, () => null, (row: any) => ({
+                        id: row.id || undefined,
+                        name: row.name,
+                        address: row.address,
+                        serviceType: row.serviceType,
+                        params: (() => { try { return JSON.parse(row.params || '{}'); } catch { return {}; } })(),
+                        createdAt: Date.now(),
+                        updatedAt: Date.now(),
+                      }));
+                      const { saveJob } = await import('@/services/jobs');
+                      for (const j of result.rows) { await saveJob(j as any); }
+                      alert(`Imported ${result.rows.length} jobs. Errors: ${result.errors.length}`);
+                    }} />
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>

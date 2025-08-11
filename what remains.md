@@ -7,22 +7,22 @@
 Status key: [NS] Not Started, [IP] In Progress, [D] Done
 
 - Totals & Tax
-  - [IP] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
+  - [D] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
 - Estimator Inputs & UX
   - [IP] Structured address inputs with autocomplete; route map preview (supplier → job → return)
   - [NS] Preset templates (Driveway / Parking Lot)
 - Calculators
   - [IP] Trailer MPG modifiers and leg-based fuel costing
   - [IP] Patching: tack coat/additives toggles; productivity curves by thickness/material
-  - [NS] Crack: propane by hours; deep/wide sand prefill tuning
+  - [IP] Crack: propane by hours; deep/wide sand prefill tuning
   - [IP] Sealcoat: multi-coat, waste factor, method productivity
   - [NS] Oil-spot polygon input with per-area prep-seal calculation
 - Striping
   - [IP] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas
 - Persistence & Data
   - [IP] Supabase adapters for jobs/customers (best-effort sync, local fallback)
-  - [IP] Supabase schema tables (users, jobs, customers, business_overrides)
-  - [NS] Migration utility from localStorage; conflict resolution UI
+  - [IP] Supabase schema tables (users, jobs, customers, business_overrides, projects)
+  - [IP] Migration utility from localStorage; conflict resolution UI
 - Exports & Invoicing
   - [D] Branded PDF invoices (header styling); email/share stub
   - [IP] CSV import with mapping; import preview + validation
@@ -30,11 +30,11 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
 - QA, CI/CD & Security
   - [IP] Expand unit tests across estimator helpers and edge cases; E2E flows
   - [IP] GitHub Actions (lint, typecheck, test, build)
-  - [NS] Error tracking (Sentry); CSP and dependency updates
+  - [IP] Error tracking (Sentry); CSP and dependency updates
 - Performance/UX
-  - [IP] Persist map layer and overlay preferences (basemap selection, radar opacity/toggles)
+  - [D] Persist map layer and overlay preferences (basemap selection, radar opacity/toggles)
   - [NS] Lazy-load heavy exporters/geocode libs; PWA/offline for quoting
-  - [NS] Geocode throttling UI, spinners, and error toasts
+  - [IP] Geocode throttling UI, spinners, and error toasts
 
 Notes:
 - Items in UPDATEDTODOLIST marked complete but not found in this codebase were treated as not applicable for this repo (e.g., UnifiedMap page, Supplier Receipts CSV page, Cost Analyzer modal). Radar/weather overlay and OverWatch page exist; advanced basemap preference persistence not verified.
