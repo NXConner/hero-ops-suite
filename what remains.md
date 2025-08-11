@@ -4,10 +4,10 @@
 
 ## Condensed remaining (cross-checked) — Status
 
-Status key: [NS] Not Started, [IP] In Progress, [D] Done
+Status key: [NS] Not Started, [IP] In Progress, [P] Completed
 
 - Totals & Tax
-  - [D] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
+  - [P] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
 - Estimator Inputs & UX
   - [IP] Structured address inputs with autocomplete; route map preview (supplier → job → return)
   - [NS] Preset templates (Driveway / Parking Lot)
@@ -24,7 +24,7 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
   - [IP] Supabase schema tables (users, jobs, customers, business_overrides, projects)
   - [IP] Migration utility from localStorage; conflict resolution UI
 - Exports & Invoicing
-  - [D] Branded PDF invoices (header styling); email/share stub
+  - [P] Branded PDF invoices (header styling); email/share stub
   - [IP] CSV import with mapping; import preview + validation
   - [IP] Estimate → Project conversion and change orders
 - QA, CI/CD & Security
@@ -32,7 +32,7 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
   - [IP] GitHub Actions (lint, typecheck, test, build)
   - [IP] Error tracking (Sentry); CSP and dependency updates
 - Performance/UX
-  - [D] Persist map layer and overlay preferences (basemap selection, radar opacity/toggles)
+  - [P] Persist map layer and overlay preferences (basemap selection, radar opacity/toggles)
   - [NS] Lazy-load heavy exporters/geocode libs; PWA/offline for quoting
   - [IP] Geocode throttling UI, spinners, and error toasts
 
