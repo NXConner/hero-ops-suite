@@ -59,7 +59,7 @@ const OperationsSuite = () => {
       <iframe
         key={path}
         ref={iframeRef}
-        title="Operations Suite"
+        title="Fleet & Field Ops"
         src={path}
         style={{ width: '100%', height }}
         className="rounded-md border border-border bg-background"
