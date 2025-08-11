@@ -23,6 +23,7 @@ import {
   Pause,
   RotateCcw
 } from 'lucide-react';
+import VehicleChecklists from '@/components/fleet/VehicleChecklists';
 
 interface Vehicle {
   id: string;
@@ -586,10 +587,11 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="assets" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-slate-800">
+          <TabsList className="grid w-full grid-cols-4 bg-slate-800">
             <TabsTrigger value="assets" className="text-xs">Assets</TabsTrigger>
             <TabsTrigger value="alerts" className="text-xs">Alerts</TabsTrigger>
             <TabsTrigger value="history" className="text-xs">History</TabsTrigger>
+            <TabsTrigger value="checklists" className="text-xs">Checklists</TabsTrigger>
           </TabsList>
 
           <TabsContent value="assets" className="space-y-3">
@@ -715,6 +717,10 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
                 Data points: {realTimeData.length}
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="checklists" className="space-y-3">
+            <VehicleChecklists vehicles={vehicles.map(v => ({ id: v.id, name: v.name }))} />
           </TabsContent>
         </Tabs>
       </CardContent>
