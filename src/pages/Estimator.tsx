@@ -174,8 +174,8 @@ const Estimator = () => {
     if (miles && Number.isFinite(miles)) setRoundTripMilesJob(miles);
   };
 
-  const handleSaveJob = () => {
-    const record = saveJob({
+  const handleSaveJob = async () => {
+    const record = await saveJob({
       name: jobName || `Job ${new Date().toLocaleString()}`,
       address: jobAddress,
       serviceType,
