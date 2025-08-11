@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Asphalt Mobile",
+    "slug": "asphalt-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0b1c2c"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {},
+    "web": {}
+  }
+}

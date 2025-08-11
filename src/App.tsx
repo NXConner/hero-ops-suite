@@ -28,6 +28,8 @@ const OverWatch = lazy(() => import("./pages/OverWatch"));
 const Estimator = lazy(() => import("./pages/Estimator"));
 const Builder = lazy(() => import("./pages/Builder"));
 const AdvancedThemeCustomizer = lazy(() => import("./components/theme/AdvancedThemeCustomizer"));
+const ClientPortal = lazy(() => import("./pages/ClientPortal"));
+const ContractorPortal = lazy(() => import("./pages/ContractorPortal"));
 
 const queryClient = new QueryClient();
 
@@ -60,11 +62,13 @@ const App = () => (
                 <Route path="/communications" element={<Communications />} />
                 <Route path="/intel-reports" element={<IntelReports />} />
                 <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
-                <Route path="/overwatch" element={<OverWatch />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/pavement-estimator" element={<Estimator />} />
-                                 <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
-                 <Route path="/builder" element={<Builder />} />
+                                 <Route path="/overwatch" element={<OverWatch />} />
+                 <Route path="/settings" element={<Settings />} />
+                 <Route path="/pavement-estimator" element={<Estimator />} />
+                 <Route path="/client-portal" element={<ClientPortal />} />
+                 <Route path="/contractor-portal" element={<ContractorPortal />} />
+                                  <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
+                   <Route path="/builder" element={<Builder />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                 </Routes>
