@@ -7,7 +7,7 @@
 Status key: [NS] Not Started, [IP] In Progress, [D] Done
 
 - Totals & Tax
-  - [NS] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
+  - [IP] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
 - Estimator Inputs & UX
   - [NS] Structured address inputs with autocomplete; route map preview (supplier → job → return)
   - [NS] Preset templates (Driveway / Parking Lot)
@@ -31,7 +31,7 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
   - [NS] GitHub Actions (lint, typecheck, test, build)
   - [NS] Error tracking (Sentry); CSP and dependency updates
 - Performance/UX
-  - [NS] Persist map layer and overlay preferences (basemap selection, radar opacity/toggles)
+  - [IP] Persist map layer and overlay preferences (basemap selection, radar opacity/toggles)
   - [NS] Lazy-load heavy exporters/geocode libs; PWA/offline for quoting
   - [NS] Geocode throttling UI, spinners, and error toasts
 

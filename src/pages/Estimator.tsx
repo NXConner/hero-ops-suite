@@ -91,7 +91,8 @@ const Estimator = () => {
     prepSealPricePer5Gal: BUSINESS_PROFILE.materials.prepSealPricePer5Gal,
     crackBoxPricePer30lb: BUSINESS_PROFILE.materials.crackBoxPricePer30lb,
     propanePerTank: BUSINESS_PROFILE.materials.propanePerTank,
-    includeTransportWeightCheck: includeWeightCheck
+    includeTransportWeightCheck: includeWeightCheck,
+    applySalesTax: (params as any).applySalesTax === true
   }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, pmmPrice, includeWeightCheck, sealerActiveHours, excessiveIdleHours]);
 
   const result = useMemo(() => buildEstimate(estimateInput), [estimateInput]);
@@ -123,6 +124,9 @@ const Estimator = () => {
     lines.push(`${result.overhead.label}: ${formatMoney(result.overhead.cost)}`);
     lines.push(`${result.profit.label}: ${formatMoney(result.profit.cost)}`);
     lines.push(`Total: ${formatMoney(result.total)}`);
+    if ((params as any).applySalesTax) {
+      lines.push(`(Sales tax included in Total)`);
+    }
     if (result.transportLoad) {
       lines.push('');
       lines.push(`Transport Load: ~${result.transportLoad.totalWeightLbs} lbs. ${result.transportLoad.exceedsLikelyGvwr ? 'Check GVWR!' : ''}`);
@@ -175,6 +179,7 @@ const Estimator = () => {
         includeWeightCheck,
         pmmPrice,
         notes,
+        applySalesTax: (params as any).applySalesTax === true,
       },
     });
     setJobs(listJobs());
@@ -211,6 +216,7 @@ const Estimator = () => {
     setIncludeWeightCheck(!!j.params.includeWeightCheck);
     setPmmPrice(j.params.pmmPrice ?? BUSINESS_PROFILE.materials.pmmPricePerGallon);
     setNotes(j.params.notes ?? '');
+    setParams(p => ({ ...p, applySalesTax: !!(j as any).params?.applySalesTax }));
   };
 
   const handleUseMyLocation = async () => {
@@ -438,6 +444,16 @@ const Estimator = () => {
                     <SelectContent>
                       <SelectItem value="yes">Include</SelectItem>
                       <SelectItem value="no">Exclude</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Apply sales tax</Label>
+                  <Select value={(params as any).applySalesTax ? 'yes' : 'no'} onValueChange={(v) => setParams(p => ({ ...p, applySalesTax: v === 'yes' }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

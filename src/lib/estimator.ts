@@ -47,6 +47,7 @@ export interface EstimateInput {
   propanePerTank: number; // 10
   // Options
   includeTransportWeightCheck?: boolean;
+  applySalesTax?: boolean; // per‑job toggle to include sales tax in total
 }
 
 export interface EstimateBreakdownItem {
@@ -428,7 +429,15 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
 
   const overheadCost = roundToTwo(subtotal * DEFAULTS.overheadPct);
   const profitCost = roundToTwo((subtotal + overheadCost) * DEFAULTS.profitPct);
-  const total = roundToTwo(subtotal + overheadCost + profitCost);
+  let total = roundToTwo(subtotal + overheadCost + profitCost);
+
+  // Sales tax (optional per-job)
+  const taxPct = BUSINESS_PROFILE.pricing.salesTaxPct ?? 0;
+  if (input.applySalesTax && taxPct > 0) {
+    const tax = roundToTwo(total * taxPct);
+    materials.push({ label: `Sales Tax (${Math.round(taxPct * 100)}%)`, cost: tax });
+    total = roundToTwo(total + tax);
+  }
 
   const totalWith25PctMarkup = roundToTwo(total * 1.25);
   const roundedTotal = Math.ceil(total / 10) * 10;
@@ -438,13 +447,6 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
   let transportLoad: EstimateOutput['transportLoad'];
   if (input.includeTransportWeightCheck && scContext) {
     transportLoad = computeTransportLoad(scContext.concentrateGallons, scContext.sandBags, scContext.waterGallons);
-  }
-
-  const taxPct = BUSINESS_PROFILE.pricing.salesTaxPct ?? 0;
-  if (taxPct > 0) {
-    const tax = roundToTwo(total * taxPct);
-    materials.push({ label: `Sales Tax (${Math.round(taxPct * 100)}%)`, cost: tax });
-    // update totals to reflect tax separately if desired; leaving total as-is keeps prior logic
   }
 
   notes.push('Estimate valid for 30 days. Subject to site inspection.');
