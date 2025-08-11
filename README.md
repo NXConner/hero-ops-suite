@@ -17,10 +17,15 @@ This repository contains:
 1. Install dependencies:
    - `cd mobile`
    - `npm install`
-2. Configure environment variables in `mobile/src/config/index.ts`:
-   - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and optional API base.
+2. Configure API base (default points to local server):
+   - Edit `mobile/src/config/index.ts` if needed.
 3. Run in development:
    - `npm run start`
+
+### Local API server (dev)
+1. `cd server && npm install`
+2. `npm start` (starts on http://localhost:3001)
+3. Mobile app uses this base to call endpoints like `/scans`, `/scans/{id}/overlay`.
 
 ## Modules
 - Overlay schema (single source of truth) in `mobile/src/types/overlay.ts`.
