@@ -7,6 +7,7 @@
     "packages/*"
   ],
   "scripts": {
+    "prebuild": "npm run --workspace=@asphalt/platform-sdk build",
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",

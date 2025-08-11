@@ -242,6 +242,9 @@ export interface Theme {
   tags: string[];
   featured: boolean;
   public: boolean;
+  // Veteran access control (optional)
+  requiresVeteran?: boolean;
+  branchTag?: 'army' | 'navy' | 'airforce' | 'marines' | 'coastguard' | 'spaceforce' | 'all';
 }
 
 export interface ThemePreset {
@@ -300,4 +303,11 @@ export interface ThemeContext {
   // Low power mode
   setLowPower: (enabled: boolean) => void;
   lowPowerMode: boolean;
+  // Veteran module
+  isVeteran: boolean;
+  setIsVeteran: (value: boolean) => void;
+  veteranBranch: string;
+  setVeteranBranch: (branch: string) => void;
+  isBranchWallpaperPersistent: boolean;
+  setIsBranchWallpaperPersistent: (enabled: boolean) => void;
 }

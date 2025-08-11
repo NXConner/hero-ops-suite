@@ -63,8 +63,21 @@ const Settings = () => {
     isGlobalWallpaperEnabled,
     setGlobalWallpaperOverride,
     setIsGlobalWallpaperEnabled,
-    setLowPower
-  , wallpaperProfiles, saveWallpaperProfile, applyWallpaperProfile, deleteWallpaperProfile } = useAdvancedTheme();
+    setLowPower,
+    wallpaperProfiles,
+    saveWallpaperProfile,
+    applyWallpaperProfile,
+    deleteWallpaperProfile,
+    // Veteran module
+    isVeteran,
+    setIsVeteran,
+    veteranBranch,
+    setVeteranBranch,
+    isBranchWallpaperPersistent,
+    setIsBranchWallpaperPersistent,
+    availableThemes,
+    setTheme
+  } = useAdvancedTheme();
 
   return (
     <div className="flex h-screen bg-background">
@@ -113,6 +126,7 @@ const Settings = () => {
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
               <TabsTrigger value="display">Display</TabsTrigger>
+              <TabsTrigger value="veteran">Veteran</TabsTrigger>
               <TabsTrigger value="data">Data</TabsTrigger>
             </TabsList>
 
@@ -1280,6 +1294,86 @@ const Settings = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="veteran" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-primary" />
+                      Veteran Verification
+                    </CardTitle>
+                    <CardDescription>Confirm your U.S. veteran status to unlock veteran-only content</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">I am a U.S. veteran</div>
+                        <div className="text-sm text-muted-foreground">Enable veteran features and themes</div>
+                      </div>
+                      <Switch
+                        checked={isVeteran}
+                        onCheckedChange={(v) => setIsVeteran(v)}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Branch of Service</Label>
+                        <Select value={veteranBranch} onValueChange={(v) => setVeteranBranch(v)} disabled={!isVeteran}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your branch" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="army">U.S. Army</SelectItem>
+                            <SelectItem value="navy">U.S. Navy</SelectItem>
+                            <SelectItem value="airforce">U.S. Air Force</SelectItem>
+                            <SelectItem value="marines">U.S. Marine Corps</SelectItem>
+                            <SelectItem value="coastguard">U.S. Coast Guard</SelectItem>
+                            <SelectItem value="spaceforce">U.S. Space Force</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Persistent Branch Wallpaper</Label>
+                        <div className="flex items-center justify-between rounded-md border border-border/50 p-3">
+                          <div className="text-sm text-muted-foreground">Use branch wallpaper across all themes</div>
+                          <Switch
+                            checked={isBranchWallpaperPersistent}
+                            onCheckedChange={(v) => setIsBranchWallpaperPersistent(v)}
+                            disabled={!isVeteran || !veteranBranch}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <ImageIcon className="h-5 w-5 text-primary" />
+                      Veteran Themes & Wallpapers
+                    </CardTitle>
+                    <CardDescription>Quickly apply veteran and branch-specific themes</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('veteran-patriot')}>Patriot</Button>
+                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-army')}>Army</Button>
+                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-navy')}>Navy</Button>
+                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-airforce')}>Air Force</Button>
+                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-marines')}>Marines</Button>
+                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-coastguard')}>Coast Guard</Button>
+                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-spaceforce')}>Space Force</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
