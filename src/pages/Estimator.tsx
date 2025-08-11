@@ -16,6 +16,7 @@ import { listCustomers, saveCustomer, type Customer } from '@/services/customers
 import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile } from '@/services/exporters';
 import RealMapComponent from '@/components/map/RealMapComponent';
 import { geocodeAddress } from '@/lib/geo';
+import { listProjects, saveProject, type Project } from '@/services/projects';
 
 const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
@@ -63,6 +64,7 @@ const Estimator = () => {
   const [jobName, setJobName] = useState('');
   const [customers, setCustomers] = useState<Customer[]>(listCustomers());
   const [customerName, setCustomerName] = useState('');
+  const [projects, setProjects] = useState<Project[]>(listProjects());
 
   // React to business profile changes
   useMemo(() => {
@@ -260,6 +262,18 @@ const Estimator = () => {
     if (!customerName || !jobAddress) return;
     await saveCustomer({ name: customerName, address: jobAddress, notes: '' });
     setCustomers(listCustomers());
+  };
+
+  const handleConvertToProject = async () => {
+    const record = await saveProject({
+      name: jobName || `Project ${new Date().toLocaleString()}`,
+      address: jobAddress,
+      status: 'planned',
+      serviceType,
+      estimate: result,
+    });
+    setProjects(listProjects());
+    setJobName(record.name);
   };
 
   return (
@@ -617,6 +631,7 @@ ${textInvoiceRounded}`}
                 <Button type="button" variant="outline" onClick={() => exportInvoicePDF(`${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`, jobName || 'invoice')}>Export PDF</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportJobsCSV(jobs), 'jobs.csv', 'text/csv')}>Jobs CSV</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportCustomersCSV(customers), 'customers.csv', 'text/csv')}>Customers CSV</Button>
+                <Button type="button" onClick={handleConvertToProject}>Convert to Project</Button>
               </div>
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -630,6 +645,22 @@ ${textInvoiceRounded}`}
                         </div>
                         <div className="flex gap-2">
                           <Button type="button" variant="outline" size="sm" onClick={() => handleLoadJob(j)}>Load</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label>Projects</Label>
+                  <div className="mt-2 space-y-2 max-h-64 overflow-auto">
+                    {projects.map(p => (
+                      <div key={p.id} className="flex items-center justify-between p-2 rounded border border-border/30">
+                        <div className="text-sm">
+                          <div className="font-medium">{p.name}</div>
+                          <div className="text-muted-foreground">{p.status}</div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" size="sm" onClick={() => setJobAddress(p.address)}>Use Address</Button>
                         </div>
                       </div>
                     ))}
