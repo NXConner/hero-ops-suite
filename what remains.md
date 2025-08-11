@@ -2,6 +2,26 @@
 
 This document summarizes the Division-inspired theming/effects implementation delivered, and lists remaining work to finish the end‑to‑end plan. It includes a consolidated to‑do list from this chat and an overall project checklist.
 
+## Field platform status (Mobile + Server + Web portals)
+
+- P Mobile (Expo)
+  - P Capture flow with mesh picker; optional Supabase upload to `meshes/`; updates `mesh_url` on server
+  - P Overlay handling and unified schema; estimator and branded PDF report
+  - P 3D viewer (GLTF load) with overlays: cracks (lines), distress polygons, slope vectors; offline queue flush
+  - P Settings (API base, branding), Pricing editor, Analytics (summary + prioritized), Login screen scaffold
+  - R Auth gating across screens; session persistence; slope heatmap shader; production Supabase wiring (auth/RLS)
+
+- P Server (Node dev API on 3002)
+  - P Scans CRUD (create, update), overlay upload/retrieval, persistence to disk
+  - P Config endpoints: pricing/branding; analytics (summary/prioritized); estimate from pricing; jobs/messages endpoints
+  - R Hook CV analysis endpoint to generate overlays; auth; production DB (Supabase) equivalent routes
+
+- P Web app
+  - P Client and Contractor portals added and routed; root build succeeds
+  - R Auth gating, role-based views, messaging UI polish; link to interactive 3D where applicable
+
+The rest of this document reflects the original theme/effects plan and remains valid. Items above are additive to that plan.
+
 ## Implemented, current state
 
 - Themes and theme system
