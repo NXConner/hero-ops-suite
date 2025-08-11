@@ -159,6 +159,25 @@ app.post('/jobs', async (req, res) => {
   res.json({ job_id });
 });
 
+app.get('/jobs', async (req, res) => {
+  const scan_id = req.query.scan_id;
+  const list = Array.from(jobs.values()).filter((j) => (scan_id ? j.scan_id === scan_id : true));
+  res.json({ jobs: list });
+});
+
+const messages = [];
+app.get('/messages', async (req, res) => {
+  const scan_id = req.query.scan_id;
+  const list = messages.filter((m) => (scan_id ? m.scan_id === scan_id : true));
+  res.json({ messages: list });
+});
+
+app.post('/messages', async (req, res) => {
+  const msg = { id: id(), ...req.body, timestamp: new Date().toISOString() };
+  messages.push(msg);
+  res.json({ message: msg });
+});
+
 app.post('/invoices', async (req, res) => {
   const invoice_id = id();
   invoices.set(invoice_id, { invoice_id, ...req.body, status: 'draft', created_at: new Date().toISOString() });

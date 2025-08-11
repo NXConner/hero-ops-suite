@@ -60,11 +60,13 @@ const App = () => (
                 <Route path="/communications" element={<Communications />} />
                 <Route path="/intel-reports" element={<IntelReports />} />
                 <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
-                <Route path="/overwatch" element={<OverWatch />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/pavement-estimator" element={<Estimator />} />
-                                 <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
-                 <Route path="/builder" element={<Builder />} />
+                                 <Route path="/overwatch" element={<OverWatch />} />
+                 <Route path="/settings" element={<Settings />} />
+                 <Route path="/pavement-estimator" element={<Estimator />} />
+                 <Route path="/client-portal" element={<(await import('./pages/ClientPortal')).default />} />
+                 <Route path="/contractor-portal" element={<(await import('./pages/ContractorPortal')).default />} />
+                                  <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
+                  <Route path="/builder" element={<Builder />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                 </Routes>
