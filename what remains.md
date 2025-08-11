@@ -1,5 +1,59 @@
 # What Remains
 
+<!-- Added condensed, cross-checked list and plan -->
+
+## Condensed remaining (cross-checked) — Status
+
+Status key: [NS] Not Started, [IP] In Progress, [D] Done
+
+- Totals & Tax
+  - [NS] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
+- Estimator Inputs & UX
+  - [NS] Structured address inputs with autocomplete; route map preview (supplier → job → return)
+  - [NS] Preset templates (Driveway / Parking Lot)
+- Calculators
+  - [NS] Trailer MPG modifiers and leg-based fuel costing
+  - [NS] Patching: tack coat/additives toggles; productivity curves by thickness/material
+  - [NS] Crack: propane by hours; deep/wide sand prefill tuning
+  - [NS] Sealcoat: multi-coat, waste factor, method productivity
+  - [NS] Oil-spot polygon input with per-area prep-seal calculation
+- Striping
+  - [NS] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas
+- Persistence & Data
+  - [NS] Supabase schema (users, business profile, price book, jobs, customers) and adapters
+  - [NS] Migration utility from localStorage; conflict resolution UI
+- Exports & Invoicing
+  - [NS] Branded PDF invoices (logo, terms, signatures) and email/share workflow
+  - [NS] CSV import with mapping, preview, validation
+  - [NS] Estimate → Project conversion and change orders
+- QA, CI/CD & Security
+  - [NS] Expand unit tests across estimator helpers and edge cases; E2E flows
+  - [NS] GitHub Actions (lint, typecheck, test, build)
+  - [NS] Error tracking (Sentry); CSP and dependency updates
+- Performance/UX
+  - [NS] Persist map layer and overlay preferences (basemap selection, radar opacity/toggles)
+  - [NS] Lazy-load heavy exporters/geocode libs; PWA/offline for quoting
+  - [NS] Geocode throttling UI, spinners, and error toasts
+
+Notes:
+- Items in UPDATEDTODOLIST marked complete but not found in this codebase were treated as not applicable for this repo (e.g., UnifiedMap page, Supplier Receipts CSV page, Cost Analyzer modal). Radar/weather overlay and OverWatch page exist; advanced basemap preference persistence not verified.
+
+## Strategic plan (effective & efficient)
+
+- Phase 1: Totals/Tax and Core UX (1–2 days)
+  - Implement per-job tax flag, calculator inclusion, UI surfacing; add branded invoice text scaffolding
+  - Add structured address fields with geocode autocomplete and route preview
+- Phase 2: Calculators & Striping (2–3 days)
+  - Trailer MPG modifiers and leg-based costing; patch/crack/sealcoat refinements; oil-spot polygon input
+  - Build stencil catalog data + picker UI; per-color deltas
+- Phase 3: Persistence & Exports (2–3 days)
+  - Supabase schema + adapters; migrate local data with conflict resolution
+  - Branded PDF invoices and CSV import mapping/preview/validation; Estimate → Project flow
+- Phase 4: QA/CI, Security, Perf (1–2 days)
+  - Unit/E2E tests; GitHub Actions; Sentry; CSP and deps updates; lazy-load/PWA; throttling UI and error toasts
+
+---
+
 This document summarizes the Division-inspired theming/effects implementation delivered, and lists remaining work to finish the end‑to‑end plan. It includes a consolidated to‑do list from this chat and an overall project checklist.
 
 ## Implemented, current state
