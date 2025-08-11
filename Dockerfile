@@ -42,6 +42,20 @@ COPY mobile/ .
 # Build Expo for web (static export)
 RUN npx expo export --platform web --output-dir dist
 
+# --- Builder ---
+FROM node:20-alpine AS builder_fleet
+WORKDIR /app_fleet
+
+# Install deps for Fleet Focus Manager
+COPY suite/fleet-focus-manager/package.json suite/fleet-focus-manager/package-lock.json* suite/fleet-focus-manager/bun.lockb* ./
+RUN npm ci --no-audit --no-fund --legacy-peer-deps || npm ci --no-audit --no-fund --legacy-peer-deps
+
+# Copy fleet sources
+COPY suite/fleet-focus-manager/ .
+
+# Build fleet with base path for subdirectory hosting
+RUN npm run build -- --base=/suite/fleet/
+
 # --- Runtime ---
 FROM nginx:alpine AS runtime
 WORKDIR /usr/share/nginx/html
@@ -50,6 +64,7 @@ WORKDIR /usr/share/nginx/html
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY --from=builder_odoo /app_odoo/dist /usr/share/nginx/html/suite
 COPY --from=builder_mobile /app_mobile/dist /usr/share/nginx/html/mobile
+COPY --from=builder_fleet /app_fleet/dist /usr/share/nginx/html/suite/fleet
 
 # Copy nginx config for SPA fallback
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
