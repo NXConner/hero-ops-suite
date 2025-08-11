@@ -12,10 +12,10 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
   - [IP] Structured address inputs with autocomplete; route map preview (supplier → job → return)
   - [NS] Preset templates (Driveway / Parking Lot)
 - Calculators
-  - [NS] Trailer MPG modifiers and leg-based fuel costing
-  - [NS] Patching: tack coat/additives toggles; productivity curves by thickness/material
+  - [IP] Trailer MPG modifiers and leg-based fuel costing
+  - [IP] Patching: tack coat/additives toggles; productivity curves by thickness/material
   - [NS] Crack: propane by hours; deep/wide sand prefill tuning
-  - [NS] Sealcoat: multi-coat, waste factor, method productivity
+  - [IP] Sealcoat: multi-coat, waste factor, method productivity
   - [NS] Oil-spot polygon input with per-area prep-seal calculation
 - Striping
   - [NS] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas

@@ -447,9 +447,23 @@ const Estimator = () => {
                   <Input type="number" step="0.01" min={0} value={fuelPrice} onChange={e => setFuelPrice(Math.max(0, Number(e.target.value) || 0))} />
                 </div>
                 <div>
+                  <Label>Trailer MPG modifier (%)</Label>
+                  <Input type="number" step="1" placeholder="e.g., -10 for -10%" onBlur={e => setParams(p => ({ ...p, trailerMpgModifierPct: (Number(e.target.value) || 0) / 100 }))} />
+                </div>
+                <div>
+                  <Label>Application method</Label>
+                  <Select value={(params as any).applicationMethod || 'spray'} onValueChange={(v) => setParams(p => ({ ...p, applicationMethod: v as any }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="spray">Spray</SelectItem>
+                      <SelectItem value="squeegee">Squeegee</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <Label>PMM price $/gal</Label>
                   <div className="flex gap-2">
-                    <Input type="number" step="0.01" value={pmmPrice} onChange={e => setPmmPrice(Number(e.target.value))} />
+                    <Input type="number" step="0.01" value={pmmPrice} onChange={e => setPmmPrice(Math.max(0, Number(e.target.value) || 0))} />
                     <Select onValueChange={(v) => setPmmPrice(v === 'bulk' ? BUSINESS_PROFILE.materials.pmmBulkPricePerGallon : BUSINESS_PROFILE.materials.pmmPricePerGallon)}>
                       <SelectTrigger className="w-[140px]"><SelectValue placeholder="Preset" /></SelectTrigger>
                       <SelectContent>
@@ -498,6 +512,42 @@ const Estimator = () => {
                       <SelectItem value="no">No</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <Label>Sealcoat coats</Label>
+                  <Select value={String((params as any).multiCoat || 1)} onValueChange={(v) => setParams(p => ({ ...p, multiCoat: Number(v) }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Waste factor (%)</Label>
+                  <Input type="number" step="1" placeholder="e.g., 5" onBlur={e => setParams(p => ({ ...p, wasteFactorPct: (Number(e.target.value) || 0) / 100 }))} />
+                </div>
+                <div>
+                  <Label>Tack coat / Additives</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select value={(params as any).tackCoat ? 'yes' : 'no'} onValueChange={(v) => setParams(p => ({ ...p, tackCoat: v === 'yes' }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="yes">Tack</SelectItem>
+                        <SelectItem value="no">No tack</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={(params as any).additives ? 'yes' : 'no'} onValueChange={(v) => setParams(p => ({ ...p, additives: v === 'yes' }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="yes">Additives</SelectItem>
+                        <SelectItem value="no">None</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 

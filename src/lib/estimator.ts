@@ -21,6 +21,8 @@ export interface EstimateInput {
   // Patching detail
   patchThicknessInches?: number; // default 2
   patchMaterial?: 'hot' | 'cold';
+  tackCoat?: boolean;
+  additives?: boolean;
   // Crack detail
   deepCrackPrefillPct?: number; // 0..1 portion needing sand prefill
   // Crew & labor
@@ -32,7 +34,9 @@ export interface EstimateInput {
   roundTripMilesJob: number; // business -> job -> business
   c30MpgLoaded?: number; // default 12
   dakotaMpg?: number; // default 17
+  trailerMpgModifierPct?: number; // e.g., -0.1 reduces mpg by 10%
   fuelPricePerGallon: number; // current fuel price
+  legBasedRouting?: boolean; // if true, cost legs separately (supplier->job->return)
   // Equipment operation
   sealerActiveHours?: number; // hours machine actively used
   equipmentActiveFuelGph?: number; // gallons per hour when active (default 2)
@@ -48,6 +52,9 @@ export interface EstimateInput {
   // Options
   includeTransportWeightCheck?: boolean;
   applySalesTax?: boolean; // per‑job toggle to include sales tax in total
+  multiCoat?: number; // e.g., 1,2
+  wasteFactorPct?: number; // e.g., 0.05
+  applicationMethod?: 'spray' | 'squeegee';
 }
 
 export interface EstimateBreakdownItem {
@@ -116,7 +123,7 @@ export function computeSealcoatMaterials(
   oilSpotSqft: number
 ) {
   const effectiveCoverage = DEFAULTS.mixedSealerCoverageSqftPerGal / (porosityFactor || 1);
-  const mixedGallonsNeeded = squareFeet / effectiveCoverage;
+  let mixedGallonsNeeded = squareFeet / effectiveCoverage;
   const concentrateGallons = mixedGallonsNeeded / (1 + DEFAULTS.waterPercent);
   const sandBags = (concentrateGallons / 100) * DEFAULTS.sandBagsPer100GalConcentrate;
   const fastDryGallons = (concentrateGallons / 125) * DEFAULTS.fastDryGalPer125GalConcentrate;
@@ -268,15 +275,17 @@ export function computeFuelAndEquipment(
   concentrateGallonsUsed?: number
 ) {
   const c30MpgBase = input.c30MpgLoaded ?? DEFAULTS.c30MpgLoaded;
-  const dakotaMpg = input.dakotaMpg ?? DEFAULTS.dakotaMpg;
+  const dakotaMpgBase = input.dakotaMpg ?? DEFAULTS.dakotaMpg;
   const fuelRate = input.fuelPricePerGallon;
   const degrade = BUSINESS_PROFILE.fuel.mpgDegradeLoadedPct ?? 0;
+  const trailerMod = input.trailerMpgModifierPct ?? 0;
 
   const c30Miles = input.roundTripMilesSupplier + input.roundTripMilesJob;
   const dakotaMiles = input.roundTripMilesJob;
-  const c30MpgEffective = c30Miles > 0 ? c30MpgBase * (1 - degrade) : c30MpgBase;
+  const c30MpgEffective = c30Miles > 0 ? c30MpgBase * (1 - degrade) * (1 + trailerMod) : c30MpgBase;
+  const dakotaMpgEffective = dakotaMiles > 0 ? dakotaMpgBase * (1 + trailerMod) : dakotaMpgBase;
   const c30Fuel = c30Miles / c30MpgEffective;
-  const dakotaFuel = dakotaMiles / dakotaMpg;
+  const dakotaFuel = dakotaMiles / dakotaMpgEffective;
   const travelFuelGallons = c30Fuel + dakotaFuel;
   const travelFuelCost = roundToTwo(travelFuelGallons * fuelRate);
 
@@ -363,6 +372,21 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
     concentrateGallons = sc.concentrateGallons;
     scContext = { concentrateGallons: sc.concentrateGallons, sandBags: sc.sandBags, waterGallons: sc.waterGallons } as any;
     materials = materials.concat(sc.materials);
+    // Multi-coat and waste factor
+    const coats = Math.max(1, input.multiCoat ?? 1);
+    if (coats > 1) {
+      const extraCoats = coats - 1;
+      const extraCost = roundToTwo((sc.materials.reduce((s, m) => s + m.cost, 0)) * extraCoats * 0.9); // assume 90% of initial per extra coat
+      materials.push({ label: `Additional Coats x${extraCoats}`, cost: extraCost });
+    }
+    if ((input.wasteFactorPct ?? 0) > 0) {
+      const baseMat = materials.reduce((s, m) => s + m.cost, 0);
+      const waste = roundToTwo(baseMat * (input.wasteFactorPct ?? 0));
+      materials.push({ label: `Waste Factor`, cost: waste, notes: `${Math.round((input.wasteFactorPct ?? 0) * 100)}%` });
+    }
+    // Application method productivity impact on labor hours
+    if (input.applicationMethod === 'spray') laborHours += Math.max(0, -0.2 * (sqft / 3000));
+    if (input.applicationMethod === 'squeegee') laborHours += Math.max(0.2, 0.2 * (sqft / 3000));
     projectDescription += `Sealcoating ${sqft} sq ft. `;
     laborHours += Math.max(2, sqft / 3000);
   }
@@ -372,6 +396,9 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
     if (patchSqft > 0) {
       const patch = computePatching(patchSqft, DEFAULTS.patchingPerSqft, input.patchThicknessInches ?? 2, (input.patchMaterial as any) ?? 'hot');
       baseSellFromTasks += patch.sellPrice;
+      // Tack coat/additives surcharges
+      if (input.tackCoat) materials.push({ label: 'Tack Coat', cost: roundToTwo(patchSqft * 0.15) });
+      if (input.additives) materials.push({ label: 'Additives', cost: roundToTwo(patchSqft * 0.10) });
       projectDescription += `Patching ${patchSqft} sq ft @ ${input.patchThicknessInches ?? 2}\" ${input.patchMaterial ?? 'hot'}-mix. `;
       laborHours += Math.max(1, patchSqft / 400);
     }
