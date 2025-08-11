@@ -297,11 +297,5 @@ export interface ThemeContext {
   saveWallpaperProfile: (name: string, wallpaper?: ThemeWallpaper | null) => void;
   applyWallpaperProfile: (name: string) => void;
   deleteWallpaperProfile: (name: string) => void;
-}
-
-// Extend Theme with optional UI tokens (kept optional for backward compatibility)
-declare module './theme' {
-  interface Theme {
-    ui?: ThemeUI;
-  }
+  
 }
