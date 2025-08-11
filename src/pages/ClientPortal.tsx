@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getApiBaseUrl } from '@/config/api';
+import { getApiBaseUrl, getAuthToken } from '@/config/api';
+import { createApiClient } from '@asphalt/platform-sdk';
 
 export default function ClientPortal() {
   const [scanId, setScanId] = useState('');
@@ -7,13 +8,14 @@ export default function ClientPortal() {
   const [overlay, setOverlay] = useState<any | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
 
-    const API = getApiBaseUrl();
+  const api = createApiClient({ baseUrl: getApiBaseUrl(), token: getAuthToken() || undefined });
+  const API = getApiBaseUrl();
 
   const load = async () => {
     if (!scanId) return;
-    const s = await fetch(`${API}/scans/${scanId}`).then((r) => r.json());
+    const s = await api.getScan(scanId);
     setScan(s.scan);
-    setOverlay(s.overlay);
+    setOverlay((s as any).overlay);
     const m = await fetch(`${API}/messages?scan_id=${scanId}`).then((r) => r.json());
     setMessages(m.messages || []);
   };

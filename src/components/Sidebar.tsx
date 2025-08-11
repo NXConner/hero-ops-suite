@@ -54,6 +54,7 @@ const defaultNav: NavItemConfig[] = [
   { name: 'PavementScan Pro', href: '/pavement-scan-pro', icon: 'Scan', badge: 'NEW' },
   { name: 'Estimator', href: '/pavement-estimator', icon: 'Shield', badge: 'BETA' },
   { name: 'Operations Suite', href: '/operations-suite', icon: 'LayoutDashboard', badge: 'BETA' },
+  { name: 'Mobile Companion', href: '/mobile-companion', icon: 'LayoutDashboard', badge: 'WEB' },
   { name: 'Settings', href: '/settings', icon: 'Settings' }
 ];
 
