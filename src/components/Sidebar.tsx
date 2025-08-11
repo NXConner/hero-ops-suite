@@ -20,6 +20,7 @@ import {
   Scan,
   Radar
 } from "lucide-react";
+import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
 
 interface NavItemConfig {
   name: string;
@@ -80,6 +81,7 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const { config } = useNavConfig();
+  const { isVeteran, veteranBranch } = useAdvancedTheme();
 
   const navigation = useMemo(() => config.filter(i => !i.hidden), [config]);
 
@@ -187,6 +189,14 @@ const Sidebar = () => {
                   Operational
                 </Badge>
               </div>
+              {isVeteran && (
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-muted-foreground">Veteran</div>
+                  <Badge variant="secondary" className="text-xs capitalize">
+                    {veteranBranch || 'Verified'}
+                  </Badge>
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <AdvancedThemeToggle />
                 <Button variant="ghost" size="icon" className="h-8 w-8">

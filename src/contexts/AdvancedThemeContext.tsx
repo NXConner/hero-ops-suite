@@ -36,6 +36,17 @@ export function AdvancedThemeProvider({
   const [isGlobalWallpaperEnabled, setIsGlobalWallpaperEnabledState] = useState<boolean>(false);
   const [wallpaperProfiles, setWallpaperProfiles] = useState<{ name: string; wallpaper: ThemeWallpaper }[]>([]);
 
+  // Veteran module state
+  const [isVeteran, setIsVeteranState] = useState<boolean>(() => {
+    try { return localStorage.getItem('is-veteran') === '1'; } catch { return false; }
+  });
+  const [veteranBranch, setVeteranBranchState] = useState<string>(() => {
+    try { return localStorage.getItem('veteran-branch') || ''; } catch { return ''; }
+  });
+  const [isBranchWallpaperPersistent, setIsBranchWallpaperPersistentState] = useState<boolean>(() => {
+    try { return localStorage.getItem('branch-wallpaper-persistent') === '1'; } catch { return false; }
+  });
+
   // Low power override
   const [lowPowerMode, setLowPowerMode] = useState<boolean>(() => {
     try { return localStorage.getItem('low-power-mode') === '1'; } catch { return false; }
@@ -93,15 +104,22 @@ export function AdvancedThemeProvider({
     }
   }, []);
 
-  // Initialize with default themes
+  // Initialize with default themes (plus veteran themes)
   useEffect(() => {
     const initializeThemes = async () => {
       try {
         setIsLoading(true);
         const { getDefaultThemes } = await import('@/data/default-themes');
         const defaultThemes = getDefaultThemes();
-        setAvailableThemes(defaultThemes);
-        const initialTheme = defaultThemes.find(t => t.id === defaultTheme) || defaultThemes[0];
+        let allThemes = defaultThemes;
+        try {
+          const { getVeteranThemes } = await import('@/data/veteran-themes');
+          allThemes = [...defaultThemes, ...getVeteranThemes()];
+        } catch {
+          // veteran themes file may not exist yet in some builds
+        }
+        setAvailableThemes(allThemes);
+        const initialTheme = allThemes.find(t => t.id === defaultTheme) || allThemes[0];
         if (initialTheme) {
           await applyTheme(initialTheme);
         }
@@ -122,6 +140,11 @@ export function AdvancedThemeProvider({
       const errors = validateTheme(theme);
       if (errors.length > 0) {
         throw new Error(`Invalid theme: ${errors.join(', ')}`);
+      }
+
+      // Block applying veteran-only themes if not verified
+      if ((theme as any).requiresVeteran && !isVeteran) {
+        throw new Error('This theme is available to verified U.S. veterans only.');
       }
 
       const performanceLevel = getPerformanceLevel();
@@ -201,7 +224,7 @@ export function AdvancedThemeProvider({
       setError(err instanceof Error ? err.message : 'Failed to apply theme');
       console.error('Theme application error:', err);
     }
-  }, [globalWallpaperOverride, isGlobalWallpaperEnabled, lowPowerMode]);
+  }, [globalWallpaperOverride, isGlobalWallpaperEnabled, lowPowerMode, isVeteran]);
 
   const setTheme = useCallback((themeId: string) => {
     const theme = [...availableThemes, ...customThemes].find(t => t.id === themeId);
@@ -378,6 +401,51 @@ export function AdvancedThemeProvider({
     persistProfiles(updated);
   }, [wallpaperProfiles, persistProfiles]);
 
+  // Veteran helpers
+  const getBranchWallpaper = useCallback((branch: string): ThemeWallpaper | null => {
+    const map: Record<string, ThemeWallpaper> = {
+      army: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [ { color: { h: 90, s: 60, l: 28 }, position: 0 }, { color: { h: 45, s: 80, l: 32 }, position: 100 } ] }, overlay: { color: { h: 0, s: 0, l: 0 }, opacity: 0.35, blendMode: 'multiply' } },
+      navy: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [ { color: { h: 220, s: 70, l: 30 }, position: 0 }, { color: { h: 50, s: 90, l: 40 }, position: 100 } ] }, overlay: { color: { h: 0, s: 0, l: 0 }, opacity: 0.35, blendMode: 'multiply' } },
+      airforce: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [ { color: { h: 210, s: 70, l: 40 }, position: 0 }, { color: { h: 0, s: 0, l: 75 }, position: 100 } ] }, overlay: { color: { h: 0, s: 0, l: 0 }, opacity: 0.3, blendMode: 'multiply' } },
+      marines: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [ { color: { h: 350, s: 80, l: 40 }, position: 0 }, { color: { h: 45, s: 85, l: 45 }, position: 100 } ] }, overlay: { color: { h: 0, s: 0, l: 0 }, opacity: 0.35, blendMode: 'multiply' } },
+      coastguard: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [ { color: { h: 200, s: 75, l: 40 }, position: 0 }, { color: { h: 10, s: 85, l: 48 }, position: 100 } ] }, overlay: { color: { h: 0, s: 0, l: 0 }, opacity: 0.3, blendMode: 'multiply' } },
+      spaceforce: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [ { color: { h: 250, s: 60, l: 35 }, position: 0 }, { color: { h: 210, s: 60, l: 30 }, position: 100 } ] }, overlay: { color: { h: 0, s: 0, l: 0 }, opacity: 0.4, blendMode: 'multiply' } },
+    };
+    return map[branch] || null;
+  }, []);
+
+  const applyBranchWallpaperIfNeeded = useCallback((branch: string, enabled: boolean) => {
+    if (enabled && branch) {
+      const wp = getBranchWallpaper(branch);
+      if (wp) {
+        setGlobalWallpaperOverride(wp);
+        setIsGlobalWallpaperEnabled(true);
+      }
+    } else if (!enabled) {
+      setIsGlobalWallpaperEnabled(false);
+    }
+  }, [getBranchWallpaper, setGlobalWallpaperOverride, setIsGlobalWallpaperEnabled]);
+
+  // Apply persisted branch wallpaper on load or when toggles change
+  useEffect(() => {
+    applyBranchWallpaperIfNeeded(veteranBranch, isBranchWallpaperPersistent);
+  }, [veteranBranch, isBranchWallpaperPersistent]);
+
+  const setIsVeteran = useCallback((value: boolean) => {
+    setIsVeteranState(value);
+    try { localStorage.setItem('is-veteran', value ? '1' : '0'); } catch {}
+  }, []);
+
+  const setVeteranBranch = useCallback((branch: string) => {
+    setVeteranBranchState(branch);
+    try { localStorage.setItem('veteran-branch', branch); } catch {}
+  }, []);
+
+  const setIsBranchWallpaperPersistent = useCallback((enabled: boolean) => {
+    setIsBranchWallpaperPersistentState(enabled);
+    try { localStorage.setItem('branch-wallpaper-persistent', enabled ? '1' : '0'); } catch {}
+  }, []);
+
   // Handle window resize for responsive themes
   useEffect(() => {
     const handleResize = () => {
@@ -409,9 +477,13 @@ export function AdvancedThemeProvider({
     if (currentTheme) applyTheme(currentTheme);
   }, [currentTheme, applyTheme]);
 
+  const filteredAvailableThemes = useMemo(() => {
+    return availableThemes.filter((t: any) => !t.requiresVeteran || isVeteran);
+  }, [availableThemes, isVeteran]);
+
   const contextValue = useMemo(() => ({
     currentTheme: currentTheme!,
-    availableThemes,
+    availableThemes: filteredAvailableThemes,
     presets,
     customThemes,
     setTheme,
@@ -436,10 +508,17 @@ export function AdvancedThemeProvider({
     deleteWallpaperProfile,
     // Low power
     setLowPower,
-    lowPowerMode
+    lowPowerMode,
+    // Veteran module
+    isVeteran,
+    setIsVeteran,
+    veteranBranch,
+    setVeteranBranch,
+    isBranchWallpaperPersistent,
+    setIsBranchWallpaperPersistent
   }), [
     currentTheme,
-    availableThemes,
+    filteredAvailableThemes,
     presets,
     customThemes,
     setTheme,
@@ -461,7 +540,10 @@ export function AdvancedThemeProvider({
     applyWallpaperProfile,
     deleteWallpaperProfile,
     setLowPower,
-    lowPowerMode
+    lowPowerMode,
+    isVeteran,
+    veteranBranch,
+    isBranchWallpaperPersistent
   ]);
 
   return (
