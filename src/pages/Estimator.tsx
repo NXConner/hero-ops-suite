@@ -14,6 +14,9 @@ import { computeRoundTripMilesBetween, reverseGeocode } from '@/lib/geo';
 import { saveJob, listJobs, type StoredJob } from '@/services/jobs';
 import { listCustomers, saveCustomer, type Customer } from '@/services/customers';
 import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile } from '@/services/exporters';
+import RealMapComponent from '@/components/map/RealMapComponent';
+import { geocodeAddress } from '@/lib/geo';
+import { listProjects, saveProject, type Project } from '@/services/projects';
 
 const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
@@ -35,6 +38,12 @@ const Estimator = () => {
     paintColor: 'yellow',
   });
   const [jobAddress, setJobAddress] = useState(BUSINESS_PROFILE.address.full);
+  const [jobStreet, setJobStreet] = useState('');
+  const [jobCity, setJobCity] = useState('');
+  const [jobState, setJobState] = useState('');
+  const [jobZip, setJobZip] = useState('');
+  const [jobCoords, setJobCoords] = useState<{lat:number; lon:number} | null>(null);
+  const [supplierCoords, setSupplierCoords] = useState<{lat:number; lon:number} | null>(null);
   const [roundTripMilesSupplier, setRoundTripMilesSupplier] = useState(BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier); // Stuart, VA ↔ Madison, NC approx
   const [roundTripMilesJob, setRoundTripMilesJob] = useState(0); // default same as business if unknown
   const [fuelPrice, setFuelPrice] = useState(DEFAULT_FUEL_PRICE);
@@ -55,6 +64,7 @@ const Estimator = () => {
   const [jobName, setJobName] = useState('');
   const [customers, setCustomers] = useState<Customer[]>(listCustomers());
   const [customerName, setCustomerName] = useState('');
+  const [projects, setProjects] = useState<Project[]>(listProjects());
 
   // React to business profile changes
   useMemo(() => {
@@ -63,6 +73,11 @@ const Estimator = () => {
     setNumFullTime(profile.crew.numFullTime);
     setNumPartTime(profile.crew.numPartTime);
     setPmmPrice(profile.materials.pmmPricePerGallon);
+    // Precompute supplier coords once
+    (async () => {
+      const sup = await geocodeAddress(BUSINESS_PROFILE.supplier.address.full);
+      if (sup) setSupplierCoords(sup);
+    })();
   }, [profile]);
 
   const estimateInput: EstimateInput = useMemo(() => ({
@@ -91,7 +106,8 @@ const Estimator = () => {
     prepSealPricePer5Gal: BUSINESS_PROFILE.materials.prepSealPricePer5Gal,
     crackBoxPricePer30lb: BUSINESS_PROFILE.materials.crackBoxPricePer30lb,
     propanePerTank: BUSINESS_PROFILE.materials.propanePerTank,
-    includeTransportWeightCheck: includeWeightCheck
+    includeTransportWeightCheck: includeWeightCheck,
+    applySalesTax: (params as any).applySalesTax === true
   }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, pmmPrice, includeWeightCheck, sealerActiveHours, excessiveIdleHours]);
 
   const result = useMemo(() => buildEstimate(estimateInput), [estimateInput]);
@@ -123,6 +139,9 @@ const Estimator = () => {
     lines.push(`${result.overhead.label}: ${formatMoney(result.overhead.cost)}`);
     lines.push(`${result.profit.label}: ${formatMoney(result.profit.cost)}`);
     lines.push(`Total: ${formatMoney(result.total)}`);
+    if ((params as any).applySalesTax) {
+      lines.push(`(Sales tax included in Total)`);
+    }
     if (result.transportLoad) {
       lines.push('');
       lines.push(`Transport Load: ~${result.transportLoad.totalWeightLbs} lbs. ${result.transportLoad.exceedsLikelyGvwr ? 'Check GVWR!' : ''}`);
@@ -157,8 +176,8 @@ const Estimator = () => {
     if (miles && Number.isFinite(miles)) setRoundTripMilesJob(miles);
   };
 
-  const handleSaveJob = () => {
-    const record = saveJob({
+  const handleSaveJob = async () => {
+    const record = await saveJob({
       name: jobName || `Job ${new Date().toLocaleString()}`,
       address: jobAddress,
       serviceType,
@@ -175,6 +194,7 @@ const Estimator = () => {
         includeWeightCheck,
         pmmPrice,
         notes,
+        applySalesTax: (params as any).applySalesTax === true,
       },
     });
     setJobs(listJobs());
@@ -211,6 +231,7 @@ const Estimator = () => {
     setIncludeWeightCheck(!!j.params.includeWeightCheck);
     setPmmPrice(j.params.pmmPrice ?? BUSINESS_PROFILE.materials.pmmPricePerGallon);
     setNotes(j.params.notes ?? '');
+    setParams(p => ({ ...p, applySalesTax: !!(j as any).params?.applySalesTax }));
   };
 
   const handleUseMyLocation = async () => {
@@ -218,13 +239,41 @@ const Estimator = () => {
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const addr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
       if (addr) setJobAddress(addr);
+      setJobStreet(''); setJobCity(''); setJobState(''); setJobZip('');
+      setJobCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
     });
   };
 
-  const handleSaveCustomer = () => {
+  const composeStructuredAddress = () => {
+    const parts = [jobStreet, jobCity, jobState, jobZip].map(s => (s||'').trim()).filter(Boolean);
+    return parts.join(', ');
+  };
+
+  const handleStructuredAddressBlur = async () => {
+    const full = composeStructuredAddress();
+    if (full) {
+      setJobAddress(full);
+      const res = await geocodeAddress(full);
+      setJobCoords(res);
+    }
+  };
+
+  const handleSaveCustomer = async () => {
     if (!customerName || !jobAddress) return;
-    saveCustomer({ name: customerName, address: jobAddress, notes: '' });
+    await saveCustomer({ name: customerName, address: jobAddress, notes: '' });
     setCustomers(listCustomers());
+  };
+
+  const handleConvertToProject = async () => {
+    const record = await saveProject({
+      name: jobName || `Project ${new Date().toLocaleString()}`,
+      address: jobAddress,
+      status: 'planned',
+      serviceType,
+      estimate: result,
+    });
+    setProjects(listProjects());
+    setJobName(record.name);
   };
 
   return (
@@ -275,31 +324,66 @@ const Estimator = () => {
                   }}>Download .txt</Button>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <div>
+                <Label>Address (structured)</Label>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                  <Input placeholder="Street" value={jobStreet} onChange={e => setJobStreet(e.target.value)} onBlur={handleStructuredAddressBlur} />
+                  <Input placeholder="City" value={jobCity} onChange={e => setJobCity(e.target.value)} onBlur={handleStructuredAddressBlur} />
+                  <Input placeholder="State" value={jobState} onChange={e => setJobState(e.target.value)} onBlur={handleStructuredAddressBlur} />
+                  <Input placeholder="ZIP" value={jobZip} onChange={e => setJobZip(e.target.value)} onBlur={handleStructuredAddressBlur} />
+                </div>
+                <div className="mt-2">
+                  <Label className="text-xs text-muted-foreground">Full Address</Label>
+                  <Input value={jobAddress} onChange={e => setJobAddress(e.target.value)} onBlur={async () => { const res = await geocodeAddress(jobAddress); setJobCoords(res); }} />
+                  <div className="text-xs text-muted-foreground mt-1">Use My Location will override structured fields.</div>
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <Button type="button" variant="outline" onClick={handleUseMyLocation}>Use My Location</Button>
+                  <Button type="button" variant="outline" onClick={handleComputeJobMiles}>Auto Miles</Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label>Service</Label>
-                  <Select value={serviceType} onValueChange={(v: ServiceType) => setServiceType(v)}>
-                    <SelectTrigger><SelectValue placeholder="Select service" /></SelectTrigger>
+                  <Select value={serviceType} onValueChange={(v) => setServiceType(v as ServiceType)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Services</SelectLabel>
-                        <SelectItem value="sealcoating">Sealcoating</SelectItem>
-                        <SelectItem value="crack_filling">Crack Filling</SelectItem>
-                        <SelectItem value="patching">Asphalt Patching</SelectItem>
-                        <SelectItem value="line_striping">Line Striping</SelectItem>
-                        <SelectItem value="combo_driveway">Driveway Combo</SelectItem>
-                        <SelectItem value="combo_parkinglot">Parking Lot Combo</SelectItem>
-                      </SelectGroup>
+                      <SelectItem value="sealcoating">Sealcoating</SelectItem>
+                      <SelectItem value="crack_filling">Crack Filling</SelectItem>
+                      <SelectItem value="patching">Patching</SelectItem>
+                      <SelectItem value="line_striping">Line Striping</SelectItem>
+                      <SelectItem value="combo_driveway">Driveway Combo</SelectItem>
+                      <SelectItem value="combo_parkinglot">Parking Lot Combo</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Job address</Label>
-                  <div className="flex gap-2">
-                    <Input value={jobAddress} onChange={e => setJobAddress(e.target.value)} />
-                    <Button type="button" variant="outline" onClick={handleUseMyLocation}>Use my location</Button>
-                  </div>
+                  <Label>Stall size</Label>
+                  <Select value={(params as any).stallSize || 'standard'} onValueChange={(v) => setParams(p => ({ ...p, stallSize: v }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="compact">Compact</SelectItem>
+                      <SelectItem value="truck">Truck</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+                <div>
+                  <Label>Paint color</Label>
+                  <Select value={params.paintColor} onValueChange={(v) => setParams(p => ({ ...p, paintColor: v }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {(BUSINESS_PROFILE.pricing.paintColors ?? ['yellow','white','blue']).map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <Label>Sealcoat sq ft</Label>
                   <Input type="number" min={0} value={params.sealcoatSquareFeet} onChange={e => setParams(p => ({ ...p, sealcoatSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
@@ -309,41 +393,35 @@ const Estimator = () => {
                   <Input type="number" min={0} value={params.patchSquareFeet} onChange={e => setParams(p => ({ ...p, patchSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
-                  <Label>Patch thickness (in)</Label>
-                  <Input type="number" step="0.5" min={1} max={6} onChange={e => (null)} onBlur={e => setParams(p => ({ ...p, patchThicknessInches: Math.min(6, Math.max(1, Number(e.currentTarget.value) || 2)) }))} placeholder="2" />
-                </div>
-                <div>
-                  <Label>Patch material</Label>
-                  <Select onValueChange={(v) => setParams(p => ({ ...p, patchMaterial: v as any }))}>
-                    <SelectTrigger><SelectValue placeholder="hot" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hot">Hot mix</SelectItem>
-                      <SelectItem value="cold">Cold patch</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Crack feet</Label>
+                  <Label>Crack LF</Label>
                   <Input type="number" min={0} value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
-                  <Label>Deep crack prefill (%)</Label>
-                  <Input type="number" step="5" min={0} max={100} onChange={e => (null)} onBlur={e => setParams(p => ({ ...p, deepCrackPrefillPct: Math.min(100, Math.max(0, Number(e.currentTarget.value) || 0)) }))} placeholder="0" />
+                  <Label>Oil spots area (sq ft)</Label>
+                  <div className="flex gap-2">
+                    <Input type="number" min={0} value={params.oilSpotSquareFeet} onChange={e => setParams(p => ({ ...p, oilSpotSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
+                    <Button type="button" variant="outline" onClick={() => {
+                      const m = (window as any).mapMethods;
+                      // If OverWatch map exposes last polygon area in m.lastAreaSqFt, use it
+                      const area = (m?.lastAreaSqFt || 0);
+                      if (area > 0) setParams(p => ({ ...p, oilSpotSquareFeet: Math.round(area) }));
+                    }}>Use map</Button>
+                  </div>
                 </div>
                 <div>
-                  <Label>Oil spots sq ft</Label>
-                  <Input type="number" min={0} value={params.oilSpotSquareFeet} onChange={e => setParams(p => ({ ...p, oilSpotSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
+                  <Label>Crack hours</Label>
+                  <Input type="number" step="0.5" min={0} onBlur={e => setParams(p => ({ ...p, crackHours: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
-                  <Label>Porosity factor</Label>
-                  <Input type="number" step="0.1" min={0.5} max={2.5} value={params.surfacePorosityFactor} onChange={e => setParams(p => ({ ...p, surfacePorosityFactor: Math.min(2.5, Math.max(0.5, Number(e.target.value) || 1)) }))} />
+                  <Label>Propane $/hr</Label>
+                  <Input type="number" step="0.01" min={0} onBlur={e => setParams(p => ({ ...p, propaneCostPerHour: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
-                  <Label>Stalls (single)</Label>
+                  <Label>Standard stalls</Label>
                   <Input type="number" value={params.numStandardStalls} onChange={e => setParams(p => ({ ...p, numStandardStalls: Number(e.target.value) }))} />
                 </div>
                 <div>
-                  <Label>Stalls (double)</Label>
+                  <Label>Double stalls</Label>
                   <Input type="number" value={params.numDoubleStalls} onChange={e => setParams(p => ({ ...p, numDoubleStalls: Number(e.target.value) }))} />
                 </div>
                 <div>
@@ -351,31 +429,16 @@ const Estimator = () => {
                   <Input type="number" value={params.numHandicapSpots} onChange={e => setParams(p => ({ ...p, numHandicapSpots: Number(e.target.value) }))} />
                 </div>
                 <div>
-                  <Label>Arrows</Label>
-                  <Input type="number" value={params.numArrows} onChange={e => setParams(p => ({ ...p, numArrows: Number(e.target.value) }))} />
-                </div>
-                <div>
                   <Label>Crosswalks count</Label>
                   <Input type="number" value={params.numCrosswalks} onChange={e => setParams(p => ({ ...p, numCrosswalks: Number(e.target.value) }))} />
                 </div>
                 <div>
                   <Label>Stop bars</Label>
-                  <Input type="number" min={0} onChange={e => setParams(p => ({ ...p, numStopBars: Math.max(0, Number(e.target.value) || 0) }))} />
+                  <Input type="number" value={(params as any).numStopBars || 0} onChange={e => setParams(p => ({ ...p, numStopBars: Number(e.target.value) }))} />
                 </div>
                 <div>
                   <Label>Text stencils</Label>
-                  <Input type="number" min={0} onChange={e => setParams(p => ({ ...p, numTextStencils: Math.max(0, Number(e.target.value) || 0) }))} />
-                </div>
-                <div>
-                  <Label>Paint color</Label>
-                  <Select value={params.paintColor} onValueChange={(v) => setParams(p => ({ ...p, paintColor: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Color" /></SelectTrigger>
-                    <SelectContent>
-                      {(BUSINESS_PROFILE.pricing.paintColors ?? ['yellow','white','blue']).map(c => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input type="number" value={(params as any).numTextStencils || 0} onChange={e => setParams(p => ({ ...p, numTextStencils: Number(e.target.value) }))} />
                 </div>
               </div>
 
@@ -399,9 +462,23 @@ const Estimator = () => {
                   <Input type="number" step="0.01" min={0} value={fuelPrice} onChange={e => setFuelPrice(Math.max(0, Number(e.target.value) || 0))} />
                 </div>
                 <div>
+                  <Label>Trailer MPG modifier (%)</Label>
+                  <Input type="number" step="1" placeholder="e.g., -10 for -10%" onBlur={e => setParams(p => ({ ...p, trailerMpgModifierPct: (Number(e.target.value) || 0) / 100 }))} />
+                </div>
+                <div>
+                  <Label>Application method</Label>
+                  <Select value={(params as any).applicationMethod || 'spray'} onValueChange={(v) => setParams(p => ({ ...p, applicationMethod: v as any }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="spray">Spray</SelectItem>
+                      <SelectItem value="squeegee">Squeegee</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <Label>PMM price $/gal</Label>
                   <div className="flex gap-2">
-                    <Input type="number" step="0.01" value={pmmPrice} onChange={e => setPmmPrice(Number(e.target.value))} />
+                    <Input type="number" step="0.01" value={pmmPrice} onChange={e => setPmmPrice(Math.max(0, Number(e.target.value) || 0))} />
                     <Select onValueChange={(v) => setPmmPrice(v === 'bulk' ? BUSINESS_PROFILE.materials.pmmBulkPricePerGallon : BUSINESS_PROFILE.materials.pmmPricePerGallon)}>
                       <SelectTrigger className="w-[140px]"><SelectValue placeholder="Preset" /></SelectTrigger>
                       <SelectContent>
@@ -441,6 +518,52 @@ const Estimator = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <div>
+                  <Label>Apply sales tax</Label>
+                  <Select value={(params as any).applySalesTax ? 'yes' : 'no'} onValueChange={(v) => setParams(p => ({ ...p, applySalesTax: v === 'yes' }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <Label>Sealcoat coats</Label>
+                  <Select value={String((params as any).multiCoat || 1)} onValueChange={(v) => setParams(p => ({ ...p, multiCoat: Number(v) }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Waste factor (%)</Label>
+                  <Input type="number" step="1" placeholder="e.g., 5" onBlur={e => setParams(p => ({ ...p, wasteFactorPct: (Number(e.target.value) || 0) / 100 }))} />
+                </div>
+                <div>
+                  <Label>Tack coat / Additives</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select value={(params as any).tackCoat ? 'yes' : 'no'} onValueChange={(v) => setParams(p => ({ ...p, tackCoat: v === 'yes' }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="yes">Tack</SelectItem>
+                        <SelectItem value="no">No tack</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={(params as any).additives ? 'yes' : 'no'} onValueChange={(v) => setParams(p => ({ ...p, additives: v === 'yes' }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="yes">Additives</SelectItem>
+                        <SelectItem value="no">None</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -462,6 +585,49 @@ const Estimator = () => {
 
           <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
             <CardHeader>
+              <CardTitle>Route Preview</CardTitle>
+              <CardDescription>Supplier → Job (approximate straight line)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 w-full rounded overflow-hidden border border-border/30">
+                <RealMapComponent
+                  center={jobCoords ? [jobCoords.lon, jobCoords.lat] : [-74.006, 40.7128]}
+                  zoom={jobCoords ? 10 : 3}
+                  styleUrl={'mapbox://styles/mapbox/streets-v12'}
+                >
+                  {/* Draw simple line using a GeoJSON source if both coords are present */}
+                  {jobCoords && supplierCoords && (
+                    (() => {
+                      const map = (window as any).mapMethods?.getMap?.();
+                      if (map && map.isStyleLoaded()) {
+                        const route = {
+                          type: 'Feature',
+                          geometry: {
+                            type: 'LineString',
+                            coordinates: [
+                              [supplierCoords.lon, supplierCoords.lat],
+                              [jobCoords.lon, jobCoords.lat]
+                            ]
+                          }
+                        } as any;
+                        const srcId = 'route-preview';
+                        if (!map.getSource(srcId)) {
+                          map.addSource(srcId, { type: 'geojson', data: route });
+                          map.addLayer({ id: 'route-line', type: 'line', source: srcId, paint: { 'line-color': '#22d3ee', 'line-width': 3 } });
+                        } else {
+                          (map.getSource(srcId) as any).setData(route);
+                        }
+                      }
+                      return null;
+                    })()
+                  )}
+                </RealMapComponent>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+            <CardHeader>
               <CardTitle>Invoice Preview</CardTitle>
               <CardDescription>Text-only breakdown for quoting</CardDescription>
             </CardHeader>
@@ -477,6 +643,7 @@ ${textInvoiceRounded}`}
                 <Button type="button" variant="outline" onClick={() => exportInvoicePDF(`${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`, jobName || 'invoice')}>Export PDF</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportJobsCSV(jobs), 'jobs.csv', 'text/csv')}>Jobs CSV</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportCustomersCSV(customers), 'customers.csv', 'text/csv')}>Customers CSV</Button>
+                <Button type="button" onClick={handleConvertToProject}>Convert to Project</Button>
               </div>
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -490,6 +657,22 @@ ${textInvoiceRounded}`}
                         </div>
                         <div className="flex gap-2">
                           <Button type="button" variant="outline" size="sm" onClick={() => handleLoadJob(j)}>Load</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label>Projects</Label>
+                  <div className="mt-2 space-y-2 max-h-64 overflow-auto">
+                    {projects.map(p => (
+                      <div key={p.id} className="flex items-center justify-between p-2 rounded border border-border/30">
+                        <div className="text-sm">
+                          <div className="font-medium">{p.name}</div>
+                          <div className="text-muted-foreground">{p.status}</div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" size="sm" onClick={() => setJobAddress(p.address)}>Use Address</Button>
                         </div>
                       </div>
                     ))}

@@ -13,6 +13,7 @@ interface RealMapComponentProps {
   onMapClick?: (e: mapboxgl.MapMouseEvent) => void;
   onMapMove?: (center: [number, number], zoom: number) => void;
   children?: React.ReactNode;
+  styleUrl?: string;
 }
 
 const RealMapComponent: React.FC<RealMapComponentProps> = ({
@@ -22,7 +23,8 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   onMapLoad,
   onMapClick,
   onMapMove,
-  children
+  children,
+  styleUrl = 'mapbox://styles/mapbox/satellite-streets-v12'
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -37,7 +39,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     // Initialize map
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satellite view for operations
+      style: styleUrl,
       center: center,
       zoom: zoom,
       attributionControl: true
@@ -101,6 +103,13 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       });
     }
   }, [center, zoom, mapLoaded]);
+
+  // Update style when styleUrl changes
+  useEffect(() => {
+    if (map.current && mapLoaded && styleUrl) {
+      map.current.setStyle(styleUrl);
+    }
+  }, [styleUrl, mapLoaded]);
 
   const addMarker = (lng: number, lat: number, options?: { 
     color?: string; 
@@ -169,7 +178,8 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         addGeoJSONSource,
         addLayer,
         flyTo,
-        getMap: () => map.current
+        getMap: () => map.current,
+        lastAreaSqFt: (window as any).mapMethods?.lastAreaSqFt || 0,
       };
     }
   }, [mapLoaded]);

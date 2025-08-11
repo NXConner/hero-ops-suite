@@ -6,10 +6,23 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = 'invoice
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
   const margin = 40;
   const maxWidth = 612 - margin * 2; // letter width in pts
+  // Header
+  doc.setFillColor('#0f172a');
+  doc.rect(0, 0, 612, 70, 'F');
+  doc.setTextColor('#22d3ee');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('Blackout Asphalt LLC', margin, 45);
+  doc.setTextColor('#94a3b8');
+  doc.setFontSize(10);
+  doc.text('Estimate / Invoice', 480, 45, { align: 'right' });
+
+  // Body
   const lines = doc.splitTextToSize(invoiceText, maxWidth);
+  doc.setTextColor('#0f172a');
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11);
-  let y = margin;
+  let y = margin + 50;
   lines.forEach((line: string) => {
     if (y > 750) {
       doc.addPage();

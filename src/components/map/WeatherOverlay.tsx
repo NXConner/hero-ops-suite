@@ -77,6 +77,27 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
 
   const radarIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('weather-overlay-prefs') || '{}');
+      if (typeof saved.radarOpacity === 'number') setRadarOpacity(saved.radarOpacity);
+      if (typeof saved.showTemperatureOverlay === 'boolean') setShowTemperatureOverlay(saved.showTemperatureOverlay);
+      if (typeof saved.showWindOverlay === 'boolean') setShowWindOverlay(saved.showWindOverlay);
+      if (typeof saved.forecastHours === 'number') setForecastHours(saved.forecastHours);
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('weather-overlay-prefs', JSON.stringify({
+        radarOpacity,
+        showTemperatureOverlay,
+        showWindOverlay,
+        forecastHours,
+      }));
+    } catch { /* ignore */ }
+  }, [radarOpacity, showTemperatureOverlay, showWindOverlay, forecastHours]);
+
   const getTerminology = (military: string, civilian: string) => {
     switch (terminologyMode) {
       case 'military': return military;

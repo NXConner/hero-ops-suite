@@ -24,11 +24,23 @@ function saveAll(list: Customer[]) {
   } catch { /* ignore */ }
 }
 
+async function getSupabaseClient(): Promise<any | null> {
+  try {
+    const url = (import.meta as any).env?.VITE_SUPABASE_URL;
+    const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
+    if (!url || !key) return null;
+    const { createClient } = await import('@supabase/supabase-js');
+    return createClient(url, key);
+  } catch {
+    return null;
+  }
+}
+
 export function listCustomers(): Customer[] {
   return loadAll();
 }
 
-export function saveCustomer(input: Omit<Customer, "id" | "createdAt" | "updatedAt"> & { id?: string }): Customer {
+export async function saveCustomer(input: Omit<Customer, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<Customer> {
   const list = loadAll();
   const now = Date.now();
   const id = input.id ?? crypto.randomUUID?.() ?? `${now}-${Math.random().toString(36).slice(2)}`;
@@ -44,10 +56,22 @@ export function saveCustomer(input: Omit<Customer, "id" | "createdAt" | "updated
   if (existingIndex >= 0) list.splice(existingIndex, 1, record);
   else list.unshift(record);
   saveAll(list);
+
+  const supabase = await getSupabaseClient();
+  if (supabase) {
+    try {
+      await supabase.from('customers').upsert({ id: record.id, name: record.name, address: record.address, notes: record.notes ?? '', created_at: new Date(record.createdAt).toISOString(), updated_at: new Date(record.updatedAt).toISOString() });
+    } catch { /* ignore */ }
+  }
+
   return record;
 }
 
-export function deleteCustomer(id: string) {
+export async function deleteCustomer(id: string) {
   const list = loadAll().filter(c => c.id !== id);
   saveAll(list);
+  const supabase = await getSupabaseClient();
+  if (supabase) {
+    try { await supabase.from('customers').delete().eq('id', id); } catch { /* ignore */ }
+  }
 }

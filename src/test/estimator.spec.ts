@@ -1,5 +1,25 @@
 import { describe, it, expect } from 'vitest';
 import { computeSealcoatMaterials, computeCrackFill, computeStriping, computeFuelAndEquipment, computeTransportLoad } from '@/lib/estimator';
+import { buildEstimate, type EstimateInput } from '@/lib/estimator';
+
+function baseInput(): EstimateInput {
+  return {
+    serviceType: 'sealcoating',
+    sealcoatSquareFeet: 3000,
+    numFullTime: 2,
+    numPartTime: 1,
+    hourlyRatePerPerson: 12,
+    roundTripMilesSupplier: 10,
+    roundTripMilesJob: 10,
+    fuelPricePerGallon: 3.14,
+    pmmPricePerGallon: 3.65,
+    sandPricePer50lbBag: 10,
+    fastDryPricePer5Gal: 50,
+    prepSealPricePer5Gal: 50,
+    crackBoxPricePer30lb: 44.99,
+    propanePerTank: 10,
+  } as any;
+}
 
 describe('estimator helpers', () => {
   it('computes sealcoat materials with water and sand', () => {
@@ -45,5 +65,32 @@ describe('estimator helpers', () => {
     const load = computeTransportLoad(200, 12, 40);
     expect(load.totalWeightLbs).toBeGreaterThan(0);
     expect(load.notes).toContain('sand');
+  });
+
+  it('applies sales tax when applySalesTax is true', () => {
+    const input = baseInput();
+    (input as any).applySalesTax = true;
+    const out = buildEstimate(input);
+    expect(out.total).toBeGreaterThan(out.subtotal + out.overhead.cost + out.profit.cost - 1);
+  });
+
+  it('respects trailer MPG modifier', () => {
+    const input = baseInput();
+    (input as any).trailerMpgModifierPct = -0.1;
+    const outA = buildEstimate(input);
+    (input as any).trailerMpgModifierPct = 0.0;
+    const outB = buildEstimate(input);
+    expect(outA.equipmentAndFuel.reduce((s,i)=>s+i.cost,0)).toBeGreaterThan(outB.equipmentAndFuel.reduce((s,i)=>s+i.cost,0));
+  });
+
+  it('adds propane by hours to crack cost', () => {
+    const input = baseInput();
+    input.serviceType = 'crack_filling';
+    (input as any).crackLinearFeet = 150;
+    (input as any).crackHours = 2;
+    (input as any).propaneCostPerHour = 10;
+    const out = buildEstimate(input);
+    const mat = out.materials.find(m => m.label.includes('Propane (hours)'));
+    expect(mat?.cost).toBe(20);
   });
 });

@@ -135,7 +135,42 @@ const OverWatch: React.FC = () => {
   const [weatherRecommendations, setWeatherRecommendations] = useState<string[]>([]);
   const [showVoiceInterface, setShowVoiceInterface] = useState(false);
 
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('overwatch-prefs') || '{}');
+      if (saved.selectedMapService) setSelectedMapService(saved.selectedMapService);
+      if (saved.terminologyMode) setTerminologyMode(saved.terminologyMode);
+      if (Array.isArray(saved.activeOverlays)) setActiveOverlays(saved.activeOverlays);
+      if (Array.isArray(saved.mapCenter) && saved.mapCenter.length === 2) setMapCenter(saved.mapCenter);
+      if (typeof saved.mapZoom === 'number') setMapZoom(saved.mapZoom);
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('overwatch-prefs', JSON.stringify({
+        selectedMapService,
+        terminologyMode,
+        activeOverlays,
+        mapCenter,
+        mapZoom,
+      }));
+    } catch { /* ignore */ }
+  }, [selectedMapService, terminologyMode, activeOverlays, mapCenter, mapZoom]);
+
   const currentService = mapServices.find(service => service.id === selectedMapService) || mapServices[0];
+  const mapboxStyleForService: Record<string, string> = {
+    'osm': 'mapbox://styles/mapbox/streets-v12',
+    'satellite': 'mapbox://styles/mapbox/satellite-streets-v12',
+    'terrain': 'mapbox://styles/mapbox/outdoors-v12',
+    'topo': 'mapbox://styles/mapbox/outdoors-v12',
+    'google-satellite': 'mapbox://styles/mapbox/satellite-v9',
+    'google-roads': 'mapbox://styles/mapbox/streets-v12',
+    'mapbox-streets': 'mapbox://styles/mapbox/streets-v12',
+    'mapbox-satellite': 'mapbox://styles/mapbox/satellite-v9',
+    'carto-dark': 'mapbox://styles/mapbox/dark-v11',
+    'qgis-local': 'mapbox://styles/mapbox/streets-v12'
+  };
 
   const getTerminology = (military: string, civilian: string) => {
     switch (terminologyMode) {
@@ -485,6 +520,7 @@ const OverWatch: React.FC = () => {
               center={mapCenter}
               zoom={mapZoom}
               className="h-full w-full"
+              styleUrl={mapboxStyleForService[selectedMapService] || mapboxStyleForService['streets-v12']}
               onMapClick={(e) => {
                 if (isDrawingMode) {
                   console.log('Drawing mode click:', e.lngLat);

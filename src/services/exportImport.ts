@@ -66,3 +66,69 @@ export function importAll(bundle: ExportBundle) {
   if (Array.isArray(bundle.jobs)) importJobs(bundle.jobs);
   if (Array.isArray(bundle.customers)) importCustomers(bundle.customers);
 }
+
+export type CSVRow = Record<string, string>;
+
+export interface CSVMapping {
+  columns: Record<string, string>; // map incoming header -> field name
+}
+
+export interface CSVImportResult<T> {
+  rows: T[];
+  errors: { row: number; message: string }[];
+}
+
+export function parseCSV(raw: string): { header: string[]; rows: string[][] } {
+  const lines = raw.split(/\r?\n/).filter(Boolean);
+  if (lines.length === 0) return { header: [], rows: [] };
+  const header = splitCsvLine(lines[0]);
+  const rows = lines.slice(1).map(splitCsvLine);
+  return { header, rows };
+}
+
+function splitCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result.map(s => s.trim());
+}
+
+export function importCSVWithMapping<T = any>(raw: string, mapping: CSVMapping, validator: (row: CSVRow) => string | null, projector: (row: CSVRow) => T): CSVImportResult<T> {
+  const { header, rows } = parseCSV(raw);
+  const errors: { row: number; message: string }[] = [];
+  if (header.length === 0) return { rows: [], errors: [{ row: 0, message: 'Missing header' }] };
+  const headerSet = new Set(header);
+  const mappedRows: T[] = [];
+  rows.forEach((cols, idx) => {
+    const rowObj: CSVRow = {};
+    header.forEach((h, i) => { rowObj[h] = cols[i] ?? ''; });
+    const error = validator(rowObj);
+    if (error) {
+      errors.push({ row: idx + 2, message: error });
+      return;
+    }
+    const projected: any = {};
+    Object.entries(mapping.columns).forEach(([incoming, field]) => {
+      projected[field] = rowObj[incoming] ?? '';
+    });
+    try {
+      mappedRows.push(projector(projected));
+    } catch (e: any) {
+      errors.push({ row: idx + 2, message: e?.message || 'Projection error' });
+    }
+  });
+  return { rows: mappedRows, errors };
+}
