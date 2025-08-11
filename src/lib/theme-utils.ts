@@ -202,12 +202,32 @@ export function generateThemeCSS(theme: Theme): string {
     })
     .join('\n    ');
 
+  const uiTokens = (() => {
+    const vars: string[] = [];
+    const ui = (theme as any).ui as { radius?: any; borders?: any } | undefined;
+    if (ui?.radius) {
+      if (ui.radius.card) vars.push(`--radius-card: ${ui.radius.card};`);
+      if (ui.radius.button) vars.push(`--radius-button: ${ui.radius.button};`);
+      if (ui.radius.input) vars.push(`--radius-input: ${ui.radius.input};`);
+      if (ui.radius.menu) vars.push(`--radius-menu: ${ui.radius.menu};`);
+      if (ui.radius.popover) vars.push(`--radius-popover: ${ui.radius.popover};`);
+      if (ui.radius.toast) vars.push(`--radius-toast: ${ui.radius.toast};`);
+    }
+    if (ui?.borders) {
+      if (ui.borders.width) vars.push(`--border-width: ${ui.borders.width};`);
+      if (ui.borders.focusRingWidth) vars.push(`--ring-width: ${ui.borders.focusRingWidth};`);
+      if (ui.borders.focusRingOffset) vars.push(`--ring-offset: ${ui.borders.focusRingOffset};`);
+    }
+    return vars.join('\n    ');
+  })();
+
   return `:root[data-theme="${theme.id}"] {
     ${colors}
     ${gradients}
     ${shadows}
     ${animations}
     --border-radius: 0.5rem;
+    ${uiTokens}
   }`;
 }
 
