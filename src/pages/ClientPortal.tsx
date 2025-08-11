@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getApiBaseUrl } from '@/config/api';
 
 export default function ClientPortal() {
   const [scanId, setScanId] = useState('');
@@ -6,7 +7,7 @@ export default function ClientPortal() {
   const [overlay, setOverlay] = useState<any | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
 
-  const API = 'http://localhost:3002';
+    const API = getApiBaseUrl();
 
   const load = async () => {
     if (!scanId) return;

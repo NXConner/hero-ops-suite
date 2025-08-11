@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { getApiBaseUrl, getAuthToken } from "@/config/api";
 
 const OperationsSuite = () => {
   const [height, setHeight] = useState<number>(window.innerHeight - 64);
@@ -7,9 +8,8 @@ const OperationsSuite = () => {
   const initialContext = useMemo(() => ({
     type: 'suite_context',
     payload: {
-      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || '/api',
-      // If you add auth later, pass a token here
-      authToken: null,
+      apiBaseUrl: getApiBaseUrl(),
+      authToken: getAuthToken(),
       appName: 'Operations Suite',
       timestamp: Date.now(),
     }
@@ -40,8 +40,6 @@ const OperationsSuite = () => {
       if (typeof event.data !== 'object' || !event.data) return;
       if (event.data.type === 'suite_event') {
         // Handle events emitted by the sub-app if needed
-        // e.g., navigation requests, notifications, analytics hooks
-        // console.log('Suite event:', event.data.payload);
       }
     };
     window.addEventListener('message', onMessage);
