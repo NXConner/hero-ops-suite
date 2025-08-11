@@ -297,5 +297,7 @@ export interface ThemeContext {
   saveWallpaperProfile: (name: string, wallpaper?: ThemeWallpaper | null) => void;
   applyWallpaperProfile: (name: string) => void;
   deleteWallpaperProfile: (name: string) => void;
-  
+  // Low power mode
+  setLowPower: (enabled: boolean) => void;
+  lowPowerMode: boolean;
 }
