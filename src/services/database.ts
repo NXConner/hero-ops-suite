@@ -215,6 +215,21 @@ class DatabaseService {
       alertStore.createIndex('acknowledged', 'acknowledged', { unique: false });
       alertStore.createIndex('createdAt', 'createdAt', { unique: false });
     }
+
+    // Vehicle Checklists Store
+    if (!this.db.objectStoreNames.contains('vehicleChecklists')) {
+      const store = this.db.createObjectStore('vehicleChecklists', { keyPath: 'id' });
+      store.createIndex('vehicleId', 'vehicleId', { unique: false });
+      store.createIndex('type', 'type', { unique: false });
+      store.createIndex('createdAt', 'createdAt', { unique: false });
+    }
+
+    // Vehicle Documents Store
+    if (!this.db.objectStoreNames.contains('vehicleDocuments')) {
+      const store = this.db.createObjectStore('vehicleDocuments', { keyPath: 'id' });
+      store.createIndex('vehicleId', 'vehicleId', { unique: false });
+      store.createIndex('uploadedAt', 'uploadedAt', { unique: false });
+    }
   }
 
   // User Preferences Methods
@@ -403,6 +418,50 @@ class DatabaseService {
     }
   }
 
+  // Vehicle Checklist Methods
+  async saveVehicleChecklist(record: any): Promise<void> {
+    try {
+      await this.saveToStore('vehicleChecklists', record);
+      // Optionally sync to server later
+    } catch (error) {
+      console.error('Failed to save vehicle checklist:', error);
+      throw error;
+    }
+  }
+
+  async getVehicleChecklists(vehicleId: string, type?: 'inspection' | 'maintenance'): Promise<any[]> {
+    try {
+      const all = await this.getAllFromStore('vehicleChecklists', 'vehicleId', vehicleId);
+      const list = (all || []) as any[];
+      return type ? list.filter((r) => r.type === type) : list;
+    } catch (error) {
+      console.error('Failed to get vehicle checklists:', error);
+      return [];
+    }
+  }
+
+  // Vehicle Document Methods
+  async saveVehicleDocuments(records: any[]): Promise<void> {
+    try {
+      for (const rec of records) {
+        await this.saveToStore('vehicleDocuments', rec);
+      }
+    } catch (error) {
+      console.error('Failed to save vehicle documents:', error);
+      throw error;
+    }
+  }
+
+  async getVehicleDocuments(vehicleId: string): Promise<any[]> {
+    try {
+      const docs = await this.getAllFromStore('vehicleDocuments', 'vehicleId', vehicleId);
+      return (docs || []) as any[];
+    } catch (error) {
+      console.error('Failed to get vehicle documents:', error);
+      return [];
+    }
+  }
+
   // Generic Store Methods
   private async saveToStore(storeName: string, data: unknown): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -554,6 +613,8 @@ class DatabaseService {
         widgetLayouts: await this.getAllFromStore('widgetLayouts'),
         projects: await this.getAllFromStore('projects'),
         alerts: await this.getAllFromStore('alerts'),
+        vehicleChecklists: await this.getAllFromStore('vehicleChecklists'),
+        vehicleDocuments: await this.getAllFromStore('vehicleDocuments'),
         exportDate: new Date().toISOString()
       };
       return data;
@@ -566,23 +627,33 @@ class DatabaseService {
   async importData(data: Record<string, unknown>): Promise<void> {
     try {
       if (data.userPreferences) {
-        for (const pref of data.userPreferences) {
+        for (const pref of data.userPreferences as any[]) {
           await this.saveToStore('userPreferences', pref);
         }
       }
       if (data.widgetLayouts) {
-        for (const layout of data.widgetLayouts) {
+        for (const layout of data.widgetLayouts as any[]) {
           await this.saveToStore('widgetLayouts', layout);
         }
       }
       if (data.projects) {
-        for (const project of data.projects) {
+        for (const project of data.projects as any[]) {
           await this.saveToStore('projects', project);
         }
       }
       if (data.alerts) {
-        for (const alert of data.alerts) {
+        for (const alert of data.alerts as any[]) {
           await this.saveToStore('alerts', alert);
+        }
+      }
+      if (data.vehicleChecklists) {
+        for (const record of data.vehicleChecklists as any[]) {
+          await this.saveToStore('vehicleChecklists', record);
+        }
+      }
+      if (data.vehicleDocuments) {
+        for (const record of data.vehicleDocuments as any[]) {
+          await this.saveToStore('vehicleDocuments', record);
         }
       }
     } catch (error) {
