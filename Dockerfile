@@ -26,7 +26,7 @@ RUN npm ci --no-audit --no-fund
 COPY odoo/asphalt-odoo-prime/ .
 
 # Build subapp with base path for subdirectory hosting
-RUN npm run build -- --base=/odoo/
+RUN npm run build -- --base=/suite/
 
 # --- Runtime ---
 FROM nginx:alpine AS runtime
@@ -34,7 +34,7 @@ WORKDIR /usr/share/nginx/html
 
 # Copy built assets
 COPY --from=builder /app/dist /usr/share/nginx/html
-COPY --from=builder_odoo /app_odoo/dist /usr/share/nginx/html/odoo
+COPY --from=builder_odoo /app_odoo/dist /usr/share/nginx/html/suite
 
 # Copy nginx config for SPA fallback
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf

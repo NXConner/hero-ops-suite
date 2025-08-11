@@ -53,7 +53,7 @@ const defaultNav: NavItemConfig[] = [
   { name: 'Intel Reports', href: '/intel-reports', icon: 'FileText' },
   { name: 'PavementScan Pro', href: '/pavement-scan-pro', icon: 'Scan', badge: 'NEW' },
   { name: 'Estimator', href: '/pavement-estimator', icon: 'Shield', badge: 'BETA' },
-  { name: 'Odoo Suite', href: '/odoo-suite', icon: 'LayoutDashboard', badge: 'BETA' },
+  { name: 'Operations Suite', href: '/operations-suite', icon: 'LayoutDashboard', badge: 'BETA' },
   { name: 'Settings', href: '/settings', icon: 'Settings' }
 ];
 

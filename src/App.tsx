@@ -30,7 +30,7 @@ const Builder = lazy(() => import("./pages/Builder"));
 const AdvancedThemeCustomizer = lazy(() => import("./components/theme/AdvancedThemeCustomizer"));
 const ClientPortal = lazy(() => import("./pages/ClientPortal"));
 const ContractorPortal = lazy(() => import("./pages/ContractorPortal"));
-const OdooSuite = lazy(() => import("./pages/OdooSuite"));
+const OperationsSuite = lazy(() => import("./pages/OperationsSuite"));
 
 const queryClient = new QueryClient();
 
@@ -70,7 +70,7 @@ const App = () => (
                  <Route path="/contractor-portal" element={<ContractorPortal />} />
                                   <Route path="/theme-customizer" element={<AdvancedThemeCustomizer />} />
                    <Route path="/builder" element={<Builder />} />
-                 <Route path="/odoo-suite" element={<OdooSuite />} />
+                 <Route path="/operations-suite" element={<OperationsSuite />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                 </Routes>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const OdooSuite = () => {
+const OperationsSuite = () => {
   const [height, setHeight] = useState<number>(window.innerHeight - 64);
 
   useEffect(() => {
@@ -15,8 +15,8 @@ const OdooSuite = () => {
         Embedded suite is served from /odoo/ inside this deployment.
       </div>
       <iframe
-        title="Odoo Suite"
-        src="/odoo/"
+        title="Operations Suite"
+        src="/suite/"
         style={{ width: '100%', height }}
         className="rounded-md border border-border bg-background"
       />
@@ -24,4 +24,4 @@ const OdooSuite = () => {
   );
 };
 
-export default OdooSuite;
+export default OperationsSuite;

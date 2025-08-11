@@ -4,7 +4,7 @@ This repository contains:
 
 - `supabase/`: SQL schema, policies, and seeds for the backend (Postgres/Supabase).
 - `mobile/`: React Native (Expo) mobile app skeleton with overlay handling, cost estimator, PDF report, and a stub 3D viewer.
-- `odoo/asphalt-odoo-prime`: Integrated sub-application (suite module) built and served under `/odoo/` in production.
+- `odoo/asphalt-odoo-prime`: Integrated sub-application (Operations Suite) built and served under `/suite/` in production.
 
 ## Quick start
 
@@ -29,8 +29,8 @@ This repository contains:
 3. Mobile app uses this base to call endpoints like `/scans`, `/scans/{id}/overlay`.
 
 ### Integrated Odoo Suite sub-app
-- In production Docker build, the sub-app from `odoo/asphalt-odoo-prime` is built and served at `/odoo/`.
-- Inside the main UI, navigate to `Odoo Suite` in the sidebar (route `/odoo-suite`) to view it embedded.
+- In production Docker build, the sub-app from `odoo/asphalt-odoo-prime` is built and served at `/suite/`.
+- Inside the main UI, navigate to `Operations Suite` in the sidebar (route `/operations-suite`) to view it embedded.
 - For local development, run the sub-app separately with `cd odoo/asphalt-odoo-prime && npm i && npm run dev` and open it on its dev port.
 
 ## Modules
