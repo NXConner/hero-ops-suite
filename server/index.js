@@ -26,6 +26,12 @@ function id() {
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
+// List scans
+app.get('/scans', async (req, res) => {
+  const list = Array.from(scans.values());
+  res.json({ scans: list });
+});
+
 app.post('/scans', async (req, res) => {
   const scan_id = id();
   const scan = {
@@ -41,6 +47,7 @@ app.post('/scans', async (req, res) => {
   res.json({ scan_id, upload_urls: {} });
 });
 
+// Upload overlay
 app.post('/scans/:id/overlay', async (req, res) => {
   const scan_id = req.params.id;
   if (!scans.has(scan_id)) return res.status(404).json({ error: 'not_found' });
@@ -50,6 +57,17 @@ app.post('/scans/:id/overlay', async (req, res) => {
   res.json({ ok: true });
 });
 
+// Get overlay only
+app.get('/scans/:id/overlay', async (req, res) => {
+  const scan_id = req.params.id;
+  if (!scans.has(scan_id)) return res.status(404).json({ error: 'not_found' });
+  const file = path.join(overlaysDir, `${scan_id}.json`);
+  if (!(await fs.pathExists(file))) return res.status(404).json({ error: 'no_overlay' });
+  const overlay = await fs.readJson(file);
+  res.json(overlay);
+});
+
+// Get scan with overlay
 app.get('/scans/:id', async (req, res) => {
   const scan_id = req.params.id;
   const scan = scans.get(scan_id);
@@ -77,13 +95,32 @@ app.post('/invoices', async (req, res) => {
   res.json({ invoice_id });
 });
 
+function computeOverlayStats(overlay) {
+  if (!overlay) return { cracks_ft: 0, potholes_sqft: 0, gator_sqft: 0, pooling_sqft: 0, score: 0 };
+  const cracks_ft = (overlay.cracks || []).reduce((a, c) => a + (c.length_ft || 0), 0);
+  const potholes_sqft = (overlay.potholes || []).reduce((a, p) => a + (p.area_sqft || 0), 0);
+  const gator_sqft = (overlay.distress_zones || [])
+    .filter((d) => d.type === 'gatoring')
+    .reduce((a, d) => a + (d.area_sqft || 0), 0);
+  const pooling_sqft = overlay.slope_analysis?.pooling_area_sqft || 0;
+  const score = cracks_ft * 0.5 + potholes_sqft * 2 + gator_sqft * 1.2 + pooling_sqft * 1.5;
+  return { cracks_ft, potholes_sqft, gator_sqft, pooling_sqft, score };
+}
+
 app.get('/analytics/summary', async (req, res) => {
-  res.json({
-    sites: scans.size,
-    jobs: jobs.size,
-    invoices: invoices.size,
-    totals: { cracks_ft: 0, potholes_sqft: 0 },
-  });
+  let totals = { sites: 0, cracks_ft: 0, potholes_sqft: 0, gator_sqft: 0, pooling_sqft: 0, score: 0 };
+  for (const scan of scans.values()) {
+    totals.sites += 1;
+    const file = path.join(overlaysDir, `${scan.scan_id}.json`);
+    const overlay = (await fs.pathExists(file)) ? await fs.readJson(file) : null;
+    const s = computeOverlayStats(overlay);
+    totals.cracks_ft += s.cracks_ft;
+    totals.potholes_sqft += s.potholes_sqft;
+    totals.gator_sqft += s.gator_sqft;
+    totals.pooling_sqft += s.pooling_sqft;
+    totals.score += s.score;
+  }
+  res.json({ totals });
 });
 
 const port = process.env.PORT || 3001;

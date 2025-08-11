@@ -4,6 +4,11 @@ import { CONFIG } from '../config';
 
 const api = axios.create({ baseURL: CONFIG.API_BASE_URL });
 
+export async function listScans(): Promise<{ scans: any[] }> {
+  const { data } = await api.get('/scans');
+  return data;
+}
+
 export async function createScan(payload: {
   site_id?: string;
   client_id?: string;
@@ -17,6 +22,11 @@ export async function createScan(payload: {
 
 export async function uploadOverlay(scanId: string, overlay: Overlay): Promise<void> {
   await api.post(`/scans/${scanId}/overlay`, overlay);
+}
+
+export async function getOverlay(scanId: string): Promise<Overlay> {
+  const { data } = await api.get(`/scans/${scanId}/overlay`);
+  return data;
 }
 
 export async function getScan(scanId: string): Promise<{ scan: any; overlay: Overlay | null }> {
