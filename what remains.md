@@ -18,7 +18,7 @@ Status key: [NS] Not Started, [IP] In Progress, [D] Done
   - [IP] Sealcoat: multi-coat, waste factor, method productivity
   - [NS] Oil-spot polygon input with per-area prep-seal calculation
 - Striping
-  - [NS] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas
+  - [IP] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas
 - Persistence & Data
   - [NS] Supabase schema (users, business profile, price book, jobs, customers) and adapters
   - [NS] Migration utility from localStorage; conflict resolution UI

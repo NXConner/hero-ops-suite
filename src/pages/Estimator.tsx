@@ -330,24 +330,46 @@ const Estimator = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label>Service</Label>
-                  <Select value={serviceType} onValueChange={(v: ServiceType) => setServiceType(v)}>
-                    <SelectTrigger><SelectValue placeholder="Select service" /></SelectTrigger>
+                  <Select value={serviceType} onValueChange={(v) => setServiceType(v as ServiceType)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Services</SelectLabel>
-                        <SelectItem value="sealcoating">Sealcoating</SelectItem>
-                        <SelectItem value="crack_filling">Crack Filling</SelectItem>
-                        <SelectItem value="patching">Asphalt Patching</SelectItem>
-                        <SelectItem value="line_striping">Line Striping</SelectItem>
-                        <SelectItem value="combo_driveway">Driveway Combo</SelectItem>
-                        <SelectItem value="combo_parkinglot">Parking Lot Combo</SelectItem>
-                      </SelectGroup>
+                      <SelectItem value="sealcoating">Sealcoating</SelectItem>
+                      <SelectItem value="crack_filling">Crack Filling</SelectItem>
+                      <SelectItem value="patching">Patching</SelectItem>
+                      <SelectItem value="line_striping">Line Striping</SelectItem>
+                      <SelectItem value="combo_driveway">Driveway Combo</SelectItem>
+                      <SelectItem value="combo_parkinglot">Parking Lot Combo</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+                <div>
+                  <Label>Stall size</Label>
+                  <Select value={(params as any).stallSize || 'standard'} onValueChange={(v) => setParams(p => ({ ...p, stallSize: v }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="compact">Compact</SelectItem>
+                      <SelectItem value="truck">Truck</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Paint color</Label>
+                  <Select value={params.paintColor} onValueChange={(v) => setParams(p => ({ ...p, paintColor: v }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {(BUSINESS_PROFILE.pricing.paintColors ?? ['yellow','white','blue']).map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <Label>Sealcoat sq ft</Label>
                   <Input type="number" min={0} value={params.sealcoatSquareFeet} onChange={e => setParams(p => ({ ...p, sealcoatSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
@@ -357,41 +379,15 @@ const Estimator = () => {
                   <Input type="number" min={0} value={params.patchSquareFeet} onChange={e => setParams(p => ({ ...p, patchSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
-                  <Label>Patch thickness (in)</Label>
-                  <Input type="number" step="0.5" min={1} max={6} onChange={e => (null)} onBlur={e => setParams(p => ({ ...p, patchThicknessInches: Math.min(6, Math.max(1, Number(e.currentTarget.value) || 2)) }))} placeholder="2" />
-                </div>
-                <div>
-                  <Label>Patch material</Label>
-                  <Select onValueChange={(v) => setParams(p => ({ ...p, patchMaterial: v as any }))}>
-                    <SelectTrigger><SelectValue placeholder="hot" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hot">Hot mix</SelectItem>
-                      <SelectItem value="cold">Cold patch</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Crack feet</Label>
+                  <Label>Crack LF</Label>
                   <Input type="number" min={0} value={params.crackLinearFeet} onChange={e => setParams(p => ({ ...p, crackLinearFeet: Math.max(0, Number(e.target.value) || 0) }))} />
                 </div>
                 <div>
-                  <Label>Deep crack prefill (%)</Label>
-                  <Input type="number" step="5" min={0} max={100} onChange={e => (null)} onBlur={e => setParams(p => ({ ...p, deepCrackPrefillPct: Math.min(100, Math.max(0, Number(e.currentTarget.value) || 0)) }))} placeholder="0" />
-                </div>
-                <div>
-                  <Label>Oil spots sq ft</Label>
-                  <Input type="number" min={0} value={params.oilSpotSquareFeet} onChange={e => setParams(p => ({ ...p, oilSpotSquareFeet: Math.max(0, Number(e.target.value) || 0) }))} />
-                </div>
-                <div>
-                  <Label>Porosity factor</Label>
-                  <Input type="number" step="0.1" min={0.5} max={2.5} value={params.surfacePorosityFactor} onChange={e => setParams(p => ({ ...p, surfacePorosityFactor: Math.min(2.5, Math.max(0.5, Number(e.target.value) || 1)) }))} />
-                </div>
-                <div>
-                  <Label>Stalls (single)</Label>
+                  <Label>Standard stalls</Label>
                   <Input type="number" value={params.numStandardStalls} onChange={e => setParams(p => ({ ...p, numStandardStalls: Number(e.target.value) }))} />
                 </div>
                 <div>
-                  <Label>Stalls (double)</Label>
+                  <Label>Double stalls</Label>
                   <Input type="number" value={params.numDoubleStalls} onChange={e => setParams(p => ({ ...p, numDoubleStalls: Number(e.target.value) }))} />
                 </div>
                 <div>
@@ -399,31 +395,16 @@ const Estimator = () => {
                   <Input type="number" value={params.numHandicapSpots} onChange={e => setParams(p => ({ ...p, numHandicapSpots: Number(e.target.value) }))} />
                 </div>
                 <div>
-                  <Label>Arrows</Label>
-                  <Input type="number" value={params.numArrows} onChange={e => setParams(p => ({ ...p, numArrows: Number(e.target.value) }))} />
-                </div>
-                <div>
                   <Label>Crosswalks count</Label>
                   <Input type="number" value={params.numCrosswalks} onChange={e => setParams(p => ({ ...p, numCrosswalks: Number(e.target.value) }))} />
                 </div>
                 <div>
                   <Label>Stop bars</Label>
-                  <Input type="number" min={0} onChange={e => setParams(p => ({ ...p, numStopBars: Math.max(0, Number(e.target.value) || 0) }))} />
+                  <Input type="number" value={(params as any).numStopBars || 0} onChange={e => setParams(p => ({ ...p, numStopBars: Number(e.target.value) }))} />
                 </div>
                 <div>
                   <Label>Text stencils</Label>
-                  <Input type="number" min={0} onChange={e => setParams(p => ({ ...p, numTextStencils: Math.max(0, Number(e.target.value) || 0) }))} />
-                </div>
-                <div>
-                  <Label>Paint color</Label>
-                  <Select value={params.paintColor} onValueChange={(v) => setParams(p => ({ ...p, paintColor: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Color" /></SelectTrigger>
-                    <SelectContent>
-                      {(BUSINESS_PROFILE.pricing.paintColors ?? ['yellow','white','blue']).map(c => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input type="number" value={(params as any).numTextStencils || 0} onChange={e => setParams(p => ({ ...p, numTextStencils: Number(e.target.value) }))} />
                 </div>
               </div>
 

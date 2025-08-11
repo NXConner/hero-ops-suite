@@ -233,11 +233,15 @@ export function computeStriping(
     paintColor?: string;
     numStopBars?: number;
     numTextStencils?: number;
+    stallSize?: 'standard' | 'compact' | 'truck';
   },
   unitCostPerLinearFoot: number
 ) {
+  const chosen = params.stallSize || 'standard';
+  const catalog = BUSINESS_PROFILE.pricing.stencilCatalog;
+  const sizeLf = catalog?.stalls.find(s => s.size === chosen)?.lf ?? DEFAULTS.avgStallLinearFeetSingle;
   const lfStalls =
-    params.numStandardStalls * DEFAULTS.avgStallLinearFeetSingle +
+    params.numStandardStalls * sizeLf +
     params.numDoubleStalls * DEFAULTS.avgStallLinearFeetDouble;
   let extras = 0;
   if (params.numHandicapSpots > 0) {
@@ -433,6 +437,7 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
       paintColor: (input as any).paintColor || undefined,
       numStopBars: (input as any).numStopBars || 0,
       numTextStencils: (input as any).numTextStencils || 0,
+      stallSize: (input as any).stallSize || 'standard',
     };
     const strip = computeStriping(params, DEFAULTS.lineCostPerLinearFoot);
     baseSellFromTasks += strip.sellPrice;

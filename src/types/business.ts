@@ -109,4 +109,28 @@ export interface BusinessProfile {
   travelDefaults: {
     roundTripMilesSupplier: number;
   };
+  pricing: {
+    crackFillRatePerFoot: number;
+    patchingPerSqft: number;
+    lineCostPerLinearFoot: number;
+    mobilizationFee: number;
+    overheadPct: number;
+    profitPct: number;
+    handicapSymbolCost?: number;
+    arrowCost?: number;
+    crosswalkCost?: number;
+    stopBarCost?: number;
+    textStencilCost?: number;
+    paintColors?: string[];
+    paintColorCostDelta?: Record<string, number>;
+    patchingHotPerSqft?: number;
+    patchingColdPerSqft?: number;
+    salesTaxPct?: number;
+    stencilCatalog?: {
+      stalls: { size: 'standard' | 'compact' | 'truck'; lf: number }[];
+      hcSymbol: { sizes: string[]; base: number };
+      arrows: { types: string[]; base: number };
+      text: { items: string[]; base: number };
+    };
+  };
 }
