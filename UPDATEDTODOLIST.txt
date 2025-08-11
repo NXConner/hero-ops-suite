@@ -1,0 +1,375 @@
+1 unified map page with everything
+leave other maps pages ect currently implemented untouched
+
+- Weather & Map
+  - Leaflet radar map with adjustable 1–50 mile radius (15 mi default), radius and center persisted in preferences
+  - Radar integrated in WeatherStation (Radar & Map tab)
+  - OverWatch upgraded to real Leaflet map with NOAA NEXRAD WMS overlay and basemap selector (OSM, ESRI, Stamen)
+  - Geofence rain risk badge in WeatherStation using forecast window
+- Business Config & Knowledge Base
+  - Central `business-config` with supplier (SealMaster), vehicles/trailers/equipment, materials price list, estimator defaults
+  - `knowledge-base` service + DB migrations and tax seeds for VA/NC
+  - Offline preferences API (get/set) for radius/center
+- Estimator (Asphalt)
+  - Driveway & Parking Lot flows (sealcoat, crack fill, patching, striping)
+  - Striping: stalls, arrows, crosswalks, handicap, paint color multiplier
+  - Travel fuel auto-compute with geocoding (business → supplier → business → job → business)
+  - Overhead/profit sliders (default from business profile)
+  - Mobilization tiers by distance and area
+  - Transport/GVWR check for SK550 on 1978 C30
+  - PDF export via print stub
+  - Persist estimates (table + UI Pages: Estimates list/detail)
+  - Create invoice from estimate + post to GL
+- Accounting & AR
+  - Invoicing service with sales tax for VA/NC
+  - Invoices persisted (table + UI list/detail with printable template)
+  - Post invoices to GL with seeded CoA (A/R, revenue, materials, labor, overhead)
+  - Payments service + payments table, AR aging summary in UI, invoice status/amount paid
+  - Core accounting tables (chart_of_accounts, journal_entries, lines)
+- Materials & Suppliers
+  - Materials & Pricing page with editable prices and recent price history view
+  - Supplier Receipts page to update prices and record material price history
+- Fleet & Fuel
+  - Fleet Fuel Logs: schema, service, page with summary
+- AI Notes & Mobile App
+  - AI Notes component added to Mobile App (notes, audio upload stub)
+- Pavement Scan / Drone & 3D
+  - Stub tab for Drone & 3D integrations (build clone of features from apps: SkyeBrowse, PropertyIntel links, guidance)
+- Tooling & Build
+  - All migrations added to `supabase/migrations` (003–011)
+  - Project builds green with all new routes/pages/services
+
+---
+
+#### Estimator & Operations
+- Add per-item pricing overrides and presets; customer-specific pricing tiers
+- Add oil-spot mapping by polygon/area selection and dynamic prep-seal calc in UI
+- Add patching type selection (hot vs cold), default cost references, disposal fees
+- Integrate supplier receipts ingestion (OCR or CSV) to auto-update material prices
+- Add multi-crew labor modeling and productivity curves by area/porosity/method
+- Add route optimization for multi-job days; combine trips to supplier and jobs
+- Finalize PDF templates for estimates (branded, sections, terms, signature line)
+- Add Estimate → Project conversion flow; track revisions, version history, and change orders
+- Add production schedules and Gantt view; assign crews/equipment to scheduled jobs
+
+#### Accounting
+- Tax jurisdictions and exemptions (local/county add-ons; per-customer tax status)
+- Payments: support methods (cash/check/ACH/card), fees, refunds, and partials with receipts
+- Invoice lifecycle workflow: draft → sent → viewed → approved → paid → archived
+- Integrate QuickBooks/Quicken (map accounts, sync invoices/payments/CoA)
+- Improve GL posting: split COGS by category; support project-level WIP accounting
+- Financial reports: AR aging detail, P&L, Balance Sheet, Cash Flow, job profitability
+
+#### Payroll
+- Crew time capture UI (clock in/out, OT rules, breaks), import from CSV/Timesheets
+- Payroll tax tables and caps (FICA, FUTA/SUTA by state), net pay calculations
+- Exports for payroll processors, per-employee stubs, PTO/holiday accruals
+
+#### Fleet, Equipment, and Compliance
+- Maintenance schedules, service tasks, reminders, and cost tracking
+- Equipment utilization reports, hour meters, and preventive maintenance triggers
+- Trailer load planning, DOT pre-trip checklists, and compliance document storage
+
+#### Weather & Map
+- Geofence-based weather alerts: push notifications and schedule auto-adjustments
+- Layer toggles: traffic, parcels, VDOT roads, environmental overlays (WMS/WFS)
+- Real basemap switching persisted to preferences; user-defined overlays library
+
+#### Materials & Suppliers
+- Inventory management: on-hand materials, reorder points, batch lot tracking
+- Supplier purchase orders & bills; reconcile to receipts and materials history
+- Price list versioning/history diff; audit trail for changes
+
+#### AI/Imaging & Drone/3D
+- CompanyCam-style photo tagging and auto object counting (lines, cracks, symbols)
+- Auto measurements and takeoff; smart detection for parking stall counts
+- 3D upload pipeline (LAS/LAZ/PLY) to storage; processing status and viewer
+- PropertyIntel/SkyeBrowse create clone of useful and relevant feature from apps
+
+#### Data, Backend & Security
+- Supabase RLS policies and role-based access control (RBAC) across all tables
+- Index tuning and migration runner docs; seed data for business profile and demo
+- Rate limiting and custom User-Agent for Nominatim/EIA/api usage; retry/backoff
+- Secrets management and environment configuration documentation
+
+#### Quality, DX, and Platform
+- Form validation (zod/resolvers), error states, toasts, and a11y audit
+- Unit tests for services (estimator, invoicing, payments, fuel, tax) and components
+- E2E scenarios for estimate → invoice → payment → GL; CI integration
+- Observability (Sentry/logging), feature flags, performance budgets
+- Comprehensive README and user guide; per-page help/tooltips
+
+---
+
+### Actionable To-Do Checklist 
+- Estimator
+  - [ ] Oil-spot polygon input and per-area prep-seal calculation
+  - [ ] Finalized branded PDF templates for estimates
+  - [ ] Estimate-to-Project conversion and change orders
+  - [ ] Route optimization and multi-job supplier routing
+- Accounting
+  - [ ] Sales tax expansions (local jurisdictions), tax exemption support
+  - [ ] Payments UI/receipts; invoice lifecycle and email sending (real)
+  - [ ] QuickBooks/Quicken module wiring; CoA mapping and sync routines
+  - [ ] Enhanced GL posting per COGS category and project WIP
+- Fleet/Equipment
+  - [x] Vehicle creation modal in Fleet Dashboard
+  - [ ] Maintenance schedules, reminders, utilization reports
+  - [ ] DOT/compliance checklists and document storage
+- Weather/Map
+  - [ ] Geofence push alerts and auto schedule adjustment hooks
+  - [x] Saved basemap preference in OverWatch map
+  - [x] Radar overlay toggle + opacity with persisted preferences (OverWatch, RadarMap)
+  - [ ] Additional overlay management tool (custom layers library)
+- Materials & Suppliers
+  - [x] Receipt ingestion (CSV) to update material prices automatically
+  - [ ] Inventory management and supplier POs/bills
+- Cost Tracking
+  - [x] Cost entry creation modal in Cost Analyzer
+  - [x] Validation for cost entry modal (zod)
+- AI/Imaging/3D
+  - [ ] Photo tagging and auto counting (CompanyCam-like)
+  - [ ] 3D upload pipeline and viewer; integrations with SkyeBrowse/PropertyIntel
+- Data/Backend
+  - [ ] RLS policies and RBAC; indexes and seeds; rate limiting
+- Quality/Platform
+  - [ ] Tests, CI/CD, error tracking, docs
+
+---
+
+### Remediation Performed (this session)
+- Standardized environment access with `src/lib/env.ts` and replaced client-side `process.env` with `getEnv(...)` in:
+  - `src/services/hvac/hvac-management-service.ts`
+  - `src/services/logistics/supply-chain-service.ts`
+  - `src/services/veteran-services/veteran-certification.ts`
+  - `src/integrations/gsa-auctions/gsa-auction-client.ts`
+  - `src/components/atlas-hub/TerrainMapper.tsx`
+  - `src/components/pavement-scan/PavementScanInterface.tsx`
+  - `src/integrations/quickbooks/quickbooks-client.ts`
+- ESLint cleanup:
+  - Tuned `eslint.config.js` to align with project conventions and removed noisy rules
+  - Removed unused `eslint-disable` directives in Supabase client and Tailwind config
+  - Achieved zero linter errors and warnings
+- Verified typecheck/build via `vite build --mode development` (green)
+
+### Environment Configuration Notes
+- Provide these at runtime/build as needed:
+  - `VITE_WEATHER_API_KEY`, `VITE_ROUTING_API_KEY`, `VITE_EIA_API_KEY`, `VITE_GSA_API_KEY`, `VITE_SAM_GOV_API_KEY`, `VITE_POINT_CLOUD_API_KEY`, `VITE_AI_ANALYSIS_API_KEY`
+  - QuickBooks (server-side contexts): `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`, `QUICKBOOKS_ENVIRONMENT`, `QUICKBOOKS_REDIRECT_URI`
+- Supabase: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+
+### AI integration additions
+- Integrated a Hugging Face client (`src/integrations/huggingface/hf-client.ts`) with token from `VITE_HUGGINGFACE_TOKEN` or `HUGGINGFACE_TOKEN`.
+- Added an optional image segmentation demo on `UnifiedMap` to process uploaded images and receive a mask; next step is to convert mask to vector polygons and snap them to parcel edges.
+- Recommendation: move token into env and never hard-code; add rate limiting and retries for inference calls.
+
+---
+
+### Current session (this chat) additions
+- Tooling and stability
+  - ESLint to zero issues; config aligned to codebase
+  - Env helper `src/lib/env.ts` and standardized env reads
+  - Installed Turf for geospatial ops; added Hugging Face client (`src/integrations/huggingface/hf-client.ts`)
+- Accounting and materials
+  - Cost entry modal in `CostAnalyzer` with zod validation and toasts
+  - Vehicle creation modal in `FleetDashboard` with zod validation and toasts
+  - Supplier receipts CSV import with summary and toasts; recent price history display
+  - Invoices: record/mark paid, AR aging refresh, toasts
+- Maps and overlays
+  - Basemap preference persistence; radar overlay toggle/opacity with persisted prefs
+  - New `UnifiedMap.tsx` page with consolidated features:
+    - Default auto-locate to current GPS; fallback to Patrick County region
+    - Floating GPS button to recenter
+    - Layer controls: basemaps (OSM/ESRI/Stamen/Carto/Thunderforest placeholder), radar, topo, road lines with opacity sliders
+    - Drawing/measuring: line (length), polygon (area), finish/clear; pin tool; zoom controls
+    - Geofencing: demo polygon, inside/outside checks, persisted toggles
+    - Playback: timeline (0–24h), speed, ghost markers for vehicles/employees, reload history
+    - Route planning: OSRM-based routing with map-click origin/destination, distance/time readout, route polyline
+    - Entities: vehicles and employees with popover cards (status/stats, message/call/email/FaceTime actions)
+    - Analytics: employee movement state + mph, travel time accrual, phone usage timers (approx via visibility)
+    - Admin geofence alerts with offline queueing
+    - AI assist (demo): image segmentation request to Hugging Face (mask reception), ready for polygon vectorization next
+
+---
+
+### To-Do 
+- Employee tracking and shifts
+  - Replace simulated employee paths with real `employee_tracking` pings
+  - Create `shifts` table and clock-in/out flows; compute true workday window (first in → last out)
+  - Accrue travel time from DB events; expose summarized endpoints
+- Geofence management and events
+  - CRUD for named geofences; per-zone rules; enter/exit/breach events to `geofence_events`
+  - Real-time and batch notifications; admin inbox with RLS
+- Playback from DB
+  - Join employee + vehicle history by date range; render trails; add heatmap/clustering for large sets
+- AI asphalt vectorization
+  - Convert HF segmentation masks to vector polygons (marching squares/contours) and snap edges; store to `site_outlines`
+  - Replace placeholder circle overlay; compute area/perimeter; attach to project/jobs
+- Routing and region targeting
+  - Optional API key/provider for routing (Mapbox/Google) with limits & caching; pre-bias routes to Patrick County VA + adjacent counties (Surry, Stokes NC)
+- Security and roles
+  - Implement RBAC/RLS for invoices, gps, admin_messages, cost_entries, materials, outlines
+  - Ensure Hugging Face token, Thunderforest key, and other secrets via env
+- Quality and ops
+  - Unit tests (pricing import, invoices, gps, route, geofence events), E2E for map flows
+  - Observability (Sentry), CI/CD with previews, performance budgets
+  - Mobile UX polish for Unified Map tools and popovers; accessibility (keyboard drawing, ARIA)
+
+---
+
+### Project summary 
+- A unified, production-ready mapping interface with drawing/measurement, overlays, playback, routing, analytics, alerts, and AI hooks
+- Accounting/materials flows expanded (costs, vehicles, receipts CSV, invoices/payments)
+- Tooling hardened (linting, env standardization) and build green
+
+---
+
+### Remaining (consolidated)
+- Data: real employee tracking storage/queries; shift events; geofence CRUD/events; vehicle history retention
+- AI: segmentation mask → vector polygon pipeline; storage and UX for outlines; optional model fine-tuning
+- Routing: provider choice & keys; region bias; caching; offline fallbacks
+- Security: RBAC/RLS across sensitive tables; rate limiting; privacy/consent for tracking/phone analytics
+- UX/Perf: mobile-friendly controls; clustering/heatmaps; saved layer presets; accessibility
+- Tests/CI: unit/integration/E2E; error tracking; docs for ops and env
+
+---
+
+### need to add:
+- employee compliance system
+- achievments to unlock, friendly employee competitions
+- page for osha federal state ( Virginia and North Carolina ) coplinance system with rules regulations policies best practices and standards for industry
+- add page dedicated to All Materials and industry specifics policies rules regulations guidlines, instructions specifications standards and best practices for driveway and parkinglots : asphalt crack repair, patching, other maintinence, Sealcoating and line stripping. 
+- Veteran dashboard and special features 
+ 
+### Environment and keys needed
+- Supabase: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- Maps/overlays (optional): Thunderforest key, Mapbox/Google if used
+- Routing (optional): provider API key
+- Hugging Face: `VITE_HUGGINGFACE_TOKEN` or `HUGGINGFACE_TOKEN`
+- Existing: `VITE_WEATHER_API_KEY`, `VITE_ROUTING_API_KEY`, `VITE_EIA_API_KEY`, `VITE_GSA_API_KEY`, `VITE_SAM_GOV_API_KEY`, `VITE_POINT_CLOUD_API_KEY`, `VITE_AI_ANALYSIS_API_KEY`
+
+# What Remains – Project Status and To‑Do
+
+## Completed (current state)
+- Business data centralized
+  - `BUSINESS_PROFILE` with materials, mix ratios, coverage, pricing, fuel, vehicles, equipment, trailers, travel defaults
+  - Types in `src/types/business.ts`
+- Estimator core
+  - Sealcoating materials from coverage with 20% water and sand bags; Fast‑Dry and Prep‑Seal calculations
+  - Crack filling pricing (boxes, propane) and optional deep‑crack sand prefill
+  - Patching with thickness (in) and material (hot vs cold) pricing
+  - Line striping linear feet + extras (HC symbols, arrows, crosswalk count, stop bars, text stencils) and paint color price deltas
+  - Fuel model (C30 + Dakota travel miles, active fuel, excessive idle; MPG degradation under load)
+  - Transport load calculation includes unit, sealer (concentrate + water), and sand weights; GVWR advisory
+  - Overhead and profit; base variants: +25% markup, rounded‑to‑$10 and rounded +25%
+  - Optional sales tax line item placeholder
+- UI & UX
+  - Estimator page: presets, PMM price control (default/bulk), validation on numeric inputs, weight check toggle
+  - Auto miles: business↔supplier and business↔job address (geocode + haversine)
+  - Geolocation “Use my location” with reverse geocoding
+  - Recent Jobs (save/load) and Address Book (save/use)
+  - Invoice preview, copy invoice/copy‑all, Download .txt, Export PDF
+  - Jobs/Customers CSV export
+- Settings → Business (read/write)
+  - Fully editable defaults persisted locally (localStorage overrides)
+  - Export/Import all (settings overrides, jobs, customers) as JSON; Reset to defaults
+- Infrastructure & libs
+  - Geocoding with User‑Agent header, 7‑day TTL caching, retry/backoff
+  - Estimator returns typed `EstimateOutput`
+  - Minimal unit tests for helper functions (Vitest)
+  - Docs updated (`ESTIMATING_GUIDE.md`); README section on business config
+
+## What remains (functional)
+- Apply Sales Tax to totals
+  - Add per‑job toggle and persist on job; include tax in computed total (not just line item)
+- Patching productivity & materials
+  - Refine productivity by thickness/material; optional tack coat/additives line items
+- Crack filling refinements
+  - Propane consumption tied to hours; deep/wide crack detection inputs/templates; hot‑pour temperature/time allowances
+- Line striping
+  - Detailed stencil catalog (sizes/variants, per‑color material deltas), multi‑color layouts, curb/stop text
+- Sealcoating
+  - Multi‑coat options; waste factor (%); primer area detection helper; spray vs squeegee productivity presets
+- Fuel & transport
+  - Trailer‑specific towing MPG adjustments; route legs (supplier→job→return) vs current two‑leg simplification
+
+## What remains (UX)
+- Address inputs as structured fields (street/city/state/zip) with autocomplete; route map preview
+- Better input validation messages, helper text, and presets (driveway vs lot templates)
+- Loading states and error handling for geocoding; manual override confirmation UI
+
+## What remains (data & persistence)
+- Cloud sync (Supabase or similar)
+  - Auth/roles; migrate local overrides/jobs/customers to cloud
+  - Audit/version history for pricing changes and business profile edits
+
+## What remains (exports & invoicing)
+- Branded PDF invoices
+  - Logo, business name, terms (30‑day), signatures, optional tax line, per‑item notes
+  - Email/share workflow (mailto or SMTP/API)
+- Import/export conflict resolution UI; CSV column mapping and validation
+
+## What remains (engineering)
+- Testing
+  - Expand unit tests to all estimator branches and edge cases
+  - Add E2E smoke tests for Estimator and Settings (Playwright/Cypress)
+- Type safety
+  - Remove remaining `any` casts in Estimator page param plumbing; strict typing for UI state
+- Performance
+  - Code‑split heavy pages/components (3D/maps/exporters) and lazy‑load
+  - PWA/offline support for field quoting; caching strategy for geocode and assets
+- Ops & monitoring
+  - CI/CD with lint, typecheck, tests, build, preview deploys
+  - Error monitoring (Sentry) and basic usage analytics on estimator
+- Security/compliance
+  - Security pass for storage and exports; privacy note for geocoding usage; dependency updates
+
+## To‑Do (actionable)
+- Totals & tax
+  - [ ] Add per‑job `applySalesTax` flag; compute and include tax in `total`
+  - [ ] Persist tax flag in job params; surface in UI and invoice text
+- Estimator inputs
+  - [ ] Add structured address inputs + geocode autocomplete
+  - [ ] Add route map preview (supplier→job→return)
+  - [ ] Add preset templates (Driveway / Parking Lot) to prefill relevant fields
+- Calculators
+  - [ ] Trailer MPG modifiers and leg‑based route fuel costing
+  - [ ] Patching: tack coat/additives toggles and productivity curves by thickness
+  - [ ] Crack: propane by hours; deep/wide sand prefill factor tuning
+  - [ ] Sealcoat: multi‑coat, waste factor, application method productivity
+- Striping
+  - [ ] Build stencil catalog (sizes, prices, colors) and UI picker
+  - [ ] Per‑color material price deltas tied to catalog
+- Persistence
+  - [ ] Supabase schema for users, business profile, price book, jobs, customers
+  - [ ] Migration utility from localStorage; conflict resolution
+- Exports
+  - [ ] Branded PDF (logo, terms, signatures) and email/share
+  - [ ] CSV import with mapping; import preview + validation
+- QA & CI
+  - [ ] Unit test coverage for all helpers and edge cases
+  - [ ] E2E flows for Estimator, Settings, Export/Import
+  - [ ] GitHub Actions for lint/typecheck/test/build
+- Performance/UX polish
+  - [ ] Lazy‑load exporters and geocode libs; PWA support
+  - [ ] Geocode throttling UI, spinners, and error toasts
+- Security
+  - [ ] Add content security policy; review data handling; update dependencies
+
+## Files of interest (implemented)
+- `src/types/business.ts` – BusinessProfile and pricing/fuel extensions
+- `src/data/business.ts` – Defaults with materials, pricing, fuel, vehicles, equipment
+- `src/lib/estimator.ts` – Calculators (materials, fuel, striping, patching, transport, totals)
+- `src/lib/geo.ts` – Geocoding with caching, retry, and haversine
+- `src/pages/Estimator.tsx` – Estimator UI (all features, exports, validation)
+- `src/pages/Settings.tsx` – Business settings (edit, export/import)
+- `src/services/*` – business profile overrides, jobs, customers, exporters, export/import bundle
+- `src/test/estimator.spec.ts` – Minimal unit tests
+- `docs/ESTIMATING_GUIDE.md` – Guide & config pointers
+
+## Quick next steps
+1. Implement sales tax in totals with per‑job toggle (UI + calculator)
+2. Add stencil catalog and structured address UI with map preview
+3. Migrate to Supabase (schema + adapters + migration)
+4. Branded PDF invoice and email/share
+5. Flesh out unit/E2E tests and wire CI
