@@ -11,13 +11,13 @@ export interface GradientStop {
 }
 
 export interface Gradient {
-  type: 'linear' | 'radial' | 'conic';
+  type: "linear" | "radial" | "conic";
   angle?: number; // For linear gradients
   stops: GradientStop[];
 }
 
 export interface Shadow {
-  type: 'drop' | 'inner' | 'glow' | 'text';
+  type: "drop" | "inner" | "glow" | "text";
   x: number;
   y: number;
   blur: number;
@@ -29,15 +29,15 @@ export interface Shadow {
 export interface Animation {
   name: string;
   duration: number; // ms
-  easing: 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'linear' | string;
-  iterations: number | 'infinite';
-  direction: 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
+  easing: "ease" | "ease-in" | "ease-out" | "ease-in-out" | "linear" | string;
+  iterations: number | "infinite";
+  direction: "normal" | "reverse" | "alternate" | "alternate-reverse";
   delay?: number;
 }
 
 export interface ParticleEffect {
   enabled: boolean;
-  type: 'snow' | 'rain' | 'dust' | 'sparks' | 'geometric' | 'custom' | 'fog';
+  type: "snow" | "rain" | "dust" | "sparks" | "geometric" | "custom" | "fog";
   count: number;
   speed: number;
   size: { min: number; max: number };
@@ -66,7 +66,7 @@ export interface ThemeColors {
   // Base colors
   background: ThemeColor;
   foreground: ThemeColor;
-  
+
   // Interactive colors
   primary: ThemeColor;
   primaryForeground: ThemeColor;
@@ -74,7 +74,7 @@ export interface ThemeColors {
   secondaryForeground: ThemeColor;
   accent: ThemeColor;
   accentForeground: ThemeColor;
-  
+
   // Status colors
   destructive: ThemeColor;
   destructiveForeground: ThemeColor;
@@ -84,7 +84,7 @@ export interface ThemeColors {
   warningForeground: ThemeColor;
   info: ThemeColor;
   infoForeground: ThemeColor;
-  
+
   // UI colors
   muted: ThemeColor;
   mutedForeground: ThemeColor;
@@ -95,7 +95,7 @@ export interface ThemeColors {
   cardForeground: ThemeColor;
   popover: ThemeColor;
   popoverForeground: ThemeColor;
-  
+
   // Sidebar colors
   sidebar: ThemeColor;
   sidebarForeground: ThemeColor;
@@ -105,7 +105,7 @@ export interface ThemeColors {
   sidebarAccentForeground: ThemeColor;
   sidebarBorder: ThemeColor;
   sidebarRing: ThemeColor;
-  
+
   // Industry-specific colors
   asphalt?: ThemeColor;
   concrete?: ThemeColor;
@@ -122,15 +122,15 @@ export interface ThemeEffects {
     glow: Shadow;
     inner: Shadow;
   };
-  
+
   blur: {
     background: BlurEffect;
     overlay: BlurEffect;
     card: BlurEffect;
   };
-  
+
   particles: ParticleEffect;
-  
+
   animations: {
     fadeIn: Animation;
     slideIn: Animation;
@@ -141,7 +141,7 @@ export interface ThemeEffects {
     glow: Animation;
     custom?: Animation[];
   };
-  
+
   gradients: {
     primary: Gradient;
     secondary: Gradient;
@@ -153,7 +153,7 @@ export interface ThemeEffects {
 }
 
 export interface ThemeWallpaper {
-  type: 'color' | 'gradient' | 'image' | 'video' | 'canvas';
+  type: "color" | "gradient" | "image" | "video" | "canvas";
   source?: string; // URL for image/video
   gradient?: Gradient;
   color?: ThemeColor;
@@ -164,7 +164,7 @@ export interface ThemeWallpaper {
   };
   animation?: Animation;
   parallax?: boolean;
-  tiling?: 'repeat' | 'no-repeat' | 'repeat-x' | 'repeat-y';
+  tiling?: "repeat" | "no-repeat" | "repeat-x" | "repeat-y";
   position?: string;
   size?: string;
 }
@@ -188,17 +188,25 @@ export interface Theme {
   id: string;
   name: string;
   description: string;
-  category: 'military' | 'asphalt' | 'construction' | 'nature' | 'tech' | 'abstract' | 'corporate' | 'custom';
+  category:
+    | "military"
+    | "asphalt"
+    | "construction"
+    | "nature"
+    | "tech"
+    | "abstract"
+    | "corporate"
+    | "custom";
   author: string;
   version: string;
-  baseMode: 'light' | 'dark' | 'auto';
-  
+  baseMode: "light" | "dark" | "auto";
+
   // Core theme data
   colors: ThemeColors;
   effects: ThemeEffects;
   wallpaper: ThemeWallpaper;
   typography: ThemeTypography;
-  
+
   // Responsive variants
   variants?: {
     mobile?: ThemeVariant;
@@ -206,7 +214,7 @@ export interface Theme {
     desktop?: ThemeVariant;
     tv?: ThemeVariant;
   };
-  
+
   // Time-based variants
   timeVariants?: {
     morning?: ThemeVariant;
@@ -214,10 +222,10 @@ export interface Theme {
     evening?: ThemeVariant;
     night?: ThemeVariant;
   };
-  
+
   // Custom CSS
   customCSS?: string;
-  
+
   // Performance settings
   performance: {
     enableAnimations: boolean;
@@ -225,9 +233,9 @@ export interface Theme {
     enableBlur: boolean;
     enableShadows: boolean;
     enableGradients: boolean;
-    quality: 'low' | 'medium' | 'high' | 'ultra';
+    quality: "low" | "medium" | "high" | "ultra";
   };
-  
+
   // Accessibility
   accessibility: {
     highContrast: boolean;
@@ -235,7 +243,7 @@ export interface Theme {
     largeText: boolean;
     focusVisible: boolean;
   };
-  
+
   // Metadata
   createdAt: string;
   updatedAt: string;
@@ -244,7 +252,7 @@ export interface Theme {
   public: boolean;
   // Veteran access control (optional)
   requiresVeteran?: boolean;
-  branchTag?: 'army' | 'navy' | 'airforce' | 'marines' | 'coastguard' | 'spaceforce' | 'all';
+  branchTag?: "army" | "navy" | "airforce" | "marines" | "coastguard" | "spaceforce" | "all";
 }
 
 export interface ThemePreset {
@@ -256,18 +264,18 @@ export interface ThemePreset {
 
 // Optional UI token extensions for per-component radii, borders, and focus rings
 export interface ThemeUIRadius {
-  card?: string;      // e.g., '0.5rem'
-  button?: string;    // e.g., '0.5rem'
-  input?: string;     // e.g., '0.5rem'
-  menu?: string;      // e.g., '0.375rem'
-  popover?: string;   // e.g., '0.375rem'
-  toast?: string;     // e.g., '0.5rem'
+  card?: string; // e.g., '0.5rem'
+  button?: string; // e.g., '0.5rem'
+  input?: string; // e.g., '0.5rem'
+  menu?: string; // e.g., '0.375rem'
+  popover?: string; // e.g., '0.375rem'
+  toast?: string; // e.g., '0.5rem'
 }
 
 export interface ThemeUIBorders {
-  width?: string;       // e.g., '1px'
-  focusRingWidth?: string;   // e.g., '2px'
-  focusRingOffset?: string;  // e.g., '2px'
+  width?: string; // e.g., '1px'
+  focusRingWidth?: string; // e.g., '2px'
+  focusRingOffset?: string; // e.g., '2px'
 }
 
 export interface ThemeUI {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,24 +6,37 @@ import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  AlertTriangle, 
-  Ruler, 
-  MapPin, 
-  Edit3, 
-  Trash2, 
-  Eye, 
+import {
+  AlertTriangle,
+  Ruler,
+  MapPin,
+  Edit3,
+  Trash2,
+  Eye,
   Download,
   Filter,
   Search,
   TrendingUp,
   BarChart3,
-  Calendar
+  Calendar,
 } from "lucide-react";
-import { DefectData } from '@/pages/PavementScanPro';
+import { DefectData } from "@/pages/PavementScanPro";
 
 interface DefectDetectionProps {
   defects: DefectData[];
@@ -33,48 +46,49 @@ interface DefectDetectionProps {
 const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpdate }) => {
   const [selectedDefect, setSelectedDefect] = useState<DefectData | null>(null);
   const [editingDefect, setEditingDefect] = useState<DefectData | null>(null);
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterSeverity, setFilterSeverity] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterSeverity, setFilterSeverity] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const defectTypeLabels = {
-    crack: 'Crack',
-    pothole: 'Pothole',
-    alligator: 'Alligator Cracking',
-    water_pooling: 'Water Pooling',
-    gatoring: 'Gatoring',
-    broken_area: 'Broken Area',
-    weak_area: 'Weak Area',
-    subsurface: 'Subsurface Defect'
+    crack: "Crack",
+    pothole: "Pothole",
+    alligator: "Alligator Cracking",
+    water_pooling: "Water Pooling",
+    gatoring: "Gatoring",
+    broken_area: "Broken Area",
+    weak_area: "Weak Area",
+    subsurface: "Subsurface Defect",
   };
 
   const severityColors = {
-    low: 'bg-green-100 text-green-800',
-    medium: 'bg-yellow-100 text-yellow-800',
-    high: 'bg-orange-100 text-orange-800',
-    critical: 'bg-red-100 text-red-800'
+    low: "bg-green-100 text-green-800",
+    medium: "bg-yellow-100 text-yellow-800",
+    high: "bg-orange-100 text-orange-800",
+    critical: "bg-red-100 text-red-800",
   };
 
   const defectTypeColors = {
-    crack: 'bg-red-100 text-red-800',
-    pothole: 'bg-red-200 text-red-900',
-    alligator: 'bg-orange-100 text-orange-800',
-    water_pooling: 'bg-blue-100 text-blue-800',
-    gatoring: 'bg-yellow-100 text-yellow-800',
-    broken_area: 'bg-purple-100 text-purple-800',
-    weak_area: 'bg-gray-100 text-gray-800',
-    subsurface: 'bg-indigo-100 text-indigo-800'
+    crack: "bg-red-100 text-red-800",
+    pothole: "bg-red-200 text-red-900",
+    alligator: "bg-orange-100 text-orange-800",
+    water_pooling: "bg-blue-100 text-blue-800",
+    gatoring: "bg-yellow-100 text-yellow-800",
+    broken_area: "bg-purple-100 text-purple-800",
+    weak_area: "bg-gray-100 text-gray-800",
+    subsurface: "bg-indigo-100 text-indigo-800",
   };
 
   // Filter and search defects
   const filteredDefects = useMemo(() => {
-    return defects.filter(defect => {
-      const typeMatch = filterType === 'all' || defect.type === filterType;
-      const severityMatch = filterSeverity === 'all' || defect.severity === filterSeverity;
-      const searchMatch = searchTerm === '' || 
+    return defects.filter((defect) => {
+      const typeMatch = filterType === "all" || defect.type === filterType;
+      const severityMatch = filterSeverity === "all" || defect.severity === filterSeverity;
+      const searchMatch =
+        searchTerm === "" ||
         defect.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         defectTypeLabels[defect.type].toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       return typeMatch && severityMatch && searchMatch;
     });
   }, [defects, filterType, filterSeverity, searchTerm]);
@@ -83,22 +97,24 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
   const stats = useMemo(() => {
     const totalArea = defects.reduce((sum, defect) => sum + (defect.measurements.area || 0), 0);
     const totalLength = defects.reduce((sum, defect) => sum + (defect.measurements.length || 0), 0);
-    
+
     const severityCount = {
-      critical: defects.filter(d => d.severity === 'critical').length,
-      high: defects.filter(d => d.severity === 'high').length,
-      medium: defects.filter(d => d.severity === 'medium').length,
-      low: defects.filter(d => d.severity === 'low').length
+      critical: defects.filter((d) => d.severity === "critical").length,
+      high: defects.filter((d) => d.severity === "high").length,
+      medium: defects.filter((d) => d.severity === "medium").length,
+      low: defects.filter((d) => d.severity === "low").length,
     };
 
-    const typeCount = Object.keys(defectTypeLabels).reduce((acc, type) => {
-      acc[type] = defects.filter(d => d.type === type).length;
-      return acc;
-    }, {} as Record<string, number>);
+    const typeCount = Object.keys(defectTypeLabels).reduce(
+      (acc, type) => {
+        acc[type] = defects.filter((d) => d.type === type).length;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const avgConfidence = defects.length > 0 
-      ? defects.reduce((sum, d) => sum + d.confidence, 0) / defects.length 
-      : 0;
+    const avgConfidence =
+      defects.length > 0 ? defects.reduce((sum, d) => sum + d.confidence, 0) / defects.length : 0;
 
     return {
       total: defects.length,
@@ -106,7 +122,7 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
       totalLength,
       severityCount,
       typeCount,
-      avgConfidence
+      avgConfidence,
     };
   }, [defects]);
 
@@ -116,16 +132,14 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
 
   const handleSaveDefect = () => {
     if (!editingDefect) return;
-    
-    const updatedDefects = defects.map(d => 
-      d.id === editingDefect.id ? editingDefect : d
-    );
+
+    const updatedDefects = defects.map((d) => (d.id === editingDefect.id ? editingDefect : d));
     onDefectUpdate(updatedDefects);
     setEditingDefect(null);
   };
 
   const handleDeleteDefect = (defectId: string) => {
-    const updatedDefects = defects.filter(d => d.id !== defectId);
+    const updatedDefects = defects.filter((d) => d.id !== defectId);
     onDefectUpdate(updatedDefects);
     if (selectedDefect?.id === defectId) {
       setSelectedDefect(null);
@@ -133,7 +147,7 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
   };
 
   const formatMeasurement = (value: number | undefined, unit: string) => {
-    return value ? `${value.toFixed(2)} ${unit}` : 'N/A';
+    return value ? `${value.toFixed(2)} ${unit}` : "N/A";
   };
 
   const getRepairPriority = (defect: DefectData): string => {
@@ -141,7 +155,7 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
       critical: 4,
       high: 3,
       medium: 2,
-      low: 1
+      low: 1,
     }[defect.severity];
 
     const typeMultiplier = {
@@ -152,15 +166,15 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
       gatoring: 1.1,
       water_pooling: 1.0,
       weak_area: 0.9,
-      subsurface: 0.8
+      subsurface: 0.8,
     }[defect.type];
 
     const score = priorityScore * typeMultiplier;
 
-    if (score >= 5) return 'Immediate';
-    if (score >= 3) return 'Within 7 days';
-    if (score >= 2) return 'Within 30 days';
-    return 'Next maintenance cycle';
+    if (score >= 5) return "Immediate";
+    if (score >= 3) return "Within 7 days";
+    if (score >= 2) return "Within 30 days";
+    return "Next maintenance cycle";
   };
 
   return (
@@ -184,7 +198,7 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Area</p>
-                <p className="text-2xl font-bold">{formatMeasurement(stats.totalArea, 'sq ft')}</p>
+                <p className="text-2xl font-bold">{formatMeasurement(stats.totalArea, "sq ft")}</p>
               </div>
               <Ruler className="h-8 w-8 text-muted-foreground" />
             </div>
@@ -249,7 +263,9 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
                   {Object.entries(defectTypeLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -318,7 +334,7 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                   </TableHeader>
                   <TableBody>
                     {filteredDefects.map((defect) => (
-                      <TableRow 
+                      <TableRow
                         key={defect.id}
                         className="cursor-pointer hover:bg-muted/50"
                         onClick={() => setSelectedDefect(defect)}
@@ -339,10 +355,14 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                         <TableCell>
                           <div className="text-sm">
                             {defect.measurements.area && (
-                              <div>Area: {formatMeasurement(defect.measurements.area, 'sq ft')}</div>
+                              <div>
+                                Area: {formatMeasurement(defect.measurements.area, "sq ft")}
+                              </div>
                             )}
                             {defect.measurements.length && (
-                              <div>Length: {formatMeasurement(defect.measurements.length, 'ft')}</div>
+                              <div>
+                                Length: {formatMeasurement(defect.measurements.length, "ft")}
+                              </div>
                             )}
                           </div>
                         </TableCell>
@@ -402,7 +422,9 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                 <div className="space-y-3">
                   {Object.entries(stats.typeCount).map(([type, count]) => (
                     <div key={type} className="flex items-center justify-between">
-                      <span className="text-sm">{defectTypeLabels[type as keyof typeof defectTypeLabels]}</span>
+                      <span className="text-sm">
+                        {defectTypeLabels[type as keyof typeof defectTypeLabels]}
+                      </span>
                       <div className="flex items-center gap-2">
                         <Progress value={(count / stats.total) * 100} className="w-20" />
                         <span className="text-sm font-medium">{count}</span>
@@ -452,8 +474,8 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                   <div className="border-l-4 border-red-500 bg-red-50 p-4">
                     <h4 className="font-semibold text-red-800">Immediate Action Required</h4>
                     <p className="text-red-700">
-                      {stats.severityCount.critical} critical defects detected. These require immediate attention 
-                      to prevent safety hazards and further deterioration.
+                      {stats.severityCount.critical} critical defects detected. These require
+                      immediate attention to prevent safety hazards and further deterioration.
                     </p>
                   </div>
                 )}
@@ -462,8 +484,8 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                   <div className="border-l-4 border-orange-500 bg-orange-50 p-4">
                     <h4 className="font-semibold text-orange-800">Pothole Repair</h4>
                     <p className="text-orange-700">
-                      {stats.typeCount.pothole} potholes detected. Recommend cold-patch repair for temporary 
-                      solution and hot-mix asphalt for permanent repair.
+                      {stats.typeCount.pothole} potholes detected. Recommend cold-patch repair for
+                      temporary solution and hot-mix asphalt for permanent repair.
                     </p>
                   </div>
                 )}
@@ -472,8 +494,8 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                   <div className="border-l-4 border-yellow-500 bg-yellow-50 p-4">
                     <h4 className="font-semibold text-yellow-800">Crack Sealing</h4>
                     <p className="text-yellow-700">
-                      {stats.typeCount.crack} cracks detected. Apply crack sealant to prevent water infiltration 
-                      and further deterioration.
+                      {stats.typeCount.crack} cracks detected. Apply crack sealant to prevent water
+                      infiltration and further deterioration.
                     </p>
                   </div>
                 )}
@@ -482,8 +504,8 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                   <div className="border-l-4 border-blue-500 bg-blue-50 p-4">
                     <h4 className="font-semibold text-blue-800">Drainage Issues</h4>
                     <p className="text-blue-700">
-                      {stats.typeCount.water_pooling} areas with water pooling detected. Improve drainage 
-                      and consider surface leveling to prevent standing water.
+                      {stats.typeCount.water_pooling} areas with water pooling detected. Improve
+                      drainage and consider surface leveling to prevent standing water.
                     </p>
                   </div>
                 )}
@@ -522,23 +544,24 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
               <div>
                 <Label>Severity</Label>
                 <Badge className={severityColors[selectedDefect.severity]}>
-                  {selectedDefect.severity.charAt(0).toUpperCase() + selectedDefect.severity.slice(1)}
+                  {selectedDefect.severity.charAt(0).toUpperCase() +
+                    selectedDefect.severity.slice(1)}
                 </Badge>
               </div>
               <div>
                 <Label>Measurements</Label>
                 <div className="text-sm space-y-1">
                   {selectedDefect.measurements.area && (
-                    <p>Area: {formatMeasurement(selectedDefect.measurements.area, 'sq ft')}</p>
+                    <p>Area: {formatMeasurement(selectedDefect.measurements.area, "sq ft")}</p>
                   )}
                   {selectedDefect.measurements.length && (
-                    <p>Length: {formatMeasurement(selectedDefect.measurements.length, 'ft')}</p>
+                    <p>Length: {formatMeasurement(selectedDefect.measurements.length, "ft")}</p>
                   )}
                   {selectedDefect.measurements.width && (
-                    <p>Width: {formatMeasurement(selectedDefect.measurements.width, 'ft')}</p>
+                    <p>Width: {formatMeasurement(selectedDefect.measurements.width, "ft")}</p>
                   )}
                   {selectedDefect.measurements.depth && (
-                    <p>Depth: {formatMeasurement(selectedDefect.measurements.depth, 'in')}</p>
+                    <p>Depth: {formatMeasurement(selectedDefect.measurements.depth, "in")}</p>
                   )}
                 </div>
               </div>
@@ -584,17 +607,21 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                 <Label htmlFor="edit-type">Type</Label>
                 <Select
                   value={editingDefect.type}
-                  onValueChange={(value) => setEditingDefect({
-                    ...editingDefect,
-                    type: value as DefectData['type']
-                  })}
+                  onValueChange={(value) =>
+                    setEditingDefect({
+                      ...editingDefect,
+                      type: value as DefectData["type"],
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(defectTypeLabels).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -604,10 +631,12 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                 <Label htmlFor="edit-severity">Severity</Label>
                 <Select
                   value={editingDefect.severity}
-                  onValueChange={(value) => setEditingDefect({
-                    ...editingDefect,
-                    severity: value as DefectData['severity']
-                  })}
+                  onValueChange={(value) =>
+                    setEditingDefect({
+                      ...editingDefect,
+                      severity: value as DefectData["severity"],
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -628,14 +657,16 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                     id="edit-length"
                     type="number"
                     step="0.1"
-                    value={editingDefect.measurements.length || ''}
-                    onChange={(e) => setEditingDefect({
-                      ...editingDefect,
-                      measurements: {
-                        ...editingDefect.measurements,
-                        length: parseFloat(e.target.value) || undefined
-                      }
-                    })}
+                    value={editingDefect.measurements.length || ""}
+                    onChange={(e) =>
+                      setEditingDefect({
+                        ...editingDefect,
+                        measurements: {
+                          ...editingDefect.measurements,
+                          length: parseFloat(e.target.value) || undefined,
+                        },
+                      })
+                    }
                   />
                 </div>
 
@@ -645,14 +676,16 @@ const DefectDetection: React.FC<DefectDetectionProps> = ({ defects, onDefectUpda
                     id="edit-width"
                     type="number"
                     step="0.1"
-                    value={editingDefect.measurements.width || ''}
-                    onChange={(e) => setEditingDefect({
-                      ...editingDefect,
-                      measurements: {
-                        ...editingDefect.measurements,
-                        width: parseFloat(e.target.value) || undefined
-                      }
-                    })}
+                    value={editingDefect.measurements.width || ""}
+                    onChange={(e) =>
+                      setEditingDefect({
+                        ...editingDefect,
+                        measurements: {
+                          ...editingDefect.measurements,
+                          width: parseFloat(e.target.value) || undefined,
+                        },
+                      })
+                    }
                   />
                 </div>
               </div>

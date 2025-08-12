@@ -1,38 +1,80 @@
-import { Theme, ThemeColor } from '@/types/theme';
+import { Theme, ThemeColor } from "@/types/theme";
 
 // Helper function to create ThemeColor objects
 const color = (h: number, s: number, l: number, a?: number): ThemeColor => ({ h, s, l, a });
 
 // Common effect templates
 const commonShadows = {
-  sm: { type: 'drop' as const, x: 0, y: 1, blur: 2, color: color(0, 0, 0), intensity: 0.1 },
-  md: { type: 'drop' as const, x: 0, y: 4, blur: 6, color: color(0, 0, 0), intensity: 0.1 },
-  lg: { type: 'drop' as const, x: 0, y: 10, blur: 15, color: color(0, 0, 0), intensity: 0.1 },
-  xl: { type: 'drop' as const, x: 0, y: 20, blur: 25, color: color(0, 0, 0), intensity: 0.25 },
-  glow: { type: 'glow' as const, x: 0, y: 0, blur: 20, color: color(220, 100, 50), intensity: 0.5 },
-  inner: { type: 'inner' as const, x: 0, y: 2, blur: 4, color: color(0, 0, 0), intensity: 0.06 }
+  sm: { type: "drop" as const, x: 0, y: 1, blur: 2, color: color(0, 0, 0), intensity: 0.1 },
+  md: { type: "drop" as const, x: 0, y: 4, blur: 6, color: color(0, 0, 0), intensity: 0.1 },
+  lg: { type: "drop" as const, x: 0, y: 10, blur: 15, color: color(0, 0, 0), intensity: 0.1 },
+  xl: { type: "drop" as const, x: 0, y: 20, blur: 25, color: color(0, 0, 0), intensity: 0.25 },
+  glow: { type: "glow" as const, x: 0, y: 0, blur: 20, color: color(220, 100, 50), intensity: 0.5 },
+  inner: { type: "inner" as const, x: 0, y: 2, blur: 4, color: color(0, 0, 0), intensity: 0.06 },
 };
 
 const commonAnimations = {
-  fadeIn: { name: 'fadeIn', duration: 150, easing: 'ease-out' as const, iterations: 1, direction: 'normal' as const },
-  slideIn: { name: 'slideInRight', duration: 300, easing: 'ease-out' as const, iterations: 1, direction: 'normal' as const },
-  bounce: { name: 'bounce', duration: 1000, easing: 'ease-in-out' as const, iterations: 'infinite' as const, direction: 'normal' as const },
-  pulse: { name: 'pulse', duration: 2000, easing: 'ease-in-out' as const, iterations: 'infinite' as const, direction: 'alternate' as const },
-  rotate: { name: 'rotate', duration: 20000, easing: 'linear' as const, iterations: 'infinite' as const, direction: 'normal' as const },
-  scale: { name: 'scale', duration: 200, easing: 'ease-out' as const, iterations: 1, direction: 'normal' as const },
-  glow: { name: 'glow', duration: 3000, easing: 'ease-in-out' as const, iterations: 'infinite' as const, direction: 'alternate' as const }
+  fadeIn: {
+    name: "fadeIn",
+    duration: 150,
+    easing: "ease-out" as const,
+    iterations: 1,
+    direction: "normal" as const,
+  },
+  slideIn: {
+    name: "slideInRight",
+    duration: 300,
+    easing: "ease-out" as const,
+    iterations: 1,
+    direction: "normal" as const,
+  },
+  bounce: {
+    name: "bounce",
+    duration: 1000,
+    easing: "ease-in-out" as const,
+    iterations: "infinite" as const,
+    direction: "normal" as const,
+  },
+  pulse: {
+    name: "pulse",
+    duration: 2000,
+    easing: "ease-in-out" as const,
+    iterations: "infinite" as const,
+    direction: "alternate" as const,
+  },
+  rotate: {
+    name: "rotate",
+    duration: 20000,
+    easing: "linear" as const,
+    iterations: "infinite" as const,
+    direction: "normal" as const,
+  },
+  scale: {
+    name: "scale",
+    duration: 200,
+    easing: "ease-out" as const,
+    iterations: 1,
+    direction: "normal" as const,
+  },
+  glow: {
+    name: "glow",
+    duration: 3000,
+    easing: "ease-in-out" as const,
+    iterations: "infinite" as const,
+    direction: "alternate" as const,
+  },
 };
 
 export const getDefaultThemes = (): Theme[] => [
   // Military & Tactical Themes
   {
-    id: 'military-tactical',
-    name: 'Military Tactical',
-    description: 'Professional military-grade interface with tactical colors and effects',
-    category: 'military',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "military-tactical",
+    name: "Military Tactical",
+    description: "Professional military-grade interface with tactical colors and effects",
+    category: "military",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(222, 84, 5),
       foreground: color(210, 40, 98),
@@ -66,50 +108,99 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(240, 4, 16),
       sidebarAccentForeground: color(240, 5, 96),
       sidebarBorder: color(240, 4, 16),
-      sidebarRing: color(217, 91, 60)
+      sidebarRing: color(217, 91, 60),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 20, color: color(120, 100, 50), intensity: 0.3 }
+        glow: { type: "glow", x: 0, y: 0, blur: 20, color: color(120, 100, 50), intensity: 0.3 },
       },
       blur: {
         background: { enabled: true, radius: 8, saturation: 120, brightness: 80 },
         overlay: { enabled: true, radius: 4, saturation: 100, brightness: 90 },
-        card: { enabled: true, radius: 2, saturation: 110, brightness: 95 }
+        card: { enabled: true, radius: 2, saturation: 110, brightness: 95 },
       },
       particles: {
         enabled: true,
-        type: 'geometric',
+        type: "geometric",
         count: 30,
         speed: 0.5,
         size: { min: 1, max: 3 },
         color: color(120, 100, 50),
         opacity: { min: 0.1, max: 0.3 },
         direction: 45,
-        wind: 0.1
+        wind: 0.1,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 135, stops: [{ color: color(210, 100, 70), position: 0 }, { color: color(120, 100, 50), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(220, 40, 25), position: 0 }, { color: color(222, 84, 5), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(220, 100, 8), position: 0 }, { color: color(220, 60, 15), position: 100 }] },
-        card: { type: 'linear', angle: 145, stops: [{ color: color(222, 84, 5), position: 0 }, { color: color(240, 6, 10), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(210, 100, 70), position: 0 }, { color: color(210, 100, 60), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(120, 100, 50, 0.3), position: 0 }, { color: color(210, 100, 70, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(210, 100, 70), position: 0 },
+            { color: color(120, 100, 50), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(220, 40, 25), position: 0 },
+            { color: color(222, 84, 5), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(220, 100, 8), position: 0 },
+            { color: color(220, 60, 15), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 145,
+          stops: [
+            { color: color(222, 84, 5), position: 0 },
+            { color: color(240, 6, 10), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 100, 70), position: 0 },
+            { color: color(210, 100, 60), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(120, 100, 50, 0.3), position: 0 },
+            { color: color(210, 100, 70, 0.3), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'gradient',
-      gradient: { type: 'linear', angle: 135, stops: [{ color: color(220, 100, 3), position: 0 }, { color: color(240, 6, 8), position: 100 }] },
-      overlay: { color: color(0, 0, 0), opacity: 0.4, blendMode: 'multiply' }
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 135,
+        stops: [
+          { color: color(220, 100, 3), position: 0 },
+          { color: color(240, 6, 8), position: 100 },
+        ],
+      },
+      overlay: { color: color(0, 0, 0), opacity: 0.4, blendMode: "multiply" },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.015, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.015, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -117,30 +208,30 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'high'
+      quality: "high",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['military', 'tactical', 'professional', 'dark'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["military", "tactical", "professional", "dark"],
     featured: true,
-    public: true
+    public: true,
   },
 
   // Asphalt Industry Themes
   {
-    id: 'asphalt-pro',
-    name: 'Asphalt Professional',
-    description: 'Professional asphalt industry theme with road construction colors',
-    category: 'asphalt',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "asphalt-pro",
+    name: "Asphalt Professional",
+    description: "Professional asphalt industry theme with road construction colors",
+    category: "asphalt",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(30, 15, 8),
       foreground: color(40, 10, 85),
@@ -178,50 +269,98 @@ export const getDefaultThemes = (): Theme[] => [
       asphalt: color(30, 15, 8),
       concrete: color(0, 0, 75),
       machinery: color(45, 90, 40),
-      safety: color(45, 100, 60)
+      safety: color(45, 100, 60),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 15, color: color(45, 90, 55), intensity: 0.4 }
+        glow: { type: "glow", x: 0, y: 0, blur: 15, color: color(45, 90, 55), intensity: 0.4 },
       },
       blur: {
         background: { enabled: true, radius: 6, saturation: 110, brightness: 85 },
         overlay: { enabled: true, radius: 3, saturation: 105, brightness: 92 },
-        card: { enabled: true, radius: 1, saturation: 102, brightness: 98 }
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 98 },
       },
       particles: {
         enabled: true,
-        type: 'dust',
+        type: "dust",
         count: 40,
         speed: 0.3,
         size: { min: 0.5, max: 2 },
         color: color(45, 60, 40),
         opacity: { min: 0.05, max: 0.2 },
         direction: 90,
-        wind: 0.05
+        wind: 0.05,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 45, stops: [{ color: color(35, 70, 45), position: 0 }, { color: color(45, 90, 55), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(25, 25, 20), position: 0 }, { color: color(30, 15, 8), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(30, 15, 12), position: 0 }, { color: color(25, 20, 5), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(30, 15, 10), position: 0 }, { color: color(25, 20, 6), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(35, 70, 50), position: 0 }, { color: color(35, 70, 40), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(45, 90, 55, 0.3), position: 0 }, { color: color(35, 70, 45, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 45,
+          stops: [
+            { color: color(35, 70, 45), position: 0 },
+            { color: color(45, 90, 55), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(25, 25, 20), position: 0 },
+            { color: color(30, 15, 8), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(30, 15, 12), position: 0 },
+            { color: color(25, 20, 5), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(30, 15, 10), position: 0 },
+            { color: color(25, 20, 6), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(35, 70, 50), position: 0 },
+            { color: color(35, 70, 40), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(45, 90, 55, 0.3), position: 0 },
+            { color: color(35, 70, 45, 0.3), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'gradient',
-      gradient: { type: 'linear', angle: 45, stops: [{ color: color(25, 20, 5), position: 0 }, { color: color(30, 15, 8), position: 100 }] },
-      overlay: { color: color(0, 0, 0), opacity: 0.3, blendMode: 'overlay' }
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 45,
+        stops: [
+          { color: color(25, 20, 5), position: 0 },
+          { color: color(30, 15, 8), position: 100 },
+        ],
+      },
+      overlay: { color: color(0, 0, 0), opacity: 0.3, blendMode: "overlay" },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -229,29 +368,29 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'high'
+      quality: "high",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['asphalt', 'construction', 'professional', 'industry'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["asphalt", "construction", "professional", "industry"],
     featured: true,
-    public: true
+    public: true,
   },
 
   {
-    id: 'paving-master',
-    name: 'Paving Master',
-    description: 'Advanced paving operations theme with construction machinery aesthetics',
-    category: 'asphalt',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "paving-master",
+    name: "Paving Master",
+    description: "Advanced paving operations theme with construction machinery aesthetics",
+    category: "asphalt",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(0, 0, 95),
       foreground: color(30, 30, 25),
@@ -289,49 +428,98 @@ export const getDefaultThemes = (): Theme[] => [
       asphalt: color(30, 15, 8),
       concrete: color(0, 0, 85),
       machinery: color(45, 95, 40),
-      safety: color(45, 100, 60)
+      safety: color(45, 100, 60),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 12, color: color(45, 95, 50), intensity: 0.2 }
+        glow: { type: "glow", x: 0, y: 0, blur: 12, color: color(45, 95, 50), intensity: 0.2 },
       },
       blur: {
         background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
         overlay: { enabled: true, radius: 2, saturation: 105, brightness: 95 },
-        card: { enabled: true, radius: 1, saturation: 102, brightness: 98 }
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 98 },
       },
       particles: {
         enabled: false,
-        type: 'dust',
+        type: "dust",
         count: 0,
         speed: 0,
         size: { min: 0, max: 0 },
         color: color(0, 0, 0),
         opacity: { min: 0, max: 0 },
         direction: 0,
-        wind: 0
+        wind: 0,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(25, 80, 40), position: 0 }, { color: color(25, 80, 30), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(40, 40, 90), position: 0 }, { color: color(40, 40, 80), position: 100 }] },
-        hero: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 98), position: 0 }, { color: color(40, 15, 95), position: 100 }] },
-        card: { type: 'linear', angle: 145, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(40, 5, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(25, 80, 40), position: 0 }, { color: color(25, 80, 30), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(25, 80, 35, 0.3), position: 0 }, { color: color(45, 95, 50, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(25, 80, 40), position: 0 },
+            { color: color(25, 80, 30), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(40, 40, 90), position: 0 },
+            { color: color(40, 40, 80), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 98), position: 0 },
+            { color: color(40, 15, 95), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 145,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(40, 5, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(25, 80, 40), position: 0 },
+            { color: color(25, 80, 30), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(25, 80, 35, 0.3), position: 0 },
+            { color: color(45, 95, 50, 0.3), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'gradient',
-      gradient: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 98), position: 0 }, { color: color(40, 10, 95), position: 100 }] }
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 135,
+        stops: [
+          { color: color(0, 0, 98), position: 0 },
+          { color: color(40, 10, 95), position: 100 },
+        ],
+      },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.015, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.015, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -339,30 +527,30 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'medium'
+      quality: "medium",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['asphalt', 'paving', 'construction', 'light'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["asphalt", "paving", "construction", "light"],
     featured: true,
-    public: true
+    public: true,
   },
 
   // Road Construction Theme
   {
-    id: 'road-construction',
-    name: 'Road Construction',
-    description: 'Heavy machinery and road work theme with safety-focused design',
-    category: 'asphalt',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "road-construction",
+    name: "Road Construction",
+    description: "Heavy machinery and road work theme with safety-focused design",
+    category: "asphalt",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(35, 20, 12),
       foreground: color(45, 15, 88),
@@ -400,50 +588,98 @@ export const getDefaultThemes = (): Theme[] => [
       asphalt: color(35, 20, 12),
       concrete: color(0, 0, 78),
       machinery: color(45, 100, 45),
-      safety: color(60, 100, 50)
+      safety: color(60, 100, 50),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 18, color: color(60, 100, 50), intensity: 0.35 }
+        glow: { type: "glow", x: 0, y: 0, blur: 18, color: color(60, 100, 50), intensity: 0.35 },
       },
       blur: {
         background: { enabled: true, radius: 10, saturation: 125, brightness: 75 },
         overlay: { enabled: true, radius: 5, saturation: 110, brightness: 85 },
-        card: { enabled: true, radius: 3, saturation: 105, brightness: 95 }
+        card: { enabled: true, radius: 3, saturation: 105, brightness: 95 },
       },
       particles: {
         enabled: true,
-        type: 'dust',
+        type: "dust",
         count: 50,
         speed: 0.4,
         size: { min: 0.8, max: 2.5 },
         color: color(60, 80, 35),
         opacity: { min: 0.08, max: 0.25 },
         direction: 75,
-        wind: 0.08
+        wind: 0.08,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 60, stops: [{ color: color(45, 100, 60), position: 0 }, { color: color(60, 100, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 120, stops: [{ color: color(30, 30, 22), position: 0 }, { color: color(35, 20, 15), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(35, 20, 15), position: 0 }, { color: color(30, 25, 10), position: 100 }] },
-        card: { type: 'linear', angle: 150, stops: [{ color: color(35, 20, 14), position: 0 }, { color: color(30, 25, 10), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 100, 60), position: 0 }, { color: color(45, 100, 50), position: 100 }] },
-        border: { type: 'linear', angle: 45, stops: [{ color: color(60, 100, 50, 0.4), position: 0 }, { color: color(45, 100, 55, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(45, 100, 60), position: 0 },
+            { color: color(60, 100, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(30, 30, 22), position: 0 },
+            { color: color(35, 20, 15), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(35, 20, 15), position: 0 },
+            { color: color(30, 25, 10), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 150,
+          stops: [
+            { color: color(35, 20, 14), position: 0 },
+            { color: color(30, 25, 10), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(45, 100, 60), position: 0 },
+            { color: color(45, 100, 50), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 45,
+          stops: [
+            { color: color(60, 100, 50, 0.4), position: 0 },
+            { color: color(45, 100, 55, 0.3), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'gradient',
-      gradient: { type: 'linear', angle: 60, stops: [{ color: color(30, 25, 8), position: 0 }, { color: color(35, 20, 12), position: 100 }] },
-      overlay: { color: color(0, 0, 0), opacity: 0.35, blendMode: 'multiply' }
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 60,
+        stops: [
+          { color: color(30, 25, 8), position: 0 },
+          { color: color(35, 20, 12), position: 100 },
+        ],
+      },
+      overlay: { color: color(0, 0, 0), opacity: 0.35, blendMode: "multiply" },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.02, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.02, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -451,30 +687,30 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'high'
+      quality: "high",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['asphalt', 'construction', 'safety', 'heavy-machinery'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["asphalt", "construction", "safety", "heavy-machinery"],
     featured: true,
-    public: true
+    public: true,
   },
 
   // Highway Patrol Theme
   {
-    id: 'highway-patrol',
-    name: 'Highway Patrol',
-    description: 'Highway maintenance and patrol operations with high visibility colors',
-    category: 'asphalt',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "highway-patrol",
+    name: "Highway Patrol",
+    description: "Highway maintenance and patrol operations with high visibility colors",
+    category: "asphalt",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(0, 0, 97),
       foreground: color(220, 40, 15),
@@ -512,49 +748,98 @@ export const getDefaultThemes = (): Theme[] => [
       asphalt: color(220, 40, 8),
       concrete: color(0, 0, 88),
       machinery: color(45, 100, 35),
-      safety: color(45, 100, 55)
+      safety: color(45, 100, 55),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 10, color: color(210, 100, 50), intensity: 0.15 }
+        glow: { type: "glow", x: 0, y: 0, blur: 10, color: color(210, 100, 50), intensity: 0.15 },
       },
       blur: {
         background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
         overlay: { enabled: true, radius: 1, saturation: 102, brightness: 98 },
-        card: { enabled: true, radius: 0.5, saturation: 101, brightness: 99 }
+        card: { enabled: true, radius: 0.5, saturation: 101, brightness: 99 },
       },
       particles: {
         enabled: false,
-        type: 'geometric',
+        type: "geometric",
         count: 0,
         speed: 0,
         size: { min: 0, max: 0 },
         color: color(0, 0, 0),
         opacity: { min: 0, max: 0 },
         direction: 0,
-        wind: 0
+        wind: 0,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(45, 100, 45), position: 0 }, { color: color(45, 100, 35), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(220, 25, 90), position: 0 }, { color: color(220, 25, 80), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(0, 0, 99), position: 0 }, { color: color(45, 8, 96), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(220, 5, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 100, 45), position: 0 }, { color: color(45, 100, 35), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(45, 100, 40, 0.25), position: 0 }, { color: color(210, 100, 50, 0.25), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(45, 100, 45), position: 0 },
+            { color: color(45, 100, 35), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(220, 25, 90), position: 0 },
+            { color: color(220, 25, 80), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(0, 0, 99), position: 0 },
+            { color: color(45, 8, 96), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(220, 5, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(45, 100, 45), position: 0 },
+            { color: color(45, 100, 35), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(45, 100, 40, 0.25), position: 0 },
+            { color: color(210, 100, 50, 0.25), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'gradient',
-      gradient: { type: 'linear', angle: 180, stops: [{ color: color(0, 0, 99), position: 0 }, { color: color(220, 5, 96), position: 100 }] }
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(0, 0, 99), position: 0 },
+          { color: color(220, 5, 96), position: 100 },
+        ],
+      },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.015, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.025, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.025, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.015, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -562,30 +847,30 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: false,
       enableShadows: true,
       enableGradients: true,
-      quality: 'medium'
+      quality: "medium",
     },
     accessibility: {
       highContrast: true,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['asphalt', 'highway', 'patrol', 'safety', 'high-visibility'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["asphalt", "highway", "patrol", "safety", "high-visibility"],
     featured: true,
-    public: true
+    public: true,
   },
 
   // Tech & Modern Themes
   {
-    id: 'cyber-neon',
-    name: 'Cyber Neon',
-    description: 'Futuristic cyberpunk theme with neon glows and electric effects',
-    category: 'tech',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "cyber-neon",
+    name: "Cyber Neon",
+    description: "Futuristic cyberpunk theme with neon glows and electric effects",
+    category: "tech",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(240, 100, 3),
       foreground: color(180, 100, 85),
@@ -619,53 +904,106 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(240, 80, 8),
       sidebarAccentForeground: color(180, 100, 85),
       sidebarBorder: color(240, 80, 8),
-      sidebarRing: color(300, 100, 60)
+      sidebarRing: color(300, 100, 60),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 25, color: color(300, 100, 60), intensity: 0.8 }
+        glow: { type: "glow", x: 0, y: 0, blur: 25, color: color(300, 100, 60), intensity: 0.8 },
       },
       blur: {
         background: { enabled: true, radius: 12, saturation: 150, brightness: 60 },
         overlay: { enabled: true, radius: 8, saturation: 130, brightness: 70 },
-        card: { enabled: true, radius: 4, saturation: 120, brightness: 85 }
+        card: { enabled: true, radius: 4, saturation: 120, brightness: 85 },
       },
       particles: {
         enabled: true,
-        type: 'sparks',
+        type: "sparks",
         count: 60,
         speed: 1.2,
         size: { min: 1, max: 4 },
         color: color(300, 100, 70),
         opacity: { min: 0.3, max: 0.8 },
         direction: 0,
-        wind: 0.2
+        wind: 0.2,
       },
       animations: {
         ...commonAnimations,
-        glow: { name: 'neonGlow', duration: 2000, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' }
+        glow: {
+          name: "neonGlow",
+          duration: 2000,
+          easing: "ease-in-out",
+          iterations: "infinite",
+          direction: "alternate",
+        },
       },
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(300, 100, 70), position: 0 }, { color: color(300, 100, 50), position: 100 }] },
-        secondary: { type: 'linear', angle: 45, stops: [{ color: color(240, 80, 20), position: 0 }, { color: color(240, 100, 8), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(260, 100, 8), position: 0 }, { color: color(240, 100, 3), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(240, 100, 5), position: 0 }, { color: color(260, 100, 3), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(300, 100, 70), position: 0 }, { color: color(300, 100, 50), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(300, 100, 60, 0.8), position: 0 }, { color: color(180, 100, 50, 0.8), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(300, 100, 70), position: 0 },
+            { color: color(300, 100, 50), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 45,
+          stops: [
+            { color: color(240, 80, 20), position: 0 },
+            { color: color(240, 100, 8), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(260, 100, 8), position: 0 },
+            { color: color(240, 100, 3), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(240, 100, 5), position: 0 },
+            { color: color(260, 100, 3), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(300, 100, 70), position: 0 },
+            { color: color(300, 100, 50), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(300, 100, 60, 0.8), position: 0 },
+            { color: color(180, 100, 50, 0.8), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'gradient',
-      gradient: { type: 'radial', stops: [{ color: color(260, 100, 5), position: 0 }, { color: color(240, 100, 1), position: 100 }] },
-      overlay: { color: color(300, 100, 30), opacity: 0.1, blendMode: 'screen' }
+      type: "gradient",
+      gradient: {
+        type: "radial",
+        stops: [
+          { color: color(260, 100, 5), position: 0 },
+          { color: color(240, 100, 1), position: 100 },
+        ],
+      },
+      overlay: { color: color(300, 100, 30), opacity: 0.1, blendMode: "screen" },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.04, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.04, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -673,30 +1011,30 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'ultra'
+      quality: "ultra",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['tech', 'cyberpunk', 'neon', 'futuristic'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["tech", "cyberpunk", "neon", "futuristic"],
     featured: true,
-    public: true
+    public: true,
   },
 
   // Nature Theme
   {
-    id: 'forest-guardian',
-    name: 'Forest Guardian',
-    description: 'Natural forest theme with organic greens and earth tones',
-    category: 'nature',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "forest-guardian",
+    name: "Forest Guardian",
+    description: "Natural forest theme with organic greens and earth tones",
+    category: "nature",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(120, 30, 8),
       foreground: color(60, 20, 85),
@@ -730,50 +1068,98 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(120, 30, 12),
       sidebarAccentForeground: color(60, 20, 85),
       sidebarBorder: color(120, 30, 12),
-      sidebarRing: color(120, 60, 40)
+      sidebarRing: color(120, 60, 40),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 15, color: color(80, 70, 50), intensity: 0.3 }
+        glow: { type: "glow", x: 0, y: 0, blur: 15, color: color(80, 70, 50), intensity: 0.3 },
       },
       blur: {
         background: { enabled: true, radius: 6, saturation: 115, brightness: 85 },
         overlay: { enabled: true, radius: 3, saturation: 108, brightness: 92 },
-        card: { enabled: true, radius: 2, saturation: 105, brightness: 96 }
+        card: { enabled: true, radius: 2, saturation: 105, brightness: 96 },
       },
       particles: {
         enabled: true,
-        type: 'dust',
+        type: "dust",
         count: 25,
         speed: 0.2,
         size: { min: 0.5, max: 1.5 },
         color: color(80, 60, 40),
         opacity: { min: 0.1, max: 0.3 },
         direction: 135,
-        wind: 0.03
+        wind: 0.03,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 135, stops: [{ color: color(120, 60, 45), position: 0 }, { color: color(80, 70, 55), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(90, 40, 25), position: 0 }, { color: color(120, 30, 12), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(120, 30, 12), position: 0 }, { color: color(140, 40, 8), position: 100 }] },
-        card: { type: 'linear', angle: 120, stops: [{ color: color(120, 30, 10), position: 0 }, { color: color(140, 40, 6), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(120, 60, 45), position: 0 }, { color: color(120, 60, 35), position: 100 }] },
-        border: { type: 'linear', angle: 45, stops: [{ color: color(80, 70, 50, 0.3), position: 0 }, { color: color(120, 60, 40, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(120, 60, 45), position: 0 },
+            { color: color(80, 70, 55), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(90, 40, 25), position: 0 },
+            { color: color(120, 30, 12), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(120, 30, 12), position: 0 },
+            { color: color(140, 40, 8), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(120, 30, 10), position: 0 },
+            { color: color(140, 40, 6), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(120, 60, 45), position: 0 },
+            { color: color(120, 60, 35), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 45,
+          stops: [
+            { color: color(80, 70, 50, 0.3), position: 0 },
+            { color: color(120, 60, 40, 0.3), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'gradient',
-      gradient: { type: 'linear', angle: 135, stops: [{ color: color(140, 40, 6), position: 0 }, { color: color(120, 30, 8), position: 100 }] },
-      overlay: { color: color(80, 30, 20), opacity: 0.2, blendMode: 'overlay' }
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 135,
+        stops: [
+          { color: color(140, 40, 6), position: 0 },
+          { color: color(120, 30, 8), position: 100 },
+        ],
+      },
+      overlay: { color: color(80, 30, 20), opacity: 0.2, blendMode: "overlay" },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -781,28 +1167,28 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'high'
+      quality: "high",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['nature', 'forest', 'organic', 'earth-tones'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["nature", "forest", "organic", "earth-tones"],
     featured: true,
-    public: true
-    },
+    public: true,
+  },
   {
-    id: 'urban-ops',
-    name: 'Urban Ops',
-    description: 'Stealth-focused military theme with urban camo tones',
-    category: 'military',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "urban-ops",
+    name: "Urban Ops",
+    description: "Stealth-focused military theme with urban camo tones",
+    category: "military",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(220, 10, 10),
       foreground: color(210, 20, 92),
@@ -836,50 +1222,128 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(220, 8, 14),
       sidebarAccentForeground: color(210, 20, 92),
       sidebarBorder: color(220, 8, 14),
-      sidebarRing: color(200, 70, 50)
+      sidebarRing: color(200, 70, 50),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 18, color: color(200, 70, 50), intensity: 0.3 } },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 18, color: color(200, 70, 50), intensity: 0.3 },
+      },
       blur: {
         background: { enabled: true, radius: 8, saturation: 110, brightness: 80 },
         overlay: { enabled: true, radius: 4, saturation: 105, brightness: 88 },
-        card: { enabled: true, radius: 2, saturation: 102, brightness: 94 }
+        card: { enabled: true, radius: 2, saturation: 102, brightness: 94 },
       },
-      particles: { enabled: false, type: 'dust', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      particles: {
+        enabled: false,
+        type: "dust",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 135, stops: [{ color: color(200, 70, 55), position: 0 }, { color: color(200, 70, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(210, 15, 20), position: 0 }, { color: color(220, 10, 12), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(220, 10, 12), position: 0 }, { color: color(220, 10, 8), position: 100 }] },
-        card: { type: 'linear', angle: 145, stops: [{ color: color(220, 10, 10), position: 0 }, { color: color(220, 8, 12), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(200, 70, 55), position: 0 }, { color: color(200, 70, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(200, 70, 50, 0.3), position: 0 }, { color: color(0, 0, 60, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(200, 70, 55), position: 0 },
+            { color: color(200, 70, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 15, 20), position: 0 },
+            { color: color(220, 10, 12), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(220, 10, 12), position: 0 },
+            { color: color(220, 10, 8), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 145,
+          stops: [
+            { color: color(220, 10, 10), position: 0 },
+            { color: color(220, 8, 12), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(200, 70, 55), position: 0 },
+            { color: color(200, 70, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(200, 70, 50, 0.3), position: 0 },
+            { color: color(0, 0, 60, 0.3), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [{ color: color(220, 10, 10), position: 0 }, { color: color(220, 8, 12), position: 100 }] }, overlay: { color: color(0, 0, 0), opacity: 0.35, blendMode: 'multiply' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 135,
+        stops: [
+          { color: color(220, 10, 10), position: 0 },
+          { color: color(220, 8, 12), position: 100 },
+        ],
+      },
+      overlay: { color: color(0, 0, 0), opacity: 0.35, blendMode: "multiply" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['military', 'urban', 'stealth'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["military", "urban", "stealth"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'desert-ops',
-    name: 'Desert Ops',
-    description: 'Sandy desert operations with warm tactical tones',
-    category: 'military',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "desert-ops",
+    name: "Desert Ops",
+    description: "Sandy desert operations with warm tactical tones",
+    category: "military",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(40, 30, 96),
       foreground: color(35, 30, 20),
@@ -913,46 +1377,127 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(35, 20, 90),
       sidebarAccentForeground: color(35, 30, 20),
       sidebarBorder: color(35, 20, 90),
-      sidebarRing: color(35, 70, 45)
+      sidebarRing: color(35, 70, 45),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 12, color: color(35, 70, 45), intensity: 0.2 } },
-      blur: { background: { enabled: false, radius: 0, saturation: 100, brightness: 100 }, overlay: { enabled: true, radius: 2, saturation: 105, brightness: 96 }, card: { enabled: true, radius: 1, saturation: 102, brightness: 98 } },
-      particles: { enabled: true, type: 'dust', count: 20, speed: 0.2, size: { min: 0.5, max: 1.5 }, color: color(35, 40, 50), opacity: { min: 0.05, max: 0.2 }, direction: 45, wind: 0.05 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 12, color: color(35, 70, 45), intensity: 0.2 },
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 2, saturation: 105, brightness: 96 },
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 98 },
+      },
+      particles: {
+        enabled: true,
+        type: "dust",
+        count: 20,
+        speed: 0.2,
+        size: { min: 0.5, max: 1.5 },
+        color: color(35, 40, 50),
+        opacity: { min: 0.05, max: 0.2 },
+        direction: 45,
+        wind: 0.05,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(35, 70, 50), position: 0 }, { color: color(35, 70, 40), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(35, 20, 90), position: 0 }, { color: color(35, 20, 80), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(0, 0, 99), position: 0 }, { color: color(40, 20, 96), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(40, 10, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(35, 70, 50), position: 0 }, { color: color(35, 70, 40), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(35, 70, 45, 0.25), position: 0 }, { color: color(25, 70, 40, 0.25), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(35, 70, 50), position: 0 },
+            { color: color(35, 70, 40), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(35, 20, 90), position: 0 },
+            { color: color(35, 20, 80), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(0, 0, 99), position: 0 },
+            { color: color(40, 20, 96), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(40, 10, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(35, 70, 50), position: 0 },
+            { color: color(35, 70, 40), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(35, 70, 45, 0.25), position: 0 },
+            { color: color(25, 70, 40, 0.25), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 99), position: 0 }, { color: color(40, 20, 96), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 135,
+        stops: [
+          { color: color(0, 0, 99), position: 0 },
+          { color: color(40, 20, 96), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: false, enableShadows: true, enableGradients: true, quality: 'medium' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['military', 'desert', 'tactical'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "medium",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["military", "desert", "tactical"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'arctic-command',
-    name: 'Arctic Command',
-    description: 'Cold-weather military theme with icy blues and high-contrast text',
-    category: 'military',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "arctic-command",
+    name: "Arctic Command",
+    description: "Cold-weather military theme with icy blues and high-contrast text",
+    category: "military",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(210, 40, 98),
       foreground: color(210, 40, 20),
@@ -986,46 +1531,125 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(210, 20, 92),
       sidebarAccentForeground: color(210, 40, 20),
       sidebarBorder: color(210, 20, 92),
-      sidebarRing: color(200, 90, 45)
+      sidebarRing: color(200, 90, 45),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 14, color: color(200, 90, 55), intensity: 0.25 } },
-      blur: { background: { enabled: true, radius: 6, saturation: 120, brightness: 95 }, overlay: { enabled: true, radius: 3, saturation: 108, brightness: 98 }, card: { enabled: true, radius: 2, saturation: 104, brightness: 100 } },
-      particles: { enabled: true, type: 'snow', count: 30, speed: 0.4, size: { min: 1, max: 3 }, color: color(0, 0, 100), opacity: { min: 0.1, max: 0.3 }, direction: 180, wind: -0.05 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 14, color: color(200, 90, 55), intensity: 0.25 },
+      },
+      blur: {
+        background: { enabled: true, radius: 6, saturation: 120, brightness: 95 },
+        overlay: { enabled: true, radius: 3, saturation: 108, brightness: 98 },
+        card: { enabled: true, radius: 2, saturation: 104, brightness: 100 },
+      },
+      particles: {
+        enabled: true,
+        type: "snow",
+        count: 30,
+        speed: 0.4,
+        size: { min: 1, max: 3 },
+        color: color(0, 0, 100),
+        opacity: { min: 0.1, max: 0.3 },
+        direction: 180,
+        wind: -0.05,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(200, 90, 55), position: 0 }, { color: color(200, 90, 40), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(210, 30, 92), position: 0 }, { color: color(210, 30, 84), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(210, 25, 98), position: 0 }, { color: color(210, 25, 92), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(210, 25, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(200, 90, 55), position: 0 }, { color: color(200, 90, 40), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(200, 90, 45, 0.25), position: 0 }, { color: color(190, 80, 45, 0.25), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(200, 90, 55), position: 0 },
+            { color: color(200, 90, 40), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 30, 92), position: 0 },
+            { color: color(210, 30, 84), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(210, 25, 98), position: 0 },
+            { color: color(210, 25, 92), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(210, 25, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(200, 90, 55), position: 0 },
+            { color: color(200, 90, 40), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(200, 90, 45, 0.25), position: 0 },
+            { color: color(190, 80, 45, 0.25), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'radial', stops: [{ color: color(210, 25, 98), position: 0 }, { color: color(210, 25, 92), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "radial",
+        stops: [
+          { color: color(210, 25, 98), position: 0 },
+          { color: color(210, 25, 92), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: true, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['military', 'arctic', 'snow'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: true,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["military", "arctic", "snow"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'asphalt-nightshift',
-    name: 'Asphalt Night Shift',
-    description: 'Dark asphalt theme optimized for night operations',
-    category: 'asphalt',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "asphalt-nightshift",
+    name: "Asphalt Night Shift",
+    description: "Dark asphalt theme optimized for night operations",
+    category: "asphalt",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(220, 20, 6),
       foreground: color(45, 15, 90),
@@ -1063,46 +1687,127 @@ export const getDefaultThemes = (): Theme[] => [
       asphalt: color(30, 15, 8),
       concrete: color(0, 0, 75),
       machinery: color(45, 100, 45),
-      safety: color(45, 100, 60)
+      safety: color(45, 100, 60),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 16, color: color(45, 100, 50), intensity: 0.35 } },
-      blur: { background: { enabled: true, radius: 8, saturation: 120, brightness: 80 }, overlay: { enabled: true, radius: 4, saturation: 108, brightness: 88 }, card: { enabled: true, radius: 2, saturation: 105, brightness: 92 } },
-      particles: { enabled: true, type: 'dust', count: 35, speed: 0.3, size: { min: 0.5, max: 2 }, color: color(45, 60, 40), opacity: { min: 0.06, max: 0.22 }, direction: 90, wind: 0.05 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 16, color: color(45, 100, 50), intensity: 0.35 },
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 120, brightness: 80 },
+        overlay: { enabled: true, radius: 4, saturation: 108, brightness: 88 },
+        card: { enabled: true, radius: 2, saturation: 105, brightness: 92 },
+      },
+      particles: {
+        enabled: true,
+        type: "dust",
+        count: 35,
+        speed: 0.3,
+        size: { min: 0.5, max: 2 },
+        color: color(45, 60, 40),
+        opacity: { min: 0.06, max: 0.22 },
+        direction: 90,
+        wind: 0.05,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 45, stops: [{ color: color(45, 100, 55), position: 0 }, { color: color(45, 100, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(220, 15, 12), position: 0 }, { color: color(220, 15, 8), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(220, 20, 8), position: 0 }, { color: color(220, 20, 6), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(220, 20, 8), position: 0 }, { color: color(220, 15, 8), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 100, 55), position: 0 }, { color: color(45, 100, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(45, 100, 50, 0.35), position: 0 }, { color: color(35, 80, 45, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 45,
+          stops: [
+            { color: color(45, 100, 55), position: 0 },
+            { color: color(45, 100, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(220, 15, 12), position: 0 },
+            { color: color(220, 15, 8), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(220, 20, 8), position: 0 },
+            { color: color(220, 20, 6), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(220, 20, 8), position: 0 },
+            { color: color(220, 15, 8), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(45, 100, 55), position: 0 },
+            { color: color(45, 100, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(45, 100, 50, 0.35), position: 0 },
+            { color: color(35, 80, 45, 0.3), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 60, stops: [{ color: color(220, 20, 8), position: 0 }, { color: color(220, 20, 6), position: 100 }] }, overlay: { color: color(0, 0, 0), opacity: 0.3, blendMode: 'overlay' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 60,
+        stops: [
+          { color: color(220, 20, 8), position: 0 },
+          { color: color(220, 20, 6), position: 100 },
+        ],
+      },
+      overlay: { color: color(0, 0, 0), opacity: 0.3, blendMode: "overlay" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: true, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['asphalt', 'night', 'safety'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: true,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["asphalt", "night", "safety"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'concrete-lab',
-    name: 'Concrete Lab',
-    description: 'Construction-grade neutral theme inspired by concrete labs',
-    category: 'construction',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "concrete-lab",
+    name: "Concrete Lab",
+    description: "Construction-grade neutral theme inspired by concrete labs",
+    category: "construction",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(0, 0, 98),
       foreground: color(220, 10, 18),
@@ -1137,46 +1842,126 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccentForeground: color(220, 10, 18),
       sidebarBorder: color(0, 0, 92),
       sidebarRing: color(210, 70, 45),
-      concrete: color(0, 0, 75)
+      concrete: color(0, 0, 75),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 10, color: color(210, 70, 50), intensity: 0.18 } },
-      blur: { background: { enabled: false, radius: 0, saturation: 100, brightness: 100 }, overlay: { enabled: true, radius: 1, saturation: 103, brightness: 97 }, card: { enabled: true, radius: 1, saturation: 101, brightness: 99 } },
-      particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 10, color: color(210, 70, 50), intensity: 0.18 },
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 1, saturation: 103, brightness: 97 },
+        card: { enabled: true, radius: 1, saturation: 101, brightness: 99 },
+      },
+      particles: {
+        enabled: false,
+        type: "geometric",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 60, stops: [{ color: color(210, 70, 50), position: 0 }, { color: color(210, 70, 40), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(0, 0, 96), position: 0 }, { color: color(0, 0, 90), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(0, 0, 96), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(0, 0, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(210, 70, 50), position: 0 }, { color: color(210, 70, 40), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(210, 70, 45, 0.2), position: 0 }, { color: color(0, 0, 50, 0.15), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(210, 70, 50), position: 0 },
+            { color: color(210, 70, 40), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(0, 0, 96), position: 0 },
+            { color: color(0, 0, 90), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(0, 0, 96), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(0, 0, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 70, 50), position: 0 },
+            { color: color(210, 70, 40), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(210, 70, 45, 0.2), position: 0 },
+            { color: color(0, 0, 50, 0.15), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 120, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(0, 0, 96), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 120,
+        stops: [
+          { color: color(0, 0, 100), position: 0 },
+          { color: color(0, 0, 96), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: false, enableShadows: true, enableGradients: true, quality: 'medium' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['construction', 'concrete', 'neutral'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "medium",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["construction", "concrete", "neutral"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'quarry-industrial',
-    name: 'Quarry Industrial',
-    description: 'Rugged construction theme inspired by quarry operations',
-    category: 'construction',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "quarry-industrial",
+    name: "Quarry Industrial",
+    description: "Rugged construction theme inspired by quarry operations",
+    category: "construction",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(30, 20, 12),
       foreground: color(40, 10, 88),
@@ -1214,46 +1999,127 @@ export const getDefaultThemes = (): Theme[] => [
       asphalt: color(30, 15, 8),
       concrete: color(0, 0, 75),
       machinery: color(45, 100, 45),
-      safety: color(45, 100, 60)
+      safety: color(45, 100, 60),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 16, color: color(45, 100, 60), intensity: 0.32 } },
-      blur: { background: { enabled: true, radius: 8, saturation: 120, brightness: 82 }, overlay: { enabled: true, radius: 4, saturation: 108, brightness: 90 }, card: { enabled: true, radius: 2, saturation: 104, brightness: 95 } },
-      particles: { enabled: true, type: 'dust', count: 40, speed: 0.35, size: { min: 0.6, max: 2.2 }, color: color(45, 60, 40), opacity: { min: 0.08, max: 0.22 }, direction: 45, wind: 0.07 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 16, color: color(45, 100, 60), intensity: 0.32 },
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 120, brightness: 82 },
+        overlay: { enabled: true, radius: 4, saturation: 108, brightness: 90 },
+        card: { enabled: true, radius: 2, saturation: 104, brightness: 95 },
+      },
+      particles: {
+        enabled: true,
+        type: "dust",
+        count: 40,
+        speed: 0.35,
+        size: { min: 0.6, max: 2.2 },
+        color: color(45, 60, 40),
+        opacity: { min: 0.08, max: 0.22 },
+        direction: 45,
+        wind: 0.07,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 45, stops: [{ color: color(45, 100, 60), position: 0 }, { color: color(45, 100, 50), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(30, 25, 22), position: 0 }, { color: color(25, 20, 12), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(30, 20, 14), position: 0 }, { color: color(25, 20, 10), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(30, 20, 14), position: 0 }, { color: color(25, 20, 10), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 100, 60), position: 0 }, { color: color(45, 100, 50), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(45, 100, 60, 0.35), position: 0 }, { color: color(45, 80, 50, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 45,
+          stops: [
+            { color: color(45, 100, 60), position: 0 },
+            { color: color(45, 100, 50), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(30, 25, 22), position: 0 },
+            { color: color(25, 20, 12), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(30, 20, 14), position: 0 },
+            { color: color(25, 20, 10), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(30, 20, 14), position: 0 },
+            { color: color(25, 20, 10), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(45, 100, 60), position: 0 },
+            { color: color(45, 100, 50), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(45, 100, 60, 0.35), position: 0 },
+            { color: color(45, 80, 50, 0.3), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 45, stops: [{ color: color(25, 20, 10), position: 0 }, { color: color(30, 20, 12), position: 100 }] }, overlay: { color: color(0, 0, 0), opacity: 0.35, blendMode: 'multiply' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 45,
+        stops: [
+          { color: color(25, 20, 10), position: 0 },
+          { color: color(30, 20, 12), position: 100 },
+        ],
+      },
+      overlay: { color: color(0, 0, 0), opacity: 0.35, blendMode: "multiply" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['construction', 'quarry', 'rugged'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["construction", "quarry", "rugged"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'ocean-blue',
-    name: 'Ocean Blue',
-    description: 'Cool nature theme inspired by deep ocean tones',
-    category: 'nature',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "ocean-blue",
+    name: "Ocean Blue",
+    description: "Cool nature theme inspired by deep ocean tones",
+    category: "nature",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(210, 60, 8),
       foreground: color(200, 40, 88),
@@ -1287,46 +2153,126 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(210, 40, 12),
       sidebarAccentForeground: color(200, 40, 88),
       sidebarBorder: color(210, 40, 12),
-      sidebarRing: color(200, 80, 50)
+      sidebarRing: color(200, 80, 50),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 16, color: color(200, 80, 55), intensity: 0.3 } },
-      blur: { background: { enabled: true, radius: 8, saturation: 120, brightness: 82 }, overlay: { enabled: true, radius: 4, saturation: 110, brightness: 88 }, card: { enabled: true, radius: 2, saturation: 105, brightness: 92 } },
-      particles: { enabled: true, type: 'geometric', count: 20, speed: 0.4, size: { min: 1, max: 3 }, color: color(200, 80, 60), opacity: { min: 0.1, max: 0.3 }, direction: 0, wind: 0.06 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 16, color: color(200, 80, 55), intensity: 0.3 },
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 120, brightness: 82 },
+        overlay: { enabled: true, radius: 4, saturation: 110, brightness: 88 },
+        card: { enabled: true, radius: 2, saturation: 105, brightness: 92 },
+      },
+      particles: {
+        enabled: true,
+        type: "geometric",
+        count: 20,
+        speed: 0.4,
+        size: { min: 1, max: 3 },
+        color: color(200, 80, 60),
+        opacity: { min: 0.1, max: 0.3 },
+        direction: 0,
+        wind: 0.06,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(200, 80, 60), position: 0 }, { color: color(200, 80, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(210, 40, 20), position: 0 }, { color: color(210, 50, 6), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(210, 60, 8), position: 0 }, { color: color(210, 50, 6), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(210, 60, 10), position: 0 }, { color: color(210, 50, 6), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(200, 80, 60), position: 0 }, { color: color(200, 80, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(200, 80, 50, 0.3), position: 0 }, { color: color(190, 70, 55, 0.25), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(200, 80, 60), position: 0 },
+            { color: color(200, 80, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 40, 20), position: 0 },
+            { color: color(210, 50, 6), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(210, 60, 8), position: 0 },
+            { color: color(210, 50, 6), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(210, 60, 10), position: 0 },
+            { color: color(210, 50, 6), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(200, 80, 60), position: 0 },
+            { color: color(200, 80, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(200, 80, 50, 0.3), position: 0 },
+            { color: color(190, 70, 55, 0.25), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 120, stops: [{ color: color(210, 60, 8), position: 0 }, { color: color(210, 50, 6), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 120,
+        stops: [
+          { color: color(210, 60, 8), position: 0 },
+          { color: color(210, 50, 6), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['nature', 'ocean', 'cool'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["nature", "ocean", "cool"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'sunrise-meadow',
-    name: 'Sunrise Meadow',
-    description: 'Warm nature theme with sunrise gradients and soft contrast',
-    category: 'nature',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "sunrise-meadow",
+    name: "Sunrise Meadow",
+    description: "Warm nature theme with sunrise gradients and soft contrast",
+    category: "nature",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(35, 90, 98),
       foreground: color(35, 35, 25),
@@ -1360,46 +2306,127 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(35, 30, 92),
       sidebarAccentForeground: color(35, 35, 25),
       sidebarBorder: color(35, 30, 92),
-      sidebarRing: color(45, 90, 55)
+      sidebarRing: color(45, 90, 55),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 12, color: color(45, 90, 55), intensity: 0.22 } },
-      blur: { background: { enabled: false, radius: 0, saturation: 100, brightness: 100 }, overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 }, card: { enabled: true, radius: 1, saturation: 102, brightness: 99 } },
-      particles: { enabled: true, type: 'dust', count: 20, speed: 0.2, size: { min: 0.5, max: 1.5 }, color: color(45, 50, 55), opacity: { min: 0.05, max: 0.18 }, direction: 0, wind: 0.02 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 12, color: color(45, 90, 55), intensity: 0.22 },
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 },
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 99 },
+      },
+      particles: {
+        enabled: true,
+        type: "dust",
+        count: 20,
+        speed: 0.2,
+        size: { min: 0.5, max: 1.5 },
+        color: color(45, 50, 55),
+        opacity: { min: 0.05, max: 0.18 },
+        direction: 0,
+        wind: 0.02,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(45, 90, 60), position: 0 }, { color: color(45, 90, 50), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(35, 35, 98), position: 0 }, { color: color(35, 35, 92), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(35, 90, 98), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(35, 35, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 90, 60), position: 0 }, { color: color(45, 90, 50), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(45, 90, 55, 0.25), position: 0 }, { color: color(120, 60, 40, 0.2), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(45, 90, 60), position: 0 },
+            { color: color(45, 90, 50), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(35, 35, 98), position: 0 },
+            { color: color(35, 35, 92), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(35, 90, 98), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(35, 35, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(45, 90, 60), position: 0 },
+            { color: color(45, 90, 50), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(45, 90, 55, 0.25), position: 0 },
+            { color: color(120, 60, 40, 0.2), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 120, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(35, 90, 98), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 120,
+        stops: [
+          { color: color(0, 0, 100), position: 0 },
+          { color: color(35, 90, 98), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: false, enableShadows: true, enableGradients: true, quality: 'medium' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['nature', 'sunrise', 'warm'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "medium",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["nature", "sunrise", "warm"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'aurora-borealis',
-    name: 'Aurora Borealis',
-    description: 'Vivid aurora-inspired nature theme with flowing gradients',
-    category: 'nature',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "aurora-borealis",
+    name: "Aurora Borealis",
+    description: "Vivid aurora-inspired nature theme with flowing gradients",
+    category: "nature",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(230, 60, 8),
       foreground: color(160, 40, 88),
@@ -1433,46 +2460,137 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(260, 50, 12),
       sidebarAccentForeground: color(160, 40, 88),
       sidebarBorder: color(260, 50, 12),
-      sidebarRing: color(160, 80, 50)
+      sidebarRing: color(160, 80, 50),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 22, color: color(160, 80, 60), intensity: 0.5 } },
-      blur: { background: { enabled: true, radius: 10, saturation: 140, brightness: 70 }, overlay: { enabled: true, radius: 6, saturation: 130, brightness: 78 }, card: { enabled: true, radius: 3, saturation: 120, brightness: 88 } },
-      particles: { enabled: true, type: 'sparks', count: 50, speed: 0.8, size: { min: 1, max: 4 }, color: color(160, 80, 60), opacity: { min: 0.2, max: 0.6 }, direction: 0, wind: 0.15 },
-      animations: { ...commonAnimations, glow: { name: 'auroraFlow', duration: 3000, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 22, color: color(160, 80, 60), intensity: 0.5 },
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 140, brightness: 70 },
+        overlay: { enabled: true, radius: 6, saturation: 130, brightness: 78 },
+        card: { enabled: true, radius: 3, saturation: 120, brightness: 88 },
+      },
+      particles: {
+        enabled: true,
+        type: "sparks",
+        count: 50,
+        speed: 0.8,
+        size: { min: 1, max: 4 },
+        color: color(160, 80, 60),
+        opacity: { min: 0.2, max: 0.6 },
+        direction: 0,
+        wind: 0.15,
+      },
+      animations: {
+        ...commonAnimations,
+        glow: {
+          name: "auroraFlow",
+          duration: 3000,
+          easing: "ease-in-out",
+          iterations: "infinite",
+          direction: "alternate",
+        },
+      },
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(160, 80, 60), position: 0 }, { color: color(160, 80, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(260, 50, 20), position: 0 }, { color: color(230, 60, 8), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(230, 60, 8), position: 0 }, { color: color(260, 50, 8), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(230, 60, 10), position: 0 }, { color: color(230, 50, 6), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(160, 80, 60), position: 0 }, { color: color(160, 80, 45), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(160, 80, 55, 0.6), position: 0 }, { color: color(300, 80, 60, 0.5), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(160, 80, 60), position: 0 },
+            { color: color(160, 80, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(260, 50, 20), position: 0 },
+            { color: color(230, 60, 8), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(230, 60, 8), position: 0 },
+            { color: color(260, 50, 8), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(230, 60, 10), position: 0 },
+            { color: color(230, 50, 6), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(160, 80, 60), position: 0 },
+            { color: color(160, 80, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(160, 80, 55, 0.6), position: 0 },
+            { color: color(300, 80, 60, 0.5), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(230, 60, 8), position: 0 }, { color: color(260, 50, 8), position: 100 }] }, overlay: { color: color(160, 80, 50), opacity: 0.1, blendMode: 'screen' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(230, 60, 8), position: 0 },
+          { color: color(260, 50, 8), position: 100 },
+        ],
+      },
+      overlay: { color: color(160, 80, 50), opacity: 0.1, blendMode: "screen" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'ultra' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['nature', 'aurora', 'vivid'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "ultra",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["nature", "aurora", "vivid"],
     featured: true,
-    public: true
+    public: true,
   },
   {
-    id: 'matrix-green',
-    name: 'Matrix Green',
-    description: 'Classic green-on-black tech aesthetic with grid accents',
-    category: 'tech',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "matrix-green",
+    name: "Matrix Green",
+    description: "Classic green-on-black tech aesthetic with grid accents",
+    category: "tech",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(220, 40, 3),
       foreground: color(120, 60, 70),
@@ -1506,46 +2624,137 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(220, 25, 8),
       sidebarAccentForeground: color(120, 60, 70),
       sidebarBorder: color(220, 25, 8),
-      sidebarRing: color(120, 80, 45)
+      sidebarRing: color(120, 80, 45),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 18, color: color(120, 90, 50), intensity: 0.45 } },
-      blur: { background: { enabled: true, radius: 8, saturation: 130, brightness: 65 }, overlay: { enabled: true, radius: 6, saturation: 120, brightness: 72 }, card: { enabled: true, radius: 2, saturation: 110, brightness: 85 } },
-      particles: { enabled: true, type: 'geometric', count: 40, speed: 0.7, size: { min: 1, max: 3 }, color: color(120, 90, 55), opacity: { min: 0.2, max: 0.5 }, direction: 180, wind: 0.1 },
-      animations: { ...commonAnimations, glow: { name: 'matrixPulse', duration: 1800, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 18, color: color(120, 90, 50), intensity: 0.45 },
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 130, brightness: 65 },
+        overlay: { enabled: true, radius: 6, saturation: 120, brightness: 72 },
+        card: { enabled: true, radius: 2, saturation: 110, brightness: 85 },
+      },
+      particles: {
+        enabled: true,
+        type: "geometric",
+        count: 40,
+        speed: 0.7,
+        size: { min: 1, max: 3 },
+        color: color(120, 90, 55),
+        opacity: { min: 0.2, max: 0.5 },
+        direction: 180,
+        wind: 0.1,
+      },
+      animations: {
+        ...commonAnimations,
+        glow: {
+          name: "matrixPulse",
+          duration: 1800,
+          easing: "ease-in-out",
+          iterations: "infinite",
+          direction: "alternate",
+        },
+      },
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(120, 90, 55), position: 0 }, { color: color(120, 80, 40), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(220, 25, 12), position: 0 }, { color: color(220, 40, 3), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(220, 40, 3), position: 0 }, { color: color(220, 30, 4), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(220, 40, 6), position: 0 }, { color: color(220, 30, 4), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(120, 90, 55), position: 0 }, { color: color(120, 80, 40), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(120, 80, 45, 0.6), position: 0 }, { color: color(140, 40, 65, 0.5), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(120, 90, 55), position: 0 },
+            { color: color(120, 80, 40), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(220, 25, 12), position: 0 },
+            { color: color(220, 40, 3), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(220, 40, 3), position: 0 },
+            { color: color(220, 30, 4), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(220, 40, 6), position: 0 },
+            { color: color(220, 30, 4), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(120, 90, 55), position: 0 },
+            { color: color(120, 80, 40), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(120, 80, 45, 0.6), position: 0 },
+            { color: color(140, 40, 65, 0.5), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(220, 40, 3), position: 0 }, { color: color(220, 30, 4), position: 100 }] }, overlay: { color: color(120, 90, 40), opacity: 0.08, blendMode: 'screen' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(220, 40, 3), position: 0 },
+          { color: color(220, 30, 4), position: 100 },
+        ],
+      },
+      overlay: { color: color(120, 90, 40), opacity: 0.08, blendMode: "screen" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: true, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['tech', 'matrix', 'green'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: true,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["tech", "matrix", "green"],
     featured: true,
-    public: true
+    public: true,
   },
   {
-    id: 'holo-grid',
-    name: 'Holo Grid',
-    description: 'Lightweight holographic tech theme with subtle glow',
-    category: 'tech',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "holo-grid",
+    name: "Holo Grid",
+    description: "Lightweight holographic tech theme with subtle glow",
+    category: "tech",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(220, 30, 98),
       foreground: color(210, 30, 20),
@@ -1579,46 +2788,125 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(220, 18, 92),
       sidebarAccentForeground: color(210, 30, 20),
       sidebarBorder: color(220, 18, 92),
-      sidebarRing: color(270, 80, 55)
+      sidebarRing: color(270, 80, 55),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 14, color: color(270, 80, 60), intensity: 0.22 } },
-      blur: { background: { enabled: false, radius: 0, saturation: 100, brightness: 100 }, overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 }, card: { enabled: true, radius: 1, saturation: 102, brightness: 99 } },
-      particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 14, color: color(270, 80, 60), intensity: 0.22 },
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 },
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 99 },
+      },
+      particles: {
+        enabled: false,
+        type: "geometric",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(270, 80, 60), position: 0 }, { color: color(270, 80, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(220, 20, 96), position: 0 }, { color: color(220, 20, 90), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(220, 30, 98), position: 0 }, { color: color(220, 20, 96), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(220, 30, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(270, 80, 60), position: 0 }, { color: color(270, 80, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(270, 80, 55, 0.25), position: 0 }, { color: color(200, 80, 55, 0.2), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(270, 80, 60), position: 0 },
+            { color: color(270, 80, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(220, 20, 96), position: 0 },
+            { color: color(220, 20, 90), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(220, 30, 98), position: 0 },
+            { color: color(220, 20, 96), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(220, 30, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(270, 80, 60), position: 0 },
+            { color: color(270, 80, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(270, 80, 55, 0.25), position: 0 },
+            { color: color(200, 80, 55, 0.2), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'radial', stops: [{ color: color(220, 30, 98), position: 0 }, { color: color(220, 20, 96), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "radial",
+        stops: [
+          { color: color(220, 30, 98), position: 0 },
+          { color: color(220, 20, 96), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: false, enableShadows: true, enableGradients: true, quality: 'medium' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['tech', 'holographic', 'light'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "medium",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["tech", "holographic", "light"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'minimal-corporate',
-    name: 'Minimal Corporate',
-    description: 'Clean corporate theme focused on simplicity and clarity',
-    category: 'corporate',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "minimal-corporate",
+    name: "Minimal Corporate",
+    description: "Clean corporate theme focused on simplicity and clarity",
+    category: "corporate",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(0, 0, 99),
       foreground: color(220, 20, 20),
@@ -1652,46 +2940,126 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(0, 0, 94),
       sidebarAccentForeground: color(220, 20, 20),
       sidebarBorder: color(0, 0, 94),
-      sidebarRing: color(210, 80, 45)
+      sidebarRing: color(210, 80, 45),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 10, color: color(210, 80, 50), intensity: 0.18 } },
-      blur: { background: { enabled: false, radius: 0, saturation: 100, brightness: 100 }, overlay: { enabled: true, radius: 1, saturation: 103, brightness: 97 }, card: { enabled: true, radius: 1, saturation: 101, brightness: 99 } },
-      particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 10, color: color(210, 80, 50), intensity: 0.18 },
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 1, saturation: 103, brightness: 97 },
+        card: { enabled: true, radius: 1, saturation: 101, brightness: 99 },
+      },
+      particles: {
+        enabled: false,
+        type: "geometric",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 60, stops: [{ color: color(210, 80, 50), position: 0 }, { color: color(210, 80, 40), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(0, 0, 98), position: 0 }, { color: color(0, 0, 94), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(0, 0, 98), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(0, 0, 99), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(210, 80, 50), position: 0 }, { color: color(210, 80, 40), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(210, 80, 45, 0.22), position: 0 }, { color: color(0, 0, 50, 0.15), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(210, 80, 50), position: 0 },
+            { color: color(210, 80, 40), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(0, 0, 98), position: 0 },
+            { color: color(0, 0, 94), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(0, 0, 98), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(0, 0, 99), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 80, 50), position: 0 },
+            { color: color(210, 80, 40), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(210, 80, 45, 0.22), position: 0 },
+            { color: color(0, 0, 50, 0.15), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 120, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(0, 0, 98), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 120,
+        stops: [
+          { color: color(0, 0, 100), position: 0 },
+          { color: color(0, 0, 98), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: false, enableShadows: true, enableGradients: true, quality: 'medium' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['corporate', 'minimal', 'clean'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "medium",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["corporate", "minimal", "clean"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'blue-corporate',
-    name: 'Blue Corporate',
-    description: 'Professional corporate theme with blue accents',
-    category: 'corporate',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "blue-corporate",
+    name: "Blue Corporate",
+    description: "Professional corporate theme with blue accents",
+    category: "corporate",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(210, 40, 98),
       foreground: color(220, 20, 20),
@@ -1725,46 +3093,126 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(210, 18, 92),
       sidebarAccentForeground: color(220, 20, 20),
       sidebarBorder: color(210, 18, 92),
-      sidebarRing: color(210, 80, 50)
+      sidebarRing: color(210, 80, 50),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 12, color: color(210, 80, 55), intensity: 0.22 } },
-      blur: { background: { enabled: false, radius: 0, saturation: 100, brightness: 100 }, overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 }, card: { enabled: true, radius: 1, saturation: 102, brightness: 99 } },
-      particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 12, color: color(210, 80, 55), intensity: 0.22 },
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 },
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 99 },
+      },
+      particles: {
+        enabled: false,
+        type: "geometric",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 60, stops: [{ color: color(210, 80, 55), position: 0 }, { color: color(210, 80, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(210, 25, 96), position: 0 }, { color: color(210, 25, 90), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(210, 30, 98), position: 0 }, { color: color(210, 22, 96), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(210, 30, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(210, 80, 55), position: 0 }, { color: color(210, 80, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(210, 80, 50, 0.25), position: 0 }, { color: color(200, 70, 55, 0.2), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(210, 80, 55), position: 0 },
+            { color: color(210, 80, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 25, 96), position: 0 },
+            { color: color(210, 25, 90), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(210, 30, 98), position: 0 },
+            { color: color(210, 22, 96), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(210, 30, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 80, 55), position: 0 },
+            { color: color(210, 80, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(210, 80, 50, 0.25), position: 0 },
+            { color: color(200, 70, 55, 0.2), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [{ color: color(210, 30, 98), position: 0 }, { color: color(210, 22, 96), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 135,
+        stops: [
+          { color: color(210, 30, 98), position: 0 },
+          { color: color(210, 22, 96), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: false, enableShadows: true, enableGradients: true, quality: 'medium' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['corporate', 'blue', 'professional'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "medium",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["corporate", "blue", "professional"],
     featured: true,
-    public: true
+    public: true,
   },
   {
-    id: 'abstract-vaporwave',
-    name: 'Abstract Vaporwave',
-    description: 'Retro-futuristic abstract theme with bold gradients',
-    category: 'abstract',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "abstract-vaporwave",
+    name: "Abstract Vaporwave",
+    description: "Retro-futuristic abstract theme with bold gradients",
+    category: "abstract",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(260, 50, 6),
       foreground: color(320, 50, 88),
@@ -1798,46 +3246,137 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(260, 40, 12),
       sidebarAccentForeground: color(320, 50, 88),
       sidebarBorder: color(260, 40, 12),
-      sidebarRing: color(320, 90, 60)
+      sidebarRing: color(320, 90, 60),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 24, color: color(320, 90, 65), intensity: 0.6 } },
-      blur: { background: { enabled: true, radius: 10, saturation: 140, brightness: 65 }, overlay: { enabled: true, radius: 8, saturation: 130, brightness: 75 }, card: { enabled: true, radius: 4, saturation: 120, brightness: 85 } },
-      particles: { enabled: true, type: 'sparks', count: 60, speed: 1.0, size: { min: 1, max: 4 }, color: color(320, 90, 65), opacity: { min: 0.25, max: 0.7 }, direction: 0, wind: 0.12 },
-      animations: { ...commonAnimations, glow: { name: 'vaporPulse', duration: 2200, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 24, color: color(320, 90, 65), intensity: 0.6 },
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 140, brightness: 65 },
+        overlay: { enabled: true, radius: 8, saturation: 130, brightness: 75 },
+        card: { enabled: true, radius: 4, saturation: 120, brightness: 85 },
+      },
+      particles: {
+        enabled: true,
+        type: "sparks",
+        count: 60,
+        speed: 1.0,
+        size: { min: 1, max: 4 },
+        color: color(320, 90, 65),
+        opacity: { min: 0.25, max: 0.7 },
+        direction: 0,
+        wind: 0.12,
+      },
+      animations: {
+        ...commonAnimations,
+        glow: {
+          name: "vaporPulse",
+          duration: 2200,
+          easing: "ease-in-out",
+          iterations: "infinite",
+          direction: "alternate",
+        },
+      },
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(320, 90, 65), position: 0 }, { color: color(320, 90, 50), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(260, 40, 16), position: 0 }, { color: color(260, 50, 6), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(260, 50, 6), position: 0 }, { color: color(200, 80, 8), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(260, 50, 10), position: 0 }, { color: color(260, 40, 8), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(320, 90, 65), position: 0 }, { color: color(320, 90, 50), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(320, 90, 60, 0.6), position: 0 }, { color: color(200, 80, 55, 0.5), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(320, 90, 65), position: 0 },
+            { color: color(320, 90, 50), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(260, 40, 16), position: 0 },
+            { color: color(260, 50, 6), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(260, 50, 6), position: 0 },
+            { color: color(200, 80, 8), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(260, 50, 10), position: 0 },
+            { color: color(260, 40, 8), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(320, 90, 65), position: 0 },
+            { color: color(320, 90, 50), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(320, 90, 60, 0.6), position: 0 },
+            { color: color(200, 80, 55, 0.5), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(260, 50, 6), position: 0 }, { color: color(200, 80, 8), position: 100 }] }, overlay: { color: color(320, 90, 60), opacity: 0.1, blendMode: 'screen' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(260, 50, 6), position: 0 },
+          { color: color(200, 80, 8), position: 100 },
+        ],
+      },
+      overlay: { color: color(320, 90, 60), opacity: 0.1, blendMode: "screen" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'ultra' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['abstract', 'retro', 'vaporwave'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "ultra",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["abstract", "retro", "vaporwave"],
     featured: true,
-    public: true
+    public: true,
   },
   {
-    id: 'solar-flare',
-    name: 'Solar Flare',
-    description: 'High-energy abstract theme with solar-inspired oranges',
-    category: 'abstract',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "solar-flare",
+    name: "Solar Flare",
+    description: "High-energy abstract theme with solar-inspired oranges",
+    category: "abstract",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(20, 90, 6),
       foreground: color(30, 50, 92),
@@ -1871,46 +3410,137 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(20, 60, 12),
       sidebarAccentForeground: color(30, 50, 92),
       sidebarBorder: color(20, 60, 12),
-      sidebarRing: color(20, 100, 60)
+      sidebarRing: color(20, 100, 60),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 22, color: color(20, 100, 65), intensity: 0.55 } },
-      blur: { background: { enabled: true, radius: 10, saturation: 130, brightness: 70 }, overlay: { enabled: true, radius: 6, saturation: 120, brightness: 78 }, card: { enabled: true, radius: 3, saturation: 110, brightness: 86 } },
-      particles: { enabled: true, type: 'sparks', count: 55, speed: 0.9, size: { min: 1, max: 4 }, color: color(20, 100, 65), opacity: { min: 0.22, max: 0.6 }, direction: 0, wind: 0.12 },
-      animations: { ...commonAnimations, glow: { name: 'solarPulse', duration: 2000, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 22, color: color(20, 100, 65), intensity: 0.55 },
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 130, brightness: 70 },
+        overlay: { enabled: true, radius: 6, saturation: 120, brightness: 78 },
+        card: { enabled: true, radius: 3, saturation: 110, brightness: 86 },
+      },
+      particles: {
+        enabled: true,
+        type: "sparks",
+        count: 55,
+        speed: 0.9,
+        size: { min: 1, max: 4 },
+        color: color(20, 100, 65),
+        opacity: { min: 0.22, max: 0.6 },
+        direction: 0,
+        wind: 0.12,
+      },
+      animations: {
+        ...commonAnimations,
+        glow: {
+          name: "solarPulse",
+          duration: 2000,
+          easing: "ease-in-out",
+          iterations: "infinite",
+          direction: "alternate",
+        },
+      },
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(20, 100, 65), position: 0 }, { color: color(20, 100, 50), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(20, 60, 18), position: 0 }, { color: color(20, 90, 6), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(20, 90, 6), position: 0 }, { color: color(45, 100, 12), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(20, 90, 8), position: 0 }, { color: color(20, 70, 8), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(20, 100, 65), position: 0 }, { color: color(20, 100, 50), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(20, 100, 60, 0.6), position: 0 }, { color: color(45, 100, 55, 0.5), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(20, 100, 65), position: 0 },
+            { color: color(20, 100, 50), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(20, 60, 18), position: 0 },
+            { color: color(20, 90, 6), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(20, 90, 6), position: 0 },
+            { color: color(45, 100, 12), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(20, 90, 8), position: 0 },
+            { color: color(20, 70, 8), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(20, 100, 65), position: 0 },
+            { color: color(20, 100, 50), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(20, 100, 60, 0.6), position: 0 },
+            { color: color(45, 100, 55, 0.5), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(20, 90, 6), position: 0 }, { color: color(45, 100, 12), position: 100 }] }, overlay: { color: color(20, 100, 40), opacity: 0.1, blendMode: 'screen' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(20, 90, 6), position: 0 },
+          { color: color(45, 100, 12), position: 100 },
+        ],
+      },
+      overlay: { color: color(20, 100, 40), opacity: 0.1, blendMode: "screen" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['abstract', 'orange', 'energetic'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["abstract", "orange", "energetic"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'ice-glass',
-    name: 'Ice Glass',
-    description: 'Frosted glass abstract theme with cool translucency',
-    category: 'abstract',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "ice-glass",
+    name: "Ice Glass",
+    description: "Frosted glass abstract theme with cool translucency",
+    category: "abstract",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(210, 30, 98),
       foreground: color(210, 30, 20),
@@ -1944,46 +3574,125 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(210, 18, 92),
       sidebarAccentForeground: color(210, 30, 20),
       sidebarBorder: color(210, 18, 92),
-      sidebarRing: color(200, 80, 50)
+      sidebarRing: color(200, 80, 50),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 14, color: color(200, 80, 55), intensity: 0.22 } },
-      blur: { background: { enabled: true, radius: 12, saturation: 130, brightness: 95 }, overlay: { enabled: true, radius: 8, saturation: 120, brightness: 98 }, card: { enabled: true, radius: 4, saturation: 115, brightness: 100 } },
-      particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 14, color: color(200, 80, 55), intensity: 0.22 },
+      },
+      blur: {
+        background: { enabled: true, radius: 12, saturation: 130, brightness: 95 },
+        overlay: { enabled: true, radius: 8, saturation: 120, brightness: 98 },
+        card: { enabled: true, radius: 4, saturation: 115, brightness: 100 },
+      },
+      particles: {
+        enabled: false,
+        type: "geometric",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(200, 80, 55), position: 0 }, { color: color(200, 80, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(210, 22, 96), position: 0 }, { color: color(210, 20, 90), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(210, 30, 98), position: 0 }, { color: color(210, 22, 96), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(210, 30, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(200, 80, 55), position: 0 }, { color: color(200, 80, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(200, 80, 50, 0.25), position: 0 }, { color: color(210, 30, 30, 0.15), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(200, 80, 55), position: 0 },
+            { color: color(200, 80, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 22, 96), position: 0 },
+            { color: color(210, 20, 90), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(210, 30, 98), position: 0 },
+            { color: color(210, 22, 96), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(210, 30, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(200, 80, 55), position: 0 },
+            { color: color(200, 80, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(200, 80, 50, 0.25), position: 0 },
+            { color: color(210, 30, 30, 0.15), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'radial', stops: [{ color: color(210, 30, 98), position: 0 }, { color: color(210, 22, 96), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "radial",
+        stops: [
+          { color: color(210, 30, 98), position: 0 },
+          { color: color(210, 22, 96), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['abstract', 'glass', 'frosted'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["abstract", "glass", "frosted"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'tech-noir',
-    name: 'Tech Noir',
-    description: 'Dark sci-fi tech theme with magenta accents',
-    category: 'tech',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "tech-noir",
+    name: "Tech Noir",
+    description: "Dark sci-fi tech theme with magenta accents",
+    category: "tech",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(280, 40, 5),
       foreground: color(300, 40, 88),
@@ -2017,46 +3726,137 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(280, 30, 12),
       sidebarAccentForeground: color(300, 40, 88),
       sidebarBorder: color(280, 30, 12),
-      sidebarRing: color(300, 90, 60)
+      sidebarRing: color(300, 90, 60),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 22, color: color(300, 90, 65), intensity: 0.55 } },
-      blur: { background: { enabled: true, radius: 10, saturation: 140, brightness: 65 }, overlay: { enabled: true, radius: 6, saturation: 130, brightness: 72 }, card: { enabled: true, radius: 3, saturation: 120, brightness: 82 } },
-      particles: { enabled: true, type: 'sparks', count: 48, speed: 0.9, size: { min: 1, max: 4 }, color: color(300, 90, 65), opacity: { min: 0.22, max: 0.6 }, direction: 0, wind: 0.12 },
-      animations: { ...commonAnimations, glow: { name: 'noirPulse', duration: 2000, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 22, color: color(300, 90, 65), intensity: 0.55 },
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 140, brightness: 65 },
+        overlay: { enabled: true, radius: 6, saturation: 130, brightness: 72 },
+        card: { enabled: true, radius: 3, saturation: 120, brightness: 82 },
+      },
+      particles: {
+        enabled: true,
+        type: "sparks",
+        count: 48,
+        speed: 0.9,
+        size: { min: 1, max: 4 },
+        color: color(300, 90, 65),
+        opacity: { min: 0.22, max: 0.6 },
+        direction: 0,
+        wind: 0.12,
+      },
+      animations: {
+        ...commonAnimations,
+        glow: {
+          name: "noirPulse",
+          duration: 2000,
+          easing: "ease-in-out",
+          iterations: "infinite",
+          direction: "alternate",
+        },
+      },
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(300, 90, 65), position: 0 }, { color: color(300, 90, 50), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(280, 30, 14), position: 0 }, { color: color(280, 40, 5), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(280, 40, 5), position: 0 }, { color: color(210, 80, 8), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(280, 40, 8), position: 0 }, { color: color(280, 30, 7), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(300, 90, 65), position: 0 }, { color: color(300, 90, 50), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(300, 90, 60, 0.6), position: 0 }, { color: color(210, 80, 55, 0.5), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(300, 90, 65), position: 0 },
+            { color: color(300, 90, 50), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(280, 30, 14), position: 0 },
+            { color: color(280, 40, 5), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(280, 40, 5), position: 0 },
+            { color: color(210, 80, 8), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(280, 40, 8), position: 0 },
+            { color: color(280, 30, 7), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(300, 90, 65), position: 0 },
+            { color: color(300, 90, 50), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(300, 90, 60, 0.6), position: 0 },
+            { color: color(210, 80, 55, 0.5), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(280, 40, 5), position: 0 }, { color: color(210, 80, 8), position: 100 }] }, overlay: { color: color(300, 90, 50), opacity: 0.08, blendMode: 'screen' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(280, 40, 5), position: 0 },
+          { color: color(210, 80, 8), position: 100 },
+        ],
+      },
+      overlay: { color: color(300, 90, 50), opacity: 0.08, blendMode: "screen" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['tech', 'noir', 'magenta'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["tech", "noir", "magenta"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'corporate-slate',
-    name: 'Corporate Slate',
-    description: 'Modern corporate theme with slate grays and blue accents',
-    category: 'corporate',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "corporate-slate",
+    name: "Corporate Slate",
+    description: "Modern corporate theme with slate grays and blue accents",
+    category: "corporate",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(220, 10, 8),
       foreground: color(220, 20, 92),
@@ -2090,46 +3890,126 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(220, 12, 12),
       sidebarAccentForeground: color(220, 20, 92),
       sidebarBorder: color(220, 12, 12),
-      sidebarRing: color(210, 70, 50)
+      sidebarRing: color(210, 70, 50),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 16, color: color(210, 70, 55), intensity: 0.3 } },
-      blur: { background: { enabled: true, radius: 8, saturation: 120, brightness: 80 }, overlay: { enabled: true, radius: 4, saturation: 110, brightness: 86 }, card: { enabled: true, radius: 2, saturation: 105, brightness: 90 } },
-      particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 16, color: color(210, 70, 55), intensity: 0.3 },
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 120, brightness: 80 },
+        overlay: { enabled: true, radius: 4, saturation: 110, brightness: 86 },
+        card: { enabled: true, radius: 2, saturation: 105, brightness: 90 },
+      },
+      particles: {
+        enabled: false,
+        type: "geometric",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 60, stops: [{ color: color(210, 70, 55), position: 0 }, { color: color(210, 70, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(220, 15, 16), position: 0 }, { color: color(220, 15, 10), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(220, 10, 8), position: 0 }, { color: color(220, 12, 9), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(220, 10, 10), position: 0 }, { color: color(220, 12, 9), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(210, 70, 55), position: 0 }, { color: color(210, 70, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(210, 70, 50, 0.3), position: 0 }, { color: color(210, 40, 55, 0.25), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(210, 70, 55), position: 0 },
+            { color: color(210, 70, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(220, 15, 16), position: 0 },
+            { color: color(220, 15, 10), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(220, 10, 8), position: 0 },
+            { color: color(220, 12, 9), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(220, 10, 10), position: 0 },
+            { color: color(220, 12, 9), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 70, 55), position: 0 },
+            { color: color(210, 70, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(210, 70, 50, 0.3), position: 0 },
+            { color: color(210, 40, 55, 0.25), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 60, stops: [{ color: color(220, 10, 8), position: 0 }, { color: color(220, 12, 9), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 60,
+        stops: [
+          { color: color(220, 10, 8), position: 0 },
+          { color: color(220, 12, 9), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['corporate', 'slate', 'modern'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["corporate", "slate", "modern"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'sandstone-works',
-    name: 'Sandstone Works',
-    description: 'Construction theme inspired by sandstone quarries',
-    category: 'construction',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "sandstone-works",
+    name: "Sandstone Works",
+    description: "Construction theme inspired by sandstone quarries",
+    category: "construction",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(35, 30, 98),
       foreground: color(35, 30, 22),
@@ -2163,46 +4043,126 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(35, 18, 92),
       sidebarAccentForeground: color(35, 30, 22),
       sidebarBorder: color(35, 18, 92),
-      sidebarRing: color(45, 90, 55)
+      sidebarRing: color(45, 90, 55),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 12, color: color(45, 90, 60), intensity: 0.22 } },
-      blur: { background: { enabled: false, radius: 0, saturation: 100, brightness: 100 }, overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 }, card: { enabled: true, radius: 1, saturation: 102, brightness: 99 } },
-      particles: { enabled: true, type: 'dust', count: 18, speed: 0.2, size: { min: 0.5, max: 1.5 }, color: color(35, 40, 45), opacity: { min: 0.06, max: 0.18 }, direction: 60, wind: 0.03 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 12, color: color(45, 90, 60), intensity: 0.22 },
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 },
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 99 },
+      },
+      particles: {
+        enabled: true,
+        type: "dust",
+        count: 18,
+        speed: 0.2,
+        size: { min: 0.5, max: 1.5 },
+        color: color(35, 40, 45),
+        opacity: { min: 0.06, max: 0.18 },
+        direction: 60,
+        wind: 0.03,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(45, 90, 60), position: 0 }, { color: color(45, 90, 50), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(35, 20, 98), position: 0 }, { color: color(35, 20, 92), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(35, 30, 98), position: 0 }, { color: color(35, 20, 96), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(35, 30, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 90, 60), position: 0 }, { color: color(45, 90, 50), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(45, 90, 55, 0.25), position: 0 }, { color: color(25, 70, 45, 0.2), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(45, 90, 60), position: 0 },
+            { color: color(45, 90, 50), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(35, 20, 98), position: 0 },
+            { color: color(35, 20, 92), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(35, 30, 98), position: 0 },
+            { color: color(35, 20, 96), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(35, 30, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(45, 90, 60), position: 0 },
+            { color: color(45, 90, 50), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(45, 90, 55, 0.25), position: 0 },
+            { color: color(25, 70, 45, 0.2), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 120, stops: [{ color: color(35, 30, 98), position: 0 }, { color: color(35, 20, 96), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 120,
+        stops: [
+          { color: color(35, 30, 98), position: 0 },
+          { color: color(35, 20, 96), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: false, enableShadows: true, enableGradients: true, quality: 'medium' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['construction', 'sandstone', 'dust'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "medium",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["construction", "sandstone", "dust"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'urban-camo',
-    name: 'Urban Camo',
-    description: 'Military theme with urban camouflage accents',
-    category: 'military',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "urban-camo",
+    name: "Urban Camo",
+    description: "Military theme with urban camouflage accents",
+    category: "military",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(220, 10, 10),
       foreground: color(210, 20, 92),
@@ -2236,46 +4196,127 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(220, 12, 12),
       sidebarAccentForeground: color(210, 20, 92),
       sidebarBorder: color(220, 12, 12),
-      sidebarRing: color(120, 60, 45)
+      sidebarRing: color(120, 60, 45),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 16, color: color(120, 60, 48), intensity: 0.3 } },
-      blur: { background: { enabled: true, radius: 8, saturation: 115, brightness: 78 }, overlay: { enabled: true, radius: 4, saturation: 108, brightness: 86 }, card: { enabled: true, radius: 2, saturation: 104, brightness: 90 } },
-      particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 16, color: color(120, 60, 48), intensity: 0.3 },
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 115, brightness: 78 },
+        overlay: { enabled: true, radius: 4, saturation: 108, brightness: 86 },
+        card: { enabled: true, radius: 2, saturation: 104, brightness: 90 },
+      },
+      particles: {
+        enabled: false,
+        type: "geometric",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 135, stops: [{ color: color(120, 60, 50), position: 0 }, { color: color(120, 60, 40), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(220, 15, 16), position: 0 }, { color: color(220, 15, 10), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(220, 10, 10), position: 0 }, { color: color(220, 12, 9), position: 100 }] },
-        card: { type: 'linear', angle: 145, stops: [{ color: color(220, 10, 12), position: 0 }, { color: color(220, 12, 9), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(120, 60, 50), position: 0 }, { color: color(120, 60, 40), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(120, 60, 45, 0.3), position: 0 }, { color: color(0, 0, 60, 0.25), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(120, 60, 50), position: 0 },
+            { color: color(120, 60, 40), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(220, 15, 16), position: 0 },
+            { color: color(220, 15, 10), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(220, 10, 10), position: 0 },
+            { color: color(220, 12, 9), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 145,
+          stops: [
+            { color: color(220, 10, 12), position: 0 },
+            { color: color(220, 12, 9), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(120, 60, 50), position: 0 },
+            { color: color(120, 60, 40), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(120, 60, 45, 0.3), position: 0 },
+            { color: color(0, 0, 60, 0.25), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [{ color: color(220, 10, 10), position: 0 }, { color: color(220, 12, 9), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 135,
+        stops: [
+          { color: color(220, 10, 10), position: 0 },
+          { color: color(220, 12, 9), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['military', 'urban', 'camo'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["military", "urban", "camo"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'mountain-peak',
-    name: 'Mountain Peak',
-    description: 'High-altitude nature theme with crisp contrasts',
-    category: 'nature',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "mountain-peak",
+    name: "Mountain Peak",
+    description: "High-altitude nature theme with crisp contrasts",
+    category: "nature",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(210, 35, 8),
       foreground: color(210, 35, 90),
@@ -2309,46 +4350,127 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(210, 28, 12),
       sidebarAccentForeground: color(210, 35, 90),
       sidebarBorder: color(210, 28, 12),
-      sidebarRing: color(200, 70, 55)
+      sidebarRing: color(200, 70, 55),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 18, color: color(200, 70, 60), intensity: 0.35 } },
-      blur: { background: { enabled: true, radius: 8, saturation: 125, brightness: 78 }, overlay: { enabled: true, radius: 4, saturation: 115, brightness: 84 }, card: { enabled: true, radius: 2, saturation: 110, brightness: 90 } },
-      particles: { enabled: true, type: 'snow', count: 20, speed: 0.5, size: { min: 1, max: 3 }, color: color(0, 0, 100), opacity: { min: 0.1, max: 0.3 }, direction: 180, wind: -0.05 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 18, color: color(200, 70, 60), intensity: 0.35 },
+      },
+      blur: {
+        background: { enabled: true, radius: 8, saturation: 125, brightness: 78 },
+        overlay: { enabled: true, radius: 4, saturation: 115, brightness: 84 },
+        card: { enabled: true, radius: 2, saturation: 110, brightness: 90 },
+      },
+      particles: {
+        enabled: true,
+        type: "snow",
+        count: 20,
+        speed: 0.5,
+        size: { min: 1, max: 3 },
+        color: color(0, 0, 100),
+        opacity: { min: 0.1, max: 0.3 },
+        direction: 180,
+        wind: -0.05,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(200, 70, 60), position: 0 }, { color: color(200, 70, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(210, 30, 16), position: 0 }, { color: color(210, 35, 8), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(210, 35, 8), position: 0 }, { color: color(200, 70, 10), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(210, 35, 10), position: 0 }, { color: color(210, 28, 8), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(200, 70, 60), position: 0 }, { color: color(200, 70, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(200, 70, 55, 0.35), position: 0 }, { color: color(160, 70, 50, 0.3), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(200, 70, 60), position: 0 },
+            { color: color(200, 70, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(210, 30, 16), position: 0 },
+            { color: color(210, 35, 8), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(210, 35, 8), position: 0 },
+            { color: color(200, 70, 10), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(210, 35, 10), position: 0 },
+            { color: color(210, 28, 8), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(200, 70, 60), position: 0 },
+            { color: color(200, 70, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(200, 70, 55, 0.35), position: 0 },
+            { color: color(160, 70, 50, 0.3), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(210, 35, 8), position: 0 }, { color: color(200, 70, 10), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(210, 35, 8), position: 0 },
+          { color: color(200, 70, 10), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['nature', 'mountain', 'crisp'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["nature", "mountain", "crisp"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'bio-lumina',
-    name: 'Bio Lumina',
-    description: 'Nature-tech fusion with bioluminescent accents',
-    category: 'tech',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "bio-lumina",
+    name: "Bio Lumina",
+    description: "Nature-tech fusion with bioluminescent accents",
+    category: "tech",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(220, 35, 6),
       foreground: color(160, 50, 88),
@@ -2382,46 +4504,137 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(220, 25, 10),
       sidebarAccentForeground: color(160, 50, 88),
       sidebarBorder: color(220, 25, 10),
-      sidebarRing: color(160, 80, 55)
+      sidebarRing: color(160, 80, 55),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 20, color: color(160, 80, 60), intensity: 0.5 } },
-      blur: { background: { enabled: true, radius: 10, saturation: 140, brightness: 68 }, overlay: { enabled: true, radius: 6, saturation: 130, brightness: 76 }, card: { enabled: true, radius: 3, saturation: 120, brightness: 84 } },
-      particles: { enabled: true, type: 'sparks', count: 36, speed: 0.8, size: { min: 1, max: 4 }, color: color(160, 80, 60), opacity: { min: 0.2, max: 0.5 }, direction: 0, wind: 0.1 },
-      animations: { ...commonAnimations, glow: { name: 'bioGlow', duration: 2600, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 20, color: color(160, 80, 60), intensity: 0.5 },
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 140, brightness: 68 },
+        overlay: { enabled: true, radius: 6, saturation: 130, brightness: 76 },
+        card: { enabled: true, radius: 3, saturation: 120, brightness: 84 },
+      },
+      particles: {
+        enabled: true,
+        type: "sparks",
+        count: 36,
+        speed: 0.8,
+        size: { min: 1, max: 4 },
+        color: color(160, 80, 60),
+        opacity: { min: 0.2, max: 0.5 },
+        direction: 0,
+        wind: 0.1,
+      },
+      animations: {
+        ...commonAnimations,
+        glow: {
+          name: "bioGlow",
+          duration: 2600,
+          easing: "ease-in-out",
+          iterations: "infinite",
+          direction: "alternate",
+        },
+      },
       gradients: {
-        primary: { type: 'linear', angle: 90, stops: [{ color: color(160, 80, 60), position: 0 }, { color: color(160, 80, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(220, 25, 14), position: 0 }, { color: color(220, 35, 6), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(220, 35, 6), position: 0 }, { color: color(160, 80, 8), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(220, 35, 8), position: 0 }, { color: color(220, 30, 6), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(160, 80, 60), position: 0 }, { color: color(160, 80, 45), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(160, 80, 55, 0.6), position: 0 }, { color: color(200, 80, 55, 0.5), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(160, 80, 60), position: 0 },
+            { color: color(160, 80, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(220, 25, 14), position: 0 },
+            { color: color(220, 35, 6), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(220, 35, 6), position: 0 },
+            { color: color(160, 80, 8), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(220, 35, 8), position: 0 },
+            { color: color(220, 30, 6), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(160, 80, 60), position: 0 },
+            { color: color(160, 80, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(160, 80, 55, 0.6), position: 0 },
+            { color: color(200, 80, 55, 0.5), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(220, 35, 6), position: 0 }, { color: color(160, 80, 8), position: 100 }] }, overlay: { color: color(160, 80, 50), opacity: 0.08, blendMode: 'screen' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(220, 35, 6), position: 0 },
+          { color: color(160, 80, 8), position: 100 },
+        ],
+      },
+      overlay: { color: color(160, 80, 50), opacity: 0.08, blendMode: "screen" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.04, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['tech', 'bio', 'glow'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["tech", "bio", "glow"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'gridline-pro',
-    name: 'Gridline Pro',
-    description: 'Technical corporate theme with grid and blueprint accents',
-    category: 'corporate',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'light',
+    id: "gridline-pro",
+    name: "Gridline Pro",
+    description: "Technical corporate theme with grid and blueprint accents",
+    category: "corporate",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "light",
     colors: {
       background: color(210, 35, 98),
       foreground: color(220, 20, 20),
@@ -2455,46 +4668,126 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(210, 18, 92),
       sidebarAccentForeground: color(220, 20, 20),
       sidebarBorder: color(210, 18, 92),
-      sidebarRing: color(210, 70, 50)
+      sidebarRing: color(210, 70, 50),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 14, color: color(210, 70, 55), intensity: 0.22 } },
-      blur: { background: { enabled: false, radius: 0, saturation: 100, brightness: 100 }, overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 }, card: { enabled: true, radius: 1, saturation: 102, brightness: 99 } },
-      particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 14, color: color(210, 70, 55), intensity: 0.22 },
+      },
+      blur: {
+        background: { enabled: false, radius: 0, saturation: 100, brightness: 100 },
+        overlay: { enabled: true, radius: 2, saturation: 104, brightness: 97 },
+        card: { enabled: true, radius: 1, saturation: 102, brightness: 99 },
+      },
+      particles: {
+        enabled: false,
+        type: "geometric",
+        count: 0,
+        speed: 0,
+        size: { min: 0, max: 0 },
+        color: color(0, 0, 0),
+        opacity: { min: 0, max: 0 },
+        direction: 0,
+        wind: 0,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(210, 70, 55), position: 0 }, { color: color(210, 70, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(210, 22, 96), position: 0 }, { color: color(210, 20, 90), position: 100 }] },
-        hero: { type: 'radial', stops: [{ color: color(210, 35, 98), position: 0 }, { color: color(210, 22, 96), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(0, 0, 100), position: 0 }, { color: color(210, 35, 98), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(210, 70, 55), position: 0 }, { color: color(210, 70, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(210, 70, 50, 0.25), position: 0 }, { color: color(200, 70, 55, 0.2), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(210, 70, 55), position: 0 },
+            { color: color(210, 70, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 22, 96), position: 0 },
+            { color: color(210, 20, 90), position: 100 },
+          ],
+        },
+        hero: {
+          type: "radial",
+          stops: [
+            { color: color(210, 35, 98), position: 0 },
+            { color: color(210, 22, 96), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 0, 100), position: 0 },
+            { color: color(210, 35, 98), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(210, 70, 55), position: 0 },
+            { color: color(210, 70, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(210, 70, 50, 0.25), position: 0 },
+            { color: color(200, 70, 55, 0.2), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 135, stops: [{ color: color(210, 35, 98), position: 0 }, { color: color(210, 22, 96), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 135,
+        stops: [
+          { color: color(210, 35, 98), position: 0 },
+          { color: color(210, 22, 96), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 700, letterSpacing: -0.02, lineHeight: 1.2 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 500, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: false, enableBlur: false, enableShadows: true, enableGradients: true, quality: 'medium' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['corporate', 'grid', 'blueprint'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: false,
+      enableBlur: false,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "medium",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["corporate", "grid", "blueprint"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'steampunk-brass',
-    name: 'Steampunk Brass',
-    description: 'Abstract brass and leather theme with steampunk vibes',
-    category: 'abstract',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "steampunk-brass",
+    name: "Steampunk Brass",
+    description: "Abstract brass and leather theme with steampunk vibes",
+    category: "abstract",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(30, 50, 8),
       foreground: color(30, 35, 90),
@@ -2528,46 +4821,127 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(30, 40, 12),
       sidebarAccentForeground: color(30, 35, 90),
       sidebarBorder: color(30, 40, 12),
-      sidebarRing: color(35, 70, 55)
+      sidebarRing: color(35, 70, 55),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 20, color: color(35, 70, 60), intensity: 0.5 } },
-      blur: { background: { enabled: true, radius: 10, saturation: 130, brightness: 70 }, overlay: { enabled: true, radius: 6, saturation: 120, brightness: 78 }, card: { enabled: true, radius: 3, saturation: 110, brightness: 86 } },
-      particles: { enabled: true, type: 'sparks', count: 32, speed: 0.8, size: { min: 1, max: 3 }, color: color(35, 70, 60), opacity: { min: 0.2, max: 0.5 }, direction: 0, wind: 0.1 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 20, color: color(35, 70, 60), intensity: 0.5 },
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 130, brightness: 70 },
+        overlay: { enabled: true, radius: 6, saturation: 120, brightness: 78 },
+        card: { enabled: true, radius: 3, saturation: 110, brightness: 86 },
+      },
+      particles: {
+        enabled: true,
+        type: "sparks",
+        count: 32,
+        speed: 0.8,
+        size: { min: 1, max: 3 },
+        color: color(35, 70, 60),
+        opacity: { min: 0.2, max: 0.5 },
+        direction: 0,
+        wind: 0.1,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(35, 70, 60), position: 0 }, { color: color(35, 70, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(30, 40, 16), position: 0 }, { color: color(30, 50, 8), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(30, 50, 8), position: 0 }, { color: color(15, 70, 10), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(30, 50, 10), position: 0 }, { color: color(30, 45, 8), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(35, 70, 60), position: 0 }, { color: color(35, 70, 45), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(35, 70, 55, 0.6), position: 0 }, { color: color(15, 70, 50, 0.5), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(35, 70, 60), position: 0 },
+            { color: color(35, 70, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(30, 40, 16), position: 0 },
+            { color: color(30, 50, 8), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(30, 50, 8), position: 0 },
+            { color: color(15, 70, 10), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(30, 50, 10), position: 0 },
+            { color: color(30, 45, 8), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(35, 70, 60), position: 0 },
+            { color: color(35, 70, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(35, 70, 55, 0.6), position: 0 },
+            { color: color(15, 70, 50, 0.5), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(30, 50, 8), position: 0 }, { color: color(15, 70, 10), position: 100 }] } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(30, 50, 8), position: 0 },
+          { color: color(15, 70, 10), position: 100 },
+        ],
+      },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['abstract', 'steampunk', 'brass'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["abstract", "steampunk", "brass"],
     featured: false,
-    public: true
+    public: true,
   },
   {
-    id: 'desert-dusk',
-    name: 'Desert Dusk',
-    description: 'Warm nature theme with desert sunset palette',
-    category: 'nature',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "desert-dusk",
+    name: "Desert Dusk",
+    description: "Warm nature theme with desert sunset palette",
+    category: "nature",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(25, 60, 8),
       foreground: color(30, 35, 90),
@@ -2601,47 +4975,129 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(25, 40, 12),
       sidebarAccentForeground: color(30, 35, 90),
       sidebarBorder: color(25, 40, 12),
-      sidebarRing: color(20, 90, 55)
+      sidebarRing: color(20, 90, 55),
     },
     effects: {
-      shadows: { ...commonShadows, glow: { type: 'glow', x: 0, y: 0, blur: 20, color: color(20, 90, 60), intensity: 0.45 } },
-      blur: { background: { enabled: true, radius: 10, saturation: 130, brightness: 72 }, overlay: { enabled: true, radius: 6, saturation: 120, brightness: 80 }, card: { enabled: true, radius: 3, saturation: 110, brightness: 88 } },
-      particles: { enabled: true, type: 'dust', count: 28, speed: 0.4, size: { min: 0.8, max: 2.5 }, color: color(20, 60, 50), opacity: { min: 0.1, max: 0.3 }, direction: 45, wind: 0.08 },
+      shadows: {
+        ...commonShadows,
+        glow: { type: "glow", x: 0, y: 0, blur: 20, color: color(20, 90, 60), intensity: 0.45 },
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 130, brightness: 72 },
+        overlay: { enabled: true, radius: 6, saturation: 120, brightness: 80 },
+        card: { enabled: true, radius: 3, saturation: 110, brightness: 88 },
+      },
+      particles: {
+        enabled: true,
+        type: "dust",
+        count: 28,
+        speed: 0.4,
+        size: { min: 0.8, max: 2.5 },
+        color: color(20, 60, 50),
+        opacity: { min: 0.1, max: 0.3 },
+        direction: 45,
+        wind: 0.08,
+      },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 120, stops: [{ color: color(20, 90, 60), position: 0 }, { color: color(20, 90, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 60, stops: [{ color: color(25, 40, 16), position: 0 }, { color: color(25, 60, 8), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(25, 60, 8), position: 0 }, { color: color(45, 100, 12), position: 100 }] },
-        card: { type: 'linear', angle: 135, stops: [{ color: color(25, 60, 10), position: 0 }, { color: color(25, 50, 8), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(20, 90, 60), position: 0 }, { color: color(20, 90, 45), position: 100 }] },
-        border: { type: 'conic', angle: 0, stops: [{ color: color(20, 90, 55, 0.6), position: 0 }, { color: color(45, 100, 55, 0.5), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 120,
+          stops: [
+            { color: color(20, 90, 60), position: 0 },
+            { color: color(20, 90, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 60,
+          stops: [
+            { color: color(25, 40, 16), position: 0 },
+            { color: color(25, 60, 8), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(25, 60, 8), position: 0 },
+            { color: color(45, 100, 12), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(25, 60, 10), position: 0 },
+            { color: color(25, 50, 8), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(20, 90, 60), position: 0 },
+            { color: color(20, 90, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "conic",
+          angle: 0,
+          stops: [
+            { color: color(20, 90, 55, 0.6), position: 0 },
+            { color: color(45, 100, 55, 0.5), position: 100 },
+          ],
+        },
+      },
     },
-    wallpaper: { type: 'gradient', gradient: { type: 'linear', angle: 180, stops: [{ color: color(25, 60, 8), position: 0 }, { color: color(45, 100, 12), position: 100 }] }, overlay: { color: color(20, 90, 50), opacity: 0.1, blendMode: 'screen' } },
+    wallpaper: {
+      type: "gradient",
+      gradient: {
+        type: "linear",
+        angle: 180,
+        stops: [
+          { color: color(25, 60, 8), position: 0 },
+          { color: color(45, 100, 12), position: 100 },
+        ],
+      },
+      overlay: { color: color(20, 90, 50), opacity: 0.1, blendMode: "screen" },
+    },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.03, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0.02, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.03, lineHeight: 1.3 },
     },
-    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
-    accessibility: { highContrast: false, reducedMotion: false, largeText: false, focusVisible: true },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['nature', 'desert', 'sunset'],
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: "high",
+    },
+    accessibility: {
+      highContrast: false,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true,
+    },
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["nature", "desert", "sunset"],
     featured: false,
-    public: true
+    public: true,
   },
   // TECH: ISAC Protocol (Cyber Orange)
   {
-    id: 'isac-protocol',
-    name: 'ISAC Protocol',
-    description: 'Division-inspired cyber orange with cyan HUD accents on deep neutrals',
-    category: 'tech',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "isac-protocol",
+    name: "ISAC Protocol",
+    description: "Division-inspired cyber orange with cyan HUD accents on deep neutrals",
+    category: "tech",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(215, 19, 8), // deep charcoal
       foreground: color(196, 18, 94), // off-white
@@ -2675,52 +5131,94 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(193, 100, 58),
       sidebarAccentForeground: color(0, 0, 0),
       sidebarBorder: color(215, 19, 10),
-      sidebarRing: color(193, 100, 58)
+      sidebarRing: color(193, 100, 58),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 28, color: color(24, 100, 53), intensity: 0.35 }
+        glow: { type: "glow", x: 0, y: 0, blur: 28, color: color(24, 100, 53), intensity: 0.35 },
       },
       blur: {
         background: { enabled: true, radius: 8, saturation: 110, brightness: 90 },
         overlay: { enabled: true, radius: 4, saturation: 105, brightness: 95 },
-        card: { enabled: true, radius: 2, saturation: 110, brightness: 98 }
+        card: { enabled: true, radius: 2, saturation: 110, brightness: 98 },
       },
       particles: {
         enabled: true,
-        type: 'fog',
+        type: "fog",
         count: 20,
         speed: 0.1,
         size: { min: 40, max: 100 },
         color: color(200, 10, 80),
         opacity: { min: 0.02, max: 0.06 },
         direction: 0,
-        wind: 0.02
+        wind: 0.02,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 135, stops: [{ color: color(24, 100, 53), position: 0 }, { color: color(24, 100, 46), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(215, 19, 8), position: 0 }, { color: color(215, 19, 12), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(215, 19, 6), position: 0 }, { color: color(215, 19, 10), position: 100 }] },
-        card: { type: 'linear', angle: 145, stops: [{ color: color(215, 19, 9), position: 0 }, { color: color(215, 19, 12), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(24, 100, 53), position: 0 }, { color: color(24, 100, 46), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(24, 100, 53, 0.4), position: 0 }, { color: color(193, 100, 58, 0.4), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(24, 100, 53), position: 0 },
+            { color: color(24, 100, 46), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(215, 19, 8), position: 0 },
+            { color: color(215, 19, 12), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(215, 19, 6), position: 0 },
+            { color: color(215, 19, 10), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 145,
+          stops: [
+            { color: color(215, 19, 9), position: 0 },
+            { color: color(215, 19, 12), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(24, 100, 53), position: 0 },
+            { color: color(24, 100, 46), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(24, 100, 53, 0.4), position: 0 },
+            { color: color(193, 100, 58, 0.4), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'image',
-      source: '/hero-bg.jpg',
-      position: 'center',
-      size: 'cover',
-      overlay: { color: color(193, 100, 58), opacity: 0.08, blendMode: 'screen' }
+      type: "image",
+      source: "/hero-bg.jpg",
+      position: "center",
+      size: "cover",
+      overlay: { color: color(193, 100, 58), opacity: 0.08, blendMode: "screen" },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -2728,30 +5226,30 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'high'
+      quality: "high",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['tech', 'isac', 'division', 'hud'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["tech", "isac", "division", "hud"],
     featured: true,
-    public: true
+    public: true,
   },
 
   // TECH: Disavowed Protocol (Rogue)
   {
-    id: 'disavowed-protocol',
-    name: 'Disavowed Protocol',
-    description: 'Rogue red on black with tactical greys and aggressive glitch accents',
-    category: 'tech',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "disavowed-protocol",
+    name: "Disavowed Protocol",
+    description: "Rogue red on black with tactical greys and aggressive glitch accents",
+    category: "tech",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(215, 20, 6),
       foreground: color(210, 10, 90),
@@ -2785,52 +5283,94 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(43, 100, 52),
       sidebarAccentForeground: color(0, 0, 0),
       sidebarBorder: color(0, 70, 30),
-      sidebarRing: color(0, 82, 50)
+      sidebarRing: color(0, 82, 50),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 24, color: color(0, 82, 50), intensity: 0.4 }
+        glow: { type: "glow", x: 0, y: 0, blur: 24, color: color(0, 82, 50), intensity: 0.4 },
       },
       blur: {
         background: { enabled: true, radius: 6, saturation: 110, brightness: 85 },
         overlay: { enabled: true, radius: 3, saturation: 100, brightness: 92 },
-        card: { enabled: true, radius: 2, saturation: 105, brightness: 96 }
+        card: { enabled: true, radius: 2, saturation: 105, brightness: 96 },
       },
       particles: {
         enabled: false,
-        type: 'dust',
+        type: "dust",
         count: 10,
         speed: 0.2,
         size: { min: 1, max: 2 },
         color: color(0, 82, 50),
         opacity: { min: 0.05, max: 0.15 },
         direction: 0,
-        wind: 0.02
+        wind: 0.02,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 135, stops: [{ color: color(0, 82, 50), position: 0 }, { color: color(0, 82, 40), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(215, 20, 6), position: 0 }, { color: color(215, 20, 10), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(215, 20, 5), position: 0 }, { color: color(215, 20, 10), position: 100 }] },
-        card: { type: 'linear', angle: 145, stops: [{ color: color(215, 20, 8), position: 0 }, { color: color(215, 20, 12), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(0, 82, 50), position: 0 }, { color: color(0, 82, 40), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(0, 82, 50, 0.4), position: 0 }, { color: color(43, 100, 52, 0.4), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(0, 82, 50), position: 0 },
+            { color: color(0, 82, 40), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(215, 20, 6), position: 0 },
+            { color: color(215, 20, 10), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(215, 20, 5), position: 0 },
+            { color: color(215, 20, 10), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 145,
+          stops: [
+            { color: color(215, 20, 8), position: 0 },
+            { color: color(215, 20, 12), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(0, 82, 50), position: 0 },
+            { color: color(0, 82, 40), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(0, 82, 50, 0.4), position: 0 },
+            { color: color(43, 100, 52, 0.4), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'image',
-      source: '/hero-bg.jpg',
-      position: 'center',
-      size: 'cover',
-      overlay: { color: color(0, 82, 50), opacity: 0.1, blendMode: 'screen' }
+      type: "image",
+      source: "/hero-bg.jpg",
+      position: "center",
+      size: "cover",
+      overlay: { color: color(0, 82, 50), opacity: 0.1, blendMode: "screen" },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -2838,30 +5378,30 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'high'
+      quality: "high",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['tech', 'rogue', 'disavowed', 'glitch'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["tech", "rogue", "disavowed", "glitch"],
     featured: true,
-    public: true
+    public: true,
   },
 
   // TECH: Darkzone Containment (DZ)
   {
-    id: 'darkzone-containment',
-    name: 'Darkzone Containment',
-    description: 'Dark Zone purple + black/steel with UV neon atmosphere',
-    category: 'tech',
-    author: 'OverWatch Systems',
-    version: '1.0.0',
-    baseMode: 'dark',
+    id: "darkzone-containment",
+    name: "Darkzone Containment",
+    description: "Dark Zone purple + black/steel with UV neon atmosphere",
+    category: "tech",
+    author: "OverWatch Systems",
+    version: "1.0.0",
+    baseMode: "dark",
     colors: {
       background: color(233, 20, 6), // near black steel
       foreground: color(250, 25, 91), // #E8E6F7
@@ -2895,52 +5435,94 @@ export const getDefaultThemes = (): Theme[] => [
       sidebarAccent: color(255, 86, 67),
       sidebarAccentForeground: color(0, 0, 0),
       sidebarBorder: color(250, 12, 18),
-      sidebarRing: color(265, 100, 50)
+      sidebarRing: color(265, 100, 50),
     },
     effects: {
       shadows: {
         ...commonShadows,
-        glow: { type: 'glow', x: 0, y: 0, blur: 26, color: color(265, 100, 50), intensity: 0.4 }
+        glow: { type: "glow", x: 0, y: 0, blur: 26, color: color(265, 100, 50), intensity: 0.4 },
       },
       blur: {
         background: { enabled: true, radius: 10, saturation: 120, brightness: 85 },
         overlay: { enabled: true, radius: 4, saturation: 110, brightness: 92 },
-        card: { enabled: true, radius: 2, saturation: 108, brightness: 96 }
+        card: { enabled: true, radius: 2, saturation: 108, brightness: 96 },
       },
       particles: {
         enabled: true,
-        type: 'fog',
+        type: "fog",
         count: 24,
         speed: 0.1,
         size: { min: 50, max: 120 },
         color: color(265, 100, 50),
         opacity: { min: 0.02, max: 0.06 },
         direction: 0,
-        wind: 0.015
+        wind: 0.015,
       },
       animations: commonAnimations,
       gradients: {
-        primary: { type: 'linear', angle: 135, stops: [{ color: color(265, 100, 50), position: 0 }, { color: color(265, 100, 45), position: 100 }] },
-        secondary: { type: 'linear', angle: 90, stops: [{ color: color(233, 20, 6), position: 0 }, { color: color(233, 20, 10), position: 100 }] },
-        hero: { type: 'linear', angle: 180, stops: [{ color: color(233, 20, 5), position: 0 }, { color: color(233, 20, 10), position: 100 }] },
-        card: { type: 'linear', angle: 145, stops: [{ color: color(233, 20, 8), position: 0 }, { color: color(233, 20, 12), position: 100 }] },
-        button: { type: 'linear', angle: 90, stops: [{ color: color(265, 100, 50), position: 0 }, { color: color(265, 100, 45), position: 100 }] },
-        border: { type: 'linear', angle: 0, stops: [{ color: color(265, 100, 50, 0.4), position: 0 }, { color: color(196, 88, 63, 0.4), position: 100 }] }
-      }
+        primary: {
+          type: "linear",
+          angle: 135,
+          stops: [
+            { color: color(265, 100, 50), position: 0 },
+            { color: color(265, 100, 45), position: 100 },
+          ],
+        },
+        secondary: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(233, 20, 6), position: 0 },
+            { color: color(233, 20, 10), position: 100 },
+          ],
+        },
+        hero: {
+          type: "linear",
+          angle: 180,
+          stops: [
+            { color: color(233, 20, 5), position: 0 },
+            { color: color(233, 20, 10), position: 100 },
+          ],
+        },
+        card: {
+          type: "linear",
+          angle: 145,
+          stops: [
+            { color: color(233, 20, 8), position: 0 },
+            { color: color(233, 20, 12), position: 100 },
+          ],
+        },
+        button: {
+          type: "linear",
+          angle: 90,
+          stops: [
+            { color: color(265, 100, 50), position: 0 },
+            { color: color(265, 100, 45), position: 100 },
+          ],
+        },
+        border: {
+          type: "linear",
+          angle: 0,
+          stops: [
+            { color: color(265, 100, 50, 0.4), position: 0 },
+            { color: color(196, 88, 63, 0.4), position: 100 },
+          ],
+        },
+      },
     },
     wallpaper: {
-      type: 'image',
-      source: '/hero-bg.jpg',
-      position: 'center',
-      size: 'cover',
-      overlay: { color: color(265, 100, 50), opacity: 0.1, blendMode: 'screen' }
+      type: "image",
+      source: "/hero-bg.jpg",
+      position: "center",
+      size: "cover",
+      overlay: { color: color(265, 100, 50), opacity: 0.1, blendMode: "screen" },
     },
     typography: {
-      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
-      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
-      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
-      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
-      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 }
+      heading: { fontFamily: "Inter", fontWeight: 800, letterSpacing: -0.03, lineHeight: 1.1 },
+      body: { fontFamily: "Inter", fontWeight: 400, letterSpacing: 0, lineHeight: 1.6 },
+      caption: { fontFamily: "Inter", fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: "Monaco", fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: "Inter", fontWeight: 700, letterSpacing: 0.01, lineHeight: 1.3 },
     },
     performance: {
       enableAnimations: true,
@@ -2948,18 +5530,18 @@ export const getDefaultThemes = (): Theme[] => [
       enableBlur: true,
       enableShadows: true,
       enableGradients: true,
-      quality: 'high'
+      quality: "high",
     },
     accessibility: {
       highContrast: false,
       reducedMotion: false,
       largeText: false,
-      focusVisible: true
+      focusVisible: true,
     },
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    tags: ['tech', 'darkzone', 'uv', 'purple'],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    tags: ["tech", "darkzone", "uv", "purple"],
     featured: true,
-    public: true
+    public: true,
   },
 ];

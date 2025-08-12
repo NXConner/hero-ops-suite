@@ -7,9 +7,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -59,13 +57,7 @@ export default defineConfig(({ mode }) => ({
             "@babylonjs/core",
             "@babylonjs/gui",
           ],
-          charts_misc: [
-            "recharts",
-            "date-fns",
-            "jszip",
-            "html2canvas",
-            "jspdf",
-          ],
+          charts_misc: ["recharts", "date-fns", "jszip", "html2canvas", "jspdf"],
           shadcn_misc: [
             "class-variance-authority",
             "clsx",

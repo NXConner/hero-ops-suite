@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 // Mapbox access token - should be set via environment variable
-const MAPBOX_TOKEN: string = (typeof import.meta !== 'undefined' && (import.meta as ImportMeta).env?.VITE_MAPBOX_TOKEN) ?? 'pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example';
+const MAPBOX_TOKEN: string =
+  (typeof import.meta !== "undefined" && (import.meta as ImportMeta).env?.VITE_MAPBOX_TOKEN) ??
+  "pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example";
 
 interface RealMapComponentProps {
   center: [number, number];
@@ -19,12 +21,12 @@ interface RealMapComponentProps {
 const RealMapComponent: React.FC<RealMapComponentProps> = ({
   center,
   zoom,
-  className = '',
+  className = "",
   onMapLoad,
   onMapClick,
   onMapMove,
   children,
-  styleUrl = 'mapbox://styles/mapbox/satellite-streets-v12'
+  styleUrl = "mapbox://styles/mapbox/satellite-streets-v12",
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -42,41 +44,41 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       style: styleUrl,
       center: center,
       zoom: zoom,
-      attributionControl: true
+      attributionControl: true,
     });
 
     // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     // Add geolocate control
     map.current.addControl(
       new mapboxgl.GeolocateControl({
         positionOptions: {
-          enableHighAccuracy: true
+          enableHighAccuracy: true,
         },
         trackUserLocation: true,
-        showUserHeading: true
+        showUserHeading: true,
       }),
-      'top-right'
+      "top-right",
     );
 
     // Add scale control
-    map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+    map.current.addControl(new mapboxgl.ScaleControl(), "bottom-left");
 
     // Add fullscreen control
-    map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+    map.current.addControl(new mapboxgl.FullscreenControl(), "top-right");
 
     // Set up event listeners
-    map.current.on('load', () => {
+    map.current.on("load", () => {
       setMapLoaded(true);
       onMapLoad?.(map.current!);
     });
 
-    map.current.on('click', (e) => {
+    map.current.on("click", (e) => {
       onMapClick?.(e);
     });
 
-    map.current.on('moveend', () => {
+    map.current.on("moveend", () => {
       if (map.current) {
         const newCenter = map.current.getCenter();
         const newZoom = map.current.getZoom();
@@ -99,7 +101,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       map.current.easeTo({
         center: center,
         zoom: zoom,
-        duration: 1000
+        duration: 1000,
       });
     }
   }, [center, zoom, mapLoaded]);
@@ -111,24 +113,27 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     }
   }, [styleUrl, mapLoaded]);
 
-  const addMarker = (lng: number, lat: number, options?: { 
-    color?: string; 
-    popup?: string;
-    draggable?: boolean;
-    className?: string;
-  }) => {
+  const addMarker = (
+    lng: number,
+    lat: number,
+    options?: {
+      color?: string;
+      popup?: string;
+      draggable?: boolean;
+      className?: string;
+    },
+  ) => {
     if (!map.current) return null;
 
     const marker = new mapboxgl.Marker({
-      color: options?.color || '#3FB1CE',
-      draggable: options?.draggable || false
+      color: options?.color || "#3FB1CE",
+      draggable: options?.draggable || false,
     })
       .setLngLat([lng, lat])
       .addTo(map.current);
 
     if (options?.popup) {
-      const popup = new mapboxgl.Popup({ offset: 25 })
-        .setHTML(options.popup);
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(options.popup);
       marker.setPopup(popup);
     }
 
@@ -137,7 +142,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
 
   const addGeoJSONSource = (
     sourceId: string,
-    data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>
+    data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>,
   ) => {
     if (!map.current || !mapLoaded) return;
 
@@ -145,8 +150,8 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       (map.current.getSource(sourceId) as mapboxgl.GeoJSONSource).setData(data);
     } else {
       map.current.addSource(sourceId, {
-        type: 'geojson',
-        data: data
+        type: "geojson",
+        data: data,
       });
     }
   };
@@ -165,7 +170,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     map.current.flyTo({
       center: center,
       zoom: zoom || map.current.getZoom(),
-      duration: 2000
+      duration: 2000,
     });
   };
 
@@ -187,7 +192,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   return (
     <div className={`relative w-full h-full ${className}`}>
       <div ref={mapContainer} data-testid="map-container" className="w-full h-full" />
-      
+
       {/* Loading indicator */}
       {!mapLoaded && (
         <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">

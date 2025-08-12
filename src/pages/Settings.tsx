@@ -8,18 +8,24 @@ import { exportAll, importAll } from "@/services/exportImport";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Sidebar from "@/components/Sidebar";
 import NavigationEditor from "@/components/settings/NavigationEditor";
-import { 
-  Settings as SettingsIcon, 
-  User, 
-  Shield, 
-  Bell, 
-  Monitor, 
+import {
+  Settings as SettingsIcon,
+  User,
+  Shield,
+  Bell,
+  Monitor,
   Database,
   Lock,
   ArrowLeft,
@@ -34,7 +40,7 @@ import {
   Smartphone,
   Image as ImageIcon,
   Waves as WavesIcon,
-  ListTree
+  ListTree,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -55,7 +61,7 @@ const Settings = () => {
     rank: "Colonel",
     clearanceLevel: "Top Secret",
     unit: "Special Operations Command",
-    avatar: "/avatars/commander.jpg"
+    avatar: "/avatars/commander.jpg",
   };
 
   const {
@@ -76,13 +82,13 @@ const Settings = () => {
     isBranchWallpaperPersistent,
     setIsBranchWallpaperPersistent,
     availableThemes,
-    setTheme
+    setTheme,
   } = useAdvancedTheme();
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
-      
+
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <div className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -130,7 +136,6 @@ const Settings = () => {
               <TabsTrigger value="data">Data</TabsTrigger>
             </TabsList>
 
-
             <TabsContent value="profile" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Profile Information */}
@@ -140,22 +145,27 @@ const Settings = () => {
                       <User className="h-5 w-5 text-primary" />
                       Profile Information
                     </CardTitle>
-                    <CardDescription>Update your personal information and credentials</CardDescription>
+                    <CardDescription>
+                      Update your personal information and credentials
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex items-center space-x-4">
                       <Avatar className="h-20 w-20">
                         <AvatarImage src={userProfile.avatar} alt={userProfile.name} />
-                        <AvatarFallback>{userProfile.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        <AvatarFallback>
+                          {userProfile.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="space-y-2">
                         <Button variant="outline" size="sm">
                           <Upload className="h-4 w-4 mr-2" />
                           Change Photo
                         </Button>
-                        <div className="text-sm text-muted-foreground">
-                          JPG, PNG up to 5MB
-                        </div>
+                        <div className="text-sm text-muted-foreground">JPG, PNG up to 5MB</div>
                       </div>
                     </div>
 
@@ -180,11 +190,7 @@ const Settings = () => {
 
                     <div>
                       <Label htmlFor="bio">Bio / Notes</Label>
-                      <Textarea 
-                        id="bio" 
-                        placeholder="Additional information..."
-                        rows={3}
-                      />
+                      <Textarea id="bio" placeholder="Additional information..." rows={3} />
                     </div>
                   </CardContent>
                 </Card>
@@ -199,10 +205,12 @@ const Settings = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-500">{userProfile.clearanceLevel}</div>
+                      <div className="text-2xl font-bold text-green-500">
+                        {userProfile.clearanceLevel}
+                      </div>
                       <div className="text-sm text-muted-foreground">Current Level</div>
                     </div>
-                    
+
                     <Separator />
 
                     <div className="space-y-3">
@@ -237,7 +245,9 @@ const Settings = () => {
                       <Key className="h-5 w-5 text-primary" />
                       Password & Authentication
                     </CardTitle>
-                    <CardDescription>Manage your login credentials and authentication methods</CardDescription>
+                    <CardDescription>
+                      Manage your login credentials and authentication methods
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
@@ -262,10 +272,7 @@ const Settings = () => {
                           Add an extra layer of security
                         </div>
                       </div>
-                      <Switch 
-                        checked={twoFactorAuth} 
-                        onCheckedChange={setTwoFactorAuth}
-                      />
+                      <Switch checked={twoFactorAuth} onCheckedChange={setTwoFactorAuth} />
                     </div>
 
                     <Button className="w-full">Update Password</Button>
@@ -287,26 +294,33 @@ const Settings = () => {
                         device: "Windows PC - Operations Center",
                         location: "Base Alpha",
                         lastActive: "Active now",
-                        current: true
+                        current: true,
                       },
                       {
                         device: "iPad - Mobile Command",
                         location: "Field Operations",
                         lastActive: "2 hours ago",
-                        current: false
+                        current: false,
                       },
                       {
                         device: "Android Phone",
                         location: "Unknown Location",
                         lastActive: "1 day ago",
-                        current: false
-                      }
+                        current: false,
+                      },
                     ].map((session, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30"
+                      >
                         <div>
                           <div className="font-medium flex items-center gap-2">
                             {session.device}
-                            {session.current && <Badge variant="default" className="text-xs">Current</Badge>}
+                            {session.current && (
+                              <Badge variant="default" className="text-xs">
+                                Current
+                              </Badge>
+                            )}
                           </div>
                           <div className="text-sm text-muted-foreground">
                             {session.location} • {session.lastActive}
@@ -342,10 +356,7 @@ const Settings = () => {
                           Immediate notifications for critical system events
                         </div>
                       </div>
-                      <Switch 
-                        checked={activeAlerts} 
-                        onCheckedChange={setActiveAlerts}
-                      />
+                      <Switch checked={activeAlerts} onCheckedChange={setActiveAlerts} />
                     </div>
 
                     <Separator />
@@ -357,8 +368,8 @@ const Settings = () => {
                           Receive updates via email
                         </div>
                       </div>
-                      <Switch 
-                        checked={emailNotifications} 
+                      <Switch
+                        checked={emailNotifications}
                         onCheckedChange={setEmailNotifications}
                       />
                     </div>
@@ -370,10 +381,7 @@ const Settings = () => {
                           Browser and mobile push notifications
                         </div>
                       </div>
-                      <Switch 
-                        checked={pushNotifications} 
-                        onCheckedChange={setPushNotifications}
-                      />
+                      <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
                     </div>
 
                     <Separator />
@@ -491,7 +499,9 @@ const Settings = () => {
                       <Monitor className="h-5 w-5 text-primary" />
                       Performance Settings
                     </CardTitle>
-                    <CardDescription>Optimize system performance and resource usage</CardDescription>
+                    <CardDescription>
+                      Optimize system performance and resource usage
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
@@ -555,7 +565,9 @@ const Settings = () => {
                     <Monitor className="h-5 w-5 text-primary" />
                     Display Settings
                   </CardTitle>
-                  <CardDescription>Customize the appearance and layout of the interface</CardDescription>
+                  <CardDescription>
+                    Customize the appearance and layout of the interface
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -648,27 +660,111 @@ const Settings = () => {
                   <div className="space-y-3">
                     <div className="text-sm font-medium">HUD Effects</div>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ minimal: true })}>Minimal Mode</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ minimal: false })}>Full Mode</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ scanlines: true })}>Scanlines On</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ scanlines: false })}>Scanlines Off</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ refreshBarH: true })}>Refresh H</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ refreshBarV: true })}>Refresh V</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ radarSweep: true })}>Radar</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ uvVignette: true })}>UV Vignette</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ ticker: true })}>Ticker</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ vignette: true })}>Vignette</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.set({ glitch: true })}>Glitch</Button>
-                      <Button variant="outline" onClick={() => (window as any).owEffects?.reset?.()}>Reset</Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ minimal: true })}
+                      >
+                        Minimal Mode
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ minimal: false })}
+                      >
+                        Full Mode
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ scanlines: true })}
+                      >
+                        Scanlines On
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ scanlines: false })}
+                      >
+                        Scanlines Off
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ refreshBarH: true })}
+                      >
+                        Refresh H
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ refreshBarV: true })}
+                      >
+                        Refresh V
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ radarSweep: true })}
+                      >
+                        Radar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ uvVignette: true })}
+                      >
+                        UV Vignette
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ ticker: true })}
+                      >
+                        Ticker
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ vignette: true })}
+                      >
+                        Vignette
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.set({ glitch: true })}
+                      >
+                        Glitch
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => (window as any).owEffects?.reset?.()}
+                      >
+                        Reset
+                      </Button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Scanline Spacing</Label>
-                        <input type="range" min={2} max={10} step={1} defaultValue={3} onChange={(e) => (window as any).owEffects?.set({ scanlineSpacing: parseInt(e.target.value, 10) })} className="w-full" />
+                        <input
+                          type="range"
+                          min={2}
+                          max={10}
+                          step={1}
+                          defaultValue={3}
+                          onChange={(e) =>
+                            (window as any).owEffects?.set({
+                              scanlineSpacing: parseInt(e.target.value, 10),
+                            })
+                          }
+                          className="w-full"
+                        />
                       </div>
                       <div>
                         <Label>Glitch Intensity</Label>
-                        <input type="range" min={0} max={1} step={0.05} defaultValue={0.3} onChange={(e) => (window as any).owEffects?.set({ glitchLevel: parseFloat(e.target.value) })} className="w-full" />
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          defaultValue={0.3}
+                          onChange={(e) =>
+                            (window as any).owEffects?.set({
+                              glitchLevel: parseFloat(e.target.value),
+                            })
+                          }
+                          className="w-full"
+                        />
                       </div>
                     </div>
                   </div>
@@ -683,13 +779,16 @@ const Settings = () => {
                     <ImageIcon className="h-5 w-5 text-primary" />
                     Wallpapers
                   </CardTitle>
-                  <CardDescription>Use any wallpaper with any theme. Configure a global override.</CardDescription>
+                  <CardDescription>
+                    Use any wallpaper with any theme. Configure a global override.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <div className="text-sm font-medium">Use Global Wallpaper</div>
-                      <div className="text-sm text-muted-foreground">Overrides the active theme wallpaper
+                      <div className="text-sm text-muted-foreground">
+                        Overrides the active theme wallpaper
                       </div>
                     </div>
                     <Switch
@@ -706,20 +805,42 @@ const Settings = () => {
                       <div className="text-sm font-medium">Profiles</div>
                       <div className="flex items-center gap-2">
                         <Input placeholder="Profile name" id="wp-profile-name" className="w-48" />
-                        <Button size="sm" onClick={() => {
-                          const name = (document.getElementById('wp-profile-name') as HTMLInputElement)?.value?.trim();
-                          if (!name) return;
-                          // @ts-ignore
-                          saveWallpaperProfile(name);
-                        }}>Save Profile</Button>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const name = (
+                              document.getElementById("wp-profile-name") as HTMLInputElement
+                            )?.value?.trim();
+                            if (!name) return;
+                            // @ts-ignore
+                            saveWallpaperProfile(name);
+                          }}
+                        >
+                          Save Profile
+                        </Button>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {wallpaperProfiles?.map((p) => (
-                        <div key={p.name} className="flex items-center gap-2 border rounded px-2 py-1">
+                        <div
+                          key={p.name}
+                          className="flex items-center gap-2 border rounded px-2 py-1"
+                        >
                           <span className="text-sm">{p.name}</span>
-                          <Button size="sm" variant="outline" onClick={() => applyWallpaperProfile(p.name)}>Apply</Button>
-                          <Button size="sm" variant="ghost" onClick={() => deleteWallpaperProfile(p.name)}>Delete</Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => applyWallpaperProfile(p.name)}
+                          >
+                            Apply
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => deleteWallpaperProfile(p.name)}
+                          >
+                            Delete
+                          </Button>
                         </div>
                       ))}
                     </div>
@@ -729,9 +850,12 @@ const Settings = () => {
                     <div className="space-y-4">
                       <Label>Wallpaper Type</Label>
                       <Select
-                        value={globalWallpaperOverride?.type || 'color'}
+                        value={globalWallpaperOverride?.type || "color"}
                         onValueChange={(type: any) => {
-                          const next = { ...(globalWallpaperOverride || { type: 'color' }), type } as any;
+                          const next = {
+                            ...(globalWallpaperOverride || { type: "color" }),
+                            type,
+                          } as any;
                           setGlobalWallpaperOverride(next);
                         }}
                       >
@@ -747,60 +871,131 @@ const Settings = () => {
                         </SelectContent>
                       </Select>
 
-                      {(globalWallpaperOverride?.type === 'image' || globalWallpaperOverride?.type === 'video') && (
+                      {(globalWallpaperOverride?.type === "image" ||
+                        globalWallpaperOverride?.type === "video") && (
                         <div className="space-y-2">
                           <Label>Source URL</Label>
                           <Input
                             placeholder="/hero-bg.jpg or https://..."
-                            value={globalWallpaperOverride?.source || ''}
-                            onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride || { type: 'image' }), source: e.target.value })}
+                            value={globalWallpaperOverride?.source || ""}
+                            onChange={(e) =>
+                              setGlobalWallpaperOverride({
+                                ...(globalWallpaperOverride || { type: "image" }),
+                                source: e.target.value,
+                              })
+                            }
                           />
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <input type="file" accept={globalWallpaperOverride?.type === 'video' ? 'video/*' : 'image/*'} onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              const url = URL.createObjectURL(file);
-                              setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), source: url });
-                            }} />
-                            <span>(Local uploads use temporary URLs; not persisted across reloads)</span>
+                            <input
+                              type="file"
+                              accept={
+                                globalWallpaperOverride?.type === "video" ? "video/*" : "image/*"
+                              }
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const url = URL.createObjectURL(file);
+                                setGlobalWallpaperOverride({
+                                  ...(globalWallpaperOverride as any),
+                                  source: url,
+                                });
+                              }}
+                            />
+                            <span>
+                              (Local uploads use temporary URLs; not persisted across reloads)
+                            </span>
                           </div>
                         </div>
                       )}
 
-                      {globalWallpaperOverride?.type === 'color' && (
+                      {globalWallpaperOverride?.type === "color" && (
                         <ColorPicker
                           color={globalWallpaperOverride?.color || { h: 215, s: 20, l: 8 }}
-                          onChange={(color) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), color })}
+                          onChange={(color) =>
+                            setGlobalWallpaperOverride({
+                              ...(globalWallpaperOverride as any),
+                              color,
+                            })
+                          }
                           label="Background Color"
                         />
                       )}
 
-                      {globalWallpaperOverride?.type === 'gradient' && (
+                      {globalWallpaperOverride?.type === "gradient" && (
                         <div className="space-y-4">
                           <Label>Gradient Angle</Label>
-                          <input type="range" min={0} max={360} step={1} value={globalWallpaperOverride?.gradient?.angle || 135} onChange={(e) => {
-                            const angle = parseInt(e.target.value, 10);
-                            const grad = globalWallpaperOverride?.gradient || { type: 'linear', stops: [{ color: { h: 220, s: 100, l: 3 }, position: 0 }, { color: { h: 240, s: 6, l: 8 }, position: 100 }] };
-                            setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, angle } });
-                          }} className="w-full" />
+                          <input
+                            type="range"
+                            min={0}
+                            max={360}
+                            step={1}
+                            value={globalWallpaperOverride?.gradient?.angle || 135}
+                            onChange={(e) => {
+                              const angle = parseInt(e.target.value, 10);
+                              const grad = globalWallpaperOverride?.gradient || {
+                                type: "linear",
+                                stops: [
+                                  { color: { h: 220, s: 100, l: 3 }, position: 0 },
+                                  { color: { h: 240, s: 6, l: 8 }, position: 100 },
+                                ],
+                              };
+                              setGlobalWallpaperOverride({
+                                ...(globalWallpaperOverride as any),
+                                gradient: { ...grad, angle },
+                              });
+                            }}
+                            className="w-full"
+                          />
                           <div className="grid grid-cols-2 gap-2">
                             <ColorPicker
-                              color={globalWallpaperOverride?.gradient?.stops?.[0]?.color || { h: 220, s: 100, l: 3 }}
+                              color={
+                                globalWallpaperOverride?.gradient?.stops?.[0]?.color || {
+                                  h: 220,
+                                  s: 100,
+                                  l: 3,
+                                }
+                              }
                               onChange={(color) => {
-                                const grad = globalWallpaperOverride?.gradient || { type: 'linear', angle: 135, stops: [{ color, position: 0 }, { color, position: 100 }] };
+                                const grad = globalWallpaperOverride?.gradient || {
+                                  type: "linear",
+                                  angle: 135,
+                                  stops: [
+                                    { color, position: 0 },
+                                    { color, position: 100 },
+                                  ],
+                                };
                                 const stops = [...(grad.stops || [])];
                                 stops[0] = { ...(stops[0] || { position: 0 }), color };
-                                setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, stops } });
+                                setGlobalWallpaperOverride({
+                                  ...(globalWallpaperOverride as any),
+                                  gradient: { ...grad, stops },
+                                });
                               }}
                               label="Stop 1"
                             />
                             <ColorPicker
-                              color={globalWallpaperOverride?.gradient?.stops?.[1]?.color || { h: 240, s: 6, l: 8 }}
+                              color={
+                                globalWallpaperOverride?.gradient?.stops?.[1]?.color || {
+                                  h: 240,
+                                  s: 6,
+                                  l: 8,
+                                }
+                              }
                               onChange={(color) => {
-                                const grad = globalWallpaperOverride?.gradient || { type: 'linear', angle: 135, stops: [{ color, position: 0 }, { color, position: 100 }] };
+                                const grad = globalWallpaperOverride?.gradient || {
+                                  type: "linear",
+                                  angle: 135,
+                                  stops: [
+                                    { color, position: 0 },
+                                    { color, position: 100 },
+                                  ],
+                                };
                                 const stops = [...(grad.stops || [])];
                                 stops[1] = { ...(stops[1] || { position: 100 }), color };
-                                setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), gradient: { ...grad, stops } });
+                                setGlobalWallpaperOverride({
+                                  ...(globalWallpaperOverride as any),
+                                  gradient: { ...grad, stops },
+                                });
                               }}
                               label="Stop 2"
                             />
@@ -818,7 +1013,13 @@ const Settings = () => {
                           onCheckedChange={(enabled) => {
                             if (!globalWallpaperOverride) return;
                             const next = { ...globalWallpaperOverride } as any;
-                            next.overlay = enabled ? (next.overlay || { color: { h: 0, s: 0, l: 0, a: 0.3 }, opacity: 0.3, blendMode: 'multiply' }) : undefined;
+                            next.overlay = enabled
+                              ? next.overlay || {
+                                  color: { h: 0, s: 0, l: 0, a: 0.3 },
+                                  opacity: 0.3,
+                                  blendMode: "multiply",
+                                }
+                              : undefined;
                             setGlobalWallpaperOverride(next);
                           }}
                         />
@@ -827,8 +1028,14 @@ const Settings = () => {
                         <div>
                           <Label>Blend Mode</Label>
                           <Select
-                            value={globalWallpaperOverride?.overlay?.blendMode || 'multiply'}
-                            onValueChange={(blendMode) => globalWallpaperOverride && setGlobalWallpaperOverride({ ...globalWallpaperOverride, overlay: { ...(globalWallpaperOverride.overlay as any), blendMode } })}
+                            value={globalWallpaperOverride?.overlay?.blendMode || "multiply"}
+                            onValueChange={(blendMode) =>
+                              globalWallpaperOverride &&
+                              setGlobalWallpaperOverride({
+                                ...globalWallpaperOverride,
+                                overlay: { ...(globalWallpaperOverride.overlay as any), blendMode },
+                              })
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue />
@@ -849,7 +1056,16 @@ const Settings = () => {
                             max={1}
                             step={0.05}
                             value={globalWallpaperOverride?.overlay?.opacity ?? 0.3}
-                            onChange={(e) => globalWallpaperOverride && setGlobalWallpaperOverride({ ...globalWallpaperOverride, overlay: { ...(globalWallpaperOverride.overlay as any), opacity: parseFloat(e.target.value) } })}
+                            onChange={(e) =>
+                              globalWallpaperOverride &&
+                              setGlobalWallpaperOverride({
+                                ...globalWallpaperOverride,
+                                overlay: {
+                                  ...(globalWallpaperOverride.overlay as any),
+                                  opacity: parseFloat(e.target.value),
+                                },
+                              })
+                            }
                           />
                         </div>
                       </div>
@@ -860,15 +1076,41 @@ const Settings = () => {
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <Label>Position</Label>
-                          <Input placeholder="center" value={globalWallpaperOverride?.position || 'center'} onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), position: e.target.value })} />
+                          <Input
+                            placeholder="center"
+                            value={globalWallpaperOverride?.position || "center"}
+                            onChange={(e) =>
+                              setGlobalWallpaperOverride({
+                                ...(globalWallpaperOverride as any),
+                                position: e.target.value,
+                              })
+                            }
+                          />
                         </div>
                         <div>
                           <Label>Size</Label>
-                          <Input placeholder="cover" value={globalWallpaperOverride?.size || 'cover'} onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), size: e.target.value })} />
+                          <Input
+                            placeholder="cover"
+                            value={globalWallpaperOverride?.size || "cover"}
+                            onChange={(e) =>
+                              setGlobalWallpaperOverride({
+                                ...(globalWallpaperOverride as any),
+                                size: e.target.value,
+                              })
+                            }
+                          />
                         </div>
                         <div>
                           <Label>Tiling</Label>
-                          <Select value={globalWallpaperOverride?.tiling || 'no-repeat'} onValueChange={(tiling: any) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), tiling })}>
+                          <Select
+                            value={globalWallpaperOverride?.tiling || "no-repeat"}
+                            onValueChange={(tiling: any) =>
+                              setGlobalWallpaperOverride({
+                                ...(globalWallpaperOverride as any),
+                                tiling,
+                              })
+                            }
+                          >
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
@@ -881,7 +1123,15 @@ const Settings = () => {
                           </Select>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Switch checked={!!globalWallpaperOverride?.parallax} onCheckedChange={(parallax) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), parallax })} />
+                          <Switch
+                            checked={!!globalWallpaperOverride?.parallax}
+                            onCheckedChange={(parallax) =>
+                              setGlobalWallpaperOverride({
+                                ...(globalWallpaperOverride as any),
+                                parallax,
+                              })
+                            }
+                          />
                           <span className="text-sm">Parallax</span>
                         </div>
                       </div>
@@ -912,11 +1162,24 @@ const Settings = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                     <div className="md:col-span-2">
                       <Label>Volume</Label>
-                      <input type="range" min={0} max={1} step={0.05} defaultValue={0.5} onChange={(e) => (window as any).owSounds?.setVolume?.(parseFloat(e.target.value))} className="w-full" />
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        defaultValue={0.5}
+                        onChange={(e) =>
+                          (window as any).owSounds?.setVolume?.(parseFloat(e.target.value))
+                        }
+                        className="w-full"
+                      />
                     </div>
                     <div>
                       <Label>Preset</Label>
-                      <Select defaultValue="none" onValueChange={(v: any) => (window as any).owSounds?.setPreset?.(v)}>
+                      <Select
+                        defaultValue="none"
+                        onValueChange={(v: any) => (window as any).owSounds?.setPreset?.(v)}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -931,12 +1194,42 @@ const Settings = () => {
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    <Button variant="outline" onClick={() => (window as any).owSounds?.ui.hover?.()}>Hover</Button>
-                    <Button variant="outline" onClick={() => (window as any).owSounds?.ui.select?.()}>Select</Button>
-                    <Button variant="outline" onClick={() => (window as any).owSounds?.ui.confirm?.()}>Confirm</Button>
-                    <Button variant="outline" onClick={() => (window as any).owSounds?.ui.error?.()}>Error</Button>
-                    <Button variant="outline" onClick={() => (window as any).owSounds?.scanner.ping?.()}>Scan Ping</Button>
-                    <Button variant="outline" onClick={() => (window as any).owSounds?.rogue.engaged?.()}>Rogue</Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => (window as any).owSounds?.ui.hover?.()}
+                    >
+                      Hover
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => (window as any).owSounds?.ui.select?.()}
+                    >
+                      Select
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => (window as any).owSounds?.ui.confirm?.()}
+                    >
+                      Confirm
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => (window as any).owSounds?.ui.error?.()}
+                    >
+                      Error
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => (window as any).owSounds?.scanner.ping?.()}
+                    >
+                      Scan Ping
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => (window as any).owSounds?.rogue.engaged?.()}
+                    >
+                      Rogue
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -965,10 +1258,7 @@ const Settings = () => {
                           Enable scheduled data backups
                         </div>
                       </div>
-                      <Switch 
-                        checked={autoBackup} 
-                        onCheckedChange={setAutoBackup}
-                      />
+                      <Switch checked={autoBackup} onCheckedChange={setAutoBackup} />
                     </div>
 
                     <div>
@@ -1025,12 +1315,35 @@ const Settings = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {[
-                        { date: "Today, 3:00 AM", size: "2.4 GB", status: "Complete", type: "Automatic" },
-                        { date: "Yesterday, 3:00 AM", size: "2.3 GB", status: "Complete", type: "Automatic" },
-                        { date: "Jan 17, 3:00 AM", size: "2.2 GB", status: "Complete", type: "Automatic" },
-                        { date: "Jan 16, 2:15 PM", size: "2.1 GB", status: "Complete", type: "Manual" }
+                        {
+                          date: "Today, 3:00 AM",
+                          size: "2.4 GB",
+                          status: "Complete",
+                          type: "Automatic",
+                        },
+                        {
+                          date: "Yesterday, 3:00 AM",
+                          size: "2.3 GB",
+                          status: "Complete",
+                          type: "Automatic",
+                        },
+                        {
+                          date: "Jan 17, 3:00 AM",
+                          size: "2.2 GB",
+                          status: "Complete",
+                          type: "Automatic",
+                        },
+                        {
+                          date: "Jan 16, 2:15 PM",
+                          size: "2.1 GB",
+                          status: "Complete",
+                          type: "Manual",
+                        },
                       ].map((backup, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30"
+                        >
                           <div>
                             <div className="font-medium">{backup.date}</div>
                             <div className="text-sm text-muted-foreground">
@@ -1038,7 +1351,9 @@ const Settings = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Badge variant={backup.status === "Complete" ? "default" : "destructive"}>
+                            <Badge
+                              variant={backup.status === "Complete" ? "default" : "destructive"}
+                            >
                               {backup.status}
                             </Badge>
                             <Button variant="outline" size="sm">
@@ -1067,27 +1382,79 @@ const Settings = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Business Address</Label>
-                        <Input defaultValue={profile.address.full} onBlur={(e) => save({ address: { ...profile.address, full: e.target.value } })} />
+                        <Input
+                          defaultValue={profile.address.full}
+                          onBlur={(e) =>
+                            save({ address: { ...profile.address, full: e.target.value } })
+                          }
+                        />
                       </div>
                       <div>
                         <Label>Supplier</Label>
-                        <Input defaultValue={`${profile.supplier.name}, ${profile.supplier.address.full}`} onBlur={(e) => {
-                          const val = e.target.value;
-                          const [name, ...rest] = val.split(',');
-                          save({ supplier: { name: name?.trim() || profile.supplier.name, address: { ...profile.supplier.address, full: rest.join(',').trim() || profile.supplier.address.full } } });
-                        }} />
+                        <Input
+                          defaultValue={`${profile.supplier.name}, ${profile.supplier.address.full}`}
+                          onBlur={(e) => {
+                            const val = e.target.value;
+                            const [name, ...rest] = val.split(",");
+                            save({
+                              supplier: {
+                                name: name?.trim() || profile.supplier.name,
+                                address: {
+                                  ...profile.supplier.address,
+                                  full: rest.join(",").trim() || profile.supplier.address.full,
+                                },
+                              },
+                            });
+                          }}
+                        />
                       </div>
                       <div>
                         <Label>Crew (FT / PT)</Label>
                         <div className="flex gap-2">
-                          <Input type="number" defaultValue={profile.crew.numFullTime} onBlur={(e) => save({ crew: { ...profile.crew, numFullTime: Number(e.target.value) } })} />
-                          <Input type="number" defaultValue={profile.crew.numPartTime} onBlur={(e) => save({ crew: { ...profile.crew, numPartTime: Number(e.target.value) } })} />
-                          <Input type="number" step="0.5" defaultValue={profile.crew.hourlyRatePerPerson} onBlur={(e) => save({ crew: { ...profile.crew, hourlyRatePerPerson: Number(e.target.value) } })} />
+                          <Input
+                            type="number"
+                            defaultValue={profile.crew.numFullTime}
+                            onBlur={(e) =>
+                              save({
+                                crew: { ...profile.crew, numFullTime: Number(e.target.value) },
+                              })
+                            }
+                          />
+                          <Input
+                            type="number"
+                            defaultValue={profile.crew.numPartTime}
+                            onBlur={(e) =>
+                              save({
+                                crew: { ...profile.crew, numPartTime: Number(e.target.value) },
+                              })
+                            }
+                          />
+                          <Input
+                            type="number"
+                            step="0.5"
+                            defaultValue={profile.crew.hourlyRatePerPerson}
+                            onBlur={(e) =>
+                              save({
+                                crew: {
+                                  ...profile.crew,
+                                  hourlyRatePerPerson: Number(e.target.value),
+                                },
+                              })
+                            }
+                          />
                         </div>
                       </div>
                       <div>
                         <Label>Travel (supplier RT miles)</Label>
-                        <Input type="number" defaultValue={profile.travelDefaults.roundTripMilesSupplier} onBlur={(e) => save({ travelDefaults: { roundTripMilesSupplier: Number(e.target.value) } })} />
+                        <Input
+                          type="number"
+                          defaultValue={profile.travelDefaults.roundTripMilesSupplier}
+                          onBlur={(e) =>
+                            save({
+                              travelDefaults: { roundTripMilesSupplier: Number(e.target.value) },
+                            })
+                          }
+                        />
                       </div>
                     </div>
 
@@ -1099,31 +1466,115 @@ const Settings = () => {
                         <div className="grid grid-cols-1 gap-2">
                           <div className="flex items-center gap-2">
                             <span className="w-40">PMM $/gal</span>
-                            <Input type="number" step="0.01" defaultValue={profile.materials.pmmPricePerGallon} onBlur={(e) => save({ materials: { ...profile.materials, pmmPricePerGallon: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.materials.pmmPricePerGallon}
+                              onBlur={(e) =>
+                                save({
+                                  materials: {
+                                    ...profile.materials,
+                                    pmmPricePerGallon: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">PMM bulk $/gal</span>
-                            <Input type="number" step="0.01" defaultValue={profile.materials.pmmBulkPricePerGallon} onBlur={(e) => save({ materials: { ...profile.materials, pmmBulkPricePerGallon: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.materials.pmmBulkPricePerGallon}
+                              onBlur={(e) =>
+                                save({
+                                  materials: {
+                                    ...profile.materials,
+                                    pmmBulkPricePerGallon: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Sand (50lb)</span>
-                            <Input type="number" step="0.01" defaultValue={profile.materials.sandPricePer50lbBag} onBlur={(e) => save({ materials: { ...profile.materials, sandPricePer50lbBag: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.materials.sandPricePer50lbBag}
+                              onBlur={(e) =>
+                                save({
+                                  materials: {
+                                    ...profile.materials,
+                                    sandPricePer50lbBag: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Prep Seal 5gal</span>
-                            <Input type="number" step="0.01" defaultValue={profile.materials.prepSealPricePer5Gal} onBlur={(e) => save({ materials: { ...profile.materials, prepSealPricePer5Gal: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.materials.prepSealPricePer5Gal}
+                              onBlur={(e) =>
+                                save({
+                                  materials: {
+                                    ...profile.materials,
+                                    prepSealPricePer5Gal: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Fast Dry 5gal</span>
-                            <Input type="number" step="0.01" defaultValue={profile.materials.fastDryPricePer5Gal} onBlur={(e) => save({ materials: { ...profile.materials, fastDryPricePer5Gal: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.materials.fastDryPricePer5Gal}
+                              onBlur={(e) =>
+                                save({
+                                  materials: {
+                                    ...profile.materials,
+                                    fastDryPricePer5Gal: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">CrackMaster 30lb</span>
-                            <Input type="number" step="0.01" defaultValue={profile.materials.crackBoxPricePer30lb} onBlur={(e) => save({ materials: { ...profile.materials, crackBoxPricePer30lb: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.materials.crackBoxPricePer30lb}
+                              onBlur={(e) =>
+                                save({
+                                  materials: {
+                                    ...profile.materials,
+                                    crackBoxPricePer30lb: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Propane tank</span>
-                            <Input type="number" step="0.01" defaultValue={profile.materials.propanePerTank} onBlur={(e) => save({ materials: { ...profile.materials, propanePerTank: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.materials.propanePerTank}
+                              onBlur={(e) =>
+                                save({
+                                  materials: {
+                                    ...profile.materials,
+                                    propanePerTank: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                         </div>
                       </div>
@@ -1132,23 +1583,80 @@ const Settings = () => {
                         <div className="grid grid-cols-1 gap-2">
                           <div className="flex items-center gap-2">
                             <span className="w-40">Water %</span>
-                            <Input type="number" step="0.01" defaultValue={profile.mix.waterPercent} onBlur={(e) => save({ mix: { ...profile.mix, waterPercent: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.mix.waterPercent}
+                              onBlur={(e) =>
+                                save({
+                                  mix: { ...profile.mix, waterPercent: Number(e.target.value) },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Sand bags /100 gal</span>
-                            <Input type="number" step="1" defaultValue={profile.mix.sandBagsPer100GalConcentrate} onBlur={(e) => save({ mix: { ...profile.mix, sandBagsPer100GalConcentrate: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="1"
+                              defaultValue={profile.mix.sandBagsPer100GalConcentrate}
+                              onBlur={(e) =>
+                                save({
+                                  mix: {
+                                    ...profile.mix,
+                                    sandBagsPer100GalConcentrate: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">FastDry gal /125 gal</span>
-                            <Input type="number" step="0.1" defaultValue={profile.mix.fastDryGalPer125GalConcentrate} onBlur={(e) => save({ mix: { ...profile.mix, fastDryGalPer125GalConcentrate: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.1"
+                              defaultValue={profile.mix.fastDryGalPer125GalConcentrate}
+                              onBlur={(e) =>
+                                save({
+                                  mix: {
+                                    ...profile.mix,
+                                    fastDryGalPer125GalConcentrate: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Mixed cov sqft/gal</span>
-                            <Input type="number" step="1" defaultValue={profile.coverage.mixedSealerCoverageSqftPerGal} onBlur={(e) => save({ coverage: { ...profile.coverage, mixedSealerCoverageSqftPerGal: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="1"
+                              defaultValue={profile.coverage.mixedSealerCoverageSqftPerGal}
+                              onBlur={(e) =>
+                                save({
+                                  coverage: {
+                                    ...profile.coverage,
+                                    mixedSealerCoverageSqftPerGal: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">PrepSeal sqft/gal</span>
-                            <Input type="number" step="1" defaultValue={profile.coverage.prepSealCoverageSqftPerGal} onBlur={(e) => save({ coverage: { ...profile.coverage, prepSealCoverageSqftPerGal: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="1"
+                              defaultValue={profile.coverage.prepSealCoverageSqftPerGal}
+                              onBlur={(e) =>
+                                save({
+                                  coverage: {
+                                    ...profile.coverage,
+                                    prepSealCoverageSqftPerGal: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                         </div>
                       </div>
@@ -1162,27 +1670,99 @@ const Settings = () => {
                         <div className="grid grid-cols-1 gap-2">
                           <div className="flex items-center gap-2">
                             <span className="w-40">Crack fill $/lf</span>
-                            <Input type="number" step="0.01" defaultValue={profile.pricing.crackFillRatePerFoot} onBlur={(e) => save({ pricing: { ...profile.pricing, crackFillRatePerFoot: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.pricing.crackFillRatePerFoot}
+                              onBlur={(e) =>
+                                save({
+                                  pricing: {
+                                    ...profile.pricing,
+                                    crackFillRatePerFoot: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Patching $/sqft</span>
-                            <Input type="number" step="0.01" defaultValue={profile.pricing.patchingPerSqft} onBlur={(e) => save({ pricing: { ...profile.pricing, patchingPerSqft: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.pricing.patchingPerSqft}
+                              onBlur={(e) =>
+                                save({
+                                  pricing: {
+                                    ...profile.pricing,
+                                    patchingPerSqft: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Striping $/lf</span>
-                            <Input type="number" step="0.01" defaultValue={profile.pricing.lineCostPerLinearFoot} onBlur={(e) => save({ pricing: { ...profile.pricing, lineCostPerLinearFoot: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.pricing.lineCostPerLinearFoot}
+                              onBlur={(e) =>
+                                save({
+                                  pricing: {
+                                    ...profile.pricing,
+                                    lineCostPerLinearFoot: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Mobilization $</span>
-                            <Input type="number" step="1" defaultValue={profile.pricing.mobilizationFee} onBlur={(e) => save({ pricing: { ...profile.pricing, mobilizationFee: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="1"
+                              defaultValue={profile.pricing.mobilizationFee}
+                              onBlur={(e) =>
+                                save({
+                                  pricing: {
+                                    ...profile.pricing,
+                                    mobilizationFee: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Overhead %</span>
-                            <Input type="number" step="0.01" defaultValue={profile.pricing.overheadPct} onBlur={(e) => save({ pricing: { ...profile.pricing, overheadPct: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.pricing.overheadPct}
+                              onBlur={(e) =>
+                                save({
+                                  pricing: {
+                                    ...profile.pricing,
+                                    overheadPct: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Profit %</span>
-                            <Input type="number" step="0.01" defaultValue={profile.pricing.profitPct} onBlur={(e) => save({ pricing: { ...profile.pricing, profitPct: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              defaultValue={profile.pricing.profitPct}
+                              onBlur={(e) =>
+                                save({
+                                  pricing: {
+                                    ...profile.pricing,
+                                    profitPct: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                         </div>
                       </div>
@@ -1191,19 +1771,61 @@ const Settings = () => {
                         <div className="grid grid-cols-1 gap-2">
                           <div className="flex items-center gap-2">
                             <span className="w-40">C30 mpg loaded</span>
-                            <Input type="number" step="0.1" defaultValue={profile.fuel.c30MpgLoaded} onBlur={(e) => save({ fuel: { ...profile.fuel, c30MpgLoaded: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.1"
+                              defaultValue={profile.fuel.c30MpgLoaded}
+                              onBlur={(e) =>
+                                save({
+                                  fuel: { ...profile.fuel, c30MpgLoaded: Number(e.target.value) },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Dakota mpg</span>
-                            <Input type="number" step="0.1" defaultValue={profile.fuel.dakotaMpg} onBlur={(e) => save({ fuel: { ...profile.fuel, dakotaMpg: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.1"
+                              defaultValue={profile.fuel.dakotaMpg}
+                              onBlur={(e) =>
+                                save({
+                                  fuel: { ...profile.fuel, dakotaMpg: Number(e.target.value) },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Active fuel gph</span>
-                            <Input type="number" step="0.1" defaultValue={profile.fuel.equipmentActiveFuelGph} onBlur={(e) => save({ fuel: { ...profile.fuel, equipmentActiveFuelGph: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.1"
+                              defaultValue={profile.fuel.equipmentActiveFuelGph}
+                              onBlur={(e) =>
+                                save({
+                                  fuel: {
+                                    ...profile.fuel,
+                                    equipmentActiveFuelGph: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="w-40">Idle $/hr</span>
-                            <Input type="number" step="0.1" defaultValue={profile.fuel.excessiveIdleCostPerHour} onBlur={(e) => save({ fuel: { ...profile.fuel, excessiveIdleCostPerHour: Number(e.target.value) } })} />
+                            <Input
+                              type="number"
+                              step="0.1"
+                              defaultValue={profile.fuel.excessiveIdleCostPerHour}
+                              onBlur={(e) =>
+                                save({
+                                  fuel: {
+                                    ...profile.fuel,
+                                    excessiveIdleCostPerHour: Number(e.target.value),
+                                  },
+                                })
+                              }
+                            />
                           </div>
                         </div>
                       </div>
@@ -1211,36 +1833,49 @@ const Settings = () => {
 
                     <div className="flex gap-2 justify-between pt-2">
                       <div className="flex gap-2">
-                        <Button variant="outline" onClick={reset}>Reset Defaults</Button>
+                        <Button variant="outline" onClick={reset}>
+                          Reset Defaults
+                        </Button>
                         <Button onClick={() => save({})}>Save Changes</Button>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => {
-                          const data = exportAll();
-                          const blob = new Blob([data], { type: 'application/json' });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `export_${new Date().toISOString()}.json`;
-                          a.click();
-                          URL.revokeObjectURL(url);
-                        }}>Export All</Button>
-                        <Button onClick={async () => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'application/json';
-                          input.onchange = async () => {
-                            const file = input.files?.[0];
-                            if (!file) return;
-                            const text = await file.text();
-                            try {
-                              const json = JSON.parse(text);
-                              importAll(json);
-                              window.location.reload();
-                            } catch { /* ignore */ }
-                          };
-                          input.click();
-                        }}>Import</Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            const data = exportAll();
+                            const blob = new Blob([data], { type: "application/json" });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `export_${new Date().toISOString()}.json`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                          }}
+                        >
+                          Export All
+                        </Button>
+                        <Button
+                          onClick={async () => {
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.accept = "application/json";
+                            input.onchange = async () => {
+                              const file = input.files?.[0];
+                              if (!file) return;
+                              const text = await file.text();
+                              try {
+                                const json = JSON.parse(text);
+                                importAll(json);
+                                window.location.reload();
+                              } catch {
+                                /* ignore */
+                              }
+                            };
+                            input.click();
+                          }}
+                        >
+                          Import
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -1252,45 +1887,85 @@ const Settings = () => {
               <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
                 <CardHeader>
                   <CardTitle>Data Migration & Import</CardTitle>
-                  <CardDescription>Sync local data to Supabase and import CSVs with mapping</CardDescription>
+                  <CardDescription>
+                    Sync local data to Supabase and import CSVs with mapping
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Supabase Sync</Label>
-                    <p className="text-sm text-muted-foreground">Push local Jobs and Customers to Supabase (best-effort)</p>
-                    <Button type="button" onClick={async () => {
-                      const jobs = (await import('@/services/jobs')).listJobs();
-                      const { saveJob } = await import('@/services/jobs');
-                      for (const j of jobs) { await saveJob(j); }
-                      const customers = (await import('@/services/customers')).listCustomers();
-                      const { saveCustomer } = await import('@/services/customers');
-                      for (const c of customers) { await saveCustomer(c); }
-                    }}>Push Local → Supabase</Button>
+                    <p className="text-sm text-muted-foreground">
+                      Push local Jobs and Customers to Supabase (best-effort)
+                    </p>
+                    <Button
+                      type="button"
+                      onClick={async () => {
+                        const jobs = (await import("@/services/jobs")).listJobs();
+                        const { saveJob } = await import("@/services/jobs");
+                        for (const j of jobs) {
+                          await saveJob(j);
+                        }
+                        const customers = (await import("@/services/customers")).listCustomers();
+                        const { saveCustomer } = await import("@/services/customers");
+                        for (const c of customers) {
+                          await saveCustomer(c);
+                        }
+                      }}
+                    >
+                      Push Local → Supabase
+                    </Button>
                   </div>
 
                   <Separator />
 
                   <div className="space-y-2">
                     <Label>CSV Import (Jobs)</Label>
-                    <input type="file" accept=".csv,text/csv" onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const text = await file.text();
-                      const { importCSVWithMapping } = await import('@/services/exportImport');
-                      const mapping = { columns: { id: 'id', name: 'name', address: 'address', serviceType: 'serviceType', params: 'params' } };
-                      const result = importCSVWithMapping(text, mapping, () => null, (row: any) => ({
-                        id: row.id || undefined,
-                        name: row.name,
-                        address: row.address,
-                        serviceType: row.serviceType,
-                        params: (() => { try { return JSON.parse(row.params || '{}'); } catch { return {}; } })(),
-                        createdAt: Date.now(),
-                        updatedAt: Date.now(),
-                      }));
-                      const { saveJob } = await import('@/services/jobs');
-                      for (const j of result.rows) { await saveJob(j as any); }
-                      alert(`Imported ${result.rows.length} jobs. Errors: ${result.errors.length}`);
-                    }} />
+                    <input
+                      type="file"
+                      accept=".csv,text/csv"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const text = await file.text();
+                        const { importCSVWithMapping } = await import("@/services/exportImport");
+                        const mapping = {
+                          columns: {
+                            id: "id",
+                            name: "name",
+                            address: "address",
+                            serviceType: "serviceType",
+                            params: "params",
+                          },
+                        };
+                        const result = importCSVWithMapping(
+                          text,
+                          mapping,
+                          () => null,
+                          (row: any) => ({
+                            id: row.id || undefined,
+                            name: row.name,
+                            address: row.address,
+                            serviceType: row.serviceType,
+                            params: (() => {
+                              try {
+                                return JSON.parse(row.params || "{}");
+                              } catch {
+                                return {};
+                              }
+                            })(),
+                            createdAt: Date.now(),
+                            updatedAt: Date.now(),
+                          }),
+                        );
+                        const { saveJob } = await import("@/services/jobs");
+                        for (const j of result.rows) {
+                          await saveJob(j as any);
+                        }
+                        alert(
+                          `Imported ${result.rows.length} jobs. Errors: ${result.errors.length}`,
+                        );
+                      }}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -1304,18 +1979,19 @@ const Settings = () => {
                       <Shield className="h-5 w-5 text-primary" />
                       Veteran Verification
                     </CardTitle>
-                    <CardDescription>Confirm your U.S. veteran status to unlock veteran-only content</CardDescription>
+                    <CardDescription>
+                      Confirm your U.S. veteran status to unlock veteran-only content
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">I am a U.S. veteran</div>
-                        <div className="text-sm text-muted-foreground">Enable veteran features and themes</div>
+                        <div className="text-sm text-muted-foreground">
+                          Enable veteran features and themes
+                        </div>
                       </div>
-                      <Switch
-                        checked={isVeteran}
-                        onCheckedChange={(v) => setIsVeteran(v)}
-                      />
+                      <Switch checked={isVeteran} onCheckedChange={(v) => setIsVeteran(v)} />
                     </div>
 
                     <Separator />
@@ -1323,7 +1999,11 @@ const Settings = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Branch of Service</Label>
-                        <Select value={veteranBranch} onValueChange={(v) => setVeteranBranch(v)} disabled={!isVeteran}>
+                        <Select
+                          value={veteranBranch}
+                          onValueChange={(v) => setVeteranBranch(v)}
+                          disabled={!isVeteran}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select your branch" />
                           </SelectTrigger>
@@ -1341,7 +2021,9 @@ const Settings = () => {
                       <div className="space-y-2">
                         <Label>Persistent Branch Wallpaper</Label>
                         <div className="flex items-center justify-between rounded-md border border-border/50 p-3">
-                          <div className="text-sm text-muted-foreground">Use branch wallpaper across all themes</div>
+                          <div className="text-sm text-muted-foreground">
+                            Use branch wallpaper across all themes
+                          </div>
                           <Switch
                             checked={isBranchWallpaperPersistent}
                             onCheckedChange={(v) => setIsBranchWallpaperPersistent(v)}
@@ -1359,17 +2041,61 @@ const Settings = () => {
                       <ImageIcon className="h-5 w-5 text-primary" />
                       Veteran Themes & Wallpapers
                     </CardTitle>
-                    <CardDescription>Quickly apply veteran and branch-specific themes</CardDescription>
+                    <CardDescription>
+                      Quickly apply veteran and branch-specific themes
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('veteran-patriot')}>Patriot</Button>
-                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-army')}>Army</Button>
-                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-navy')}>Navy</Button>
-                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-airforce')}>Air Force</Button>
-                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-marines')}>Marines</Button>
-                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-coastguard')}>Coast Guard</Button>
-                      <Button variant="outline" disabled={!isVeteran} onClick={() => setTheme('branch-spaceforce')}>Space Force</Button>
+                      <Button
+                        variant="outline"
+                        disabled={!isVeteran}
+                        onClick={() => setTheme("veteran-patriot")}
+                      >
+                        Patriot
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={!isVeteran}
+                        onClick={() => setTheme("branch-army")}
+                      >
+                        Army
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={!isVeteran}
+                        onClick={() => setTheme("branch-navy")}
+                      >
+                        Navy
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={!isVeteran}
+                        onClick={() => setTheme("branch-airforce")}
+                      >
+                        Air Force
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={!isVeteran}
+                        onClick={() => setTheme("branch-marines")}
+                      >
+                        Marines
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={!isVeteran}
+                        onClick={() => setTheme("branch-coastguard")}
+                      >
+                        Coast Guard
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={!isVeteran}
+                        onClick={() => setTheme("branch-spaceforce")}
+                      >
+                        Space Force
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

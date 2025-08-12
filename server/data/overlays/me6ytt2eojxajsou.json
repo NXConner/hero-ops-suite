@@ -4,10 +4,7 @@
   "dimensions": {
     "perimeter_ft": 142.5,
     "area_sqft": 1200,
-    "bbox_ft": [
-      60,
-      20
-    ]
+    "bbox_ft": [60, 20]
   },
   "cracks": [
     {
@@ -42,8 +39,5 @@
     "risk_zones": [],
     "slope_vectors": []
   },
-  "recommendations": [
-    "Seal cracks",
-    "Patch pothole"
-  ]
+  "recommendations": ["Seal cracks", "Patch pothole"]
 }
