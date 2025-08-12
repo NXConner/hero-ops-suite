@@ -28,5 +28,5 @@ export default tseslint.config(
       "no-case-declarations": "off",
       "prefer-const": "warn",
     },
-  },
+  }
 );

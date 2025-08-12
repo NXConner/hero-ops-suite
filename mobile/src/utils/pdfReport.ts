@@ -1,7 +1,7 @@
-import * as Print from "expo-print";
-import { Overlay } from "../types/overlay";
-import { EstimateResult } from "./costEstimator";
-import { BRAND as DEFAULT_BRAND } from "../theme/branding";
+import * as Print from 'expo-print';
+import { Overlay } from '../types/overlay';
+import { EstimateResult } from './costEstimator';
+import { BRAND as DEFAULT_BRAND } from '../theme/branding';
 
 type Brand = { companyName: string; primary: string; footerDisclaimer: string };
 
@@ -28,13 +28,13 @@ export async function generatePdfReport(params: {
     </head>
     <body>
       <h1>${brand.companyName} — Asphalt Assessment</h1>
-      <div>Site: ${siteName || "N/A"}</div>
+      <div>Site: ${siteName || 'N/A'}</div>
       <div>Date: ${new Date(overlay.timestamp).toLocaleString()}</div>
 
       <div class="section">
         <h2>Dimensions</h2>
-        <div>Perimeter (ft): ${overlay.dimensions?.perimeter_ft ?? "—"}</div>
-        <div>Area (sqft): ${overlay.dimensions?.area_sqft ?? "—"}</div>
+        <div>Perimeter (ft): ${overlay.dimensions?.perimeter_ft ?? '—'}</div>
+        <div>Area (sqft): ${overlay.dimensions?.area_sqft ?? '—'}</div>
       </div>
 
       <div class="section">
@@ -51,12 +51,11 @@ export async function generatePdfReport(params: {
           <tbody>
             ${estimate.lines
               .map(
-                (l) =>
-                  `<tr><td>${l.description}</td><td>${l.quantity.toFixed(2)}</td><td>${l.unit}</td><td>$${l.unit_cost.toFixed(
-                    2,
-                  )}</td><td>$${l.total.toFixed(2)}</td></tr>`,
+                (l) => `<tr><td>${l.description}</td><td>${l.quantity.toFixed(2)}</td><td>${l.unit}</td><td>$${l.unit_cost.toFixed(
+                  2
+                )}</td><td>$${l.total.toFixed(2)}</td></tr>`
               )
-              .join("")}
+              .join('')}
             <tr><td>Mobilization</td><td></td><td></td><td></td><td>$${estimate.mobilization.toFixed(2)}</td></tr>
           </tbody>
         </table>
@@ -67,7 +66,7 @@ export async function generatePdfReport(params: {
       <div class="section">
         <h2>Recommendations</h2>
         <ul>
-          ${(overlay.recommendations || []).map((r) => `<li>${r}</li>`).join("")}
+          ${(overlay.recommendations || []).map((r) => `<li>${r}</li>`).join('')}
         </ul>
       </div>
 

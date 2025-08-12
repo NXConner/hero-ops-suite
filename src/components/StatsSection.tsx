@@ -3,23 +3,23 @@ const StatsSection = () => {
     {
       number: "99.9%",
       label: "System Uptime",
-      description: "Reliable 24/7 operations",
+      description: "Reliable 24/7 operations"
     },
     {
       number: "1M+",
       label: "Operations Managed",
-      description: "Successfully coordinated missions",
+      description: "Successfully coordinated missions"
     },
     {
       number: "256-bit",
       label: "Encryption Standard",
-      description: "Military-grade security",
+      description: "Military-grade security"
     },
     {
       number: "<500ms",
       label: "Response Time",
-      description: "Lightning-fast alerts",
-    },
+      description: "Lightning-fast alerts"
+    }
   ];
 
   return (
@@ -46,8 +46,12 @@ const StatsSection = () => {
               <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
                 {stat.number}
               </div>
-              <div className="text-lg font-semibold text-foreground mb-2">{stat.label}</div>
-              <div className="text-sm text-muted-foreground">{stat.description}</div>
+              <div className="text-lg font-semibold text-foreground mb-2">
+                {stat.label}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {stat.description}
+              </div>
             </div>
           ))}
         </div>

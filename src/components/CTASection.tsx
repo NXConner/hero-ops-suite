@@ -4,10 +4,7 @@ import { Link } from "react-router-dom";
 
 const CTASection = () => {
   return (
-    <section
-      id="contact"
-      className="py-24 bg-gradient-to-b from-background via-primary/5 to-background"
-    >
+    <section id="contact" className="py-24 bg-gradient-to-b from-background via-primary/5 to-background">
       <div className="container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-center mb-8">
@@ -15,35 +12,28 @@ const CTASection = () => {
               <Shield className="h-16 w-16 text-primary" />
             </div>
           </div>
-
+          
           <h2 className="text-4xl md:text-6xl font-bold mb-6">
             Ready to Deploy{" "}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               OverWatch Ops?
             </span>
           </h2>
-
+          
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
-            Join elite operational units worldwide. Secure your tactical advantage with the most
-            advanced operations management system available.
+            Join elite operational units worldwide. Secure your tactical advantage 
+            with the most advanced operations management system available.
           </p>
-
+          
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Link to="/dashboard">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-primary to-accent hover:shadow-glow transition-all duration-300 text-lg px-8 py-6"
-              >
+              <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:shadow-glow transition-all duration-300 text-lg px-8 py-6">
                 Start Mission Planning
                 <ArrowRight className="ml-2 h-6 w-6" />
               </Button>
             </Link>
             <Link to="/analytics">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-primary/50 hover:bg-primary/10 text-lg px-8 py-6"
-              >
+              <Button size="lg" variant="outline" className="border-primary/50 hover:bg-primary/10 text-lg px-8 py-6">
                 View Analytics
               </Button>
             </Link>

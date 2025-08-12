@@ -37,7 +37,6 @@ Status key: [NS] Not Started, [IP] In Progress, [P] Completed
   - [IP] Geocode throttling UI, spinners, and error toasts
 
 Notes:
-
 - Items in UPDATEDTODOLIST marked complete but not found in this codebase were treated as not applicable for this repo (e.g., UnifiedMap page, Supplier Receipts CSV page, Cost Analyzer modal). Radar/weather overlay and OverWatch page exist; advanced basemap preference persistence not verified.
 
 ## Strategic plan (effective & efficient)
@@ -251,7 +250,7 @@ The rest of this document reflects the original theme/effects plan and remains v
 ## Current plan to finish
 
 - Finalize remaining feature gaps listed above incrementally. Prioritize:
-  1. Effects presets and Minimal Mode shortcut, 2) Customizer non-color tokens, 3) Builder widget settings.
+  1) Effects presets and Minimal Mode shortcut, 2) Customizer non-color tokens, 3) Builder widget settings.
 - Add smoke tests for Settings, Builder, and EffectsOverlay flows.
 - Prepare production assets for wallpapers/effects and verify performance in Low Power Mode.
 

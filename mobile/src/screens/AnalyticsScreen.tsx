@@ -1,12 +1,12 @@
-import React from "react";
-import { View, Text, StyleSheet, Button, FlatList } from "react-native";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAnalyticsSummary, getPrioritized } from "../services/api";
+import React from 'react';
+import { View, Text, StyleSheet, Button, FlatList } from 'react-native';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getAnalyticsSummary, getPrioritized } from '../services/api';
 
 export default function AnalyticsScreen() {
   const qc = useQueryClient();
-  const summary = useQuery({ queryKey: ["analytics"], queryFn: getAnalyticsSummary });
-  const prioritized = useQuery({ queryKey: ["analytics_prioritized"], queryFn: getPrioritized });
+  const summary = useQuery({ queryKey: ['analytics'], queryFn: getAnalyticsSummary });
+  const prioritized = useQuery({ queryKey: ['analytics_prioritized'], queryFn: getPrioritized });
 
   return (
     <View style={styles.container}>
@@ -33,26 +33,14 @@ export default function AnalyticsScreen() {
           </View>
         )}
       />
-      <Button
-        title="Refresh"
-        onPress={() => {
-          qc.invalidateQueries({ queryKey: ["analytics"] });
-          qc.invalidateQueries({ queryKey: ["analytics_prioritized"] });
-        }}
-      />
+      <Button title="Refresh" onPress={() => { qc.invalidateQueries({ queryKey: ['analytics'] }); qc.invalidateQueries({ queryKey: ['analytics_prioritized'] }); }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  title: { fontSize: 20, fontWeight: "600", marginBottom: 8 },
-  subtitle: { fontSize: 16, fontWeight: "600", marginBottom: 8 },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-  },
+  title: { fontSize: 20, fontWeight: '600', marginBottom: 8 },
+  subtitle: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderColor: '#eee' },
 });

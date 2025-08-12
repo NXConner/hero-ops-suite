@@ -1,9 +1,0 @@
-path: /workspace/data/processed/pklot
-train: images/train
-val: images/val
-# optional test split
-# test: images/test
-
-names:
-  - vacant
-  - occupied

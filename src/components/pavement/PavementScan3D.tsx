@@ -1,29 +1,23 @@
 // @ts-nocheck
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 // Removed React Three.js dependencies - using real 3D implementation
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Real3DPavementViewer from "./Real3DPavementViewerThree";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Scan,
-  Eye,
-  EyeOff,
-  Download,
-  Upload,
-  RotateCcw,
-  ZoomIn,
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Real3DPavementViewer from './Real3DPavementViewer';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  Scan, 
+  Eye, 
+  EyeOff, 
+  Download, 
+  Upload, 
+  RotateCcw, 
+  ZoomIn, 
   ZoomOut,
   Layers,
   AlertTriangle,
@@ -35,8 +29,8 @@ import {
   Save,
   FileImage,
   Ruler,
-  Target,
-} from "lucide-react";
+  Target
+} from 'lucide-react';
 
 // Placeholder types to replace Three.js
 interface Vector3 {
@@ -47,8 +41,8 @@ interface Vector3 {
 
 interface DefectData {
   id: string;
-  type: "crack" | "pothole" | "alligator" | "rutting" | "bleeding" | "raveling" | "patching";
-  severity: "low" | "medium" | "high" | "critical";
+  type: 'crack' | 'pothole' | 'alligator' | 'rutting' | 'bleeding' | 'raveling' | 'patching';
+  severity: 'low' | 'medium' | 'high' | 'critical';
   position: Vector3;
   area: number; // square feet
   length?: number; // for linear defects
@@ -82,7 +76,7 @@ interface PavementScan3DProps {
   scanData?: ScanData;
   onDefectSelect?: (defect: DefectData) => void;
   onAnalysisComplete?: (analysis: any) => void;
-  terminologyMode: "military" | "civilian" | "both";
+  terminologyMode: 'military' | 'civilian' | 'both';
 }
 
 // Analysis moved to Real3DPavementViewer component
@@ -92,42 +86,32 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
   scanData,
   onDefectSelect,
   onAnalysisComplete,
-  terminologyMode,
+  terminologyMode
 }) => {
   const [is3DMode, setIs3DMode] = useState(false);
   const [showDefects, setShowDefects] = useState(true);
   const [selectedDefectTypes, setSelectedDefectTypes] = useState<string[]>([
-    "crack",
-    "pothole",
-    "alligator",
-    "rutting",
-    "bleeding",
-    "raveling",
-    "patching",
+    'crack', 'pothole', 'alligator', 'rutting', 'bleeding', 'raveling', 'patching'
   ]);
   const [meshOpacity, setMeshOpacity] = useState(80);
   const [showGrid, setShowGrid] = useState(true);
   const [showAnalysis, setShowAnalysis] = useState(true);
-  const [viewMode, setViewMode] = useState<"top" | "perspective" | "side">("perspective");
+  const [viewMode, setViewMode] = useState<'top' | 'perspective' | 'side'>('perspective');
 
   const getTerminology = (military: string, civilian: string) => {
     switch (terminologyMode) {
-      case "military":
-        return military;
-      case "civilian":
-        return civilian;
-      case "both":
-        return `${military} / ${civilian}`;
-      default:
-        return military;
+      case 'military': return military;
+      case 'civilian': return civilian;
+      case 'both': return `${military} / ${civilian}`;
+      default: return military;
     }
   };
 
   // Generate mock scan data if none provided
   const mockScanData: ScanData = scanData || {
-    id: "scan-001",
-    name: "Highway 101 Section A",
-    location: { lat: 40.7128, lng: -74.006 },
+    id: 'scan-001',
+    name: 'Highway 101 Section A',
+    location: { lat: 40.7128, lng: -74.0060 },
     scanDate: new Date(),
     area: 5280, // square feet
     surfaceConditionIndex: 68,
@@ -135,59 +119,65 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
     estimatedLifespan: 8.5,
     defects: [
       {
-        id: "d1",
-        type: "crack",
-        severity: "medium",
+        id: 'd1',
+        type: 'crack',
+        severity: 'medium',
         position: { x: 2, y: 0.1, z: 1 },
         area: 15.5,
         length: 24,
-        description: "Longitudinal crack extending 24 feet",
+        description: 'Longitudinal crack extending 24 feet',
         timestamp: new Date(),
         repairCost: 850,
-        priority: 3,
+        priority: 3
       },
       {
-        id: "d2",
-        type: "pothole",
-        severity: "critical",
+        id: 'd2',
+        type: 'pothole',
+        severity: 'critical',
         position: { x: -1, y: 0.2, z: -2 },
         area: 8.2,
         depth: 3.5,
-        description: "Deep pothole requiring immediate attention",
+        description: 'Deep pothole requiring immediate attention',
         timestamp: new Date(),
         repairCost: 1200,
-        priority: 1,
+        priority: 1
       },
       {
-        id: "d3",
-        type: "alligator",
-        severity: "high",
+        id: 'd3',
+        type: 'alligator',
+        severity: 'high',
         position: { x: 0, y: 0.05, z: 3 },
         area: 45.8,
-        description: "Alligator cracking pattern indicating structural failure",
+        description: 'Alligator cracking pattern indicating structural failure',
         timestamp: new Date(),
         repairCost: 3400,
-        priority: 2,
-      },
+        priority: 2
+      }
     ],
     meshData: {
       vertices: new Float32Array([
-        -5, 0, -5, 5, 0, -5, 5, 0, 5, -5, 0, 5, -3, 0.1, -3, 3, 0.1, -3, 3, 0.1, 3, -3, 0.1, 3,
+        -5, 0, -5,  5, 0, -5,  5, 0, 5,  -5, 0, 5,
+        -3, 0.1, -3,  3, 0.1, -3,  3, 0.1, 3,  -3, 0.1, 3
       ]),
-      indices: new Uint32Array([0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7]),
+      indices: new Uint32Array([
+        0, 1, 2,  0, 2, 3,  4, 5, 6,  4, 6, 7
+      ]),
       normals: new Float32Array([
-        0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+        0, 1, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0,
+        0, 1, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0
       ]),
       colors: new Float32Array([
-        0.3, 0.3, 0.3, 0.4, 0.4, 0.4, 0.3, 0.3, 0.3, 0.4, 0.4, 0.4, 0.2, 0.2, 0.2, 0.3, 0.3, 0.3,
-        0.2, 0.2, 0.2, 0.3, 0.3, 0.3,
-      ]),
-    },
+        0.3, 0.3, 0.3,  0.4, 0.4, 0.4,  0.3, 0.3, 0.3,  0.4, 0.4, 0.4,
+        0.2, 0.2, 0.2,  0.3, 0.3, 0.3,  0.2, 0.2, 0.2,  0.3, 0.3, 0.3
+      ])
+    }
   };
 
   const toggleDefectType = (type: string) => {
-    setSelectedDefectTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
+    setSelectedDefectTypes(prev => 
+      prev.includes(type) 
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
     );
   };
 
@@ -195,16 +185,16 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
     const analysis = {
       scanId: mockScanData.id,
       totalDefects: mockScanData.defects.length,
-      criticalDefects: mockScanData.defects.filter((d) => d.severity === "critical").length,
+      criticalDefects: mockScanData.defects.filter(d => d.severity === 'critical').length,
       totalRepairCost: mockScanData.defects.reduce((sum, d) => sum + d.repairCost, 0),
       surfaceConditionIndex: mockScanData.surfaceConditionIndex,
       estimatedLifespan: mockScanData.estimatedLifespan,
-      recommendations: generateRecommendations(mockScanData),
+      recommendations: generateRecommendations(mockScanData)
     };
 
-    const blob = new Blob([JSON.stringify(analysis, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(analysis, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = `pavement-analysis-${mockScanData.id}.json`;
     document.body.appendChild(a);
@@ -215,16 +205,16 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
 
   const generateRecommendations = (data: ScanData): string[] => {
     const recommendations: string[] = [];
-
+    
     if (data.surfaceConditionIndex < 50) {
-      recommendations.push("Major rehabilitation required - consider full reconstruction");
+      recommendations.push('Major rehabilitation required - consider full reconstruction');
     } else if (data.surfaceConditionIndex < 70) {
-      recommendations.push("Preventive maintenance recommended within 6 months");
+      recommendations.push('Preventive maintenance recommended within 6 months');
     } else {
-      recommendations.push("Surface in good condition - monitor annually");
+      recommendations.push('Surface in good condition - monitor annually');
     }
 
-    const criticalDefects = data.defects.filter((d) => d.severity === "critical").length;
+    const criticalDefects = data.defects.filter(d => d.severity === 'critical').length;
     if (criticalDefects > 0) {
       recommendations.push(`${criticalDefects} critical defects require immediate attention`);
     }
@@ -247,7 +237,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
             showGrid={showGrid}
             showAnalysis={showAnalysis}
           />
-
+          
           {/* 3D Mode Close Button */}
           <Button
             variant="ghost"
@@ -267,7 +257,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
           <div className="flex items-center justify-between">
             <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
               <Scan className="w-4 h-4" />
-              {getTerminology("Surface Intel Analysis", "PavementScan Pro")}
+              {getTerminology('Surface Intel Analysis', 'PavementScan Pro')}
             </CardTitle>
             <Button
               variant="ghost"
@@ -279,19 +269,13 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
             </Button>
           </div>
         </CardHeader>
-
+        
         <CardContent>
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-slate-800">
-              <TabsTrigger value="overview" className="text-xs">
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="defects" className="text-xs">
-                Defects
-              </TabsTrigger>
-              <TabsTrigger value="analysis" className="text-xs">
-                Analysis
-              </TabsTrigger>
+              <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
+              <TabsTrigger value="defects" className="text-xs">Defects</TabsTrigger>
+              <TabsTrigger value="analysis" className="text-xs">Analysis</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-3">
@@ -356,15 +340,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
               <div className="space-y-2">
                 <Label className="text-xs text-cyan-400">Defect Types:</Label>
                 <div className="grid grid-cols-2 gap-1">
-                  {[
-                    "crack",
-                    "pothole",
-                    "alligator",
-                    "rutting",
-                    "bleeding",
-                    "raveling",
-                    "patching",
-                  ].map((type) => (
+                  {['crack', 'pothole', 'alligator', 'rutting', 'bleeding', 'raveling', 'patching'].map(type => (
                     <Button
                       key={type}
                       variant={selectedDefectTypes.includes(type) ? "default" : "outline"}
@@ -372,23 +348,15 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
                       onClick={() => toggleDefectType(type)}
                       className="text-xs h-7 justify-start"
                     >
-                      <div
-                        className={`w-2 h-2 rounded-full mr-2 ${
-                          type === "crack"
-                            ? "bg-yellow-400"
-                            : type === "pothole"
-                              ? "bg-red-400"
-                              : type === "alligator"
-                                ? "bg-purple-400"
-                                : type === "rutting"
-                                  ? "bg-green-400"
-                                  : type === "bleeding"
-                                    ? "bg-pink-400"
-                                    : type === "raveling"
-                                      ? "bg-blue-400"
-                                      : "bg-gray-400"
-                        }`}
-                      />
+                      <div className={`w-2 h-2 rounded-full mr-2 ${
+                        type === 'crack' ? 'bg-yellow-400' :
+                        type === 'pothole' ? 'bg-red-400' :
+                        type === 'alligator' ? 'bg-purple-400' :
+                        type === 'rutting' ? 'bg-green-400' :
+                        type === 'bleeding' ? 'bg-pink-400' :
+                        type === 'raveling' ? 'bg-blue-400' :
+                        'bg-gray-400'
+                      }`} />
                       {type}
                     </Button>
                   ))}
@@ -398,29 +366,24 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
               <div className="space-y-2">
                 <Label className="text-xs text-cyan-400">Detected Defects:</Label>
                 <div className="max-h-32 overflow-y-auto space-y-1">
-                  {mockScanData.defects.map((defect) => (
+                  {mockScanData.defects.map(defect => (
                     <div key={defect.id} className="bg-slate-800 p-2 rounded text-xs">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-slate-300 capitalize">{defect.type}</span>
-                        <Badge
-                          variant="outline"
+                        <Badge 
+                          variant="outline" 
                           className={`text-xs ${
-                            defect.severity === "critical"
-                              ? "text-red-400 border-red-400"
-                              : defect.severity === "high"
-                                ? "text-orange-400 border-orange-400"
-                                : defect.severity === "medium"
-                                  ? "text-yellow-400 border-yellow-400"
-                                  : "text-blue-400 border-blue-400"
+                            defect.severity === 'critical' ? 'text-red-400 border-red-400' :
+                            defect.severity === 'high' ? 'text-orange-400 border-orange-400' :
+                            defect.severity === 'medium' ? 'text-yellow-400 border-yellow-400' :
+                            'text-blue-400 border-blue-400'
                           }`}
                         >
                           {defect.severity}
                         </Badge>
                       </div>
                       <div className="text-slate-400">{defect.area.toFixed(1)} sq ft</div>
-                      <div className="text-orange-400 font-mono">
-                        ${defect.repairCost.toLocaleString()}
-                      </div>
+                      <div className="text-orange-400 font-mono">${defect.repairCost.toLocaleString()}</div>
                     </div>
                   ))}
                 </div>
@@ -430,7 +393,7 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
             <TabsContent value="analysis" className="space-y-3">
               <div className="bg-slate-800 p-3 rounded">
                 <div className="text-xs text-cyan-400 mb-2">
-                  {getTerminology("Tactical Assessment", "Analysis Summary")}
+                  {getTerminology('Tactical Assessment', 'Analysis Summary')}
                 </div>
                 <div className="space-y-2 text-xs">
                   {generateRecommendations(mockScanData).map((rec, index) => (
@@ -445,23 +408,24 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="text-center bg-slate-800 p-2 rounded">
                   <div className="text-lg font-mono text-red-400">
-                    {mockScanData.defects.filter((d) => d.severity === "critical").length}
+                    {mockScanData.defects.filter(d => d.severity === 'critical').length}
                   </div>
                   <div className="text-slate-300">Critical</div>
                 </div>
                 <div className="text-center bg-slate-800 p-2 rounded">
                   <div className="text-lg font-mono text-orange-400">
-                    $
-                    {mockScanData.defects
-                      .reduce((sum, d) => sum + d.repairCost, 0)
-                      .toLocaleString()}
+                    ${mockScanData.defects.reduce((sum, d) => sum + d.repairCost, 0).toLocaleString()}
                   </div>
                   <div className="text-slate-300">Repair Cost</div>
                 </div>
               </div>
 
               <div className="flex gap-2">
-                <Button size="sm" onClick={exportAnalysis} className="flex-1 text-xs">
+                <Button
+                  size="sm"
+                  onClick={exportAnalysis}
+                  className="flex-1 text-xs"
+                >
                   <Download className="w-3 h-3 mr-1" />
                   Export
                 </Button>

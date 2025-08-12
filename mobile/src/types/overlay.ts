@@ -3,7 +3,7 @@ export type Vector3 = { x: number; y: number; z: number };
 export type Crack = {
   id: string;
   length_ft: number;
-  severity: "minor" | "moderate" | "severe" | string;
+  severity: 'minor' | 'moderate' | 'severe' | string;
   coordinates: Vector3[];
 };
 
@@ -16,7 +16,7 @@ export type Pothole = {
 
 export type DistressZone = {
   id: string;
-  type: "gatoring" | "patch" | "edge" | string;
+  type: 'gatoring' | 'patch' | 'edge' | string;
   area_sqft: number;
   polygon: Vector3[];
 };
@@ -30,7 +30,7 @@ export type SlopeVector = {
 export type RiskZone = {
   id: string;
   center: Vector3;
-  severity: "low" | "medium" | "high" | string;
+  severity: 'low' | 'medium' | 'high' | string;
 };
 
 export type SlopeAnalysis = {

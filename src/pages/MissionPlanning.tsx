@@ -6,23 +6,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  Map,
-  MapPin,
-  Users,
-  Target,
-  Clock,
-  Shield,
-  Truck,
-  Radio,
+import { 
+  Map, 
+  MapPin, 
+  Users, 
+  Target, 
+  Clock, 
+  Shield, 
+  Truck, 
+  Radio, 
   Eye,
   Plus,
   Save,
@@ -30,7 +24,7 @@ import {
   Navigation,
   Crosshair,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
@@ -43,29 +37,23 @@ const MissionPlanning = () => {
 
   const teams = [
     { id: "alpha", name: "Alpha Team", status: "Available", members: 8, specialty: "Assault" },
-    {
-      id: "bravo",
-      name: "Bravo Team",
-      status: "On Mission",
-      members: 6,
-      specialty: "Reconnaissance",
-    },
+    { id: "bravo", name: "Bravo Team", status: "On Mission", members: 6, specialty: "Reconnaissance" },
     { id: "charlie", name: "Charlie Team", status: "Available", members: 7, specialty: "Support" },
-    { id: "delta", name: "Delta Team", status: "Standby", members: 5, specialty: "Sniper" },
+    { id: "delta", name: "Delta Team", status: "Standby", members: 5, specialty: "Sniper" }
   ];
 
   const resources = [
     { type: "Transport", items: ["Humvee x3", "Transport Truck x2", "ATV x4"] },
     { type: "Equipment", items: ["Comm Radios x12", "Night Vision x8", "Body Armor x10"] },
     { type: "Weapons", items: ["Assault Rifles x10", "Sniper Rifles x2", "Explosives Kit x1"] },
-    { type: "Support", items: ["Medic Kit x3", "Rations (72h) x4", "GPS Units x6"] },
+    { type: "Support", items: ["Medic Kit x3", "Rations (72h) x4", "GPS Units x6"] }
   ];
 
   const mapMarkers = [
     { id: 1, type: "objective", x: 45, y: 30, label: "Primary Target", status: "pending" },
     { id: 2, type: "waypoint", x: 25, y: 50, label: "Rally Point Alpha", status: "active" },
     { id: 3, type: "hazard", x: 65, y: 40, label: "Known Threat", status: "warning" },
-    { id: 4, type: "friendly", x: 15, y: 70, label: "Base Camp", status: "secure" },
+    { id: 4, type: "friendly", x: 15, y: 70, label: "Base Camp", status: "secure" }
   ];
 
   const addObjective = () => {
@@ -81,7 +69,7 @@ const MissionPlanning = () => {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
-
+      
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <div className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -133,7 +121,7 @@ const MissionPlanning = () => {
                     <Label htmlFor="mission-name">Mission Name</Label>
                     <Input id="mission-name" placeholder="Enter mission name" />
                   </div>
-
+                  
                   <div>
                     <Label htmlFor="mission-type">Mission Type</Label>
                     <Select value={missionType} onValueChange={setMissionType}>
@@ -167,8 +155,8 @@ const MissionPlanning = () => {
 
                   <div>
                     <Label htmlFor="mission-desc">Mission Description</Label>
-                    <Textarea
-                      id="mission-desc"
+                    <Textarea 
+                      id="mission-desc" 
                       placeholder="Enter detailed mission description..."
                       rows={3}
                     />
@@ -216,15 +204,7 @@ const MissionPlanning = () => {
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="font-medium">{team.name}</div>
-                          <Badge
-                            variant={
-                              team.status === "Available"
-                                ? "default"
-                                : team.status === "On Mission"
-                                  ? "destructive"
-                                  : "secondary"
-                            }
-                          >
+                          <Badge variant={team.status === "Available" ? "default" : team.status === "On Mission" ? "destructive" : "secondary"}>
                             {team.status}
                           </Badge>
                         </div>
@@ -246,28 +226,22 @@ const MissionPlanning = () => {
                     <Map className="h-5 w-5 text-primary" />
                     Tactical Map
                   </CardTitle>
-                  <CardDescription>Place waypoints, objectives, and plan routes</CardDescription>
+                  <CardDescription>
+                    Place waypoints, objectives, and plan routes
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="relative w-full h-96 bg-secondary/20 rounded-lg border border-border/30 overflow-hidden">
                     {/* Map Background */}
                     <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 via-yellow-900/20 to-brown-900/20" />
-
+                    
                     {/* Grid Lines */}
                     <div className="absolute inset-0 opacity-20">
                       {[...Array(10)].map((_, i) => (
-                        <div
-                          key={`v-${i}`}
-                          className="absolute h-full border-l border-border"
-                          style={{ left: `${i * 10}%` }}
-                        />
+                        <div key={`v-${i}`} className="absolute h-full border-l border-border" style={{ left: `${i * 10}%` }} />
                       ))}
                       {[...Array(8)].map((_, i) => (
-                        <div
-                          key={`h-${i}`}
-                          className="absolute w-full border-t border-border"
-                          style={{ top: `${i * 12.5}%` }}
-                        />
+                        <div key={`h-${i}`} className="absolute w-full border-t border-border" style={{ top: `${i * 12.5}%` }} />
                       ))}
                     </div>
 
@@ -278,29 +252,16 @@ const MissionPlanning = () => {
                         className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
                         style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
                       >
-                        <div
-                          className={`p-2 rounded-full border-2 ${
-                            marker.type === "objective"
-                              ? "bg-red-500/20 border-red-500"
-                              : marker.type === "waypoint"
-                                ? "bg-blue-500/20 border-blue-500"
-                                : marker.type === "hazard"
-                                  ? "bg-yellow-500/20 border-yellow-500"
-                                  : "bg-green-500/20 border-green-500"
-                          }`}
-                        >
-                          {marker.type === "objective" && (
-                            <Target className="h-4 w-4 text-red-500" />
-                          )}
-                          {marker.type === "waypoint" && (
-                            <MapPin className="h-4 w-4 text-blue-500" />
-                          )}
-                          {marker.type === "hazard" && (
-                            <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                          )}
-                          {marker.type === "friendly" && (
-                            <Shield className="h-4 w-4 text-green-500" />
-                          )}
+                        <div className={`p-2 rounded-full border-2 ${
+                          marker.type === "objective" ? "bg-red-500/20 border-red-500" :
+                          marker.type === "waypoint" ? "bg-blue-500/20 border-blue-500" :
+                          marker.type === "hazard" ? "bg-yellow-500/20 border-yellow-500" :
+                          "bg-green-500/20 border-green-500"
+                        }`}>
+                          {marker.type === "objective" && <Target className="h-4 w-4 text-red-500" />}
+                          {marker.type === "waypoint" && <MapPin className="h-4 w-4 text-blue-500" />}
+                          {marker.type === "hazard" && <AlertTriangle className="h-4 w-4 text-yellow-500" />}
+                          {marker.type === "friendly" && <Shield className="h-4 w-4 text-green-500" />}
                         </div>
                         <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 bg-background/90 border border-border/50 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                           {marker.label}
@@ -359,7 +320,9 @@ const MissionPlanning = () => {
                     <Truck className="h-5 w-5 text-primary" />
                     Resource Allocation
                   </CardTitle>
-                  <CardDescription>Assign equipment and supplies for the mission</CardDescription>
+                  <CardDescription>
+                    Assign equipment and supplies for the mission
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="transport" className="w-full">
@@ -371,22 +334,14 @@ const MissionPlanning = () => {
                     </TabsList>
 
                     {resources.map((category) => (
-                      <TabsContent
-                        key={category.type.toLowerCase()}
-                        value={category.type.toLowerCase()}
-                      >
+                      <TabsContent key={category.type.toLowerCase()} value={category.type.toLowerCase()}>
                         <div className="space-y-3">
                           {category.items.map((item, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30"
-                            >
+                            <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30">
                               <span className="font-medium">{item}</span>
                               <div className="flex items-center gap-2">
                                 <Input className="w-16 h-8" placeholder="0" type="number" min="0" />
-                                <Button size="sm" variant="outline">
-                                  Add
-                                </Button>
+                                <Button size="sm" variant="outline">Add</Button>
                               </div>
                             </div>
                           ))}
@@ -406,7 +361,9 @@ const MissionPlanning = () => {
                 <Clock className="h-5 w-5 text-primary" />
                 Mission Timeline
               </CardTitle>
-              <CardDescription>Schedule mission phases and checkpoints</CardDescription>
+              <CardDescription>
+                Schedule mission phases and checkpoints
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

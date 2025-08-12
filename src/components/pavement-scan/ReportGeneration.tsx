@@ -1,24 +1,18 @@
-import { useState, useRef } from "react";
+import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  FileText,
-  Download,
-  Share,
+import { 
+  FileText, 
+  Download, 
+  Share, 
   Mail,
   Printer,
   Eye,
@@ -30,11 +24,11 @@ import {
   Camera,
   Ruler,
   AlertTriangle,
-  CheckCircle,
+  CheckCircle
 } from "lucide-react";
-import { DefectData, ScanData } from "@/pages/PavementScanPro";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import { DefectData, ScanData } from '@/pages/PavementScanPro';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 interface ReportGenerationProps {
   scanData: ScanData | null;
@@ -53,25 +47,25 @@ interface ReportConfig {
   includeRecommendations: boolean;
   includePhotos: boolean;
   includeMeasurements: boolean;
-  reportType: "summary" | "detailed" | "technical";
-  format: "pdf" | "word" | "html";
+  reportType: 'summary' | 'detailed' | 'technical';
+  format: 'pdf' | 'word' | 'html';
 }
 
 const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }) => {
   const [reportConfig, setReportConfig] = useState<ReportConfig>({
-    title: "Pavement Condition Assessment Report",
-    projectName: "",
-    clientName: "",
-    inspectorName: "",
-    location: "",
+    title: 'Pavement Condition Assessment Report',
+    projectName: '',
+    clientName: '',
+    inspectorName: '',
+    location: '',
     includeExecutiveSummary: true,
     includeDefectDetails: true,
     include3DModel: true,
     includeRecommendations: true,
     includePhotos: true,
     includeMeasurements: true,
-    reportType: "detailed",
-    format: "pdf",
+    reportType: 'detailed',
+    format: 'pdf'
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -80,18 +74,18 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
   const reportPreviewRef = useRef<HTMLDivElement>(null);
 
   const handleConfigChange = (key: keyof ReportConfig, value: any) => {
-    setReportConfig((prev) => ({ ...prev, [key]: value }));
+    setReportConfig(prev => ({ ...prev, [key]: value }));
   };
 
   const generateExecutiveSummary = () => {
     const totalDefects = defects.length;
-    const criticalDefects = defects.filter((d) => d.severity === "critical").length;
-    const highDefects = defects.filter((d) => d.severity === "high").length;
-
-    let condition = "Good";
-    if (criticalDefects > 0) condition = "Poor";
-    else if (highDefects > 2) condition = "Fair";
-
+    const criticalDefects = defects.filter(d => d.severity === 'critical').length;
+    const highDefects = defects.filter(d => d.severity === 'high').length;
+    
+    let condition = 'Good';
+    if (criticalDefects > 0) condition = 'Poor';
+    else if (highDefects > 2) condition = 'Fair';
+    
     return `
       This pavement condition assessment was conducted on ${scanData?.timestamp.toLocaleDateString()} 
       using advanced AI-powered scanning technology. The scanned area covers ${scanData?.area.toFixed(1)} 
@@ -105,48 +99,34 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
       • High priority repairs needed: ${highDefects}
       • Average defect detection confidence: ${((defects.reduce((sum, d) => sum + d.confidence, 0) / defects.length) * 100).toFixed(1)}%
       
-      ${criticalDefects > 0 ? "Immediate action is recommended for critical defects to prevent safety hazards and further deterioration." : "No critical defects were identified during this assessment."}
+      ${criticalDefects > 0 ? 'Immediate action is recommended for critical defects to prevent safety hazards and further deterioration.' : 'No critical defects were identified during this assessment.'}
     `;
   };
 
   const generateRecommendations = () => {
-    const defectTypes = [...new Set(defects.map((d) => d.type))];
+    const defectTypes = [...new Set(defects.map(d => d.type))];
     const recommendations = [];
 
-    if (defectTypes.includes("pothole")) {
-      recommendations.push(
-        "• Pothole Repair: Use cold-patch asphalt for temporary repairs and hot-mix asphalt for permanent solutions.",
-      );
+    if (defectTypes.includes('pothole')) {
+      recommendations.push('• Pothole Repair: Use cold-patch asphalt for temporary repairs and hot-mix asphalt for permanent solutions.');
     }
-    if (defectTypes.includes("crack")) {
-      recommendations.push(
-        "• Crack Sealing: Apply rubberized crack sealant to prevent water infiltration.",
-      );
+    if (defectTypes.includes('crack')) {
+      recommendations.push('• Crack Sealing: Apply rubberized crack sealant to prevent water infiltration.');
     }
-    if (defectTypes.includes("alligator")) {
-      recommendations.push(
-        "• Alligator Cracking: Remove and replace affected areas with new asphalt overlay.",
-      );
+    if (defectTypes.includes('alligator')) {
+      recommendations.push('• Alligator Cracking: Remove and replace affected areas with new asphalt overlay.');
     }
-    if (defectTypes.includes("water_pooling")) {
-      recommendations.push(
-        "• Drainage Improvement: Install additional drainage or resurface to correct grade issues.",
-      );
+    if (defectTypes.includes('water_pooling')) {
+      recommendations.push('• Drainage Improvement: Install additional drainage or resurface to correct grade issues.');
     }
-    if (defectTypes.includes("gatoring")) {
-      recommendations.push(
-        "• Surface Treatment: Apply microsurfacing or thin overlay to address gatoring.",
-      );
+    if (defectTypes.includes('gatoring')) {
+      recommendations.push('• Surface Treatment: Apply microsurfacing or thin overlay to address gatoring.');
     }
 
-    recommendations.push(
-      "• Regular Monitoring: Schedule annual inspections to track defect progression.",
-    );
-    recommendations.push(
-      "• Preventive Maintenance: Implement seal coating every 3-5 years to extend pavement life.",
-    );
+    recommendations.push('• Regular Monitoring: Schedule annual inspections to track defect progression.');
+    recommendations.push('• Preventive Maintenance: Implement seal coating every 3-5 years to extend pavement life.');
 
-    return recommendations.join("\n");
+    return recommendations.join('\n');
   };
 
   const generateReport = async () => {
@@ -156,30 +136,31 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
     try {
       // Simulate report generation progress
       const steps = [
-        "Analyzing scan data...",
-        "Processing defect information...",
-        "Generating 3D model images...",
-        "Creating executive summary...",
-        "Compiling recommendations...",
-        "Formatting document...",
-        "Finalizing report...",
+        'Analyzing scan data...',
+        'Processing defect information...',
+        'Generating 3D model images...',
+        'Creating executive summary...',
+        'Compiling recommendations...',
+        'Formatting document...',
+        'Finalizing report...'
       ];
 
       for (let i = 0; i < steps.length; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setGenerationProgress(((i + 1) / steps.length) * 100);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setGenerationProgress((i + 1) / steps.length * 100);
       }
 
-      if (reportConfig.format === "pdf") {
+      if (reportConfig.format === 'pdf') {
         await generatePDFReport();
-      } else if (reportConfig.format === "html") {
+      } else if (reportConfig.format === 'html') {
         generateHTMLReport();
       } else {
         // Mock Word document generation
-        console.log("Generating Word document...");
+        console.log('Generating Word document...');
       }
+
     } catch (error) {
-      console.error("Error generating report:", error);
+      console.error('Error generating report:', error);
     } finally {
       setIsGenerating(false);
       setGenerationProgress(0);
@@ -187,14 +168,14 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
   };
 
   const generatePDFReport = async () => {
-    const pdf = new jsPDF("p", "mm", "a4");
+    const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = 210;
     const pageHeight = 297;
     let currentY = 20;
 
     // Title Page
     pdf.setFontSize(24);
-    pdf.text(reportConfig.title, pageWidth / 2, currentY, { align: "center" });
+    pdf.text(reportConfig.title, pageWidth / 2, currentY, { align: 'center' });
     currentY += 20;
 
     pdf.setFontSize(16);
@@ -212,7 +193,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
     // Executive Summary
     if (reportConfig.includeExecutiveSummary) {
       pdf.setFontSize(18);
-      pdf.text("Executive Summary", 20, currentY);
+      pdf.text('Executive Summary', 20, currentY);
       currentY += 15;
 
       pdf.setFontSize(12);
@@ -231,7 +212,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
     // Measurements
     if (reportConfig.includeMeasurements) {
       pdf.setFontSize(18);
-      pdf.text("Site Measurements", 20, currentY);
+      pdf.text('Site Measurements', 20, currentY);
       currentY += 15;
 
       pdf.setFontSize(12);
@@ -251,7 +232,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
       }
 
       pdf.setFontSize(18);
-      pdf.text("Defect Analysis", 20, currentY);
+      pdf.text('Defect Analysis', 20, currentY);
       currentY += 15;
 
       defects.forEach((defect, index) => {
@@ -289,7 +270,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
       }
 
       pdf.setFontSize(18);
-      pdf.text("Recommendations", 20, currentY);
+      pdf.text('Recommendations', 20, currentY);
       currentY += 15;
 
       pdf.setFontSize(12);
@@ -299,7 +280,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
     }
 
     // Save PDF
-    pdf.save(`${reportConfig.projectName || "Pavement-Report"}-${Date.now()}.pdf`);
+    pdf.save(`${reportConfig.projectName || 'Pavement-Report'}-${Date.now()}.pdf`);
   };
 
   const generateHTMLReport = () => {
@@ -331,20 +312,14 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
           <p><strong>Date:</strong> ${scanData?.timestamp.toLocaleDateString()}</p>
         </div>
 
-        ${
-          reportConfig.includeExecutiveSummary
-            ? `
+        ${reportConfig.includeExecutiveSummary ? `
           <div class="section">
             <h2>Executive Summary</h2>
-            <p>${generateExecutiveSummary().replace(/\n/g, "<br>")}</p>
+            <p>${generateExecutiveSummary().replace(/\n/g, '<br>')}</p>
           </div>
-        `
-            : ""
-        }
+        ` : ''}
 
-        ${
-          reportConfig.includeMeasurements
-            ? `
+        ${reportConfig.includeMeasurements ? `
           <div class="section">
             <h2>Site Measurements</h2>
             <ul>
@@ -353,13 +328,9 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
               <li>Defects Detected: ${defects.length}</li>
             </ul>
           </div>
-        `
-            : ""
-        }
+        ` : ''}
 
-        ${
-          reportConfig.includeDefectDetails && defects.length > 0
-            ? `
+        ${reportConfig.includeDefectDetails && defects.length > 0 ? `
           <div class="section">
             <h2>Defect Analysis</h2>
             <table class="defect-table">
@@ -372,48 +343,38 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                 </tr>
               </thead>
               <tbody>
-                ${defects
-                  .map(
-                    (defect) => `
+                ${defects.map(defect => `
                   <tr>
-                    <td>${defect.type.replace("_", " ").toUpperCase()}</td>
+                    <td>${defect.type.replace('_', ' ').toUpperCase()}</td>
                     <td class="severity-${defect.severity}">${defect.severity.toUpperCase()}</td>
                     <td>
-                      ${defect.measurements.area ? `Area: ${defect.measurements.area.toFixed(2)} sq ft<br>` : ""}
-                      ${defect.measurements.length ? `Length: ${defect.measurements.length.toFixed(2)} ft<br>` : ""}
-                      ${defect.measurements.width ? `Width: ${defect.measurements.width.toFixed(2)} ft` : ""}
+                      ${defect.measurements.area ? `Area: ${defect.measurements.area.toFixed(2)} sq ft<br>` : ''}
+                      ${defect.measurements.length ? `Length: ${defect.measurements.length.toFixed(2)} ft<br>` : ''}
+                      ${defect.measurements.width ? `Width: ${defect.measurements.width.toFixed(2)} ft` : ''}
                     </td>
                     <td>${(defect.confidence * 100).toFixed(1)}%</td>
                   </tr>
-                `,
-                  )
-                  .join("")}
+                `).join('')}
               </tbody>
             </table>
           </div>
-        `
-            : ""
-        }
+        ` : ''}
 
-        ${
-          reportConfig.includeRecommendations
-            ? `
+        ${reportConfig.includeRecommendations ? `
           <div class="section">
             <h2>Recommendations</h2>
             <pre>${generateRecommendations()}</pre>
           </div>
-        `
-            : ""
-        }
+        ` : ''}
       </body>
       </html>
     `;
 
-    const blob = new Blob([htmlContent], { type: "text/html" });
+    const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `${reportConfig.projectName || "Pavement-Report"}-${Date.now()}.html`;
+    a.download = `${reportConfig.projectName || 'Pavement-Report'}-${Date.now()}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -448,7 +409,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Input
                     id="title"
                     value={reportConfig.title}
-                    onChange={(e) => handleConfigChange("title", e.target.value)}
+                    onChange={(e) => handleConfigChange('title', e.target.value)}
                   />
                 </div>
                 <div>
@@ -456,7 +417,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Input
                     id="project-name"
                     value={reportConfig.projectName}
-                    onChange={(e) => handleConfigChange("projectName", e.target.value)}
+                    onChange={(e) => handleConfigChange('projectName', e.target.value)}
                   />
                 </div>
                 <div>
@@ -464,7 +425,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Input
                     id="client-name"
                     value={reportConfig.clientName}
-                    onChange={(e) => handleConfigChange("clientName", e.target.value)}
+                    onChange={(e) => handleConfigChange('clientName', e.target.value)}
                   />
                 </div>
                 <div>
@@ -472,7 +433,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Input
                     id="inspector-name"
                     value={reportConfig.inspectorName}
-                    onChange={(e) => handleConfigChange("inspectorName", e.target.value)}
+                    onChange={(e) => handleConfigChange('inspectorName', e.target.value)}
                   />
                 </div>
               </div>
@@ -481,7 +442,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                 <Textarea
                   id="location"
                   value={reportConfig.location}
-                  onChange={(e) => handleConfigChange("location", e.target.value)}
+                  onChange={(e) => handleConfigChange('location', e.target.value)}
                   placeholder="Enter the site address or description..."
                 />
               </div>
@@ -493,9 +454,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Checkbox
                     id="executive-summary"
                     checked={reportConfig.includeExecutiveSummary}
-                    onCheckedChange={(checked) =>
-                      handleConfigChange("includeExecutiveSummary", checked)
-                    }
+                    onCheckedChange={(checked) => handleConfigChange('includeExecutiveSummary', checked)}
                   />
                   <Label htmlFor="executive-summary">Executive Summary</Label>
                 </div>
@@ -503,9 +462,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Checkbox
                     id="defect-details"
                     checked={reportConfig.includeDefectDetails}
-                    onCheckedChange={(checked) =>
-                      handleConfigChange("includeDefectDetails", checked)
-                    }
+                    onCheckedChange={(checked) => handleConfigChange('includeDefectDetails', checked)}
                   />
                   <Label htmlFor="defect-details">Defect Details</Label>
                 </div>
@@ -513,7 +470,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Checkbox
                     id="3d-model"
                     checked={reportConfig.include3DModel}
-                    onCheckedChange={(checked) => handleConfigChange("include3DModel", checked)}
+                    onCheckedChange={(checked) => handleConfigChange('include3DModel', checked)}
                   />
                   <Label htmlFor="3d-model">3D Model Images</Label>
                 </div>
@@ -521,9 +478,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Checkbox
                     id="recommendations"
                     checked={reportConfig.includeRecommendations}
-                    onCheckedChange={(checked) =>
-                      handleConfigChange("includeRecommendations", checked)
-                    }
+                    onCheckedChange={(checked) => handleConfigChange('includeRecommendations', checked)}
                   />
                   <Label htmlFor="recommendations">Recommendations</Label>
                 </div>
@@ -531,7 +486,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Checkbox
                     id="photos"
                     checked={reportConfig.includePhotos}
-                    onCheckedChange={(checked) => handleConfigChange("includePhotos", checked)}
+                    onCheckedChange={(checked) => handleConfigChange('includePhotos', checked)}
                   />
                   <Label htmlFor="photos">Photos</Label>
                 </div>
@@ -539,9 +494,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Checkbox
                     id="measurements"
                     checked={reportConfig.includeMeasurements}
-                    onCheckedChange={(checked) =>
-                      handleConfigChange("includeMeasurements", checked)
-                    }
+                    onCheckedChange={(checked) => handleConfigChange('includeMeasurements', checked)}
                   />
                   <Label htmlFor="measurements">Measurements</Label>
                 </div>
@@ -554,7 +507,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Label htmlFor="report-type">Report Type</Label>
                   <Select
                     value={reportConfig.reportType}
-                    onValueChange={(value) => handleConfigChange("reportType", value)}
+                    onValueChange={(value) => handleConfigChange('reportType', value)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -570,7 +523,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
                   <Label htmlFor="format">Output Format</Label>
                   <Select
                     value={reportConfig.format}
-                    onValueChange={(value) => handleConfigChange("format", value)}
+                    onValueChange={(value) => handleConfigChange('format', value)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -599,9 +552,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
               </div>
               <Progress value={generationProgress} className="w-full" />
               <p className="text-sm text-muted-foreground">
-                {generationProgress < 100
-                  ? "Processing scan data and generating content..."
-                  : "Report generation complete!"}
+                {generationProgress < 100 ? 'Processing scan data and generating content...' : 'Report generation complete!'}
               </p>
             </div>
           </CardContent>
@@ -657,26 +608,28 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({ scanData, defects }
               <div>
                 <p className="font-medium">Project Info</p>
                 <p className="text-sm text-muted-foreground">
-                  {reportConfig.projectName || "Unnamed Project"}
+                  {reportConfig.projectName || 'Unnamed Project'}
                 </p>
               </div>
             </div>
-
+            
             <div className="flex items-center gap-3 p-3 border rounded-lg">
               <Ruler className="h-8 w-8 text-green-500" />
               <div>
                 <p className="font-medium">Measurements</p>
                 <p className="text-sm text-muted-foreground">
-                  {scanData?.area.toFixed(1) || "0"} sq ft area
+                  {scanData?.area.toFixed(1) || '0'} sq ft area
                 </p>
               </div>
             </div>
-
+            
             <div className="flex items-center gap-3 p-3 border rounded-lg">
               <AlertTriangle className="h-8 w-8 text-orange-500" />
               <div>
                 <p className="font-medium">Defects</p>
-                <p className="text-sm text-muted-foreground">{defects.length} issues detected</p>
+                <p className="text-sm text-muted-foreground">
+                  {defects.length} issues detected
+                </p>
               </div>
             </div>
           </div>

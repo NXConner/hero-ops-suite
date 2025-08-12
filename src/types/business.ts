@@ -56,7 +56,7 @@ export interface PricingBaselines {
   patchingColdPerSqft?: number; // baseline at 2"
   salesTaxPct?: number; // optional sales tax
   stencilCatalog?: {
-    stalls: { size: "standard" | "compact" | "truck"; lf: number }[];
+    stalls: { size: 'standard' | 'compact' | 'truck'; lf: number }[];
     hcSymbol: { sizes: string[]; base: number };
     arrows: { types: string[]; base: number };
     text: { items: string[]; base: number };

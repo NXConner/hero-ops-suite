@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
 function throttle(fn: (...args: any[]) => void, ms: number) {
   let last = 0;
@@ -36,7 +36,7 @@ export default function UiSoundBindings() {
         if (m.addedNodes && m.addedNodes.length > 0) {
           (m.addedNodes as any).forEach((node: any) => {
             if (!(node instanceof HTMLElement)) return;
-            if (node.matches("[data-sonner-toaster], .sonner, .toast")) {
+            if (node.matches('[data-sonner-toaster], .sonner, .toast')) {
               (window as any).owSounds?.ui.notification?.();
             }
             if (node.matches('[role="dialog"], dialog, .radix-dialog-content')) {
@@ -48,12 +48,12 @@ export default function UiSoundBindings() {
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
-    document.addEventListener("mouseover", onMouseOver);
-    document.addEventListener("click", onClick);
+    document.addEventListener('mouseover', onMouseOver);
+    document.addEventListener('click', onClick);
     return () => {
       observer.disconnect();
-      document.removeEventListener("mouseover", onMouseOver);
-      document.removeEventListener("click", onClick);
+      document.removeEventListener('mouseover', onMouseOver);
+      document.removeEventListener('click', onClick);
     };
   }, []);
 

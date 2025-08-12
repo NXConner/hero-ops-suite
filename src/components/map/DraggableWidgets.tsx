@@ -1,14 +1,14 @@
 // @ts-nocheck
-import React, { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  Move,
-  Maximize2,
-  Minimize2,
-  X as CloseIcon,
+import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Move, 
+  Maximize2, 
+  Minimize2, 
+  X as CloseIcon, 
   Settings,
   TrendingUp,
   TrendingDown,
@@ -16,8 +16,8 @@ import {
   Signal,
   Zap,
   Shield,
-  AlertTriangle,
-} from "lucide-react";
+  AlertTriangle
+} from 'lucide-react';
 
 interface Widget {
   id: string;
@@ -37,14 +37,14 @@ interface WidgetControlsProps {
   visible: boolean;
 }
 
-const STORAGE_KEY = "overwatch-widgets-layout";
+const STORAGE_KEY = 'overwatch-widgets-layout';
 
-const WidgetControls: React.FC<WidgetControlsProps> = ({
-  widget,
-  onMinimize,
-  onClose,
+const WidgetControls: React.FC<WidgetControlsProps> = ({ 
+  widget, 
+  onMinimize, 
+  onClose, 
   onStartDrag,
-  visible,
+  visible
 }) => {
   if (!visible) return null;
   return (
@@ -79,28 +79,26 @@ const WidgetControls: React.FC<WidgetControlsProps> = ({
 
 interface DraggableWidgetsProps {
   isVisible?: boolean;
-  terminologyMode?: "military" | "civilian" | "both";
+  terminologyMode?: 'military' | 'civilian' | 'both';
   onLayoutChange?: (layout: any) => void;
   editMode?: boolean;
 }
 
 const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
   isVisible = true,
-  terminologyMode = "military",
+  terminologyMode = 'military',
   onLayoutChange,
-  editMode = false,
+  editMode = false
 }) => {
   const [widgets, setWidgets] = useState<Widget[]>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) return JSON.parse(raw);
-    } catch {
-      /* ignore */
-    }
+    } catch { /* ignore */ }
     return [
       {
-        id: "comms",
-        title: "Communications",
+        id: 'comms',
+        title: 'Communications',
         content: (
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
@@ -128,11 +126,11 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
         position: { x: 20, y: 100 },
         size: { width: 200, height: 150 },
         isMinimized: false,
-        isDragging: false,
+        isDragging: false
       },
       {
-        id: "intel",
-        title: "Intelligence Feed",
+        id: 'intel',
+        title: 'Intelligence Feed',
         content: (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs">
@@ -152,15 +150,15 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
         position: { x: 240, y: 120 },
         size: { width: 220, height: 140 },
         isMinimized: false,
-        isDragging: false,
-      },
+        isDragging: false
+      }
     ];
   });
 
   const [dragState, setDragState] = useState({
     isDragging: false,
     draggedWidget: null as string | null,
-    offset: { x: 0, y: 0 },
+    offset: { x: 0, y: 0 }
   });
 
   const handleStartDrag = (id: string) => {
@@ -168,38 +166,36 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
     setDragState({
       isDragging: true,
       draggedWidget: id,
-      offset: { x: 0, y: 0 },
+      offset: { x: 0, y: 0 }
     });
   };
 
   const handleMinimize = (id: string) => {
-    setWidgets(
-      widgets.map((widget) =>
-        widget.id === id ? { ...widget, isMinimized: !widget.isMinimized } : widget,
-      ),
-    );
+    setWidgets(widgets.map(widget => 
+      widget.id === id 
+        ? { ...widget, isMinimized: !widget.isMinimized }
+        : widget
+    ));
   };
 
   const handleClose = (id: string) => {
-    setWidgets(widgets.filter((widget) => widget.id !== id));
+    setWidgets(widgets.filter(widget => widget.id !== id));
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (dragState.isDragging && dragState.draggedWidget) {
-        setWidgets(
-          widgets.map((widget) =>
-            widget.id === dragState.draggedWidget
-              ? {
-                  ...widget,
-                  position: {
-                    x: e.clientX - dragState.offset.x,
-                    y: e.clientY - dragState.offset.y,
-                  },
+        setWidgets(widgets.map(widget =>
+          widget.id === dragState.draggedWidget
+            ? {
+                ...widget,
+                position: {
+                  x: e.clientX - dragState.offset.x,
+                  y: e.clientY - dragState.offset.y
                 }
-              : widget,
-          ),
-        );
+              }
+            : widget
+        ));
       }
     };
 
@@ -207,35 +203,31 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
       setDragState({
         isDragging: false,
         draggedWidget: null,
-        offset: { x: 0, y: 0 },
+        offset: { x: 0, y: 0 }
       });
     };
 
     if (dragState.isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     }
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [dragState, widgets]);
 
   useEffect(() => {
     onLayoutChange?.(widgets);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets));
-    } catch {
-      /* ignore */
-    }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets)); } catch { /* ignore */ }
   }, [widgets, onLayoutChange]);
 
   if (!isVisible) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none z-[500]">
-      {widgets.map((widget) => (
+      {widgets.map(widget => (
         <Card
           key={widget.id}
           className="absolute pointer-events-auto bg-slate-900/95 border-cyan-500/30 backdrop-blur-sm"
@@ -243,14 +235,15 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
             left: widget.position.x,
             top: widget.position.y,
             width: widget.size.width,
-            height: widget.isMinimized ? "auto" : widget.size.height,
-            cursor:
-              dragState.draggedWidget === widget.id ? "grabbing" : editMode ? "grab" : "default",
+            height: widget.isMinimized ? 'auto' : widget.size.height,
+            cursor: dragState.draggedWidget === widget.id ? 'grabbing' : (editMode ? 'grab' : 'default')
           }}
         >
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-cyan-400 text-sm">{widget.title}</CardTitle>
+              <CardTitle className="text-cyan-400 text-sm">
+                {widget.title}
+              </CardTitle>
               <WidgetControls
                 widget={widget}
                 onMinimize={handleMinimize}
@@ -260,7 +253,11 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
               />
             </div>
           </CardHeader>
-          {!widget.isMinimized && <CardContent className="pt-0">{widget.content}</CardContent>}
+          {!widget.isMinimized && (
+            <CardContent className="pt-0">
+              {widget.content}
+            </CardContent>
+          )}
         </Card>
       ))}
     </div>

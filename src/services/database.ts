@@ -26,12 +26,12 @@ interface OverlaySettings {
 interface UserPreferences {
   id: string;
   userId: string;
-  terminologyMode: "military" | "civilian" | "both";
+  terminologyMode: 'military' | 'civilian' | 'both';
   mapService: string;
   widgetLayouts: WidgetLayoutConfig[];
   overlaySettings: OverlaySettings;
   notifications: boolean;
-  theme: "dark" | "light" | "auto";
+  theme: 'dark' | 'light' | 'auto';
   lastUpdated: Date;
 }
 
@@ -69,12 +69,12 @@ interface SensorData {
   sensorType: string;
   value: number;
   unit: string;
-  status: "active" | "inactive" | "error";
+  status: 'active' | 'inactive' | 'error';
 }
 
 interface ScanData {
   scanId: string;
-  scanType: "3d" | "2d" | "thermal";
+  scanType: '3d' | '2d' | 'thermal';
   resolution: number;
   fileUrl?: string;
   defects?: Array<{
@@ -88,7 +88,7 @@ type HistoricalDataValue = GPSData | WeatherData | SensorData | ScanData;
 
 interface HistoricalData {
   id: string;
-  type: "gps" | "weather" | "sensor" | "scan";
+  type: 'gps' | 'weather' | 'sensor' | 'scan';
   deviceId?: string;
   data: HistoricalDataValue;
   timestamp: Date;
@@ -107,7 +107,7 @@ interface Project {
     longitude: number;
   };
   area: number;
-  status: "planning" | "active" | "completed" | "paused";
+  status: 'planning' | 'active' | 'completed' | 'paused';
   startDate: Date;
   endDate?: Date;
   crew: string[];
@@ -128,8 +128,8 @@ interface AlertData {
 
 interface Alert {
   id: string;
-  type: "weather" | "maintenance" | "geofence" | "sensor" | "system";
-  severity: "low" | "medium" | "high" | "critical";
+  type: 'weather' | 'maintenance' | 'geofence' | 'sensor' | 'system';
+  severity: 'low' | 'medium' | 'high' | 'critical';
   title: string;
   message: string;
   data?: AlertData;
@@ -143,9 +143,9 @@ interface Alert {
 class DatabaseService {
   private static instance: DatabaseService;
   private db: IDBDatabase | null = null;
-  private readonly DB_NAME = "OverWatchDB";
+  private readonly DB_NAME = 'OverWatchDB';
   private readonly DB_VERSION = 1;
-  private readonly API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
+  private readonly API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api';
 
   static getInstance(): DatabaseService {
     if (!DatabaseService.instance) {
@@ -159,13 +159,13 @@ class DatabaseService {
       const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
       request.onerror = () => {
-        console.error("Database failed to open");
+        console.error('Database failed to open');
         reject(request.error);
       };
 
       request.onsuccess = () => {
         this.db = request.result;
-        console.log("Database opened successfully");
+        console.log('Database opened successfully');
         resolve();
       };
 
@@ -180,55 +180,55 @@ class DatabaseService {
     if (!this.db) return;
 
     // User Preferences Store
-    if (!this.db.objectStoreNames.contains("userPreferences")) {
-      const userPrefStore = this.db.createObjectStore("userPreferences", { keyPath: "id" });
-      userPrefStore.createIndex("userId", "userId", { unique: false });
+    if (!this.db.objectStoreNames.contains('userPreferences')) {
+      const userPrefStore = this.db.createObjectStore('userPreferences', { keyPath: 'id' });
+      userPrefStore.createIndex('userId', 'userId', { unique: false });
     }
 
     // Widget Layouts Store
-    if (!this.db.objectStoreNames.contains("widgetLayouts")) {
-      const layoutStore = this.db.createObjectStore("widgetLayouts", { keyPath: "id" });
-      layoutStore.createIndex("userId", "userId", { unique: false });
-      layoutStore.createIndex("isDefault", "isDefault", { unique: false });
+    if (!this.db.objectStoreNames.contains('widgetLayouts')) {
+      const layoutStore = this.db.createObjectStore('widgetLayouts', { keyPath: 'id' });
+      layoutStore.createIndex('userId', 'userId', { unique: false });
+      layoutStore.createIndex('isDefault', 'isDefault', { unique: false });
     }
 
     // Historical Data Store
-    if (!this.db.objectStoreNames.contains("historicalData")) {
-      const historyStore = this.db.createObjectStore("historicalData", { keyPath: "id" });
-      historyStore.createIndex("type", "type", { unique: false });
-      historyStore.createIndex("timestamp", "timestamp", { unique: false });
-      historyStore.createIndex("deviceId", "deviceId", { unique: false });
+    if (!this.db.objectStoreNames.contains('historicalData')) {
+      const historyStore = this.db.createObjectStore('historicalData', { keyPath: 'id' });
+      historyStore.createIndex('type', 'type', { unique: false });
+      historyStore.createIndex('timestamp', 'timestamp', { unique: false });
+      historyStore.createIndex('deviceId', 'deviceId', { unique: false });
     }
 
     // Projects Store
-    if (!this.db.objectStoreNames.contains("projects")) {
-      const projectStore = this.db.createObjectStore("projects", { keyPath: "id" });
-      projectStore.createIndex("status", "status", { unique: false });
-      projectStore.createIndex("startDate", "startDate", { unique: false });
+    if (!this.db.objectStoreNames.contains('projects')) {
+      const projectStore = this.db.createObjectStore('projects', { keyPath: 'id' });
+      projectStore.createIndex('status', 'status', { unique: false });
+      projectStore.createIndex('startDate', 'startDate', { unique: false });
     }
 
     // Alerts Store
-    if (!this.db.objectStoreNames.contains("alerts")) {
-      const alertStore = this.db.createObjectStore("alerts", { keyPath: "id" });
-      alertStore.createIndex("type", "type", { unique: false });
-      alertStore.createIndex("severity", "severity", { unique: false });
-      alertStore.createIndex("acknowledged", "acknowledged", { unique: false });
-      alertStore.createIndex("createdAt", "createdAt", { unique: false });
+    if (!this.db.objectStoreNames.contains('alerts')) {
+      const alertStore = this.db.createObjectStore('alerts', { keyPath: 'id' });
+      alertStore.createIndex('type', 'type', { unique: false });
+      alertStore.createIndex('severity', 'severity', { unique: false });
+      alertStore.createIndex('acknowledged', 'acknowledged', { unique: false });
+      alertStore.createIndex('createdAt', 'createdAt', { unique: false });
     }
 
     // Vehicle Checklists Store
-    if (!this.db.objectStoreNames.contains("vehicleChecklists")) {
-      const store = this.db.createObjectStore("vehicleChecklists", { keyPath: "id" });
-      store.createIndex("vehicleId", "vehicleId", { unique: false });
-      store.createIndex("type", "type", { unique: false });
-      store.createIndex("createdAt", "createdAt", { unique: false });
+    if (!this.db.objectStoreNames.contains('vehicleChecklists')) {
+      const store = this.db.createObjectStore('vehicleChecklists', { keyPath: 'id' });
+      store.createIndex('vehicleId', 'vehicleId', { unique: false });
+      store.createIndex('type', 'type', { unique: false });
+      store.createIndex('createdAt', 'createdAt', { unique: false });
     }
 
     // Vehicle Documents Store
-    if (!this.db.objectStoreNames.contains("vehicleDocuments")) {
-      const store = this.db.createObjectStore("vehicleDocuments", { keyPath: "id" });
-      store.createIndex("vehicleId", "vehicleId", { unique: false });
-      store.createIndex("uploadedAt", "uploadedAt", { unique: false });
+    if (!this.db.objectStoreNames.contains('vehicleDocuments')) {
+      const store = this.db.createObjectStore('vehicleDocuments', { keyPath: 'id' });
+      store.createIndex('vehicleId', 'vehicleId', { unique: false });
+      store.createIndex('uploadedAt', 'uploadedAt', { unique: false });
     }
   }
 
@@ -236,12 +236,12 @@ class DatabaseService {
   async saveUserPreferences(preferences: UserPreferences): Promise<void> {
     try {
       // Save locally
-      await this.saveToStore("userPreferences", preferences);
-
+      await this.saveToStore('userPreferences', preferences);
+      
       // Sync to server
-      await this.syncToServer("preferences", preferences);
+      await this.syncToServer('preferences', preferences);
     } catch (error) {
-      console.error("Failed to save user preferences:", error);
+      console.error('Failed to save user preferences:', error);
       throw error;
     }
   }
@@ -249,19 +249,19 @@ class DatabaseService {
   async getUserPreferences(userId: string): Promise<UserPreferences | null> {
     try {
       // Try to get from local storage first
-      const local = await this.getFromStore("userPreferences", userId);
+      const local = await this.getFromStore('userPreferences', userId);
       if (local) return local;
 
       // Fallback to server
       const serverPrefs = await this.fetchFromServer(`preferences/${userId}`);
       if (serverPrefs) {
-        await this.saveToStore("userPreferences", serverPrefs);
+        await this.saveToStore('userPreferences', serverPrefs);
         return serverPrefs;
       }
 
       return null;
     } catch (error) {
-      console.error("Failed to get user preferences:", error);
+      console.error('Failed to get user preferences:', error);
       return null;
     }
   }
@@ -269,30 +269,30 @@ class DatabaseService {
   // Widget Layout Methods
   async saveWidgetLayout(layout: WidgetLayout): Promise<void> {
     try {
-      await this.saveToStore("widgetLayouts", layout);
-      await this.syncToServer("layouts", layout);
+      await this.saveToStore('widgetLayouts', layout);
+      await this.syncToServer('layouts', layout);
     } catch (error) {
-      console.error("Failed to save widget layout:", error);
+      console.error('Failed to save widget layout:', error);
       throw error;
     }
   }
 
   async getWidgetLayouts(userId: string): Promise<WidgetLayout[]> {
     try {
-      const layouts = await this.getAllFromStore("widgetLayouts", "userId", userId);
+      const layouts = await this.getAllFromStore('widgetLayouts', 'userId', userId);
       return layouts || [];
     } catch (error) {
-      console.error("Failed to get widget layouts:", error);
+      console.error('Failed to get widget layouts:', error);
       return [];
     }
   }
 
   async deleteWidgetLayout(layoutId: string): Promise<void> {
     try {
-      await this.deleteFromStore("widgetLayouts", layoutId);
+      await this.deleteFromStore('widgetLayouts', layoutId);
       await this.deleteFromServer(`layouts/${layoutId}`);
     } catch (error) {
-      console.error("Failed to delete widget layout:", error);
+      console.error('Failed to delete widget layout:', error);
       throw error;
     }
   }
@@ -300,30 +300,30 @@ class DatabaseService {
   // Historical Data Methods
   async saveHistoricalData(data: HistoricalData): Promise<void> {
     try {
-      await this.saveToStore("historicalData", data);
+      await this.saveToStore('historicalData', data);
       // Historical data can be batch uploaded to reduce server load
     } catch (error) {
-      console.error("Failed to save historical data:", error);
+      console.error('Failed to save historical data:', error);
       throw error;
     }
   }
 
   async getHistoricalData(
-    type: HistoricalData["type"],
+    type: HistoricalData['type'],
     startDate: Date,
     endDate: Date,
-    deviceId?: string,
+    deviceId?: string
   ): Promise<HistoricalData[]> {
     try {
       return new Promise((resolve, reject) => {
         if (!this.db) {
-          reject(new Error("Database not initialized"));
+          reject(new Error('Database not initialized'));
           return;
         }
 
-        const transaction = this.db.transaction(["historicalData"], "readonly");
-        const store = transaction.objectStore("historicalData");
-        const index = store.index("timestamp");
+        const transaction = this.db.transaction(['historicalData'], 'readonly');
+        const store = transaction.objectStore('historicalData');
+        const index = store.index('timestamp');
         const range = IDBKeyRange.bound(startDate, endDate);
         const request = index.getAll(range);
 
@@ -338,7 +338,7 @@ class DatabaseService {
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error("Failed to get historical data:", error);
+      console.error('Failed to get historical data:', error);
       return [];
     }
   }
@@ -346,34 +346,34 @@ class DatabaseService {
   // Project Methods
   async saveProject(project: Project): Promise<void> {
     try {
-      await this.saveToStore("projects", project);
-      await this.syncToServer("projects", project);
+      await this.saveToStore('projects', project);
+      await this.syncToServer('projects', project);
     } catch (error) {
-      console.error("Failed to save project:", error);
+      console.error('Failed to save project:', error);
       throw error;
     }
   }
 
   async getProjects(): Promise<Project[]> {
     try {
-      const projects = await this.getAllFromStore("projects");
+      const projects = await this.getAllFromStore('projects');
       return projects || [];
     } catch (error) {
-      console.error("Failed to get projects:", error);
+      console.error('Failed to get projects:', error);
       return [];
     }
   }
 
-  async updateProjectStatus(projectId: string, status: Project["status"]): Promise<void> {
+  async updateProjectStatus(projectId: string, status: Project['status']): Promise<void> {
     try {
-      const project = await this.getFromStore("projects", projectId);
+      const project = await this.getFromStore('projects', projectId);
       if (project) {
         project.status = status;
         project.updatedAt = new Date();
         await this.saveProject(project);
       }
     } catch (error) {
-      console.error("Failed to update project status:", error);
+      console.error('Failed to update project status:', error);
       throw error;
     }
   }
@@ -381,30 +381,31 @@ class DatabaseService {
   // Alert Methods
   async saveAlert(alert: Alert): Promise<void> {
     try {
-      await this.saveToStore("alerts", alert);
-      await this.syncToServer("alerts", alert);
+      await this.saveToStore('alerts', alert);
+      await this.syncToServer('alerts', alert);
     } catch (error) {
-      console.error("Failed to save alert:", error);
+      console.error('Failed to save alert:', error);
       throw error;
     }
   }
 
   async getActiveAlerts(): Promise<Alert[]> {
     try {
-      const allAlerts = await this.getAllFromStore("alerts");
+      const allAlerts = await this.getAllFromStore('alerts');
       const now = new Date();
-      return (allAlerts || []).filter(
-        (alert: Alert) => !alert.acknowledged && (!alert.expiresAt || alert.expiresAt > now),
+      return (allAlerts || []).filter((alert: Alert) => 
+        !alert.acknowledged && 
+        (!alert.expiresAt || alert.expiresAt > now)
       );
     } catch (error) {
-      console.error("Failed to get active alerts:", error);
+      console.error('Failed to get active alerts:', error);
       return [];
     }
   }
 
   async acknowledgeAlert(alertId: string, userId: string): Promise<void> {
     try {
-      const alert = await this.getFromStore("alerts", alertId);
+      const alert = await this.getFromStore('alerts', alertId);
       if (alert) {
         alert.acknowledged = true;
         alert.acknowledgedBy = userId;
@@ -412,7 +413,7 @@ class DatabaseService {
         await this.saveAlert(alert);
       }
     } catch (error) {
-      console.error("Failed to acknowledge alert:", error);
+      console.error('Failed to acknowledge alert:', error);
       throw error;
     }
   }
@@ -420,24 +421,21 @@ class DatabaseService {
   // Vehicle Checklist Methods
   async saveVehicleChecklist(record: any): Promise<void> {
     try {
-      await this.saveToStore("vehicleChecklists", record);
+      await this.saveToStore('vehicleChecklists', record);
       // Optionally sync to server later
     } catch (error) {
-      console.error("Failed to save vehicle checklist:", error);
+      console.error('Failed to save vehicle checklist:', error);
       throw error;
     }
   }
 
-  async getVehicleChecklists(
-    vehicleId: string,
-    type?: "inspection" | "maintenance",
-  ): Promise<any[]> {
+  async getVehicleChecklists(vehicleId: string, type?: 'inspection' | 'maintenance'): Promise<any[]> {
     try {
-      const all = await this.getAllFromStore("vehicleChecklists", "vehicleId", vehicleId);
+      const all = await this.getAllFromStore('vehicleChecklists', 'vehicleId', vehicleId);
       const list = (all || []) as any[];
       return type ? list.filter((r) => r.type === type) : list;
     } catch (error) {
-      console.error("Failed to get vehicle checklists:", error);
+      console.error('Failed to get vehicle checklists:', error);
       return [];
     }
   }
@@ -446,20 +444,20 @@ class DatabaseService {
   async saveVehicleDocuments(records: any[]): Promise<void> {
     try {
       for (const rec of records) {
-        await this.saveToStore("vehicleDocuments", rec);
+        await this.saveToStore('vehicleDocuments', rec);
       }
     } catch (error) {
-      console.error("Failed to save vehicle documents:", error);
+      console.error('Failed to save vehicle documents:', error);
       throw error;
     }
   }
 
   async getVehicleDocuments(vehicleId: string): Promise<any[]> {
     try {
-      const docs = await this.getAllFromStore("vehicleDocuments", "vehicleId", vehicleId);
+      const docs = await this.getAllFromStore('vehicleDocuments', 'vehicleId', vehicleId);
       return (docs || []) as any[];
     } catch (error) {
-      console.error("Failed to get vehicle documents:", error);
+      console.error('Failed to get vehicle documents:', error);
       return [];
     }
   }
@@ -468,11 +466,11 @@ class DatabaseService {
   private async saveToStore(storeName: string, data: unknown): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([storeName], "readwrite");
+      const transaction = this.db.transaction([storeName], 'readwrite');
       const store = transaction.objectStore(storeName);
       const request = store.put(data);
 
@@ -484,11 +482,11 @@ class DatabaseService {
   private async getFromStore(storeName: string, key: string): Promise<any> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([storeName], "readonly");
+      const transaction = this.db.transaction([storeName], 'readonly');
       const store = transaction.objectStore(storeName);
       const request = store.get(key);
 
@@ -497,20 +495,16 @@ class DatabaseService {
     });
   }
 
-  private async getAllFromStore(
-    storeName: string,
-    indexName?: string,
-    indexValue?: unknown,
-  ): Promise<unknown[]> {
+  private async getAllFromStore(storeName: string, indexName?: string, indexValue?: unknown): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([storeName], "readonly");
+      const transaction = this.db.transaction([storeName], 'readonly');
       const store = transaction.objectStore(storeName);
-
+      
       let request: IDBRequest;
       if (indexName && indexValue !== undefined) {
         const index = store.index(indexName);
@@ -527,11 +521,11 @@ class DatabaseService {
   private async deleteFromStore(storeName: string, key: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
-        reject(new Error("Database not initialized"));
+        reject(new Error('Database not initialized'));
         return;
       }
 
-      const transaction = this.db.transaction([storeName], "readwrite");
+      const transaction = this.db.transaction([storeName], 'readwrite');
       const store = transaction.objectStore(storeName);
       const request = store.delete(key);
 
@@ -544,19 +538,19 @@ class DatabaseService {
   private async syncToServer(endpoint: string, data: unknown): Promise<void> {
     try {
       const response = await fetch(`${this.API_BASE_URL}/${endpoint}`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.getAuthToken()}`,
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.getAuthToken()}`
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
       });
 
       if (!response.ok) {
         throw new Error(`Server sync failed: ${response.statusText}`);
       }
     } catch (error) {
-      console.warn("Server sync failed, data saved locally:", error);
+      console.warn('Server sync failed, data saved locally:', error);
       // Continue without failing - offline support
     }
   }
@@ -565,15 +559,15 @@ class DatabaseService {
     try {
       const response = await fetch(`${this.API_BASE_URL}/${endpoint}`, {
         headers: {
-          Authorization: `Bearer ${this.getAuthToken()}`,
-        },
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        }
       });
 
       if (response.ok) {
         return await response.json();
       }
     } catch (error) {
-      console.warn("Server fetch failed:", error);
+      console.warn('Server fetch failed:', error);
     }
     return null;
   }
@@ -581,33 +575,33 @@ class DatabaseService {
   private async deleteFromServer(endpoint: string): Promise<void> {
     try {
       const response = await fetch(`${this.API_BASE_URL}/${endpoint}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${this.getAuthToken()}`,
-        },
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        }
       });
 
       if (!response.ok) {
         throw new Error(`Server delete failed: ${response.statusText}`);
       }
     } catch (error) {
-      console.warn("Server delete failed:", error);
+      console.warn('Server delete failed:', error);
     }
   }
 
   private getAuthToken(): string {
-    return localStorage.getItem("authToken") || "";
+    return localStorage.getItem('authToken') || '';
   }
 
   // Bulk Operations
   async bulkSyncHistoricalData(): Promise<void> {
     try {
-      const unsyncedData = await this.getAllFromStore("historicalData");
+      const unsyncedData = await this.getAllFromStore('historicalData');
       if (unsyncedData.length > 0) {
-        await this.syncToServer("historical-data/bulk", unsyncedData);
+        await this.syncToServer('historical-data/bulk', unsyncedData);
       }
     } catch (error) {
-      console.error("Bulk sync failed:", error);
+      console.error('Bulk sync failed:', error);
     }
   }
 
@@ -615,17 +609,17 @@ class DatabaseService {
   async exportAllData(): Promise<any> {
     try {
       const data = {
-        userPreferences: await this.getAllFromStore("userPreferences"),
-        widgetLayouts: await this.getAllFromStore("widgetLayouts"),
-        projects: await this.getAllFromStore("projects"),
-        alerts: await this.getAllFromStore("alerts"),
-        vehicleChecklists: await this.getAllFromStore("vehicleChecklists"),
-        vehicleDocuments: await this.getAllFromStore("vehicleDocuments"),
-        exportDate: new Date().toISOString(),
+        userPreferences: await this.getAllFromStore('userPreferences'),
+        widgetLayouts: await this.getAllFromStore('widgetLayouts'),
+        projects: await this.getAllFromStore('projects'),
+        alerts: await this.getAllFromStore('alerts'),
+        vehicleChecklists: await this.getAllFromStore('vehicleChecklists'),
+        vehicleDocuments: await this.getAllFromStore('vehicleDocuments'),
+        exportDate: new Date().toISOString()
       };
       return data;
     } catch (error) {
-      console.error("Data export failed:", error);
+      console.error('Data export failed:', error);
       throw error;
     }
   }
@@ -634,36 +628,36 @@ class DatabaseService {
     try {
       if (data.userPreferences) {
         for (const pref of data.userPreferences as any[]) {
-          await this.saveToStore("userPreferences", pref);
+          await this.saveToStore('userPreferences', pref);
         }
       }
       if (data.widgetLayouts) {
         for (const layout of data.widgetLayouts as any[]) {
-          await this.saveToStore("widgetLayouts", layout);
+          await this.saveToStore('widgetLayouts', layout);
         }
       }
       if (data.projects) {
         for (const project of data.projects as any[]) {
-          await this.saveToStore("projects", project);
+          await this.saveToStore('projects', project);
         }
       }
       if (data.alerts) {
         for (const alert of data.alerts as any[]) {
-          await this.saveToStore("alerts", alert);
+          await this.saveToStore('alerts', alert);
         }
       }
       if (data.vehicleChecklists) {
         for (const record of data.vehicleChecklists as any[]) {
-          await this.saveToStore("vehicleChecklists", record);
+          await this.saveToStore('vehicleChecklists', record);
         }
       }
       if (data.vehicleDocuments) {
         for (const record of data.vehicleDocuments as any[]) {
-          await this.saveToStore("vehicleDocuments", record);
+          await this.saveToStore('vehicleDocuments', record);
         }
       }
     } catch (error) {
-      console.error("Data import failed:", error);
+      console.error('Data import failed:', error);
       throw error;
     }
   }
@@ -675,26 +669,22 @@ class DatabaseService {
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
       // Clean old historical data
-      const oldHistoricalData = await this.getAllFromStore("historicalData");
+      const oldHistoricalData = await this.getAllFromStore('historicalData');
       for (const item of oldHistoricalData) {
         if (new Date(item.timestamp) < cutoffDate) {
-          await this.deleteFromStore("historicalData", item.id);
+          await this.deleteFromStore('historicalData', item.id);
         }
       }
 
       // Clean old acknowledged alerts
-      const oldAlerts = await this.getAllFromStore("alerts");
+      const oldAlerts = await this.getAllFromStore('alerts');
       for (const alert of oldAlerts) {
-        if (
-          alert.acknowledged &&
-          alert.acknowledgedAt &&
-          new Date(alert.acknowledgedAt) < cutoffDate
-        ) {
-          await this.deleteFromStore("alerts", alert.id);
+        if (alert.acknowledged && alert.acknowledgedAt && new Date(alert.acknowledgedAt) < cutoffDate) {
+          await this.deleteFromStore('alerts', alert.id);
         }
       }
     } catch (error) {
-      console.error("Cleanup failed:", error);
+      console.error('Cleanup failed:', error);
     }
   }
 }

@@ -21,9 +21,7 @@ function loadAll(): Customer[] {
 function saveAll(list: Customer[]) {
   try {
     localStorage.setItem(KEY, JSON.stringify(list));
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
 }
 
 async function getSupabaseClient(): Promise<any | null> {
@@ -31,7 +29,7 @@ async function getSupabaseClient(): Promise<any | null> {
     const url = (import.meta as any).env?.VITE_SUPABASE_URL;
     const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
     if (!url || !key) return null;
-    const { createClient } = await import("@supabase/supabase-js");
+    const { createClient } = await import('@supabase/supabase-js');
     return createClient(url, key);
   } catch {
     return null;
@@ -42,13 +40,11 @@ export function listCustomers(): Customer[] {
   return loadAll();
 }
 
-export async function saveCustomer(
-  input: Omit<Customer, "id" | "createdAt" | "updatedAt"> & { id?: string },
-): Promise<Customer> {
+export async function saveCustomer(input: Omit<Customer, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<Customer> {
   const list = loadAll();
   const now = Date.now();
   const id = input.id ?? crypto.randomUUID?.() ?? `${now}-${Math.random().toString(36).slice(2)}`;
-  const existingIndex = list.findIndex((c) => c.id === id);
+  const existingIndex = list.findIndex(c => c.id === id);
   const record: Customer = {
     id,
     name: input.name,
@@ -64,33 +60,18 @@ export async function saveCustomer(
   const supabase = await getSupabaseClient();
   if (supabase) {
     try {
-      await supabase
-        .from("customers")
-        .upsert({
-          id: record.id,
-          name: record.name,
-          address: record.address,
-          notes: record.notes ?? "",
-          created_at: new Date(record.createdAt).toISOString(),
-          updated_at: new Date(record.updatedAt).toISOString(),
-        });
-    } catch {
-      /* ignore */
-    }
+      await supabase.from('customers').upsert({ id: record.id, name: record.name, address: record.address, notes: record.notes ?? '', created_at: new Date(record.createdAt).toISOString(), updated_at: new Date(record.updatedAt).toISOString() });
+    } catch { /* ignore */ }
   }
 
   return record;
 }
 
 export async function deleteCustomer(id: string) {
-  const list = loadAll().filter((c) => c.id !== id);
+  const list = loadAll().filter(c => c.id !== id);
   saveAll(list);
   const supabase = await getSupabaseClient();
   if (supabase) {
-    try {
-      await supabase.from("customers").delete().eq("id", id);
-    } catch {
-      /* ignore */
-    }
+    try { await supabase.from('customers').delete().eq('id', id); } catch { /* ignore */ }
   }
 }

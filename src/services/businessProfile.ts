@@ -51,14 +51,10 @@ export async function saveOverridesToCloud(overrides: Partial<BusinessProfile>) 
     const url = (import.meta as any).env?.VITE_SUPABASE_URL;
     const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
     if (!url || !key) return;
-    const { createClient } = await import("@supabase/supabase-js");
+    const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(url, key);
-    await supabase
-      .from("business_overrides")
-      .upsert({ id: "default", data: overrides, updated_at: new Date().toISOString() });
-  } catch {
-    /* ignore */
-  }
+    await supabase.from('business_overrides').upsert({ id: 'default', data: overrides, updated_at: new Date().toISOString() });
+  } catch { /* ignore */ }
 }
 
 export async function loadOverridesFromCloud(): Promise<Partial<BusinessProfile> | null> {
@@ -66,17 +62,11 @@ export async function loadOverridesFromCloud(): Promise<Partial<BusinessProfile>
     const url = (import.meta as any).env?.VITE_SUPABASE_URL;
     const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
     if (!url || !key) return null;
-    const { createClient } = await import("@supabase/supabase-js");
+    const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(url, key);
-    const { data } = await supabase
-      .from("business_overrides")
-      .select("data")
-      .eq("id", "default")
-      .single();
+    const { data } = await supabase.from('business_overrides').select('data').eq('id', 'default').single();
     return (data?.data as Partial<BusinessProfile>) ?? null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 export function applyOverridesToGlobal(overrides: Partial<BusinessProfile> | null): void {
@@ -93,13 +83,10 @@ export function applyOverridesToGlobal(overrides: Partial<BusinessProfile> | nul
   if (overrides.pricing) Object.assign(BUSINESS_PROFILE.pricing, overrides.pricing);
   if (overrides.fuel) Object.assign(BUSINESS_PROFILE.fuel, overrides.fuel);
   if (overrides.crew) Object.assign(BUSINESS_PROFILE.crew, overrides.crew);
-  if (overrides.vehicles)
-    BUSINESS_PROFILE.vehicles = deepMerge(BUSINESS_PROFILE.vehicles, overrides.vehicles);
-  if (overrides.equipment)
-    BUSINESS_PROFILE.equipment = deepMerge(BUSINESS_PROFILE.equipment, overrides.equipment);
+  if (overrides.vehicles) BUSINESS_PROFILE.vehicles = deepMerge(BUSINESS_PROFILE.vehicles, overrides.vehicles);
+  if (overrides.equipment) BUSINESS_PROFILE.equipment = deepMerge(BUSINESS_PROFILE.equipment, overrides.equipment);
   if (overrides.trailers) BUSINESS_PROFILE.trailers = overrides.trailers;
-  if (overrides.travelDefaults)
-    Object.assign(BUSINESS_PROFILE.travelDefaults, overrides.travelDefaults);
+  if (overrides.travelDefaults) Object.assign(BUSINESS_PROFILE.travelDefaults, overrides.travelDefaults);
 }
 
 export function getEffectiveBusinessProfile(): BusinessProfile {

@@ -6,19 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import Sidebar from "@/components/Sidebar";
-import {
-  Shield,
-  Activity,
-  Users,
-  AlertTriangle,
-  MapPin,
-  Radio,
-  Clock,
+import { 
+  Shield, 
+  Activity, 
+  Users, 
+  AlertTriangle, 
+  MapPin, 
+  Radio, 
+  Clock, 
   TrendingUp,
   Target,
   Satellite,
   Lock,
-  Zap,
+  Zap
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -31,29 +31,29 @@ const Dashboard = () => {
       value: "12",
       change: "+2 from last hour",
       icon: Activity,
-      color: "text-green-500",
+      color: "text-green-500"
     },
     {
       title: "Team Members",
       value: "847",
       change: "23 on active duty",
       icon: Users,
-      color: "text-blue-500",
+      color: "text-blue-500"
     },
     {
       title: "Threat Level",
       value: "ELEVATED",
       change: "Updated 5 min ago",
       icon: AlertTriangle,
-      color: "text-yellow-500",
+      color: "text-yellow-500"
     },
     {
       title: "System Status",
       value: "99.9%",
       change: "All systems nominal",
       icon: Shield,
-      color: "text-green-500",
-    },
+      color: "text-green-500"
+    }
   ];
 
   const recentOperations = [
@@ -64,16 +64,16 @@ const Dashboard = () => {
       priority: "High",
       progress: 75,
       team: "Alpha Team",
-      location: "Sector 7-N",
+      location: "Sector 7-N"
     },
     {
-      id: "OP-2024-002",
+      id: "OP-2024-002", 
       name: "Supply Route Security",
       status: "Planning",
       priority: "Medium",
       progress: 25,
       team: "Bravo Team",
-      location: "Route Delta",
+      location: "Route Delta"
     },
     {
       id: "OP-2024-003",
@@ -82,21 +82,21 @@ const Dashboard = () => {
       priority: "Low",
       progress: 100,
       team: "Charlie Team",
-      location: "Base Perimeter",
-    },
+      location: "Base Perimeter"
+    }
   ];
 
   const systemMetrics = [
     { name: "Network Security", value: 98, status: "Optimal" },
     { name: "Satellite Uplink", value: 95, status: "Good" },
     { name: "Communication Array", value: 92, status: "Good" },
-    { name: "Tactical Systems", value: 99, status: "Optimal" },
+    { name: "Tactical Systems", value: 99, status: "Optimal" }
   ];
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
-
+      
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <div className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -161,26 +161,17 @@ const Dashboard = () => {
                       <Target className="h-5 w-5 text-primary" />
                       Active Operations
                     </CardTitle>
-                    <CardDescription>Current operational status and progress</CardDescription>
+                    <CardDescription>
+                      Current operational status and progress
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {recentOperations.slice(0, 2).map((op) => (
-                        <div
-                          key={op.id}
-                          className="p-4 rounded-lg bg-secondary/20 border border-border/30"
-                        >
+                        <div key={op.id} className="p-4 rounded-lg bg-secondary/20 border border-border/30">
                           <div className="flex items-center justify-between mb-2">
                             <div className="font-semibold">{op.name}</div>
-                            <Badge
-                              variant={
-                                op.priority === "High"
-                                  ? "destructive"
-                                  : op.priority === "Medium"
-                                    ? "default"
-                                    : "secondary"
-                              }
-                            >
+                            <Badge variant={op.priority === "High" ? "destructive" : op.priority === "Medium" ? "default" : "secondary"}>
                               {op.priority}
                             </Badge>
                           </div>
@@ -204,7 +195,9 @@ const Dashboard = () => {
                       <Satellite className="h-5 w-5 text-primary" />
                       System Status
                     </CardTitle>
-                    <CardDescription>Critical system metrics and performance</CardDescription>
+                    <CardDescription>
+                      Critical system metrics and performance
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -234,7 +227,9 @@ const Dashboard = () => {
                     <Zap className="h-5 w-5 text-primary" />
                     Quick Actions
                   </CardTitle>
-                  <CardDescription>Frequently used operational commands</CardDescription>
+                  <CardDescription>
+                    Frequently used operational commands
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -276,34 +271,15 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {recentOperations.map((op) => (
-                      <div
-                        key={op.id}
-                        className="p-4 rounded-lg bg-secondary/10 border border-border/30 hover:bg-secondary/20 transition-colors"
-                      >
+                      <div key={op.id} className="p-4 rounded-lg bg-secondary/10 border border-border/30 hover:bg-secondary/20 transition-colors">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <div className="font-semibold text-lg">{op.name}</div>
-                            <Badge
-                              variant={
-                                op.status === "Complete"
-                                  ? "default"
-                                  : op.status === "In Progress"
-                                    ? "secondary"
-                                    : "outline"
-                              }
-                            >
+                            <Badge variant={op.status === "Complete" ? "default" : op.status === "In Progress" ? "secondary" : "outline"}>
                               {op.status}
                             </Badge>
                           </div>
-                          <Badge
-                            variant={
-                              op.priority === "High"
-                                ? "destructive"
-                                : op.priority === "Medium"
-                                  ? "default"
-                                  : "secondary"
-                            }
-                          >
+                          <Badge variant={op.priority === "High" ? "destructive" : op.priority === "Medium" ? "default" : "secondary"}>
                             {op.priority}
                           </Badge>
                         </div>
@@ -363,15 +339,11 @@ const Dashboard = () => {
                     <div className="space-y-3">
                       <div className="p-3 rounded-lg bg-secondary/10 border border-border/30">
                         <div className="font-medium text-sm">Frequency 145.250 MHz</div>
-                        <div className="text-xs text-muted-foreground">
-                          Encrypted transmission - analyzing
-                        </div>
+                        <div className="text-xs text-muted-foreground">Encrypted transmission - analyzing</div>
                       </div>
                       <div className="p-3 rounded-lg bg-secondary/10 border border-border/30">
                         <div className="font-medium text-sm">Frequency 88.750 MHz</div>
-                        <div className="text-xs text-muted-foreground">
-                          Clear communication - logged
-                        </div>
+                        <div className="text-xs text-muted-foreground">Clear communication - logged</div>
                       </div>
                     </div>
                   </CardContent>
@@ -392,17 +364,12 @@ const Dashboard = () => {
                         { name: "Primary Network", status: "Online", latency: "12ms" },
                         { name: "Backup Network", status: "Standby", latency: "15ms" },
                         { name: "Satellite Link", status: "Online", latency: "245ms" },
-                        { name: "Mesh Network", status: "Online", latency: "8ms" },
+                        { name: "Mesh Network", status: "Online", latency: "8ms" }
                       ].map((network, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30"
-                        >
+                        <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30">
                           <div>
                             <div className="font-medium">{network.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              Latency: {network.latency}
-                            </div>
+                            <div className="text-sm text-muted-foreground">Latency: {network.latency}</div>
                           </div>
                           <Badge variant={network.status === "Online" ? "default" : "secondary"}>
                             {network.status}

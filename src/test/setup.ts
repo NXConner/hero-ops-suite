@@ -1,10 +1,10 @@
-import "@testing-library/jest-dom";
-import { vi } from "vitest";
+import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 
 // Mock DOM APIs
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation(query => ({
     matches: false,
     media: query,
     onchange: null,
@@ -16,7 +16,7 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
-Object.defineProperty(window, "ResizeObserver", {
+Object.defineProperty(window, 'ResizeObserver', {
   writable: true,
   value: vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
@@ -25,7 +25,7 @@ Object.defineProperty(window, "ResizeObserver", {
   })),
 });
 
-Object.defineProperty(window, "IntersectionObserver", {
+Object.defineProperty(window, 'IntersectionObserver', {
   writable: true,
   value: vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
@@ -40,9 +40,9 @@ const mockIDBRequest = {
   error: null,
   onsuccess: null,
   onerror: null,
-  readyState: "done",
+  readyState: 'done',
   source: null,
-  transaction: null,
+  transaction: null
 };
 
 const mockIDBObjectStore = {
@@ -54,8 +54,8 @@ const mockIDBObjectStore = {
   createIndex: vi.fn(),
   index: vi.fn().mockReturnValue({
     get: vi.fn().mockReturnValue(mockIDBRequest),
-    getAll: vi.fn().mockReturnValue(mockIDBRequest),
-  }),
+    getAll: vi.fn().mockReturnValue(mockIDBRequest)
+  })
 };
 
 const mockIDBTransaction = {
@@ -63,11 +63,11 @@ const mockIDBTransaction = {
   abort: vi.fn(),
   commit: vi.fn(),
   error: null,
-  mode: "readwrite",
-  objectStoreNames: ["test"],
+  mode: 'readwrite',
+  objectStoreNames: ['test'],
   oncomplete: null,
   onerror: null,
-  onabort: null,
+  onabort: null
 };
 
 const mockIDBDatabase = {
@@ -75,16 +75,16 @@ const mockIDBDatabase = {
   deleteObjectStore: vi.fn(),
   transaction: vi.fn().mockReturnValue(mockIDBTransaction),
   close: vi.fn(),
-  name: "test",
+  name: 'test',
   version: 1,
-  objectStoreNames: ["test"],
+  objectStoreNames: ['test'],
   onabort: null,
   onclose: null,
   onerror: null,
-  onversionchange: null,
+  onversionchange: null
 };
 
-Object.defineProperty(window, "indexedDB", {
+Object.defineProperty(window, 'indexedDB', {
   writable: true,
   value: {
     open: vi.fn().mockImplementation(() => ({
@@ -93,15 +93,15 @@ Object.defineProperty(window, "indexedDB", {
       onerror: null,
       onupgradeneeded: null,
       onblocked: null,
-      result: mockIDBDatabase,
+      result: mockIDBDatabase
     })),
     deleteDatabase: vi.fn().mockReturnValue(mockIDBRequest),
-    databases: vi.fn().mockResolvedValue([]),
-  },
+    databases: vi.fn().mockResolvedValue([])
+  }
 });
 
 // Mock localStorage
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(window, 'localStorage', {
   writable: true,
   value: {
     getItem: vi.fn(),
@@ -109,19 +109,19 @@ Object.defineProperty(window, "localStorage", {
     removeItem: vi.fn(),
     clear: vi.fn(),
     length: 0,
-    key: vi.fn(),
-  },
+    key: vi.fn()
+  }
 });
 
 // Mock URL.createObjectURL
-Object.defineProperty(window.URL, "createObjectURL", {
+Object.defineProperty(window.URL, 'createObjectURL', {
   writable: true,
-  value: vi.fn().mockReturnValue("blob:test"),
+  value: vi.fn().mockReturnValue('blob:test')
 });
 
-Object.defineProperty(window.URL, "revokeObjectURL", {
+Object.defineProperty(window.URL, 'revokeObjectURL', {
   writable: true,
-  value: vi.fn(),
+  value: vi.fn()
 });
 
 // Mock HTMLCanvasElement.getContext
@@ -129,11 +129,11 @@ HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
   fillRect: vi.fn(),
   clearRect: vi.fn(),
   getImageData: vi.fn().mockReturnValue({
-    data: new Uint8ClampedArray(4),
+    data: new Uint8ClampedArray(4)
   }),
   putImageData: vi.fn(),
   createImageData: vi.fn().mockReturnValue({
-    data: new Uint8ClampedArray(4),
+    data: new Uint8ClampedArray(4)
   }),
   setTransform: vi.fn(),
   drawImage: vi.fn(),
@@ -153,14 +153,14 @@ HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
   measureText: vi.fn().mockReturnValue({ width: 0 }),
   transform: vi.fn(),
   rect: vi.fn(),
-  clip: vi.fn(),
+  clip: vi.fn()
 });
 
 // Mock fetch
 global.fetch = vi.fn();
 
 // Mock crypto
-Object.defineProperty(window, "crypto", {
+Object.defineProperty(window, 'crypto', {
   writable: true,
   value: {
     getRandomValues: vi.fn().mockImplementation((arr) => {
@@ -169,30 +169,30 @@ Object.defineProperty(window, "crypto", {
       }
       return arr;
     }),
-    randomUUID: vi.fn().mockReturnValue("test-uuid"),
-  },
+    randomUUID: vi.fn().mockReturnValue('test-uuid')
+  }
 });
 
 // Mock performance
-Object.defineProperty(window, "performance", {
+Object.defineProperty(window, 'performance', {
   writable: true,
   value: {
     now: vi.fn().mockReturnValue(Date.now()),
     mark: vi.fn(),
     measure: vi.fn(),
     getEntriesByName: vi.fn().mockReturnValue([]),
-    getEntriesByType: vi.fn().mockReturnValue([]),
-  },
+    getEntriesByType: vi.fn().mockReturnValue([])
+  }
 });
 
 // Suppress console warnings in tests
 const originalConsoleWarn = console.warn;
 console.warn = (...args: any[]) => {
   if (
-    typeof args[0] === "string" &&
-    (args[0].includes("React Router") ||
-      args[0].includes("Warning: ") ||
-      args[0].includes("Three.js"))
+    typeof args[0] === 'string' &&
+    (args[0].includes('React Router') || 
+     args[0].includes('Warning: ') ||
+     args[0].includes('Three.js'))
   ) {
     return;
   }
@@ -202,8 +202,10 @@ console.warn = (...args: any[]) => {
 const originalConsoleError = console.error;
 console.error = (...args: any[]) => {
   if (
-    typeof args[0] === "string" &&
-    (args[0].includes("Warning: ") || args[0].includes("Error: ") || args[0].includes("Three.js"))
+    typeof args[0] === 'string' &&
+    (args[0].includes('Warning: ') ||
+     args[0].includes('Error: ') ||
+     args[0].includes('Three.js'))
   ) {
     return;
   }

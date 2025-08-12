@@ -14,10 +14,6 @@ COPY . .
 # Build
 RUN npm run build
 
-# Precompress assets (gzip and brotli)
-RUN apk add --no-cache gzip brotli && \
-  find /app/dist -type f -regex ".*\.(js\|css\|svg\|html)" -exec sh -c 'gzip -k -f -9 "$1" && brotli -k -f -Z "$1"' sh {} \;
-
 # --- Builder ---
 FROM node:20-alpine AS builder_odoo
 WORKDIR /app_odoo
@@ -31,10 +27,6 @@ COPY odoo/asphalt-odoo-prime/ .
 
 # Build subapp with base path for subdirectory hosting
 RUN npm run build -- --base=/suite/
-
-# Precompress assets
-RUN apk add --no-cache gzip brotli && \
-  find /app_odoo/dist -type f -regex ".*\.(js\|css\|svg\|html)" -exec sh -c 'gzip -k -f -9 "$1" && brotli -k -f -Z "$1"' sh {} \;
 
 # --- Builder ---
 FROM node:20-alpine AS builder_mobile
@@ -50,10 +42,6 @@ COPY mobile/ .
 # Build Expo for web (static export)
 RUN npx expo export --platform web --output-dir dist
 
-# Precompress assets
-RUN apk add --no-cache gzip brotli && \
-  find /app_mobile/dist -type f -regex ".*\.(js\|css\|svg\|html)" -exec sh -c 'gzip -k -f -9 "$1" && brotli -k -f -Z "$1"' sh {} \;
-
 # --- Builder ---
 FROM node:20-alpine AS builder_fleet
 WORKDIR /app_fleet
@@ -67,10 +55,6 @@ COPY suite/fleet-focus-manager/ .
 
 # Build fleet with base path for subdirectory hosting
 RUN npm run build -- --base=/suite/fleet/
-
-# Precompress assets
-RUN apk add --no-cache gzip brotli && \
-  find /app_fleet/dist -type f -regex ".*\.(js\|css\|svg\|html)" -exec sh -c 'gzip -k -f -9 "$1" && brotli -k -f -Z "$1"' sh {} \;
 
 # --- Runtime ---
 FROM nginx:alpine AS runtime

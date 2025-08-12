@@ -1,15 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BUSINESS_PROFILE } from "@/data/business";
 import type { BusinessProfile } from "@/types/business";
-import {
-  applyOverridesToGlobal,
-  clearOverrides,
-  getEffectiveBusinessProfile,
-  loadOverrides,
-  saveOverrides,
-  loadOverridesFromCloud,
-  saveOverridesToCloud,
-} from "@/services/businessProfile";
+import { applyOverridesToGlobal, clearOverrides, getEffectiveBusinessProfile, loadOverrides, saveOverrides, loadOverridesFromCloud, saveOverridesToCloud } from "@/services/businessProfile";
 
 export function useBusinessProfile() {
   const [overrides, setOverrides] = useState<Partial<BusinessProfile> | null>(null);

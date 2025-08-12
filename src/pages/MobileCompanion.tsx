@@ -5,34 +5,29 @@ const MobileCompanion = () => {
   const [height, setHeight] = useState<number>(window.innerHeight - 64);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  const initialContext = useMemo(
-    () => ({
-      type: "mobile_context",
-      payload: {
-        apiBaseUrl: getApiBaseUrl(),
-        timestamp: Date.now(),
-      },
-    }),
-    [],
-  );
+  const initialContext = useMemo(() => ({
+    type: 'mobile_context',
+    payload: {
+      apiBaseUrl: getApiBaseUrl(),
+      timestamp: Date.now(),
+    }
+  }), []);
 
   useEffect(() => {
     const onResize = () => setHeight(window.innerHeight - 64);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   useEffect(() => {
     const onLoad = () => {
       try {
         iframeRef.current?.contentWindow?.postMessage(initialContext, window.location.origin);
-      } catch {
-        /* ignore */
-      }
+      } catch {}
     };
     const iframe = iframeRef.current;
-    if (iframe) iframe.addEventListener("load", onLoad);
-    return () => iframe?.removeEventListener("load", onLoad);
+    if (iframe) iframe.addEventListener('load', onLoad);
+    return () => iframe?.removeEventListener('load', onLoad);
   }, [initialContext]);
 
   return (
@@ -44,7 +39,7 @@ const MobileCompanion = () => {
         ref={iframeRef}
         title="Mobile Companion"
         src="/mobile/"
-        style={{ width: "100%", height }}
+        style={{ width: '100%', height }}
         className="rounded-md border border-border bg-background"
       />
     </div>

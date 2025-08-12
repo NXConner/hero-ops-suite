@@ -1,18 +1,26 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import {
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
-import { hslToString } from "@/lib/theme-utils";
-import { Palette, Check, Settings, Wand2, Sun, Moon, Monitor } from "lucide-react";
-import { Link } from "react-router-dom";
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { useAdvancedTheme } from '@/contexts/AdvancedThemeContext';
+import { hslToString } from '@/lib/theme-utils';
+import { 
+  Palette, 
+  Check, 
+  Settings,
+  Wand2,
+  Sun,
+  Moon,
+  Monitor
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function AdvancedThemeToggle() {
   const { currentTheme, availableThemes, setTheme, isLoading } = useAdvancedTheme();
@@ -26,16 +34,13 @@ export function AdvancedThemeToggle() {
     );
   }
 
-  const groupedThemes = availableThemes.reduce(
-    (acc, theme) => {
-      if (!acc[theme.category]) {
-        acc[theme.category] = [];
-      }
-      acc[theme.category].push(theme);
-      return acc;
-    },
-    {} as Record<string, typeof availableThemes>,
-  );
+  const groupedThemes = availableThemes.reduce((acc, theme) => {
+    if (!acc[theme.category]) {
+      acc[theme.category] = [];
+    }
+    acc[theme.category].push(theme);
+    return acc;
+  }, {} as Record<string, typeof availableThemes>);
 
   const categoryIcons = {
     military: <Monitor className="h-3 w-3" />,
@@ -45,7 +50,7 @@ export function AdvancedThemeToggle() {
     tech: <Wand2 className="h-3 w-3" />,
     abstract: <Palette className="h-3 w-3" />,
     corporate: <Monitor className="h-3 w-3" />,
-    custom: <Wand2 className="h-3 w-3" />,
+    custom: <Wand2 className="h-3 w-3" />
   };
 
   return (
@@ -55,13 +60,9 @@ export function AdvancedThemeToggle() {
           <Palette className="h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">Toggle theme</span>
           {/* Current theme indicator */}
-          <div
+          <div 
             className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-background"
-            style={{
-              backgroundColor: hslToString(
-                currentTheme?.colors.primary || { h: 220, s: 100, l: 50 },
-              ),
-            }}
+            style={{ backgroundColor: hslToString(currentTheme?.colors.primary || { h: 220, s: 100, l: 50 }) }}
           />
         </Button>
       </DropdownMenuTrigger>
@@ -76,7 +77,7 @@ export function AdvancedThemeToggle() {
           </Link>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-
+        
         {Object.entries(groupedThemes).map(([category, themes]) => (
           <div key={category}>
             <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-1">
@@ -92,20 +93,20 @@ export function AdvancedThemeToggle() {
                 <div className="flex items-center gap-3">
                   {/* Theme color preview */}
                   <div className="flex gap-1">
-                    <div
+                    <div 
                       className="w-3 h-3 rounded-full border border-border"
                       style={{ backgroundColor: hslToString(theme.colors.background) }}
                     />
-                    <div
+                    <div 
                       className="w-3 h-3 rounded-full border border-border"
                       style={{ backgroundColor: hslToString(theme.colors.primary) }}
                     />
-                    <div
+                    <div 
                       className="w-3 h-3 rounded-full border border-border"
                       style={{ backgroundColor: hslToString(theme.colors.accent) }}
                     />
                   </div>
-
+                  
                   <div className="flex-1">
                     <div className="font-medium text-sm">{theme.name}</div>
                     <div className="text-xs text-muted-foreground">{theme.description}</div>
@@ -117,24 +118,22 @@ export function AdvancedThemeToggle() {
                       )}
                       {theme.baseMode && (
                         <Badge variant="outline" className="text-xs h-4 px-1">
-                          {theme.baseMode === "dark" ? (
-                            <Moon className="h-2 w-2" />
-                          ) : (
-                            <Sun className="h-2 w-2" />
-                          )}
+                          {theme.baseMode === 'dark' ? <Moon className="h-2 w-2" /> : <Sun className="h-2 w-2" />}
                         </Badge>
                       )}
                     </div>
                   </div>
                 </div>
-
-                {currentTheme?.id === theme.id && <Check className="h-4 w-4 text-primary" />}
+                
+                {currentTheme?.id === theme.id && (
+                  <Check className="h-4 w-4 text-primary" />
+                )}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
           </div>
         ))}
-
+        
         <DropdownMenuLabel className="text-center">
           <Link to="/theme-customizer">
             <Button variant="ghost" className="w-full">

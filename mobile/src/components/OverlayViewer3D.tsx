@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import { View, StyleSheet } from "react-native";
-import { GLView } from "expo-gl";
-import * as THREE from "three";
-import { Renderer } from "expo-three";
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { GLView } from 'expo-gl';
+import * as THREE from 'three';
+import { Renderer } from 'expo-three';
 // @ts-ignore - GLTFLoader path from three examples
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 type Props = { meshUrl?: string; overlay?: any };
 
@@ -44,18 +44,12 @@ export default function OverlayViewer3D({ meshUrl, overlay }: Props) {
               const gltf = await loader.loadAsync(meshUrl);
               root = gltf.scene;
               scene.add(root);
-            } catch {
-              /* ignore */
-            }
+            } catch {}
           }
 
           if (!root) {
             const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshPhongMaterial({
-              color: 0x156289,
-              emissive: 0x072534,
-              flatShading: true,
-            });
+            const material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: true });
             const cube = new THREE.Mesh(geometry, material);
             scene.add(cube);
             root = cube;
@@ -77,13 +71,8 @@ export default function OverlayViewer3D({ meshUrl, overlay }: Props) {
           // Overlay: draw distress polygons (e.g., gatoring)
           if (overlay?.distress_zones?.length) {
             overlay.distress_zones.forEach((zone: any) => {
-              const color = zone.type === "gatoring" ? 0xffaa00 : 0xffff00;
-              const material = new THREE.MeshBasicMaterial({
-                color,
-                transparent: true,
-                opacity: 0.35,
-                side: THREE.DoubleSide,
-              });
+              const color = zone.type === 'gatoring' ? 0xffaa00 : 0xffff00;
+              const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
               const shape = new THREE.Shape();
               const vertices = zone.polygon || [];
               if (vertices.length >= 3) {
@@ -130,6 +119,6 @@ export default function OverlayViewer3D({ meshUrl, overlay }: Props) {
 const styles = StyleSheet.create({
   container: {
     height: 300,
-    backgroundColor: "#000",
+    backgroundColor: '#000',
   },
 });
