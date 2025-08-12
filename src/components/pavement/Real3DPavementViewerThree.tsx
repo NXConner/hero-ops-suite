@@ -91,17 +91,8 @@ const Real3DPavementViewerThree: React.FC<Props> = ({
     camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
 
-    const hemi = new THREE.HemisphericLight?.(0xffffff as any, 0x444444 as any, 1.0) as any;
-    // Fallback: just use ambient and directional if HemisphericLight helper not present
-    if (!hemi || typeof hemi === "undefined") {
-      const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambient);
-      const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-      dir.position.set(5, 10, 7);
-      scene.add(dir);
-    } else {
-      scene.add(hemi);
-    }
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+    scene.add(hemi);
 
     // Ground plane representing pavement
     const groundGeo = new THREE.PlaneGeometry(20, 20, 10, 10);
