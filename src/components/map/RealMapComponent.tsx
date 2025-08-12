@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 // Mapbox is heavy; load on demand
-import type mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // Mapbox access token - should be set via environment variable
@@ -31,14 +30,12 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any | null>(null);
-  const mapboxRef = useRef<any | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     if (!mapContainer.current) return;
     (async () => {
       const { default: mapboxgl } = await import("mapbox-gl");
-      mapboxRef.current = mapboxgl;
       // Set mapbox access token
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -131,7 +128,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   ) => {
     if (!map.current) return null;
 
-    const marker = new (mapboxRef.current as any).Marker({
+    const marker = new mapboxgl.Marker({
       color: options?.color || "#3FB1CE",
       draggable: options?.draggable || false,
     })
@@ -139,7 +136,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       .addTo(map.current);
 
     if (options?.popup) {
-      const popup = new (mapboxRef.current as any).Popup({ offset: 25 }).setHTML(options.popup);
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(options.popup);
       marker.setPopup(popup);
     }
 
