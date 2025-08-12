@@ -1,34 +1,40 @@
 // @ts-nocheck
-import React, { useState, useMemo, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { useAdvancedTheme } from '@/contexts/AdvancedThemeContext';
-import { Theme, ThemeColor, ParticleEffect } from '@/types/theme';
-import { 
-  hslToString, 
-  adjustHue, 
-  adjustSaturation, 
+import React, { useState, useMemo, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
+import { Theme, ThemeColor, ParticleEffect } from "@/types/theme";
+import {
+  hslToString,
+  adjustHue,
+  adjustSaturation,
   adjustLightness,
   generateColorScheme,
   generateThemeCSS,
-  generateWallpaperCSS
-} from '@/lib/theme-utils';
-import ParticleSystem from '@/components/effects/ParticleSystem';
-import { 
-  Palette, 
-  Sparkles, 
-  Settings, 
-  Eye, 
-  Download, 
-  Upload, 
+  generateWallpaperCSS,
+} from "@/lib/theme-utils";
+import ParticleSystem from "@/components/effects/ParticleSystem";
+import {
+  Palette,
+  Sparkles,
+  Settings,
+  Eye,
+  Download,
+  Upload,
   Wand2,
   Sun,
   Moon,
@@ -39,9 +45,9 @@ import {
   Gauge,
   Accessibility,
   Target,
-  Check
-} from 'lucide-react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+  Check,
+} from "lucide-react";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 
 interface ColorPickerProps {
   color: ThemeColor;
@@ -88,7 +94,7 @@ function ColorPicker({ color, onChange, label }: ColorPickerProps) {
           <span className="text-xs text-muted-foreground">{color.l}%</span>
         </div>
         <div className="flex items-end">
-          <div 
+          <div
             className="w-8 h-8 rounded border border-border"
             style={{ backgroundColor: hslToString(color) }}
           />
@@ -108,17 +114,17 @@ function ParticleControls({ particles, onChange }: ParticleControlsProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Label>Enable Particles</Label>
-        <Switch 
+        <Switch
           checked={particles.enabled}
           onCheckedChange={(enabled) => onChange({ ...particles, enabled })}
         />
       </div>
-      
+
       {particles.enabled && (
         <>
           <div>
             <Label>Particle Type</Label>
-            <Select 
+            <Select
               value={particles.type}
               onValueChange={(type: any) => onChange({ ...particles, type })}
             >
@@ -180,38 +186,43 @@ function ParticleControls({ particles, onChange }: ParticleControlsProps) {
 }
 
 export function AdvancedThemeCustomizer() {
-  const { currentTheme, updateTheme, createTheme, exportTheme, importTheme, setTheme } = useAdvancedTheme();
+  const { currentTheme, updateTheme, createTheme, exportTheme, importTheme, setTheme } =
+    useAdvancedTheme();
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [customTheme, setCustomTheme] = useState<Theme>(currentTheme);
-  const [selectedDevice, setSelectedDevice] = useState<'mobile' | 'tablet' | 'desktop' | 'tv'>('desktop');
+  const [selectedDevice, setSelectedDevice] = useState<"mobile" | "tablet" | "desktop" | "tv">(
+    "desktop",
+  );
   const [isTargetsMode, setIsTargetsMode] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(false);
-  const [inspectorPath, setInspectorPath] = useState<string>('colors.card');
+  const [inspectorPath, setInspectorPath] = useState<string>("colors.card");
 
   // Inject/remove preview CSS
   useEffect(() => {
     if (!isPreviewMode) {
-      const prev = document.getElementById('preview-theme-styles');
+      const prev = document.getElementById("preview-theme-styles");
       if (prev) prev.remove();
-      document.documentElement.setAttribute('data-theme', currentTheme.id);
+      document.documentElement.setAttribute("data-theme", currentTheme.id);
       return;
     }
     try {
       const css = generateThemeCSS(customTheme);
       const wp = generateWallpaperCSS(customTheme);
-      const style = document.createElement('style');
-      style.id = 'preview-theme-styles';
+      const style = document.createElement("style");
+      style.id = "preview-theme-styles";
       style.textContent = `
         ${css}
         body { ${wp} }
       `;
       // remove existing first
-      const prev = document.getElementById('preview-theme-styles');
+      const prev = document.getElementById("preview-theme-styles");
       if (prev) prev.remove();
       document.head.appendChild(style);
-      document.documentElement.setAttribute('data-theme', customTheme.id);
-        } catch (e) { /* ignore */ }
-   }, [isPreviewMode, customTheme, currentTheme]);
+      document.documentElement.setAttribute("data-theme", customTheme.id);
+    } catch (e) {
+      /* ignore */
+    }
+  }, [isPreviewMode, customTheme, currentTheme]);
 
   // Real-time preview theme
   const previewTheme = useMemo(() => {
@@ -221,14 +232,14 @@ export function AdvancedThemeCustomizer() {
 
   const updateColor = (path: string, color: ThemeColor) => {
     const updatedTheme = { ...customTheme };
-    const pathParts = path.split('.');
+    const pathParts = path.split(".");
     let current: any = updatedTheme;
-    
+
     for (let i = 0; i < pathParts.length - 1; i++) {
       current = current[pathParts[i]];
     }
     current[pathParts[pathParts.length - 1]] = color;
-    
+
     setCustomTheme(updatedTheme);
   };
 
@@ -247,10 +258,13 @@ export function AdvancedThemeCustomizer() {
     }
   };
 
-  const generateScheme = (baseColor: ThemeColor, type: 'monochromatic' | 'complementary' | 'triadic' | 'analogous') => {
+  const generateScheme = (
+    baseColor: ThemeColor,
+    type: "monochromatic" | "complementary" | "triadic" | "analogous",
+  ) => {
     const colors = generateColorScheme(baseColor, type);
     const updatedTheme = { ...customTheme };
-    
+
     // Apply generated colors to theme
     if (colors.length >= 2) {
       updatedTheme.colors.primary = colors[0];
@@ -259,7 +273,7 @@ export function AdvancedThemeCustomizer() {
     if (colors.length >= 3) {
       updatedTheme.colors.accent = colors[2];
     }
-    
+
     setCustomTheme(updatedTheme);
   };
 
@@ -272,11 +286,11 @@ export function AdvancedThemeCustomizer() {
 
   const handleExportTheme = () => {
     const themeData = exportTheme(customTheme.id);
-    const blob = new Blob([themeData], { type: 'application/json' });
+    const blob = new Blob([themeData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `${customTheme.name.toLowerCase().replace(/\s+/g, '-')}.json`;
+    a.download = `${customTheme.name.toLowerCase().replace(/\s+/g, "-")}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -292,7 +306,7 @@ export function AdvancedThemeCustomizer() {
           const themeData = e.target?.result as string;
           importTheme(themeData);
         } catch (error) {
-          console.error('Failed to import theme:', error);
+          console.error("Failed to import theme:", error);
         }
       };
       reader.readAsText(file);
@@ -310,9 +324,7 @@ export function AdvancedThemeCustomizer() {
                 <Palette className="h-5 w-5" />
                 Advanced Theme Customizer
               </CardTitle>
-              <CardDescription>
-                Create and customize themes with real-time preview
-              </CardDescription>
+              <CardDescription>Create and customize themes with real-time preview</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -331,7 +343,11 @@ export function AdvancedThemeCustomizer() {
                 <Eye className="h-4 w-4" />
                 {isPreviewMode ? "Exit Preview" : "Preview Mode"}
               </Button>
-              <Button onClick={handleApplyToCurrent} variant="outline" className="flex items-center gap-2">
+              <Button
+                onClick={handleApplyToCurrent}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
                 <Check className="h-4 w-4" />
                 Apply to Current
               </Button>
@@ -361,40 +377,38 @@ export function AdvancedThemeCustomizer() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Color Scheme</CardTitle>
-                  <CardDescription>
-                    Customize the color palette for your theme
-                  </CardDescription>
+                  <CardDescription>Customize the color palette for your theme</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Quick Color Scheme Generation */}
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Quick Schemes</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
-                        onClick={() => generateScheme(customTheme.colors.primary, 'monochromatic')}
+                        onClick={() => generateScheme(customTheme.colors.primary, "monochromatic")}
                       >
                         Monochromatic
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
-                        onClick={() => generateScheme(customTheme.colors.primary, 'complementary')}
+                        onClick={() => generateScheme(customTheme.colors.primary, "complementary")}
                       >
                         Complementary
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
-                        onClick={() => generateScheme(customTheme.colors.primary, 'triadic')}
+                        onClick={() => generateScheme(customTheme.colors.primary, "triadic")}
                       >
                         Triadic
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
-                        onClick={() => generateScheme(customTheme.colors.primary, 'analogous')}
+                        onClick={() => generateScheme(customTheme.colors.primary, "analogous")}
                       >
                         Analogous
                       </Button>
@@ -407,32 +421,32 @@ export function AdvancedThemeCustomizer() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ColorPicker
                       color={customTheme.colors.background}
-                      onChange={(color) => updateColor('colors.background', color)}
+                      onChange={(color) => updateColor("colors.background", color)}
                       label="Background"
                     />
                     <ColorPicker
                       color={customTheme.colors.foreground}
-                      onChange={(color) => updateColor('colors.foreground', color)}
+                      onChange={(color) => updateColor("colors.foreground", color)}
                       label="Foreground"
                     />
                     <ColorPicker
                       color={customTheme.colors.primary}
-                      onChange={(color) => updateColor('colors.primary', color)}
+                      onChange={(color) => updateColor("colors.primary", color)}
                       label="Primary"
                     />
                     <ColorPicker
                       color={customTheme.colors.secondary}
-                      onChange={(color) => updateColor('colors.secondary', color)}
+                      onChange={(color) => updateColor("colors.secondary", color)}
                       label="Secondary"
                     />
                     <ColorPicker
                       color={customTheme.colors.accent}
-                      onChange={(color) => updateColor('colors.accent', color)}
+                      onChange={(color) => updateColor("colors.accent", color)}
                       label="Accent"
                     />
                     <ColorPicker
                       color={customTheme.colors.muted}
-                      onChange={(color) => updateColor('colors.muted', color)}
+                      onChange={(color) => updateColor("colors.muted", color)}
                       label="Muted"
                     />
                   </div>
@@ -447,28 +461,28 @@ export function AdvancedThemeCustomizer() {
                           {customTheme.colors.asphalt && (
                             <ColorPicker
                               color={customTheme.colors.asphalt}
-                              onChange={(color) => updateColor('colors.asphalt', color)}
+                              onChange={(color) => updateColor("colors.asphalt", color)}
                               label="Asphalt"
                             />
                           )}
                           {customTheme.colors.concrete && (
                             <ColorPicker
                               color={customTheme.colors.concrete}
-                              onChange={(color) => updateColor('colors.concrete', color)}
+                              onChange={(color) => updateColor("colors.concrete", color)}
                               label="Concrete"
                             />
                           )}
                           {customTheme.colors.machinery && (
                             <ColorPicker
                               color={customTheme.colors.machinery}
-                              onChange={(color) => updateColor('colors.machinery', color)}
+                              onChange={(color) => updateColor("colors.machinery", color)}
                               label="Machinery"
                             />
                           )}
                           {customTheme.colors.safety && (
                             <ColorPicker
                               color={customTheme.colors.safety}
-                              onChange={(color) => updateColor('colors.safety', color)}
+                              onChange={(color) => updateColor("colors.safety", color)}
                               label="Safety"
                             />
                           )}
@@ -495,10 +509,10 @@ export function AdvancedThemeCustomizer() {
                   {/* Particles (existing) */}
                   <ParticleControls
                     particles={customTheme.effects.particles}
-                    onChange={(particles) => 
+                    onChange={(particles) =>
                       setCustomTheme({
                         ...customTheme,
-                        effects: { ...customTheme.effects, particles }
+                        effects: { ...customTheme.effects, particles },
                       })
                     }
                   />
@@ -510,14 +524,21 @@ export function AdvancedThemeCustomizer() {
                     <div>
                       <Label>Border Radius</Label>
                       <Slider
-                        value={[parseInt(getComputedStyle(document.documentElement).getPropertyValue('--border-radius') || '8', 10)]}
+                        value={[
+                          parseInt(
+                            getComputedStyle(document.documentElement).getPropertyValue(
+                              "--border-radius",
+                            ) || "8",
+                            10,
+                          ),
+                        ]}
                         min={0}
                         max={24}
                         step={1}
                         onValueChange={([v]) => {
-                          const s = document.getElementById('preview-theme-styles');
-                          const style = s || document.createElement('style');
-                          style.id = 'preview-theme-styles';
+                          const s = document.getElementById("preview-theme-styles");
+                          const style = s || document.createElement("style");
+                          style.id = "preview-theme-styles";
                           style.textContent = `:root{ --border-radius: ${v}px; }`;
                           if (!s) document.head.appendChild(style);
                         }}
@@ -526,13 +547,21 @@ export function AdvancedThemeCustomizer() {
                     <div>
                       <Label>Glow Intensity</Label>
                       <Slider
-                        value={[Math.round((customTheme.effects.shadows.glow.intensity || 0.3) * 100)]}
+                        value={[
+                          Math.round((customTheme.effects.shadows.glow.intensity || 0.3) * 100),
+                        ]}
                         min={0}
                         max={100}
                         step={5}
                         onValueChange={([v]) => {
                           const updated = { ...customTheme } as any;
-                          updated.effects = { ...customTheme.effects, shadows: { ...customTheme.effects.shadows, glow: { ...customTheme.effects.shadows.glow, intensity: v/100 } } } as any;
+                          updated.effects = {
+                            ...customTheme.effects,
+                            shadows: {
+                              ...customTheme.effects.shadows,
+                              glow: { ...customTheme.effects.shadows.glow, intensity: v / 100 },
+                            },
+                          } as any;
                           setCustomTheme(updated);
                         }}
                       />
@@ -546,15 +575,27 @@ export function AdvancedThemeCustomizer() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Card Radius</Label>
-                        <Slider min={0} max={24} step={1} value={[parseInt(((customTheme as any).ui?.radius?.card || '8px').toString(), 10)]}
+                        <Slider
+                          min={0}
+                          max={24}
+                          step={1}
+                          value={[
+                            parseInt(
+                              ((customTheme as any).ui?.radius?.card || "8px").toString(),
+                              10,
+                            ),
+                          ]}
                           onValueChange={([v]) => {
                             const updated = { ...customTheme } as any;
-                            updated.ui = { ...(updated.ui || {}), radius: { ...(updated.ui?.radius || {}), card: `${v}px` } };
+                            updated.ui = {
+                              ...(updated.ui || {}),
+                              radius: { ...(updated.ui?.radius || {}), card: `${v}px` },
+                            };
                             setCustomTheme(updated);
-                            const s = document.getElementById('preview-theme-styles');
-                            const style = s || document.createElement('style');
-                            style.id = 'preview-theme-styles';
-                            const prev = style.textContent || '';
+                            const s = document.getElementById("preview-theme-styles");
+                            const style = s || document.createElement("style");
+                            style.id = "preview-theme-styles";
+                            const prev = style.textContent || "";
                             style.textContent = `${prev}\n:root{ --radius-card: ${v}px; }`;
                             if (!s) document.head.appendChild(style);
                           }}
@@ -562,15 +603,27 @@ export function AdvancedThemeCustomizer() {
                       </div>
                       <div>
                         <Label>Button Radius</Label>
-                        <Slider min={0} max={24} step={1} value={[parseInt(((customTheme as any).ui?.radius?.button || '8px').toString(), 10)]}
+                        <Slider
+                          min={0}
+                          max={24}
+                          step={1}
+                          value={[
+                            parseInt(
+                              ((customTheme as any).ui?.radius?.button || "8px").toString(),
+                              10,
+                            ),
+                          ]}
                           onValueChange={([v]) => {
                             const updated = { ...customTheme } as any;
-                            updated.ui = { ...(updated.ui || {}), radius: { ...(updated.ui?.radius || {}), button: `${v}px` } };
+                            updated.ui = {
+                              ...(updated.ui || {}),
+                              radius: { ...(updated.ui?.radius || {}), button: `${v}px` },
+                            };
                             setCustomTheme(updated);
-                            const s = document.getElementById('preview-theme-styles');
-                            const style = s || document.createElement('style');
-                            style.id = 'preview-theme-styles';
-                            const prev = style.textContent || '';
+                            const s = document.getElementById("preview-theme-styles");
+                            const style = s || document.createElement("style");
+                            style.id = "preview-theme-styles";
+                            const prev = style.textContent || "";
                             style.textContent = `${prev}\n:root{ --radius-button: ${v}px; }`;
                             if (!s) document.head.appendChild(style);
                           }}
@@ -578,15 +631,27 @@ export function AdvancedThemeCustomizer() {
                       </div>
                       <div>
                         <Label>Input Radius</Label>
-                        <Slider min={0} max={24} step={1} value={[parseInt(((customTheme as any).ui?.radius?.input || '8px').toString(), 10)]}
+                        <Slider
+                          min={0}
+                          max={24}
+                          step={1}
+                          value={[
+                            parseInt(
+                              ((customTheme as any).ui?.radius?.input || "8px").toString(),
+                              10,
+                            ),
+                          ]}
                           onValueChange={([v]) => {
                             const updated = { ...customTheme } as any;
-                            updated.ui = { ...(updated.ui || {}), radius: { ...(updated.ui?.radius || {}), input: `${v}px` } };
+                            updated.ui = {
+                              ...(updated.ui || {}),
+                              radius: { ...(updated.ui?.radius || {}), input: `${v}px` },
+                            };
                             setCustomTheme(updated);
-                            const s = document.getElementById('preview-theme-styles');
-                            const style = s || document.createElement('style');
-                            style.id = 'preview-theme-styles';
-                            const prev = style.textContent || '';
+                            const s = document.getElementById("preview-theme-styles");
+                            const style = s || document.createElement("style");
+                            style.id = "preview-theme-styles";
+                            const prev = style.textContent || "";
                             style.textContent = `${prev}\n:root{ --radius-input: ${v}px; }`;
                             if (!s) document.head.appendChild(style);
                           }}
@@ -594,15 +659,29 @@ export function AdvancedThemeCustomizer() {
                       </div>
                       <div>
                         <Label>Focus Ring Width</Label>
-                        <Slider min={0} max={6} step={1} value={[parseInt(((customTheme as any).ui?.borders?.focusRingWidth || '2px').toString(), 10)]}
+                        <Slider
+                          min={0}
+                          max={6}
+                          step={1}
+                          value={[
+                            parseInt(
+                              (
+                                (customTheme as any).ui?.borders?.focusRingWidth || "2px"
+                              ).toString(),
+                              10,
+                            ),
+                          ]}
                           onValueChange={([v]) => {
                             const updated = { ...customTheme } as any;
-                            updated.ui = { ...(updated.ui || {}), borders: { ...(updated.ui?.borders || {}), focusRingWidth: `${v}px` } };
+                            updated.ui = {
+                              ...(updated.ui || {}),
+                              borders: { ...(updated.ui?.borders || {}), focusRingWidth: `${v}px` },
+                            };
                             setCustomTheme(updated);
-                            const s = document.getElementById('preview-theme-styles');
-                            const style = s || document.createElement('style');
-                            style.id = 'preview-theme-styles';
-                            const prev = style.textContent || '';
+                            const s = document.getElementById("preview-theme-styles");
+                            const style = s || document.createElement("style");
+                            style.id = "preview-theme-styles";
+                            const prev = style.textContent || "";
                             style.textContent = `${prev}\n:root{ --ring-width: ${v}px; }`;
                             if (!s) document.head.appendChild(style);
                           }}
@@ -617,26 +696,108 @@ export function AdvancedThemeCustomizer() {
                   <div className="space-y-3">
                     <div className="text-sm font-medium">Overlay Effects (Preview)</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('minimal')}>Preset: Minimal</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('isac')}>Preset: ISAC</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('disavowed')}>Preset: Disavowed</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('darkzone')}>Preset: Darkzone</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.preset?.('vivid')}>Preset: Vivid</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ scanlines: true })}>Scanlines On</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ scanlines: false })}>Scanlines Off</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ radarSweep: true })}>Radar</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ vignette: true })}>Vignette</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.set({ glitch: true })}>Glitch</Button>
-                      <Button variant="outline" size="sm" onClick={() => (window as any).owEffects?.reset?.()}>Reset</Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.preset?.("minimal")}
+                      >
+                        Preset: Minimal
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.preset?.("isac")}
+                      >
+                        Preset: ISAC
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.preset?.("disavowed")}
+                      >
+                        Preset: Disavowed
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.preset?.("darkzone")}
+                      >
+                        Preset: Darkzone
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.preset?.("vivid")}
+                      >
+                        Preset: Vivid
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.set({ scanlines: true })}
+                      >
+                        Scanlines On
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.set({ scanlines: false })}
+                      >
+                        Scanlines Off
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.set({ radarSweep: true })}
+                      >
+                        Radar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.set({ vignette: true })}
+                      >
+                        Vignette
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.set({ glitch: true })}
+                      >
+                        Glitch
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => (window as any).owEffects?.reset?.()}
+                      >
+                        Reset
+                      </Button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Scanline Spacing</Label>
-                        <Slider min={2} max={10} step={1} value={[3]} onValueChange={([v]) => (window as any).owEffects?.set?.({ scanlineSpacing: v })} />
+                        <Slider
+                          min={2}
+                          max={10}
+                          step={1}
+                          value={[3]}
+                          onValueChange={([v]) =>
+                            (window as any).owEffects?.set?.({ scanlineSpacing: v })
+                          }
+                        />
                       </div>
                       <div>
                         <Label>Glitch Intensity</Label>
-                        <Slider min={0} max={1} step={0.05} value={[0.3]} onValueChange={([v]) => (window as any).owEffects?.set?.({ glitchLevel: v })} />
+                        <Slider
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={[0.3]}
+                          onValueChange={([v]) =>
+                            (window as any).owEffects?.set?.({ glitchLevel: v })
+                          }
+                        />
                       </div>
                     </div>
                   </div>
@@ -655,12 +816,12 @@ export function AdvancedThemeCustomizer() {
                 <CardContent className="space-y-4">
                   <div>
                     <Label>Wallpaper Type</Label>
-                    <Select 
+                    <Select
                       value={customTheme.wallpaper.type}
-                      onValueChange={(type: any) => 
+                      onValueChange={(type: any) =>
                         setCustomTheme({
                           ...customTheme,
-                          wallpaper: { ...customTheme.wallpaper, type }
+                          wallpaper: { ...customTheme.wallpaper, type },
                         })
                       }
                     >
@@ -676,13 +837,13 @@ export function AdvancedThemeCustomizer() {
                     </Select>
                   </div>
 
-                  {customTheme.wallpaper.type === 'color' && customTheme.wallpaper.color && (
+                  {customTheme.wallpaper.type === "color" && customTheme.wallpaper.color && (
                     <ColorPicker
                       color={customTheme.wallpaper.color}
-                      onChange={(color) => 
+                      onChange={(color) =>
                         setCustomTheme({
                           ...customTheme,
-                          wallpaper: { ...customTheme.wallpaper, color }
+                          wallpaper: { ...customTheme.wallpaper, color },
                         })
                       }
                       label="Background Color"
@@ -696,22 +857,20 @@ export function AdvancedThemeCustomizer() {
               <Card>
                 <CardHeader>
                   <CardTitle>Typography</CardTitle>
-                  <CardDescription>
-                    Customize fonts, weights, and text styling
-                  </CardDescription>
+                  <CardDescription>Customize fonts, weights, and text styling</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <Label>Heading Font Family</Label>
-                    <Select 
+                    <Select
                       value={customTheme.typography.heading.fontFamily}
-                      onValueChange={(fontFamily) => 
+                      onValueChange={(fontFamily) =>
                         setCustomTheme({
                           ...customTheme,
                           typography: {
                             ...customTheme.typography,
-                            heading: { ...customTheme.typography.heading, fontFamily }
-                          }
+                            heading: { ...customTheme.typography.heading, fontFamily },
+                          },
                         })
                       }
                     >
@@ -732,13 +891,13 @@ export function AdvancedThemeCustomizer() {
                     <Label>Heading Weight: {customTheme.typography.heading.fontWeight}</Label>
                     <Slider
                       value={[customTheme.typography.heading.fontWeight]}
-                      onValueChange={([fontWeight]) => 
+                      onValueChange={([fontWeight]) =>
                         setCustomTheme({
                           ...customTheme,
                           typography: {
                             ...customTheme.typography,
-                            heading: { ...customTheme.typography.heading, fontWeight }
-                          }
+                            heading: { ...customTheme.typography.heading, fontWeight },
+                          },
                         })
                       }
                       min={100}
@@ -761,33 +920,33 @@ export function AdvancedThemeCustomizer() {
                 <CardContent>
                   <div className="flex gap-2 mb-4">
                     <Button
-                      variant={selectedDevice === 'mobile' ? 'default' : 'outline'}
+                      variant={selectedDevice === "mobile" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setSelectedDevice('mobile')}
+                      onClick={() => setSelectedDevice("mobile")}
                     >
                       <Smartphone className="h-4 w-4 mr-1" />
                       Mobile
                     </Button>
                     <Button
-                      variant={selectedDevice === 'tablet' ? 'default' : 'outline'}
+                      variant={selectedDevice === "tablet" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setSelectedDevice('tablet')}
+                      onClick={() => setSelectedDevice("tablet")}
                     >
                       <Tablet className="h-4 w-4 mr-1" />
                       Tablet
                     </Button>
                     <Button
-                      variant={selectedDevice === 'desktop' ? 'default' : 'outline'}
+                      variant={selectedDevice === "desktop" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setSelectedDevice('desktop')}
+                      onClick={() => setSelectedDevice("desktop")}
                     >
                       <Monitor className="h-4 w-4 mr-1" />
                       Desktop
                     </Button>
                     <Button
-                      variant={selectedDevice === 'tv' ? 'default' : 'outline'}
+                      variant={selectedDevice === "tv" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setSelectedDevice('tv')}
+                      onClick={() => setSelectedDevice("tv")}
                     >
                       <Tv className="h-4 w-4 mr-1" />
                       TV
@@ -814,12 +973,12 @@ export function AdvancedThemeCustomizer() {
                 <CardContent className="space-y-4">
                   <div>
                     <Label>Performance Quality</Label>
-                    <Select 
+                    <Select
                       value={customTheme.performance.quality}
-                      onValueChange={(quality: any) => 
+                      onValueChange={(quality: any) =>
                         setCustomTheme({
                           ...customTheme,
-                          performance: { ...customTheme.performance, quality }
+                          performance: { ...customTheme.performance, quality },
                         })
                       }
                     >
@@ -838,48 +997,48 @@ export function AdvancedThemeCustomizer() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm">Animations</Label>
-                      <Switch 
+                      <Switch
                         checked={customTheme.performance.enableAnimations}
-                        onCheckedChange={(enableAnimations) => 
+                        onCheckedChange={(enableAnimations) =>
                           setCustomTheme({
                             ...customTheme,
-                            performance: { ...customTheme.performance, enableAnimations }
+                            performance: { ...customTheme.performance, enableAnimations },
                           })
                         }
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label className="text-sm">Particles</Label>
-                      <Switch 
+                      <Switch
                         checked={customTheme.performance.enableParticles}
-                        onCheckedChange={(enableParticles) => 
+                        onCheckedChange={(enableParticles) =>
                           setCustomTheme({
                             ...customTheme,
-                            performance: { ...customTheme.performance, enableParticles }
+                            performance: { ...customTheme.performance, enableParticles },
                           })
                         }
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label className="text-sm">Blur Effects</Label>
-                      <Switch 
+                      <Switch
                         checked={customTheme.performance.enableBlur}
-                        onCheckedChange={(enableBlur) => 
+                        onCheckedChange={(enableBlur) =>
                           setCustomTheme({
                             ...customTheme,
-                            performance: { ...customTheme.performance, enableBlur }
+                            performance: { ...customTheme.performance, enableBlur },
                           })
                         }
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label className="text-sm">Shadows</Label>
-                      <Switch 
+                      <Switch
                         checked={customTheme.performance.enableShadows}
-                        onCheckedChange={(enableShadows) => 
+                        onCheckedChange={(enableShadows) =>
                           setCustomTheme({
                             ...customTheme,
-                            performance: { ...customTheme.performance, enableShadows }
+                            performance: { ...customTheme.performance, enableShadows },
                           })
                         }
                       />
@@ -896,48 +1055,48 @@ export function AdvancedThemeCustomizer() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="flex items-center justify-between">
                         <Label className="text-sm">High Contrast</Label>
-                        <Switch 
+                        <Switch
                           checked={customTheme.accessibility.highContrast}
-                          onCheckedChange={(highContrast) => 
+                          onCheckedChange={(highContrast) =>
                             setCustomTheme({
                               ...customTheme,
-                              accessibility: { ...customTheme.accessibility, highContrast }
+                              accessibility: { ...customTheme.accessibility, highContrast },
                             })
                           }
                         />
                       </div>
                       <div className="flex items-center justify-between">
                         <Label className="text-sm">Reduced Motion</Label>
-                        <Switch 
+                        <Switch
                           checked={customTheme.accessibility.reducedMotion}
-                          onCheckedChange={(reducedMotion) => 
+                          onCheckedChange={(reducedMotion) =>
                             setCustomTheme({
                               ...customTheme,
-                              accessibility: { ...customTheme.accessibility, reducedMotion }
+                              accessibility: { ...customTheme.accessibility, reducedMotion },
                             })
                           }
                         />
                       </div>
                       <div className="flex items-center justify-between">
                         <Label className="text-sm">Large Text</Label>
-                        <Switch 
+                        <Switch
                           checked={customTheme.accessibility.largeText}
-                          onCheckedChange={(largeText) => 
+                          onCheckedChange={(largeText) =>
                             setCustomTheme({
                               ...customTheme,
-                              accessibility: { ...customTheme.accessibility, largeText }
+                              accessibility: { ...customTheme.accessibility, largeText },
                             })
                           }
                         />
                       </div>
                       <div className="flex items-center justify-between">
                         <Label className="text-sm">Focus Visible</Label>
-                        <Switch 
+                        <Switch
                           checked={customTheme.accessibility.focusVisible}
-                          onCheckedChange={(focusVisible) => 
+                          onCheckedChange={(focusVisible) =>
                             setCustomTheme({
                               ...customTheme,
-                              accessibility: { ...customTheme.accessibility, focusVisible }
+                              accessibility: { ...customTheme.accessibility, focusVisible },
                             })
                           }
                         />
@@ -953,12 +1112,14 @@ export function AdvancedThemeCustomizer() {
           <Card>
             <CardHeader>
               <CardTitle>Import / Export</CardTitle>
-              <CardDescription>
-                Save and share your custom themes
-              </CardDescription>
+              <CardDescription>Save and share your custom themes</CardDescription>
             </CardHeader>
             <CardContent className="flex gap-2">
-              <Button onClick={handleExportTheme} variant="outline" className="flex items-center gap-2">
+              <Button
+                onClick={handleExportTheme}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
                 <Download className="h-4 w-4" />
                 Export Theme
               </Button>
@@ -1010,17 +1171,35 @@ export function AdvancedThemeCustomizer() {
                 {isTargetsMode && (
                   <>
                     {/* Card */}
-                    <button onClick={() => openInspector('colors.card')} className="absolute inset-x-4 top-[140px] h-14 rounded-md ring-2 ring-accent/60 bg-accent/10" />
+                    <button
+                      onClick={() => openInspector("colors.card")}
+                      className="absolute inset-x-4 top-[140px] h-14 rounded-md ring-2 ring-accent/60 bg-accent/10"
+                    />
                     {/* Primary Button */}
-                    <button onClick={() => openInspector('colors.primary')} className="absolute left-4 top-4 h-10 w-40 rounded ring-2 ring-primary/60 bg-primary/10" />
+                    <button
+                      onClick={() => openInspector("colors.primary")}
+                      className="absolute left-4 top-4 h-10 w-40 rounded ring-2 ring-primary/60 bg-primary/10"
+                    />
                     {/* Input/Table (use muted/border) */}
-                    <button onClick={() => openInspector('colors.muted')} className="absolute left-4 top-[200px] h-24 w-[calc(100%-2rem)] rounded ring-2 ring-foreground/40" />
+                    <button
+                      onClick={() => openInspector("colors.muted")}
+                      className="absolute left-4 top-[200px] h-24 w-[calc(100%-2rem)] rounded ring-2 ring-foreground/40"
+                    />
                     {/* Header (use background) */}
-                    <button onClick={() => openInspector('colors.background')} className="absolute inset-x-0 -top-3 h-8 ring-2 ring-secondary/50" />
+                    <button
+                      onClick={() => openInspector("colors.background")}
+                      className="absolute inset-x-0 -top-3 h-8 ring-2 ring-secondary/50"
+                    />
                     {/* Sidebar/nav (use sidebar color) */}
-                    <button onClick={() => openInspector('colors.sidebar')} className="absolute -left-3 inset-y-8 w-3 ring-2 ring-sidebar/50" />
+                    <button
+                      onClick={() => openInspector("colors.sidebar")}
+                      className="absolute -left-3 inset-y-8 w-3 ring-2 ring-sidebar/50"
+                    />
                     {/* Badge (use accent) */}
-                    <button onClick={() => openInspector('colors.accent')} className="absolute right-6 bottom-20 h-6 w-24 rounded ring-2 ring-accent/60" />
+                    <button
+                      onClick={() => openInspector("colors.accent")}
+                      className="absolute right-6 bottom-20 h-6 w-24 rounded ring-2 ring-accent/60"
+                    />
                   </>
                 )}
               </div>
@@ -1036,12 +1215,18 @@ export function AdvancedThemeCustomizer() {
           </DrawerHeader>
           <div className="p-4">
             <ColorPicker
-              color={customTheme.colors[(inspectorPath.split('.')[1]) as keyof typeof customTheme.colors] || customTheme.colors.card}
+              color={
+                customTheme.colors[
+                  inspectorPath.split(".")[1] as keyof typeof customTheme.colors
+                ] || customTheme.colors.card
+              }
               onChange={(color) => updateColor(inspectorPath, color)}
               label={inspectorPath}
             />
             <div className="mt-4 flex items-center gap-2">
-              <Button variant="outline" onClick={() => setInspectorOpen(false)}>Close</Button>
+              <Button variant="outline" onClick={() => setInspectorOpen(false)}>
+                Close
+              </Button>
               <Button onClick={() => setIsPreviewMode(true)}>Preview Changes</Button>
             </div>
           </div>

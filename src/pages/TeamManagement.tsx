@@ -6,17 +6,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Users, 
-  User, 
-  Shield, 
-  Star, 
-  Clock, 
-  Mail, 
-  Phone, 
+import {
+  Users,
+  User,
+  Shield,
+  Star,
+  Clock,
+  Mail,
+  Phone,
   MapPin,
   Award,
   Activity,
@@ -28,10 +34,17 @@ import {
   MessageSquare,
   Settings,
   Calendar,
-  FileText
+  FileText,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import Sidebar from "@/components/Sidebar";
 
 const TeamManagement = () => {
@@ -48,7 +61,7 @@ const TeamManagement = () => {
       members: 8,
       specialty: "Assault Operations",
       lastMission: "2024-01-15",
-      successRate: 95
+      successRate: 95,
     },
     {
       id: "bravo",
@@ -58,7 +71,7 @@ const TeamManagement = () => {
       members: 6,
       specialty: "Reconnaissance",
       lastMission: "2024-01-18",
-      successRate: 92
+      successRate: 92,
     },
     {
       id: "charlie",
@@ -68,7 +81,7 @@ const TeamManagement = () => {
       members: 7,
       specialty: "Support Operations",
       lastMission: "2024-01-12",
-      successRate: 98
+      successRate: 98,
     },
     {
       id: "delta",
@@ -78,8 +91,8 @@ const TeamManagement = () => {
       members: 5,
       specialty: "Sniper Operations",
       lastMission: "2024-01-10",
-      successRate: 89
-    }
+      successRate: 89,
+    },
   ];
 
   const personnel = [
@@ -98,13 +111,13 @@ const TeamManagement = () => {
         combat: 95,
         leadership: 98,
         technical: 85,
-        medical: 70
+        medical: 70,
       },
       contact: {
         email: "s.connor@ops.military",
         phone: "+1-555-0101",
-        location: "Base Alpha"
-      }
+        location: "Base Alpha",
+      },
     },
     {
       id: 2,
@@ -121,13 +134,13 @@ const TeamManagement = () => {
         combat: 88,
         leadership: 90,
         technical: 95,
-        medical: 75
+        medical: 75,
       },
       contact: {
         email: "j.smith@ops.military",
         phone: "+1-555-0102",
-        location: "Field Operations"
-      }
+        location: "Field Operations",
+      },
     },
     {
       id: 3,
@@ -144,13 +157,13 @@ const TeamManagement = () => {
         combat: 75,
         leadership: 85,
         technical: 80,
-        medical: 98
+        medical: 98,
       },
       contact: {
         email: "m.rodriguez@ops.military",
         phone: "+1-555-0103",
-        location: "Medical Bay"
-      }
+        location: "Medical Bay",
+      },
     },
     {
       id: 4,
@@ -167,30 +180,32 @@ const TeamManagement = () => {
         combat: 98,
         leadership: 82,
         technical: 88,
-        medical: 65
+        medical: 65,
       },
       contact: {
         email: "a.johnson@ops.military",
         phone: "+1-555-0104",
-        location: "Training Facility"
-      }
-    }
+        location: "Training Facility",
+      },
+    },
   ];
 
-  const filteredPersonnel = personnel.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.team.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.role.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = selectedFilter === "all" || member.status.toLowerCase() === selectedFilter;
-    
+  const filteredPersonnel = personnel.filter((member) => {
+    const matchesSearch =
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.team.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.role.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesFilter =
+      selectedFilter === "all" || member.status.toLowerCase() === selectedFilter;
+
     return matchesSearch && matchesFilter;
   });
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
-      
+
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <div className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -239,11 +254,22 @@ const TeamManagement = () => {
               {/* Team Overview */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {teams.map((team) => (
-                  <Card key={team.id} className="bg-card/50 backdrop-blur-sm border border-border/50 hover:shadow-glow transition-all duration-300">
+                  <Card
+                    key={team.id}
+                    className="bg-card/50 backdrop-blur-sm border border-border/50 hover:shadow-glow transition-all duration-300"
+                  >
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg">{team.name}</CardTitle>
-                        <Badge variant={team.status === "Available" ? "default" : team.status === "On Mission" ? "destructive" : "secondary"}>
+                        <Badge
+                          variant={
+                            team.status === "Available"
+                              ? "default"
+                              : team.status === "On Mission"
+                                ? "destructive"
+                                : "secondary"
+                          }
+                        >
                           {team.status}
                         </Badge>
                       </div>
@@ -318,21 +344,39 @@ const TeamManagement = () => {
               {/* Personnel Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPersonnel.map((member) => (
-                  <Card key={member.id} className="bg-card/50 backdrop-blur-sm border border-border/50 hover:shadow-glow transition-all duration-300">
+                  <Card
+                    key={member.id}
+                    className="bg-card/50 backdrop-blur-sm border border-border/50 hover:shadow-glow transition-all duration-300"
+                  >
                     <CardHeader>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-12 w-12">
                           <AvatarImage src={member.avatar} alt={member.name} />
-                          <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          <AvatarFallback>
+                            {member.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-base">{member.name}</CardTitle>
-                            <Badge variant={member.status === "Active" ? "default" : member.status === "On Mission" ? "destructive" : "secondary"}>
+                            <Badge
+                              variant={
+                                member.status === "Active"
+                                  ? "default"
+                                  : member.status === "On Mission"
+                                    ? "destructive"
+                                    : "secondary"
+                              }
+                            >
                               {member.status}
                             </Badge>
                           </div>
-                          <CardDescription>{member.rank} • {member.role}</CardDescription>
+                          <CardDescription>
+                            {member.rank} • {member.role}
+                          </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
@@ -350,7 +394,7 @@ const TeamManagement = () => {
                           <span>Missions:</span>
                           <span className="font-medium">{member.missions}</span>
                         </div>
-                        
+
                         {/* Skills */}
                         <div className="space-y-2">
                           <div className="text-sm font-medium">Skills</div>
@@ -421,7 +465,7 @@ const TeamManagement = () => {
                         lead: "John Smith",
                         status: "In Progress",
                         progress: 75,
-                        deadline: "2024-01-20"
+                        deadline: "2024-01-20",
                       },
                       {
                         mission: "Equipment Maintenance",
@@ -429,7 +473,7 @@ const TeamManagement = () => {
                         lead: "Maria Rodriguez",
                         status: "Planning",
                         progress: 25,
-                        deadline: "2024-01-22"
+                        deadline: "2024-01-22",
                       },
                       {
                         mission: "Training Exercise",
@@ -437,16 +481,29 @@ const TeamManagement = () => {
                         lead: "Alex Johnson",
                         status: "Scheduled",
                         progress: 0,
-                        deadline: "2024-01-25"
-                      }
+                        deadline: "2024-01-25",
+                      },
                     ].map((assignment, index) => (
-                      <div key={index} className="p-4 rounded-lg bg-secondary/10 border border-border/30">
+                      <div
+                        key={index}
+                        className="p-4 rounded-lg bg-secondary/10 border border-border/30"
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <div>
                             <div className="font-semibold">{assignment.mission}</div>
-                            <div className="text-sm text-muted-foreground">{assignment.team} • Lead: {assignment.lead}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {assignment.team} • Lead: {assignment.lead}
+                            </div>
                           </div>
-                          <Badge variant={assignment.status === "In Progress" ? "default" : assignment.status === "Planning" ? "secondary" : "outline"}>
+                          <Badge
+                            variant={
+                              assignment.status === "In Progress"
+                                ? "default"
+                                : assignment.status === "Planning"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
                             {assignment.status}
                           </Badge>
                         </div>
@@ -482,15 +539,40 @@ const TeamManagement = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {[
-                        { name: "Advanced Combat Training", duration: "2 weeks", participants: 12, next: "2024-02-01" },
-                        { name: "Medical Certification", duration: "1 week", participants: 8, next: "2024-02-05" },
-                        { name: "Technical Systems", duration: "3 days", participants: 15, next: "2024-02-10" },
-                        { name: "Leadership Development", duration: "1 week", participants: 6, next: "2024-02-15" }
+                        {
+                          name: "Advanced Combat Training",
+                          duration: "2 weeks",
+                          participants: 12,
+                          next: "2024-02-01",
+                        },
+                        {
+                          name: "Medical Certification",
+                          duration: "1 week",
+                          participants: 8,
+                          next: "2024-02-05",
+                        },
+                        {
+                          name: "Technical Systems",
+                          duration: "3 days",
+                          participants: 15,
+                          next: "2024-02-10",
+                        },
+                        {
+                          name: "Leadership Development",
+                          duration: "1 week",
+                          participants: 6,
+                          next: "2024-02-15",
+                        },
                       ].map((program, index) => (
-                        <div key={index} className="p-3 rounded-lg bg-secondary/10 border border-border/30">
+                        <div
+                          key={index}
+                          className="p-3 rounded-lg bg-secondary/10 border border-border/30"
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <div className="font-medium">{program.name}</div>
-                            <Button size="sm" variant="outline">Enroll</Button>
+                            <Button size="sm" variant="outline">
+                              Enroll
+                            </Button>
                           </div>
                           <div className="text-sm text-muted-foreground grid grid-cols-3 gap-2">
                             <span>Duration: {program.duration}</span>
@@ -514,16 +596,25 @@ const TeamManagement = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {[
-                        { time: "08:00", event: "Morning PT - Alpha Team", instructor: "SGT Wilson" },
+                        {
+                          time: "08:00",
+                          event: "Morning PT - Alpha Team",
+                          instructor: "SGT Wilson",
+                        },
                         { time: "10:30", event: "Weapons Training", instructor: "CPT Anderson" },
                         { time: "14:00", event: "Tactical Simulation", instructor: "LT Brown" },
-                        { time: "16:00", event: "Medical Training", instructor: "Dr. Martinez" }
+                        { time: "16:00", event: "Medical Training", instructor: "Dr. Martinez" },
                       ].map((session, index) => (
-                        <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/10 border border-border/30">
+                        <div
+                          key={index}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-secondary/10 border border-border/30"
+                        >
                           <div className="text-sm font-medium text-primary">{session.time}</div>
                           <div className="flex-1">
                             <div className="font-medium">{session.event}</div>
-                            <div className="text-sm text-muted-foreground">Instructor: {session.instructor}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Instructor: {session.instructor}
+                            </div>
                           </div>
                         </div>
                       ))}

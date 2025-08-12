@@ -1,4 +1,4 @@
-@import url('./styles/advanced-animations.css');
+@import url("./styles/advanced-animations.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,7 +29,7 @@ All colors MUST be HSL.
 
     --accent: 210 100% 50%;
     --accent-foreground: 210 40% 98%;
-    
+
     --gradient-primary: linear-gradient(135deg, hsl(220 100% 20%), hsl(210 100% 50%));
     --gradient-hero: linear-gradient(180deg, hsl(220 100% 8%), hsl(220 60% 15%));
     --shadow-glow: 0 0 40px hsl(210 100% 50% / 0.3);
@@ -129,7 +129,7 @@ All colors MUST be HSL.
   height: 20px;
   bottom: 0;
   right: 0;
-  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZG90cyBmaWxsPSIjODg4IiBkPSJtMTUgMTJhMyAzIDAgMSAxLTYgMCAzIDMgMCAwIDEgNiAwem0tMyA2YTMgMyAwIDEgMSAwLTYgMyAzIDAgMCAxIDAgNnoiLz4KPHN2Zz4K');
+  background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZG90cyBmaWxsPSIjODg4IiBkPSJtMTUgMTJhMyAzIDAgMSAxLTYgMCAzIDMgMCAwIDEgNiAwem0tMyA2YTMgMyAwIDEgMSAwLTYgMyAzIDAgMCAxIDAgNnoiLz4KPHN2Zz4K");
   background-position: bottom right;
   padding: 0 3px 3px 0;
   background-repeat: no-repeat;

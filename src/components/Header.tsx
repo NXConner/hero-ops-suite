@@ -17,7 +17,7 @@ const Header = () => {
               OverWatch Ops
             </span>
           </div>
-          
+
           <nav className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-foreground hover:text-primary transition-colors">
               Features
@@ -36,10 +36,7 @@ const Header = () => {
             </Link>
           </nav>
 
-          <button
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
+          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <CloseIcon className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>

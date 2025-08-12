@@ -4,21 +4,21 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdvancedThemeToggle } from "@/components/theme/AdvancedThemeToggle";
-import { 
-  LayoutDashboard, 
-  Target, 
-  Users, 
-  BarChart3, 
-  MessageSquare, 
-  FileText, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Target,
+  Users,
+  BarChart3,
+  MessageSquare,
+  FileText,
+  Settings,
   Shield,
   Menu,
   X as CloseIcon,
   Bell,
   Search,
   Scan,
-  Radar
+  Radar,
 } from "lucide-react";
 import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
 
@@ -41,29 +41,34 @@ const iconMap: Record<string, any> = {
   FileText,
   Scan,
   Shield,
-  Settings
+  Settings,
 };
 
 const defaultNav: NavItemConfig[] = [
-  { name: 'Dashboard', href: '/dashboard', icon: 'LayoutDashboard' },
-  { name: 'OverWatch Map', href: '/overwatch', icon: 'Radar', badge: 'LIVE' },
-  { name: 'Mission Planning', href: '/mission-planning', icon: 'Target' },
-  { name: 'Team Management', href: '/team-management', icon: 'Users' },
-  { name: 'Analytics', href: '/analytics', icon: 'BarChart3' },
-  { name: 'Communications', href: '/communications', icon: 'MessageSquare', badge: '3' },
-  { name: 'Intel Reports', href: '/intel-reports', icon: 'FileText' },
-  { name: 'PavementScan Pro', href: '/pavement-scan-pro', icon: 'Scan', badge: 'NEW' },
-  { name: 'Estimator', href: '/pavement-estimator', icon: 'Shield', badge: 'BETA' },
-  { name: 'Fleet & Field Ops', href: '/fleet-field-ops', icon: 'LayoutDashboard', badge: 'BETA' },
-  { name: 'Fleet Focus Manager', href: '/fleet-field-ops?app=fleet', icon: 'LayoutDashboard', parent: '/fleet-field-ops' },
-  { name: 'Mobile Companion', href: '/mobile-companion', icon: 'LayoutDashboard', badge: 'WEB' },
-  { name: 'Settings', href: '/settings', icon: 'Settings' }
+  { name: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
+  { name: "OverWatch Map", href: "/overwatch", icon: "Radar", badge: "LIVE" },
+  { name: "Mission Planning", href: "/mission-planning", icon: "Target" },
+  { name: "Team Management", href: "/team-management", icon: "Users" },
+  { name: "Analytics", href: "/analytics", icon: "BarChart3" },
+  { name: "Communications", href: "/communications", icon: "MessageSquare", badge: "3" },
+  { name: "Intel Reports", href: "/intel-reports", icon: "FileText" },
+  { name: "PavementScan Pro", href: "/pavement-scan-pro", icon: "Scan", badge: "NEW" },
+  { name: "Estimator", href: "/pavement-estimator", icon: "Shield", badge: "BETA" },
+  { name: "Fleet & Field Ops", href: "/fleet-field-ops", icon: "LayoutDashboard", badge: "BETA" },
+  {
+    name: "Fleet Focus Manager",
+    href: "/fleet-field-ops?app=fleet",
+    icon: "LayoutDashboard",
+    parent: "/fleet-field-ops",
+  },
+  { name: "Mobile Companion", href: "/mobile-companion", icon: "LayoutDashboard", badge: "WEB" },
+  { name: "Settings", href: "/settings", icon: "Settings" },
 ];
 
 function useNavConfig() {
   const [config, setConfig] = useState<NavItemConfig[]>(() => {
     try {
-      const raw = localStorage.getItem('sidebar-nav-config');
+      const raw = localStorage.getItem("sidebar-nav-config");
       return raw ? JSON.parse(raw) : defaultNav;
     } catch {
       return defaultNav;
@@ -71,7 +76,11 @@ function useNavConfig() {
   });
 
   useEffect(() => {
-    try { localStorage.setItem('sidebar-nav-config', JSON.stringify(config)); } catch { /* ignore */ }
+    try {
+      localStorage.setItem("sidebar-nav-config", JSON.stringify(config));
+    } catch {
+      /* ignore */
+    }
   }, [config]);
 
   return { config, setConfig } as const;
@@ -83,16 +92,18 @@ const Sidebar = () => {
   const { config } = useNavConfig();
   const { isVeteran, veteranBranch } = useAdvancedTheme();
 
-  const navigation = useMemo(() => config.filter(i => !i.hidden), [config]);
+  const navigation = useMemo(() => config.filter((i) => !i.hidden), [config]);
 
-  const topLevel = navigation.filter(n => !n.parent);
-  const childrenOf = (parentHref: string) => navigation.filter(n => n.parent === parentHref);
+  const topLevel = navigation.filter((n) => !n.parent);
+  const childrenOf = (parentHref: string) => navigation.filter((n) => n.parent === parentHref);
 
   return (
-    <div className={cn(
-      "fixed left-0 top-0 z-40 h-screen bg-card/50 backdrop-blur-sm border-r border-border transition-all duration-300",
-      isCollapsed ? "w-16" : "w-64"
-    )}>
+    <div
+      className={cn(
+        "fixed left-0 top-0 z-40 h-screen bg-card/50 backdrop-blur-sm border-r border-border transition-all duration-300",
+        isCollapsed ? "w-16" : "w-64",
+      )}
+    >
       <div className="flex h-full flex-col">
         {/* Header */}
         <div className="flex h-16 items-center justify-between px-4 border-b border-border">
@@ -110,13 +121,17 @@ const Sidebar = () => {
               size="sm"
               className="hidden md:inline-flex"
               onClick={() => (window as any).owEffects?.set?.({ minimal: true })}
-            >Minimal</Button>
+            >
+              Minimal
+            </Button>
             <Button
               variant="outline"
               size="sm"
               className="hidden md:inline-flex"
               onClick={() => (window as any).owEffects?.set?.({ minimal: false })}
-            >Full</Button>
+            >
+              Full
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -142,7 +157,7 @@ const Sidebar = () => {
                     "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group",
                     current
                       ? "bg-primary/10 text-primary border border-primary/20"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
                   )}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
@@ -163,10 +178,16 @@ const Sidebar = () => {
                       const CIcon = iconMap[child.icon] || LayoutDashboard;
                       const isCurrent = location.pathname === child.href;
                       return (
-                        <Link key={child.href} to={child.href} className={cn(
-                          "flex items-center px-3 py-1.5 text-xs rounded-md",
-                          isCurrent ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                        )}>
+                        <Link
+                          key={child.href}
+                          to={child.href}
+                          className={cn(
+                            "flex items-center px-3 py-1.5 text-xs rounded-md",
+                            isCurrent
+                              ? "bg-primary/10 text-primary"
+                              : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
+                          )}
+                        >
                           <CIcon className="h-4 w-4" />
                           <span className="ml-2">{child.name}</span>
                         </Link>
@@ -193,7 +214,7 @@ const Sidebar = () => {
                 <div className="flex items-center justify-between">
                   <div className="text-xs text-muted-foreground">Veteran</div>
                   <Badge variant="secondary" className="text-xs capitalize">
-                    {veteranBranch || 'Verified'}
+                    {veteranBranch || "Verified"}
                   </Badge>
                 </div>
               )}

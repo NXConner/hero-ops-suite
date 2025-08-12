@@ -5,33 +5,35 @@ const FeatureGrid = () => {
     {
       icon: Shield,
       title: "Advanced Security",
-      description: "Military-grade encryption and multi-layer security protocols to protect sensitive operations."
+      description:
+        "Military-grade encryption and multi-layer security protocols to protect sensitive operations.",
     },
     {
       icon: Radar,
       title: "Real-Time Intelligence",
-      description: "Continuous monitoring and threat detection with AI-powered analysis and instant alerts."
+      description:
+        "Continuous monitoring and threat detection with AI-powered analysis and instant alerts.",
     },
     {
       icon: Users,
       title: "Team Coordination",
-      description: "Seamless communication and task assignment across multiple operational units."
+      description: "Seamless communication and task assignment across multiple operational units.",
     },
     {
       icon: Lock,
       title: "Secure Communications",
-      description: "End-to-end encrypted messaging and file sharing for classified information."
+      description: "End-to-end encrypted messaging and file sharing for classified information.",
     },
     {
       icon: Activity,
       title: "Performance Analytics",
-      description: "Comprehensive reporting and analytics to optimize operational efficiency."
+      description: "Comprehensive reporting and analytics to optimize operational efficiency.",
     },
     {
       icon: Globe,
       title: "Global Operations",
-      description: "Worldwide deployment capabilities with multi-timezone coordination support."
-    }
+      description: "Worldwide deployment capabilities with multi-timezone coordination support.",
+    },
   ];
 
   return (
@@ -60,12 +62,8 @@ const FeatureGrid = () => {
                   <feature.icon className="h-8 w-8 text-primary" />
                 </div>
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-foreground">
-                {feature.title}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {feature.description}
-              </p>
+              <h3 className="text-xl font-semibold mb-3 text-foreground">{feature.title}</h3>
+              <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>

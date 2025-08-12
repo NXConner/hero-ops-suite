@@ -17,10 +17,6 @@ export default defineConfig(({ mode }) => ({
       ],
     },
   },
-  plugins: [
-    react(),
-    mode === "development" && componentTagger(),
-  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -61,16 +57,6 @@ export default defineConfig(({ mode }) => ({
             "@radix-ui/react-toggle-group",
             "@radix-ui/react-tooltip",
           ],
-          maps_ml_3d: [
-            "mapbox-gl",
-            "@tensorflow/tfjs",
-            "three",
-            "@react-three/fiber",
-            "@react-three/drei",
-            "babylonjs",
-            "@babylonjs/core",
-            "@babylonjs/gui",
-          ],
           charts_misc: ["recharts", "date-fns", "jszip", "html2canvas", "jspdf"],
           shadcn_misc: [
             "class-variance-authority",
@@ -79,8 +65,12 @@ export default defineConfig(({ mode }) => ({
             "tailwind-merge",
             "tailwindcss-animate",
           ],
+          // separate heavy libs to maximize route-level splitting
+          three_bundle: ["three", "@react-three/fiber", "@react-three/drei"],
+          mapbox: ["mapbox-gl"],
         },
       },
     },
+    chunkSizeWarningLimit: 3000,
   },
 }));
