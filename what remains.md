@@ -9,24 +9,26 @@ Status key: [NS] Not Started, [IP] In Progress, [P] Completed
 - Totals & Tax
   - [P] Apply sales tax to totals with per-job toggle; persist on job; surface in UI and invoice text
 - Estimator Inputs & UX
-  - [IP] Structured address inputs with autocomplete; route map preview (supplier → job → return)
+  - [IP] Structured address inputs with autocomplete; route map preview (structured inputs + route preview present; autocomplete pending)
   - [NS] Preset templates (Driveway / Parking Lot)
 - Calculators
-  - [IP] Trailer MPG modifiers and leg-based fuel costing
-  - [IP] Patching: tack coat/additives toggles; productivity curves by thickness/material
-  - [IP] Crack: propane by hours; deep/wide sand prefill tuning
-  - [IP] Sealcoat: multi-coat, waste factor, method productivity
-  - [IP] Oil-spot polygon input with per-area prep-seal calculation
+  - [P] Trailer MPG modifiers
+  - [NS] Leg-based fuel costing (separate legs supplier → job → return)
+  - [P] Patching: tack coat/additives toggles; productivity curves by thickness/material (basic)
+  - [P] Crack: propane by hours; deep/wide sand prefill
+  - [P] Sealcoat: multi-coat, waste factor, method productivity
+  - [NS] Oil-spot polygon input with per-area prep-seal calculation (wire map to provide lastAreaSqFt)
 - Striping
-  - [IP] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas
+  - [IP] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas (basic color delta and stall size present; full catalog UI pending)
 - Persistence & Data
   - [IP] Supabase adapters for jobs/customers (best-effort sync, local fallback)
   - [IP] Supabase schema tables (users, jobs, customers, business_overrides, projects)
   - [IP] Migration utility from localStorage; conflict resolution UI
 - Exports & Invoicing
   - [P] Branded PDF invoices (header styling); email/share stub
-  - [IP] CSV import with mapping; import preview + validation
-  - [IP] Estimate → Project conversion and change orders
+  - [IP] CSV import with mapping; import preview + validation (jobs import flow present; preview/validation minimal)
+  - [P] Estimate → Project conversion
+  - [NS] Change orders
 - QA, CI/CD & Security
   - [IP] Expand unit tests across estimator helpers and edge cases; E2E flows
   - [IP] GitHub Actions (lint, typecheck, test, build)
@@ -37,7 +39,7 @@ Status key: [NS] Not Started, [IP] In Progress, [P] Completed
   - [IP] Geocode throttling UI, spinners, and error toasts
 
 Notes:
-- Items in UPDATEDTODOLIST marked complete but not found in this codebase were treated as not applicable for this repo (e.g., UnifiedMap page, Supplier Receipts CSV page, Cost Analyzer modal). Radar/weather overlay and OverWatch page exist; advanced basemap preference persistence not verified.
+- Items in UPDATEDTODOLIST marked complete but not found in this codebase were treated as not applicable for this repo (e.g., UnifiedMap page, Supplier Receipts CSV page, Cost Analyzer modal). Radar/weather overlay and OverWatch page exist; advanced basemap preference persistence verified.
 
 ## Strategic plan (effective & efficient)
 
