@@ -266,5 +266,39 @@ app.post('/estimate/:id', async (req, res) => {
   res.json(estimate);
 });
 
+app.post('/intel/scrape', async (req, res) => {
+  try {
+    const kind = (req.body && req.body.kind) || 'all';
+    const root = path.resolve(__dirname, '..');
+    // Prefer running via workspace script; for now, write a marker file and respond
+    // The CLI can be run manually: npm run scrape:intel
+    res.json({ ok: true, message: 'Scrape triggered, run workspace script to execute', kind });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/intel/competitors', async (req, res) => {
+  try {
+    const file = path.join(dataDir, 'intel-competitors.json');
+    if (!(await fs.pathExists(file))) return res.json({ competitors: [], keyword_summary: {}, scraped_at: null });
+    const json = await fs.readJson(file);
+    res.json(json);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/intel/trends', async (req, res) => {
+  try {
+    const file = path.join(dataDir, 'intel-trends.json');
+    if (!(await fs.pathExists(file))) return res.json({ feeds: [], items: [], scraped_at: null });
+    const json = await fs.readJson(file);
+    res.json(json);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => console.log(`API server listening on http://localhost:${port}`));

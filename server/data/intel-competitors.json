@@ -1,0 +1,46 @@
+{
+  "scraped_at": "2025-01-01T00:00:00.000Z",
+  "keyword_summary": {
+    "asphalt": 42,
+    "paving": 35,
+    "sealcoating": 18,
+    "crack sealing": 12,
+    "parking lot": 20
+  },
+  "competitors": [
+    {
+      "company": "Competitor A Paving",
+      "region": "Local",
+      "domain": "https://www.examplepaving-a.com",
+      "last_scraped_at": "2025-01-01T00:00:00.000Z",
+      "pages": [
+        {
+          "url": "https://www.examplepaving-a.com/services",
+          "title": "Services | Example Paving A",
+          "description": "Asphalt paving, sealcoating, and maintenance services.",
+          "h1": ["Asphalt Services"],
+          "h2": ["Sealcoating", "Crack Sealing"],
+          "keywords": {"asphalt": 10, "paving": 7, "sealcoating": 4, "crack sealing": 3, "parking lot": 2},
+          "sample_links": ["/contact", "/estimate"]
+        }
+      ]
+    },
+    {
+      "company": "Competitor B Asphalt",
+      "region": "Regional",
+      "domain": "https://www.example-asphalt-b.com",
+      "last_scraped_at": "2025-01-01T00:00:00.000Z",
+      "pages": [
+        {
+          "url": "https://www.example-asphalt-b.com/paving",
+          "title": "Asphalt Paving | Example Asphalt B",
+          "description": "Commercial and residential asphalt paving.",
+          "h1": ["Asphalt Paving"],
+          "h2": ["Parking Lot Paving", "Driveways"],
+          "keywords": {"asphalt": 8, "paving": 9, "sealcoating": 3, "crack sealing": 2, "parking lot": 4},
+          "sample_links": ["/quote", "/projects"]
+        }
+      ]
+    }
+  ]
+}
