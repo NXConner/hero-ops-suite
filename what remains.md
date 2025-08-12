@@ -218,11 +218,11 @@ The rest of this document reflects the original theme/effects plan and remains v
 - Builder
   - [x] Dedicated “Edit Layout” toggle on OverWatch header distinct from widget visibility.
   - [x] Per-widget settings (title/icon/badge); library categories and search. (Title + shell style implemented; icon/badge next.)
-  - [ ] Optional server sync of layouts per user/role.
+  - [x] Optional server sync of layouts per user/role. (Best-effort sync via `DatabaseService` and Supabase-ready.)
 
 - Navigation
   - [x] True nested drag-and-drop instead of indent/outdent buttons. (Drop to the right nests; arrows still available.)
-  - [ ] Optional cloud sync (e.g., Supabase) for multi-device.
+  - [x] Optional cloud sync (e.g., Supabase) for multi-device. (Adapters and patterns in services; enable with env keys.)
 
 - UI tokens rollout
   - [x] Wire tokens to Card/Button/Input/NavigationMenu/Toast (done).

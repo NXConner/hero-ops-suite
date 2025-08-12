@@ -21,6 +21,7 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { databaseService } from '@/services/database';
 
 interface Widget {
   id: string;
@@ -246,6 +247,17 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
   useEffect(() => {
     onLayoutChange?.(widgets);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets)); } catch { /* ignore */ }
+    // Optional cloud sync via DatabaseService best-effort
+    const userId = localStorage.getItem('current-user-id') || 'local-user';
+    databaseService.saveWidgetLayout({
+      id: 'default-overwatch',
+      userId,
+      name: 'OverWatch Layout',
+      layout: widgets.map(w => ({ i: w.id, x: w.position.x, y: w.position.y, w: w.size.width, h: w.size.height })),
+      isDefault: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    } as any).catch(() => {});
   }, [widgets, onLayoutChange]);
 
   if (!isVisible) return null;
