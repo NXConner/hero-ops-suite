@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBusinessProfile } from "@/hooks/useBusinessProfile";
-import { exportAll, importAll } from "@/services/exportImport";
+// Note: export/import utilities are dynamically imported when needed to reduce initial bundle size
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -1841,7 +1841,8 @@ const Settings = () => {
                       <div className="flex gap-2">
                         <Button
                           variant="outline"
-                          onClick={() => {
+                          onClick={async () => {
+                            const { exportAll } = await import("@/services/exportImport");
                             const data = exportAll();
                             const blob = new Blob([data], { type: "application/json" });
                             const url = URL.createObjectURL(blob);
@@ -1865,6 +1866,7 @@ const Settings = () => {
                               const text = await file.text();
                               try {
                                 const json = JSON.parse(text);
+                                const { importAll } = await import("@/services/exportImport");
                                 importAll(json);
                                 window.location.reload();
                               } catch {
@@ -1874,7 +1876,7 @@ const Settings = () => {
                             input.click();
                           }}
                         >
-                          Import
+                          Import All
                         </Button>
                       </div>
                     </div>

@@ -1,16 +1,6 @@
 // @ts-nocheck
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Engine,
-  Scene,
-  Vector3,
-  FreeCamera,
-  HemisphericLight,
-  MeshBuilder,
-  StandardMaterial,
-  Color3,
-  GroundMesh,
-} from "@babylonjs/core";
+// Babylon is large; load on demand to reduce initial bundle size
 import { sensorDataService, SensorDataResponse } from "@/services/api";
 
 interface DefectData {
@@ -60,81 +50,83 @@ const Real3DPavementViewer: React.FC<Real3DPavementViewerProps> = ({
   className = "",
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<Engine | null>(null);
-  const sceneRef = useRef<Scene | null>(null);
+  const engineRef = useRef<any | null>(null);
+  const sceneRef = useRef<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [realSensorData, setRealSensorData] = useState<SensorDataResponse[]>([]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
+    (async () => {
+      const BABYLON = await import("@babylonjs/core");
+      // Initialize Babylon.js
+      const engine = new BABYLON.Engine(canvasRef.current!, true);
+      engineRef.current = engine as any;
 
-    // Initialize Babylon.js
-    const engine = new Engine(canvasRef.current, true);
-    engineRef.current = engine;
+      const scene = new BABYLON.Scene(engine);
+      sceneRef.current = scene as any;
 
-    const scene = new Scene(engine);
-    sceneRef.current = scene;
+      // Create camera
+      const camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0, 10, -10), scene);
+      camera.setTarget(BABYLON.Vector3.Zero());
+      camera.attachTo(canvasRef.current!);
 
-    // Create camera
-    const camera = new FreeCamera("camera", new Vector3(0, 10, -10), scene);
-    camera.setTarget(Vector3.Zero());
-    camera.attachTo(canvasRef.current);
+      // Create lighting
+      const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
+      light.intensity = 0.7;
 
-    // Create lighting
-    const light = new HemisphericLight("light", new Vector3(1, 1, 0), scene);
-    light.intensity = 0.7;
-
-    // Create ground mesh representing pavement
-    const ground = MeshBuilder.CreateGround(
-      "ground",
-      { width: 20, height: 20, subdivisions: 50 },
-      scene,
-    );
-    const groundMaterial = new StandardMaterial("groundMaterial", scene);
-    groundMaterial.diffuseColor = new Color3(0.3, 0.3, 0.3);
-    groundMaterial.alpha = opacity / 100;
-    ground.material = groundMaterial;
-
-    // Add grid if enabled
-    if (showGrid) {
-      const gridMaterial = new StandardMaterial("gridMaterial", scene);
-      gridMaterial.wireframe = true;
-      gridMaterial.diffuseColor = new Color3(0, 1, 1);
-
-      const gridLines = MeshBuilder.CreateGround(
-        "grid",
-        { width: 20, height: 20, subdivisions: 10 },
+      // Create ground mesh representing pavement
+      const ground = BABYLON.MeshBuilder.CreateGround(
+        "ground",
+        { width: 20, height: 20, subdivisions: 50 },
         scene,
       );
-      gridLines.material = gridMaterial;
-      gridLines.position.y = 0.01;
-    }
+      const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
+      groundMaterial.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+      groundMaterial.alpha = opacity / 100;
+      ground.material = groundMaterial;
 
-    // Load real sensor data
-    loadRealSensorData();
+      // Add grid if enabled
+      if (showGrid) {
+        const gridMaterial = new BABYLON.StandardMaterial("gridMaterial", scene);
+        gridMaterial.wireframe = true;
+        gridMaterial.diffuseColor = new BABYLON.Color3(0, 1, 1);
 
-    // Create defect markers
-    if (showDefects) {
-      createDefectMarkers(scene);
-    }
+        const gridLines = BABYLON.MeshBuilder.CreateGround(
+          "grid",
+          { width: 20, height: 20, subdivisions: 10 },
+          scene,
+        );
+        gridLines.material = gridMaterial;
+        gridLines.position.y = 0.01;
+      }
 
-    // Start rendering loop
-    engine.runRenderLoop(() => {
-      scene.render();
-    });
+      // Load real sensor data
+      loadRealSensorData();
 
-    setIsLoading(false);
+      // Create defect markers
+      if (showDefects) {
+        createDefectMarkers(scene as any);
+      }
 
-    // Handle window resize
-    const handleResize = () => {
-      engine.resize();
-    };
-    window.addEventListener("resize", handleResize);
+      // Start rendering loop
+      engine.runRenderLoop(() => {
+        scene.render();
+      });
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      engine.dispose();
-    };
+      setIsLoading(false);
+
+      // Handle window resize
+      const handleResize = () => {
+        engine.resize();
+      };
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        engine.dispose();
+      };
+    })();
   }, []);
 
   // Load real sensor data
@@ -332,16 +324,16 @@ const Real3DPavementViewer: React.FC<Real3DPavementViewerProps> = ({
   };
 
   // Create 3D defect markers
-  const createDefectMarkers = (scene: Scene) => {
+  const createDefectMarkers = (scene: any) => {
     if (!sceneRef.current) return;
 
     scanData.defects
       .filter((defect) => selectedDefectTypes.includes(defect.type))
       .forEach((defect) => {
-        const marker = MeshBuilder.CreateBox(`defect-${defect.id}`, { size: 0.5 }, scene);
+        const marker = BABYLON.MeshBuilder.CreateBox(`defect-${defect.id}`, { size: 0.5 }, scene);
         marker.position = defect.position;
 
-        const material = new StandardMaterial(`defect-material-${defect.id}`, scene);
+        const material = new BABYLON.StandardMaterial(`defect-material-${defect.id}`, scene);
         material.diffuseColor = getDefectColor(defect.type, defect.severity);
         material.emissiveColor = getDefectColor(defect.type, defect.severity);
         marker.material = material;
@@ -352,17 +344,17 @@ const Real3DPavementViewer: React.FC<Real3DPavementViewerProps> = ({
       });
   };
 
-  const getDefectColor = (type: string, severity: string): Color3 => {
+  const getDefectColor = (type: string, severity: string): BABYLON.Color3 => {
     const baseColors = {
-      crack: severity === "critical" ? new Color3(1, 0, 0) : new Color3(1, 0.5, 0),
-      pothole: new Color3(0.8, 0, 0),
-      alligator: new Color3(0.5, 0, 1),
-      rutting: new Color3(0, 0.8, 0.3),
-      bleeding: new Color3(1, 0, 0.5),
-      raveling: new Color3(0, 0.8, 1),
-      patching: new Color3(0.5, 0.5, 0.5),
+      crack: severity === "critical" ? new BABYLON.Color3(1, 0, 0) : new BABYLON.Color3(1, 0.5, 0),
+      pothole: new BABYLON.Color3(0.8, 0, 0),
+      alligator: new BABYLON.Color3(0.5, 0, 1),
+      rutting: new BABYLON.Color3(0, 0.8, 0.3),
+      bleeding: new BABYLON.Color3(1, 0, 0.5),
+      raveling: new BABYLON.Color3(0, 0.8, 1),
+      patching: new BABYLON.Color3(0.5, 0.5, 0.5),
     };
-    return baseColors[type as keyof typeof baseColors] || new Color3(0.5, 0.5, 0.5);
+    return baseColors[type as keyof typeof baseColors] || new BABYLON.Color3(0.5, 0.5, 0.5);
   };
 
   // Update defects when props change
@@ -383,7 +375,7 @@ const Real3DPavementViewer: React.FC<Real3DPavementViewerProps> = ({
     if (sceneRef.current) {
       const ground = sceneRef.current.getMeshByName("ground");
       if (ground && ground.material) {
-        (ground.material as StandardMaterial).alpha = opacity / 100;
+        (ground.material as BABYLON.StandardMaterial).alpha = opacity / 100;
       }
     }
   }, [opacity]);

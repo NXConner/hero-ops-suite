@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
+// Mapbox is heavy; load on demand
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // Mapbox access token - should be set via environment variable
@@ -29,62 +29,65 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   styleUrl = "mapbox://styles/mapbox/satellite-streets-v12",
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const map = useRef<any | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     if (!mapContainer.current) return;
+    (async () => {
+      const { default: mapboxgl } = await import("mapbox-gl");
+      // Set mapbox access token
+      mapboxgl.accessToken = MAPBOX_TOKEN;
 
-    // Set mapbox access token
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+      // Initialize map
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: styleUrl,
+        center: center,
+        zoom: zoom,
+        attributionControl: true,
+      });
 
-    // Initialize map
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: styleUrl,
-      center: center,
-      zoom: zoom,
-      attributionControl: true,
-    });
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+      // Add geolocate control
+      map.current.addControl(
+        new mapboxgl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+          showUserHeading: true,
+        }),
+        "top-right",
+      );
 
-    // Add geolocate control
-    map.current.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true,
-        },
-        trackUserLocation: true,
-        showUserHeading: true,
-      }),
-      "top-right",
-    );
+      // Add scale control
+      map.current.addControl(new mapboxgl.ScaleControl(), "bottom-left");
 
-    // Add scale control
-    map.current.addControl(new mapboxgl.ScaleControl(), "bottom-left");
+      // Add fullscreen control
+      map.current.addControl(new mapboxgl.FullscreenControl(), "top-right");
 
-    // Add fullscreen control
-    map.current.addControl(new mapboxgl.FullscreenControl(), "top-right");
+      // Set up event listeners
+      map.current.on("load", () => {
+        setMapLoaded(true);
+        onMapLoad?.(map.current!);
+      });
 
-    // Set up event listeners
-    map.current.on("load", () => {
-      setMapLoaded(true);
-      onMapLoad?.(map.current!);
-    });
+      map.current.on("click", (e: any) => {
+        onMapClick?.(e);
+      });
 
-    map.current.on("click", (e) => {
-      onMapClick?.(e);
-    });
+      map.current.on("moveend", () => {
+        if (map.current) {
+          const newCenter = map.current.getCenter();
+          const newZoom = map.current.getZoom();
+          onMapMove?.([newCenter.lng, newCenter.lat], newZoom);
+        }
+      });
 
-    map.current.on("moveend", () => {
-      if (map.current) {
-        const newCenter = map.current.getCenter();
-        const newZoom = map.current.getZoom();
-        onMapMove?.([newCenter.lng, newCenter.lat], newZoom);
-      }
-    });
+    })();
 
     // Clean up on unmount
     return () => {
@@ -156,7 +159,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     }
   };
 
-  const addLayer = (layer: mapboxgl.LayerSpecification) => {
+  const addLayer = (layer: any) => {
     if (!map.current || !mapLoaded) return;
 
     if (!map.current.getLayer(layer.id)) {
