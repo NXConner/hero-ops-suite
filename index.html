@@ -21,13 +21,14 @@
   <body>
     <div id="root"></div>
     <script type="module">
-      if (import.meta.env && import.meta.env.DEV) {
-        import('/@react-refresh').then(({ default: RefreshRuntime }) => {
-          RefreshRuntime.injectIntoGlobalHook(window)
-          window.$RefreshReg$ = () => {}
-          window.$RefreshSig$ = () => (type) => type
-          window.__vite_plugin_react_preamble_installed__ = true
-        }).catch(() => {})
+      // React Fast Refresh preamble (sync) for @vitejs/plugin-react-swc
+      // Must run before any React code
+      if (import.meta && import.meta.env && import.meta.env.DEV) {
+        import RefreshRuntime from "/@react-refresh";
+        RefreshRuntime.injectIntoGlobalHook(window);
+        window.$RefreshReg$ = () => {};
+        window.$RefreshSig$ = () => (type) => type;
+        window.__vite_plugin_react_preamble_installed__ = true;
       }
     </script>
     <script type="module" src="/src/main.tsx"></script>
