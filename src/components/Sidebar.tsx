@@ -82,7 +82,7 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const { config } = useNavConfig();
-  const { isVeteran, veteranBranch } = useAdvancedTheme();
+  const { isVeteran, veteranBranch, setLowPower, lowPowerMode } = useAdvancedTheme();
 
   const navigation = useMemo(() => config.filter(i => !i.hidden), [config]);
 
@@ -118,6 +118,12 @@ const Sidebar = () => {
               className="hidden md:inline-flex"
               onClick={() => (window as any).owEffects?.set?.({ minimal: false })}
             >Full</Button>
+            <Button
+              variant={lowPowerMode ? "default" : "outline"}
+              size="sm"
+              className="hidden md:inline-flex"
+              onClick={() => setLowPower(!lowPowerMode)}
+            >{lowPowerMode ? 'Low Power On' : 'Low Power Off'}</Button>
             <Button
               variant="ghost"
               size="icon"

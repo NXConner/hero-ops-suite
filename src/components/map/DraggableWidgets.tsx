@@ -9,7 +9,7 @@ import {
   Maximize2, 
   Minimize2, 
   X as CloseIcon, 
-  Settings,
+  Settings as SettingsIcon,
   TrendingUp,
   TrendingDown,
   Activity,
@@ -18,6 +18,10 @@ import {
   Shield,
   AlertTriangle
 } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { databaseService } from '@/services/database';
 
 interface Widget {
   id: string;
@@ -27,6 +31,7 @@ interface Widget {
   size: { width: number; height: number };
   isMinimized: boolean;
   isDragging: boolean;
+  style?: 'solid' | 'glass' | 'outlined';
 }
 
 interface WidgetControlsProps {
@@ -34,6 +39,7 @@ interface WidgetControlsProps {
   onMinimize: (id: string) => void;
   onClose: (id: string) => void;
   onStartDrag: (id: string) => void;
+  onOpenSettings: (id: string) => void;
   visible: boolean;
 }
 
@@ -44,6 +50,7 @@ const WidgetControls: React.FC<WidgetControlsProps> = ({
   onMinimize, 
   onClose, 
   onStartDrag,
+  onOpenSettings,
   visible
 }) => {
   if (!visible) return null;
@@ -64,6 +71,14 @@ const WidgetControls: React.FC<WidgetControlsProps> = ({
         onClick={() => onMinimize(widget.id)}
       >
         {widget.isMinimized ? <Maximize2 className="h-3 w-3" /> : <Minimize2 className="h-3 w-3" />}
+      </Button>
+      <Button
+        size="sm"
+        variant="ghost"
+        className="h-6 w-6 p-0 text-slate-400 hover:text-cyan-400"
+        onClick={() => onOpenSettings(widget.id)}
+      >
+        <SettingsIcon className="h-3 w-3" />
       </Button>
       <Button
         size="sm"
@@ -126,7 +141,8 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
         position: { x: 20, y: 100 },
         size: { width: 200, height: 150 },
         isMinimized: false,
-        isDragging: false
+        isDragging: false,
+        style: 'glass'
       },
       {
         id: 'intel',
@@ -150,7 +166,8 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
         position: { x: 240, y: 120 },
         size: { width: 220, height: 140 },
         isMinimized: false,
-        isDragging: false
+        isDragging: false,
+        style: 'solid'
       }
     ];
   });
@@ -160,6 +177,8 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
     draggedWidget: null as string | null,
     offset: { x: 0, y: 0 }
   });
+
+  const [settingsOpenFor, setSettingsOpenFor] = useState<string | null>(null);
 
   const handleStartDrag = (id: string) => {
     if (!editMode) return;
@@ -180,6 +199,13 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
 
   const handleClose = (id: string) => {
     setWidgets(widgets.filter(widget => widget.id !== id));
+  };
+
+  const handleOpenSettings = (id: string) => setSettingsOpenFor(id);
+  const handleCloseSettings = () => setSettingsOpenFor(null);
+  const handleApplySettings = (id: string, updates: Partial<Widget>) => {
+    setWidgets(prev => prev.map(w => w.id === id ? { ...w, ...updates } : w));
+    setSettingsOpenFor(null);
   };
 
   useEffect(() => {
@@ -221,45 +247,89 @@ const DraggableWidgets: React.FC<DraggableWidgetsProps> = ({
   useEffect(() => {
     onLayoutChange?.(widgets);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets)); } catch { /* ignore */ }
+    // Optional cloud sync via DatabaseService best-effort
+    const userId = localStorage.getItem('current-user-id') || 'local-user';
+    databaseService.saveWidgetLayout({
+      id: 'default-overwatch',
+      userId,
+      name: 'OverWatch Layout',
+      layout: widgets.map(w => ({ i: w.id, x: w.position.x, y: w.position.y, w: w.size.width, h: w.size.height })),
+      isDefault: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    } as any).catch(() => {});
   }, [widgets, onLayoutChange]);
 
   if (!isVisible) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none z-[500]">
-      {widgets.map(widget => (
-        <Card
-          key={widget.id}
-          className="absolute pointer-events-auto bg-slate-900/95 border-cyan-500/30 backdrop-blur-sm"
-          style={{
-            left: widget.position.x,
-            top: widget.position.y,
-            width: widget.size.width,
-            height: widget.isMinimized ? 'auto' : widget.size.height,
-            cursor: dragState.draggedWidget === widget.id ? 'grabbing' : (editMode ? 'grab' : 'default')
-          }}
-        >
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-cyan-400 text-sm">
-                {widget.title}
-              </CardTitle>
-              <WidgetControls
-                widget={widget}
-                onMinimize={handleMinimize}
-                onClose={handleClose}
-                onStartDrag={handleStartDrag}
-                visible={editMode}
-              />
-            </div>
-          </CardHeader>
-          {!widget.isMinimized && (
-            <CardContent className="pt-0">
-              {widget.content}
-            </CardContent>
-          )}
-        </Card>
-      ))}
+      {widgets.map(widget => {
+        const styleClass = widget.style === 'glass'
+          ? 'bg-slate-900/70 backdrop-blur-md border-cyan-500/30'
+          : widget.style === 'outlined'
+          ? 'bg-slate-900/95 border-cyan-500/50'
+          : 'bg-slate-900/95 border-cyan-500/30';
+        return (
+          <Card
+            key={widget.id}
+            className={`absolute pointer-events-auto ${styleClass}`}
+            style={{
+              left: widget.position.x,
+              top: widget.position.y,
+              width: widget.size.width,
+              height: widget.isMinimized ? 'auto' : widget.size.height,
+              cursor: dragState.draggedWidget === widget.id ? 'grabbing' : (editMode ? 'grab' : 'default')
+            }}
+          >
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-cyan-400 text-sm">
+                  {widget.title}
+                </CardTitle>
+                <WidgetControls
+                  widget={widget}
+                  onMinimize={handleMinimize}
+                  onClose={handleClose}
+                  onStartDrag={handleStartDrag}
+                  onOpenSettings={handleOpenSettings}
+                  visible={editMode}
+                />
+              </div>
+            </CardHeader>
+            {!widget.isMinimized && (
+              <CardContent className="pt-0">
+                {widget.content}
+              </CardContent>
+            )}
+            {settingsOpenFor === widget.id && (
+              <Dialog open onOpenChange={(o) => !o && handleCloseSettings()}>
+                <DialogContent className="pointer-events-auto">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm">Title</label>
+                      <Input defaultValue={widget.title} onChange={(e) => handleApplySettings(widget.id, { title: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="text-sm">Shell Style</label>
+                      <Select value={widget.style || 'solid'} onValueChange={(style: any) => handleApplySettings(widget.id, { style })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="solid">Solid</SelectItem>
+                          <SelectItem value="glass">Glass</SelectItem>
+                          <SelectItem value="outlined">Outlined</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </Card>
+        );
+      })}
     </div>
   );
 };

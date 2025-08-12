@@ -132,6 +132,7 @@ const OverWatch: React.FC = () => {
   const [drawings, setDrawings] = useState<any[]>([]);
   const [measurements, setMeasurements] = useState<any[]>([]);
   const [showWidgets, setShowWidgets] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [weatherRecommendations, setWeatherRecommendations] = useState<string[]>([]);
   const [showVoiceInterface, setShowVoiceInterface] = useState(false);
 
@@ -424,6 +425,14 @@ const OverWatch: React.FC = () => {
                   Edit Layout
                 </Button>
               </Link>
+              <Button
+                variant={isEditMode ? "default" : "outline"}
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={() => setIsEditMode(v => !v)}
+              >
+                In-Place Edit
+              </Button>
             </div>
           </div>
 
@@ -563,7 +572,7 @@ const OverWatch: React.FC = () => {
           <DraggableWidgets 
             terminologyMode={terminologyMode}
             isVisible={showWidgets}
-            editMode={showWidgets}
+            editMode={isEditMode}
             onLayoutChange={(layout) => console.log('Layout changed:', layout)}
           />
 

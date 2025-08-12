@@ -34,6 +34,7 @@ const iconOptions = [
 export default function NavigationEditor() {
   const [items, setItems] = useState<NavItemConfig[]>([]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [lastMouseX, setLastMouseX] = useState<number>(0);
 
   useEffect(() => {
     try {
@@ -55,14 +56,25 @@ export default function NavigationEditor() {
 
   function onDragOver(e: React.DragEvent<HTMLDivElement>, index: number) {
     e.preventDefault();
-    if (dragIndex === null || dragIndex === index) return;
+    setLastMouseX(e.clientX);
+  }
+
+  function onDrop(e: React.DragEvent<HTMLDivElement>, index: number) {
+    e.preventDefault();
+    if (dragIndex === null) return;
+    const isNest = lastMouseX - (e.currentTarget.getBoundingClientRect().left) > 48;
     setItems(prev => {
       const copy = [...prev];
       const [removed] = copy.splice(dragIndex, 1);
+      if (isNest) {
+        removed.parent = copy[index]?.href || null;
+      } else {
+        removed.parent = null;
+      }
       copy.splice(index, 0, removed);
       return copy;
     });
-    setDragIndex(index);
+    setDragIndex(null);
   }
 
   function indent(index: number) {
@@ -112,6 +124,7 @@ export default function NavigationEditor() {
             draggable
             onDragStart={() => onDragStart(index)}
             onDragOver={(e) => onDragOver(e, index)}
+            onDrop={(e) => onDrop(e, index)}
           >
             <GripVertical className="h-4 w-4 text-muted-foreground" />
             <div className="grid grid-cols-12 gap-2 flex-1 items-center" style={{ paddingLeft: `${level(item) * 16}px` }}>

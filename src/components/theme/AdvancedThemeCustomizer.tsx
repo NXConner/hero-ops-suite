@@ -577,7 +577,7 @@ export function AdvancedThemeCustomizer() {
                         />
                       </div>
                       <div>
-                        <Label>Input Radius</Label>
+                        <Label>Input/Select Radius</Label>
                         <Slider min={0} max={24} step={1} value={[parseInt(((customTheme as any).ui?.radius?.input || '8px').toString(), 10)]}
                           onValueChange={([v]) => {
                             const updated = { ...customTheme } as any;
@@ -588,6 +588,102 @@ export function AdvancedThemeCustomizer() {
                             style.id = 'preview-theme-styles';
                             const prev = style.textContent || '';
                             style.textContent = `${prev}\n:root{ --radius-input: ${v}px; }`;
+                            if (!s) document.head.appendChild(style);
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Menu Radius</Label>
+                        <Slider min={0} max={24} step={1} value={[parseInt(((customTheme as any).ui?.radius?.menu || '6px').toString(), 10)]}
+                          onValueChange={([v]) => {
+                            const updated = { ...customTheme } as any;
+                            updated.ui = { ...(updated.ui || {}), radius: { ...(updated.ui?.radius || {}), menu: `${v}px` } };
+                            setCustomTheme(updated);
+                            const s = document.getElementById('preview-theme-styles');
+                            const style = s || document.createElement('style');
+                            style.id = 'preview-theme-styles';
+                            const prev = style.textContent || '';
+                            style.textContent = `${prev}\n:root{ --radius-menu: ${v}px; }`;
+                            if (!s) document.head.appendChild(style);
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Popover/Dropdown Radius</Label>
+                        <Slider min={0} max={24} step={1} value={[parseInt(((customTheme as any).ui?.radius?.popover || '6px').toString(), 10)]}
+                          onValueChange={([v]) => {
+                            const updated = { ...customTheme } as any;
+                            updated.ui = { ...(updated.ui || {}), radius: { ...(updated.ui?.radius || {}), popover: `${v}px` } };
+                            setCustomTheme(updated);
+                            const s = document.getElementById('preview-theme-styles');
+                            const style = s || document.createElement('style');
+                            style.id = 'preview-theme-styles';
+                            const prev = style.textContent || '';
+                            style.textContent = `${prev}\n:root{ --radius-popover: ${v}px; }`;
+                            if (!s) document.head.appendChild(style);
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Toast Radius</Label>
+                        <Slider min={0} max={24} step={1} value={[parseInt(((customTheme as any).ui?.radius?.toast || '8px').toString(), 10)]}
+                          onValueChange={([v]) => {
+                            const updated = { ...customTheme } as any;
+                            updated.ui = { ...(updated.ui || {}), radius: { ...(updated.ui?.radius || {}), toast: `${v}px` } };
+                            setCustomTheme(updated);
+                            const s = document.getElementById('preview-theme-styles');
+                            const style = s || document.createElement('style');
+                            style.id = 'preview-theme-styles';
+                            const prev = style.textContent || '';
+                            style.textContent = `${prev}\n:root{ --radius-toast: ${v}px; }`;
+                            if (!s) document.head.appendChild(style);
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Dialog Radius</Label>
+                        <Slider min={0} max={32} step={1} value={[parseInt(((customTheme as any).ui?.radius?.dialog || '8px').toString(), 10)]}
+                          onValueChange={([v]) => {
+                            const updated = { ...customTheme } as any;
+                            updated.ui = { ...(updated.ui || {}), radius: { ...(updated.ui?.radius || {}), dialog: `${v}px` } };
+                            setCustomTheme(updated);
+                            const s = document.getElementById('preview-theme-styles');
+                            const style = s || document.createElement('style');
+                            style.id = 'preview-theme-styles';
+                            const prev = style.textContent || '';
+                            style.textContent = `${prev}\n:root{ --radius-dialog: ${v}px; }`;
+                            if (!s) document.head.appendChild(style);
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Tabs Radius</Label>
+                        <Slider min={0} max={16} step={1} value={[parseInt(((customTheme as any).ui?.radius?.tabs || '6px').toString(), 10)]}
+                          onValueChange={([v]) => {
+                            const updated = { ...customTheme } as any;
+                            updated.ui = { ...(updated.ui || {}), radius: { ...(updated.ui?.radius || {}), tabs: `${v}px` } };
+                            setCustomTheme(updated);
+                            const s = document.getElementById('preview-theme-styles');
+                            const style = s || document.createElement('style');
+                            style.id = 'preview-theme-styles';
+                            const prev = style.textContent || '';
+                            style.textContent = `${prev}\n:root{ --radius-tabs: ${v}px; }`;
+                            if (!s) document.head.appendChild(style);
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Border Width</Label>
+                        <Slider min={0} max={4} step={1} value={[parseInt(((customTheme as any).ui?.borders?.width || '1px').toString(), 10)]}
+                          onValueChange={([v]) => {
+                            const updated = { ...customTheme } as any;
+                            updated.ui = { ...(updated.ui || {}), borders: { ...(updated.ui?.borders || {}), width: `${v}px` } };
+                            setCustomTheme(updated);
+                            const s = document.getElementById('preview-theme-styles');
+                            const style = s || document.createElement('style');
+                            style.id = 'preview-theme-styles';
+                            const prev = style.textContent || '';
+                            style.textContent = `${prev}\n:root{ --border-width: ${v}px; }`;
                             if (!s) document.head.appendChild(style);
                           }}
                         />
@@ -604,6 +700,22 @@ export function AdvancedThemeCustomizer() {
                             style.id = 'preview-theme-styles';
                             const prev = style.textContent || '';
                             style.textContent = `${prev}\n:root{ --ring-width: ${v}px; }`;
+                            if (!s) document.head.appendChild(style);
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Focus Ring Offset</Label>
+                        <Slider min={0} max={6} step={1} value={[parseInt(((customTheme as any).ui?.borders?.focusRingOffset || '2px').toString(), 10)]}
+                          onValueChange={([v]) => {
+                            const updated = { ...customTheme } as any;
+                            updated.ui = { ...(updated.ui || {}), borders: { ...(updated.ui?.borders || {}), focusRingOffset: `${v}px` } };
+                            setCustomTheme(updated);
+                            const s = document.getElementById('preview-theme-styles');
+                            const style = s || document.createElement('style');
+                            style.id = 'preview-theme-styles';
+                            const prev = style.textContent || '';
+                            style.textContent = `${prev}\n:root{ --ring-offset: ${v}px; }`;
                             if (!s) document.head.appendChild(style);
                           }}
                         />

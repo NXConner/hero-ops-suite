@@ -14,6 +14,10 @@ interface EffectSettings {
   minimal?: boolean;
   scanlineSpacing?: number; // px
   glitchLevel?: number; // 0-1
+  // New effects
+  hexMesh?: boolean;
+  telemetryColumns?: boolean;
+  contaminationFog?: boolean;
 }
 
 const defaultSettings: EffectSettings = {
@@ -28,6 +32,9 @@ const defaultSettings: EffectSettings = {
   minimal: false,
   scanlineSpacing: 3,
   glitchLevel: 0.3,
+  hexMesh: false,
+  telemetryColumns: false,
+  contaminationFog: false,
 };
 
 function useEffectSettings() {
@@ -54,19 +61,19 @@ function useEffectSettings() {
       preset: (name: 'isac' | 'disavowed' | 'darkzone' | 'minimal' | 'vivid') => {
         switch (name) {
           case 'minimal':
-            setSettings({ ...defaultSettings, scanlines: false, refreshBarH: false, refreshBarV: false, radarSweep: false, vignette: false, glitch: false, uvVignette: false, ticker: false, minimal: true });
+            setSettings({ ...defaultSettings, scanlines: false, refreshBarH: false, refreshBarV: false, radarSweep: false, vignette: false, glitch: false, uvVignette: false, ticker: false, minimal: true, hexMesh: false, telemetryColumns: false, contaminationFog: false });
             break;
           case 'isac':
-            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: true, refreshBarV: false, radarSweep: false, vignette: true, glitch: false, uvVignette: false, ticker: false, scanlineSpacing: 3, glitchLevel: 0.2 }));
+            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: true, refreshBarV: false, radarSweep: false, vignette: true, glitch: false, uvVignette: false, ticker: false, scanlineSpacing: 3, glitchLevel: 0.2, hexMesh: false, telemetryColumns: true, contaminationFog: false }));
             break;
           case 'disavowed':
-            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: false, refreshBarV: true, radarSweep: false, vignette: true, glitch: true, uvVignette: false, ticker: true, scanlineSpacing: 2, glitchLevel: 0.5 }));
+            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: false, refreshBarV: true, radarSweep: false, vignette: true, glitch: true, uvVignette: false, ticker: true, scanlineSpacing: 2, glitchLevel: 0.5, hexMesh: true, telemetryColumns: false, contaminationFog: false }));
             break;
           case 'darkzone':
-            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: false, refreshBarV: false, radarSweep: true, vignette: true, glitch: true, uvVignette: true, ticker: true, scanlineSpacing: 3, glitchLevel: 0.4 }));
+            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: false, refreshBarV: false, radarSweep: true, vignette: true, glitch: true, uvVignette: true, ticker: true, scanlineSpacing: 3, glitchLevel: 0.4, hexMesh: true, telemetryColumns: false, contaminationFog: true }));
             break;
           case 'vivid':
-            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: true, refreshBarV: true, radarSweep: true, vignette: true, glitch: true, uvVignette: true, ticker: true, scanlineSpacing: 2, glitchLevel: 0.6 }));
+            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: true, refreshBarV: true, radarSweep: true, vignette: true, glitch: true, uvVignette: true, ticker: true, scanlineSpacing: 2, glitchLevel: 0.6, hexMesh: true, telemetryColumns: true, contaminationFog: true }));
             break;
         }
       }
@@ -174,6 +181,31 @@ export default function EffectsOverlay() {
             ▷ ISAC SYSTEM ONLINE ▷ LINK STABLE ▷ TELEMETRY: OK ▷ SCANLNS: ON ▷ RADAR: STBY ▷ EFFECTS: OPT ▷ 
           </div>
         </div>
+      )}
+
+      {/* Hex mesh overlay */}
+      {settings.hexMesh && (
+        <div aria-hidden className="absolute inset-0 opacity-10" style={{
+          backgroundImage: 'repeating-conic-gradient(from 0deg at 25px 43px, rgba(0,255,255,0.15) 0deg 60deg, transparent 60deg 120deg)',
+          backgroundSize: '50px 86px',
+          mixBlendMode: 'screen'
+        }} />
+      )}
+
+      {/* Telemetry columns */}
+      {settings.telemetryColumns && (
+        <div aria-hidden className="absolute inset-0" style={{
+          background: 'repeating-linear-gradient(90deg, rgba(0,255,200,0.05) 0px, rgba(0,255,200,0.05) 1px, transparent 1px, transparent 12px)',
+          mixBlendMode: 'overlay'
+        }} />
+      )}
+
+      {/* Contamination fog */}
+      {settings.contaminationFog && (
+        <div aria-hidden className="absolute inset-0" style={{
+          background: 'radial-gradient( circle at 20% 80%, rgba(120,255,0,0.08), transparent 40% ), radial-gradient( circle at 80% 20%, rgba(120,255,0,0.08), transparent 40% )',
+          filter: 'blur(2px)'
+        }} />
       )}
 
       <style>{`
