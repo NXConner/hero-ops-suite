@@ -33,15 +33,19 @@ import {
   Archive,
   Flag
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Sidebar from "@/components/Sidebar";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const IntelReports = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReport, setSelectedReport] = useState(null);
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'reports';
 
   const reports = [
     {
@@ -116,6 +120,15 @@ const IntelReports = () => {
     { type: "OSINT", active: 15, reliability: 76, reports: 89 }
   ];
 
+  const { data: competitorsData } = useQuery({
+    queryKey: ['intel-competitors'],
+    queryFn: async () => (await axios.get('/intel/competitors')).data,
+  });
+  const { data: trendsData } = useQuery({
+    queryKey: ['intel-trends'],
+    queryFn: async () => (await axios.get('/intel/trends')).data,
+  });
+
   const filteredReports = reports.filter(report => {
     const matchesSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          report.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -170,12 +183,13 @@ const IntelReports = () => {
         </div>
 
         <div className="container mx-auto px-6 py-8">
-          <Tabs defaultValue="reports" className="space-y-6">
-            <TabsList className="grid w-full lg:w-auto lg:grid-cols-5">
+          <Tabs defaultValue={initialTab} className="space-y-6">
+            <TabsList className="grid w-full lg:w-auto lg:grid-cols-6">
               <TabsTrigger value="reports">Reports</TabsTrigger>
               <TabsTrigger value="threats">Threat Analysis</TabsTrigger>
               <TabsTrigger value="sources">Intel Sources</TabsTrigger>
               <TabsTrigger value="surveillance">Surveillance</TabsTrigger>
+              <TabsTrigger value="market">Market Intel</TabsTrigger>
               <TabsTrigger value="archive">Archive</TabsTrigger>
             </TabsList>
 
@@ -524,6 +538,69 @@ const IntelReports = () => {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+
+            <TabsContent value="market" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+                <CardHeader>
+                  <CardTitle>Competitors & Trends</CardTitle>
+                  <CardDescription>OSINT pull of competitor sites and asphalt industry news</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex gap-3">
+                    <Button variant="outline" onClick={async () => { try { await axios.post('/intel/scrape', { kind: 'competitors' }); } catch {} }}>Refresh Competitors</Button>
+                    <Button variant="outline" onClick={async () => { try { await axios.post('/intel/scrape', { kind: 'trends' }); } catch {} }}>Refresh Trends</Button>
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="font-semibold mb-2">Competitors</h3>
+                      <div className="text-sm text-muted-foreground mb-2">Scraped: {competitorsData?.scraped_at || '—'}</div>
+                      <div className="space-y-3 max-h-[420px] overflow-auto pr-2">
+                        {(competitorsData?.competitors || []).map((c: any) => (
+                          <div key={c.domain} className="border border-border/40 rounded-lg p-3">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="font-medium">{c.company || c.domain}</div>
+                                <div className="text-xs text-muted-foreground">{c.region || ''} • {c.domain}</div>
+                              </div>
+                              <Badge variant="secondary">{c.pages?.length || 0} pages</Badge>
+                            </div>
+                            <div className="mt-2 grid grid-cols-2 gap-2">
+                              {(c.pages || []).slice(0, 4).map((p: any) => (
+                                <a key={p.url} className="text-xs text-primary hover:underline truncate" href={p.url} target="_blank" rel="noreferrer">{p.title || p.url}</a>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4">
+                        <h4 className="text-sm font-semibold">Keyword Mentions</h4>
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          {Object.entries(competitorsData?.keyword_summary || {}).slice(0, 12).map(([k, v]: any) => (
+                            <div key={k} className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground">{k}</span>
+                              <Badge variant="outline">{v as any}</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-2">Trends</h3>
+                      <div className="text-sm text-muted-foreground mb-2">Scraped: {trendsData?.scraped_at || '—'}</div>
+                      <div className="space-y-3 max-h-[420px] overflow-auto pr-2">
+                        {(trendsData?.items || []).slice(0, 25).map((i: any) => (
+                          <div key={i.link} className="border border-border/40 rounded-lg p-3">
+                            <a className="font-medium hover:underline" href={i.link} target="_blank" rel="noreferrer">{i.title || i.link}</a>
+                            <div className="text-xs text-muted-foreground mt-1">{i.source} • {i.pubDate || i.isoDate || ''}</div>
+                            {i.summary && <div className="text-xs mt-1 line-clamp-2">{i.summary}</div>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="archive" className="space-y-6">

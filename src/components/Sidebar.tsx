@@ -52,6 +52,7 @@ const defaultNav: NavItemConfig[] = [
   { name: 'Analytics', href: '/analytics', icon: 'BarChart3' },
   { name: 'Communications', href: '/communications', icon: 'MessageSquare', badge: '3' },
   { name: 'Intel Reports', href: '/intel-reports', icon: 'FileText' },
+  { name: 'Market Intel', href: '/intel-reports?tab=market', icon: 'FileText', parent: '/intel-reports' },
   { name: 'PavementScan Pro', href: '/pavement-scan-pro', icon: 'Scan', badge: 'NEW' },
   { name: 'Estimator', href: '/pavement-estimator', icon: 'Shield', badge: 'BETA' },
   { name: 'Fleet & Field Ops', href: '/fleet-field-ops', icon: 'LayoutDashboard', badge: 'BETA' },

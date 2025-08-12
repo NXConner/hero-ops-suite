@@ -1,0 +1,25 @@
+{
+  "scraped_at": "2025-01-01T00:00:00.000Z",
+  "feeds": [
+    { "feed": "https://theasphaltpro.com/feed/", "source": "Asphalt Pro Magazine", "items": [] },
+    { "feed": "https://pavementmag.com/feed/", "source": "Pavement Magazine", "items": [] }
+  ],
+  "items": [
+    {
+      "source": "Asphalt Pro Magazine",
+      "title": "2025 Sealcoating Best Practices",
+      "link": "https://theasphaltpro.com/articles/sealcoating-best-practices-2025",
+      "pubDate": "Mon, 01 Jan 2025 10:00:00 GMT",
+      "isoDate": "2025-01-01T10:00:00.000Z",
+      "summary": "A roundup of updated application methods, curing, and compliance for sealcoating in 2025."
+    },
+    {
+      "source": "Pavement Magazine",
+      "title": "Crack Sealing ROI in Commercial Lots",
+      "link": "https://pavementmag.com/articles/crack-sealing-roi-commercial",
+      "pubDate": "Tue, 02 Jan 2025 14:30:00 GMT",
+      "isoDate": "2025-01-02T14:30:00.000Z",
+      "summary": "Case studies showing lifecycle savings from proactive crack sealing and patching."
+    }
+  ]
+}

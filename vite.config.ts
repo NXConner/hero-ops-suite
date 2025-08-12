@@ -8,6 +8,16 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      "/scans": "http://localhost:3001",
+      "/analytics": "http://localhost:3001",
+      "/config": "http://localhost:3001",
+      "/jobs": "http://localhost:3001",
+      "/messages": "http://localhost:3001",
+      "/invoices": "http://localhost:3001",
+      "/estimate": "http://localhost:3001",
+      "/intel": "http://localhost:3001",
+    },
   },
   plugins: [
     react(),

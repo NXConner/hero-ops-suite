@@ -1,0 +1,4 @@
+[
+  { "company": "Competitor A Paving", "domain": "https://www.examplepaving-a.com", "region": "Local", "pages": ["/services", "/asphalt", "/sealcoating"] },
+  { "company": "Competitor B Asphalt", "domain": "https://www.example-asphalt-b.com", "region": "Regional", "pages": ["/services", "/paving", "/parking-lot"] }
+]

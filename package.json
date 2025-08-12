@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "server"
   ],
   "scripts": {
     "prebuild": "npm run --workspace=@asphalt/platform-sdk build",
@@ -20,7 +21,11 @@
     "test:coverage": "vitest run --coverage",
     "preview": "vite preview",
     "audit": "npm audit --audit-level=moderate || true",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "scrape:intel": "npm run --workspace=@asphalt/web-scraper scrape",
+    "scrape:intel:competitors": "npm run --workspace=@asphalt/web-scraper scrape:competitors",
+    "scrape:intel:trends": "npm run --workspace=@asphalt/web-scraper scrape:trends",
+    "server": "node server/index.js"
   },
   "dependencies": {
     "@babylonjs/core": "^8.21.1",
