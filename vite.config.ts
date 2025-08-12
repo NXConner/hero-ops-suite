@@ -57,7 +57,6 @@ export default defineConfig(({ mode }) => ({
           ],
           // separate heavy libs to maximize route-level splitting
           three_bundle: ["three", "@react-three/fiber", "@react-three/drei"],
-          babylon_bundle: ["@babylonjs/core"],
           mapbox: ["mapbox-gl"],
         },
       },
