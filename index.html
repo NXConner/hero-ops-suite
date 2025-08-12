@@ -15,19 +15,6 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-    <!-- Dev-only: Ensure Vite client and React Refresh preamble loads before modules -->
-    <script type="module">
-      try {
-        await import('/@vite/client');
-        const RefreshRuntime = (await import('/@react-refresh')).default;
-        RefreshRuntime.injectIntoGlobalHook(window);
-        window.$RefreshReg$ = () => {};
-        window.$RefreshSig$ = () => (type) => type;
-        window.__vite_plugin_react_preamble_installed__ = true;
-      } catch (err) {
-        // In production, these dev-only imports don't exist; safely ignore.
-      }
-    </script>
   </head>
 
   <body>
