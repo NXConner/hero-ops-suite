@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,6 +16,13 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <!-- Minimal preamble shim for built previews that use development mode transforms -->
+    <script>
+      // This prevents @vitejs/plugin-react-swc from throwing when build artifacts
+      // were generated with dev transforms but served without the dev preamble.
+      window.__vite_plugin_react_preamble_installed__ = true;
+    </script>
   </head>
 
   <body>
