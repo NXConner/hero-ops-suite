@@ -1,4 +1,32 @@
 [
-  { "company": "Competitor A Paving", "domain": "https://www.examplepaving-a.com", "region": "Local", "pages": ["/services", "/asphalt", "/sealcoating"] },
-  { "company": "Competitor B Asphalt", "domain": "https://www.example-asphalt-b.com", "region": "Regional", "pages": ["/services", "/paving", "/parking-lot"] }
+  {
+    "company": "Kendrick Paving",
+    "region": "Local",
+    "domain": "https://www.kendrickpaving.com",
+    "pages": ["", "/services", "/asphalt", "/sealcoating", "/paving"]
+  },
+  {
+    "company": "Kendrick Paving Facebook 1",
+    "region": "Local",
+    "domain": "https://www.facebook.com",
+    "pages": ["/share/16ibb2M5Vr"]
+  },
+  {
+    "company": "Kendrick Paving Facebook 2",
+    "region": "Local",
+    "domain": "https://www.facebook.com",
+    "pages": ["/share/16oMMUACJA/"]
+  },
+  {
+    "company": "Kendrick Paving Facebook 3",
+    "region": "Local",
+    "domain": "https://www.facebook.com",
+    "pages": ["/share/1AAL7b25vT/"]
+  },
+  {
+    "company": "Kendrick Paving Facebook 4",
+    "region": "Local",
+    "domain": "https://www.facebook.com",
+    "pages": ["/share/1GKcNFNryL/"]
+  }
 ]
