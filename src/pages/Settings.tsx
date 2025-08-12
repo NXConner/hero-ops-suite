@@ -747,6 +747,38 @@ const Settings = () => {
                         </SelectContent>
                       </Select>
 
+                      {(globalWallpaperOverride?.type === 'image' || globalWallpaperOverride?.type === 'video' || globalWallpaperOverride?.type === 'gradient' || globalWallpaperOverride?.type === 'color') && (
+                        <div className="space-y-4">
+                          <Label>Color Filters</Label>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label>Hue Rotate</Label>
+                              <input
+                                type="range"
+                                min={0}
+                                max={360}
+                                step={1}
+                                value={globalWallpaperOverride?.filters?.hue ?? 0}
+                                onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), filters: { ...(globalWallpaperOverride?.filters as any), hue: parseInt(e.target.value, 10) } })}
+                                className="w-full"
+                              />
+                            </div>
+                            <div>
+                              <Label>Brightness</Label>
+                              <input
+                                type="range"
+                                min={50}
+                                max={150}
+                                step={1}
+                                value={globalWallpaperOverride?.filters?.brightness ?? 100}
+                                onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), filters: { ...(globalWallpaperOverride?.filters as any), brightness: parseInt(e.target.value, 10) } })}
+                                className="w-full"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {(globalWallpaperOverride?.type === 'image' || globalWallpaperOverride?.type === 'video') && (
                         <div className="space-y-2">
                           <Label>Source URL</Label>
@@ -884,6 +916,20 @@ const Settings = () => {
                           <Switch checked={!!globalWallpaperOverride?.parallax} onCheckedChange={(parallax) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), parallax })} />
                           <span className="text-sm">Parallax</span>
                         </div>
+                        {globalWallpaperOverride?.parallax && (
+                          <div>
+                            <Label>Parallax Strength</Label>
+                            <input
+                              type="range"
+                              min={0}
+                              max={1}
+                              step={0.05}
+                              value={(globalWallpaperOverride as any)?.parallaxStrength ?? 0.5}
+                              onChange={(e) => setGlobalWallpaperOverride({ ...(globalWallpaperOverride as any), parallaxStrength: parseFloat(e.target.value) })}
+                              className="w-full"
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

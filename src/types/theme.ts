@@ -167,6 +167,9 @@ export interface ThemeWallpaper {
   tiling?: 'repeat' | 'no-repeat' | 'repeat-x' | 'repeat-y';
   position?: string;
   size?: string;
+  // New optional fields
+  filters?: { hue?: number; brightness?: number };
+  parallaxStrength?: number;
 }
 
 export interface ThemeTypography {
@@ -262,6 +265,8 @@ export interface ThemeUIRadius {
   menu?: string;      // e.g., '0.375rem'
   popover?: string;   // e.g., '0.375rem'
   toast?: string;     // e.g., '0.5rem'
+  dialog?: string;    // e.g., '0.5rem'
+  tabs?: string;      // e.g., '0.375rem'
 }
 
 export interface ThemeUIBorders {

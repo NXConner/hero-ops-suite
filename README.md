@@ -53,3 +53,24 @@ This repository contains:
 - Wire cloud analysis service to produce overlay JSON, then upload via `POST /scans/{id}/overlay`.
 - Flesh out 3D viewer using `expo-three` and GLTF loading.
 - Add portals and analytics as web apps or within a monorepo structure.
+
+## New routes and features
+
+- Builder: `/builder` for page/widget layouts
+- Theme Customizer: `/theme-customizer` for live theme edits
+- OverWatch Map in-place Edit toggle for widgets
+
+## Settings additions
+
+- Wallpapers: global override, profiles, color filters (hue/brightness), parallax with strength
+- Audio: UI sound presets and volume/mute
+- Navigation: drag-and-drop with nesting by drop position
+- Display: quick Minimal Effects preset buttons and Low Power Mode in sidebar
+
+## UI Tokens
+
+Per-component UI tokens are now supported and persisted in themes:
+- Radii: card, button, input/select, menu, popover/dropdown, toast, dialog, tabs
+- Borders: border width, focus ring width, focus ring offset
+
+Components are wired to CSS vars, enabling live preview and persistence across reloads.

@@ -212,6 +212,8 @@ export function generateThemeCSS(theme: Theme): string {
       if (ui.radius.menu) vars.push(`--radius-menu: ${ui.radius.menu};`);
       if (ui.radius.popover) vars.push(`--radius-popover: ${ui.radius.popover};`);
       if (ui.radius.toast) vars.push(`--radius-toast: ${ui.radius.toast};`);
+      if (ui.radius.dialog) vars.push(`--radius-dialog: ${ui.radius.dialog};`);
+      if (ui.radius.tabs) vars.push(`--radius-tabs: ${ui.radius.tabs};`);
     }
     if (ui?.borders) {
       if (ui.borders.width) vars.push(`--border-width: ${ui.borders.width};`);
@@ -257,25 +259,28 @@ export function generateWallpaperCSS(theme: Theme): string {
       break;
   }
 
+  // Filters
+  const filters = (wallpaper as any).filters as { hue?: number; brightness?: number } | undefined;
+  if (filters && (typeof filters.hue === 'number' || typeof filters.brightness === 'number')) {
+    const hue = typeof filters.hue === 'number' ? filters.hue : 0;
+    const brightness = typeof filters.brightness === 'number' ? filters.brightness : 100;
+    backgroundCSS += `\nfilter: hue-rotate(${hue}deg) brightness(${brightness}%);`;
+  }
+
+  // Parallax strength/attachment
+  if (wallpaper.parallax) {
+    backgroundCSS += `\nbackground-attachment: fixed;`;
+  }
+
+  if ((wallpaper as any).parallaxStrength) {
+    // Expose as CSS var for potential JS parallax drivers
+    backgroundCSS += `\n--parallax-strength: ${(wallpaper as any).parallaxStrength};`;
+  }
+
   if (wallpaper.overlay) {
     const overlayColor = hslToString(adjustAlpha(wallpaper.overlay.color, wallpaper.overlay.opacity));
-    backgroundCSS += `
-      background-blend-mode: ${wallpaper.overlay.blendMode};
-      position: relative;
-    `;
-    backgroundCSS += `
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: ${overlayColor};
-        mix-blend-mode: ${wallpaper.overlay.blendMode};
-        pointer-events: none;
-      }
-    `;
+    backgroundCSS += `\nbackground-blend-mode: ${wallpaper.overlay.blendMode};\nposition: relative;`;
+    // Note: pseudo-element cannot be injected via inline style string here; handled by theme CSS elsewhere if needed
   }
 
   return backgroundCSS;
