@@ -3,6 +3,7 @@ import React from 'react';
 interface ErrorBoundaryProps {
   fallback?: React.ReactNode;
   children: React.ReactNode;
+  resetKey?: unknown;
 }
 
 interface ErrorBoundaryState {
@@ -24,6 +25,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     console.error('ErrorBoundary caught an error', error);
   }
 
+  componentDidUpdate(prevProps: ErrorBoundaryProps) {
+    if (prevProps.resetKey !== this.props.resetKey && this.state.hasError) {
+      this.setState({ hasError: false });
+    }
+  }
+
   render() {
     if (this.state.hasError) {
       return this.props.fallback ?? (
@@ -31,7 +38,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
           <div className="max-w-md text-center space-y-3">
             <h1 className="text-2xl font-semibold">Something went wrong</h1>
             <p className="text-muted-foreground">Please refresh the page or try again.</p>
-            <button className="px-4 py-2 rounded bg-primary text-primary-foreground" onClick={() => location.reload()}>Reload</button>
+            <div className="flex items-center justify-center gap-2">
+              <button className="px-4 py-2 rounded bg-primary text-primary-foreground" onClick={() => location.reload()}>Reload</button>
+              <button className="px-4 py-2 rounded border" onClick={() => this.setState({ hasError: false })}>Try Again</button>
+            </div>
           </div>
         </div>
       );

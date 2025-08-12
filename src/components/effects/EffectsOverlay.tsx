@@ -90,8 +90,11 @@ export default function EffectsOverlay() {
     return () => media.removeEventListener('change', onChange);
   }, []);
 
-  const isLowPower = currentTheme?.performance.quality === 'low';
-  const enableVisuals = currentTheme?.performance.enableAnimations !== false && !isLowPower && !reducedMotion;
+  // If theme is not yet available, do not render overlay
+  if (!currentTheme) return null;
+
+  const isLowPower = currentTheme?.performance?.quality === 'low';
+  const enableVisuals = !!currentTheme?.performance?.enableAnimations && !isLowPower && !reducedMotion;
 
   if (!enableVisuals || settings.minimal) return null;
 
