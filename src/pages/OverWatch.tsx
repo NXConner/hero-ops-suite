@@ -110,8 +110,8 @@ const mapServices: MapService[] = [
     id: "mapbox-streets",
     name: "Mapbox Streets",
     url:
-      typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_MAPBOX_API_KEY
-        ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_API_KEY}`
+      typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_MAPBOX_TOKEN
+        ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_TOKEN}`
         : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "© Mapbox",
     icon: <Map className="w-4 h-4" />,
@@ -120,8 +120,8 @@ const mapServices: MapService[] = [
     id: "mapbox-satellite",
     name: "Mapbox Satellite",
     url:
-      typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_MAPBOX_API_KEY
-        ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_API_KEY}`
+      typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_MAPBOX_TOKEN
+        ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_TOKEN}`
         : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "© Mapbox",
     icon: <Eye className="w-4 h-4" />,
@@ -430,7 +430,7 @@ const OverWatch: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Radar className="w-6 h-6 text-cyan-400" />
                 <h1 className="text-xl font-bold text-cyan-400">
-                  {getTerminology("OverWatch Command Center", "OverWatch Control Hub")}
+                  {getTerminology("Unified Map Command Center", "Unified Map Control Hub")}
                 </h1>
               </div>
               <Badge variant="outline" className="text-green-400 border-green-400">

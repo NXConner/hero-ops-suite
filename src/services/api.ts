@@ -483,11 +483,13 @@ export class GPSTrackingService {
 
   private connectWebSocket(): void {
     try {
-      const wsUrl = API_CONFIG.GPS_TRACKING_URL.replace("https://", "wss://").replace(
-        "http://",
-        "ws://",
-      );
-      this.websocket = new WebSocket(`${wsUrl}/realtime`);
+      const wsUrl = (API_CONFIG.FLEET_WEBSOCKET_URL || "").startsWith("ws")
+        ? API_CONFIG.FLEET_WEBSOCKET_URL
+        : API_CONFIG.GPS_TRACKING_URL.replace("https://", "wss://").replace(
+            "http://",
+            "ws://",
+          ) + "/realtime";
+      this.websocket = new WebSocket(wsUrl);
 
       this.websocket.onopen = () => {
         console.log("GPS WebSocket connected");
