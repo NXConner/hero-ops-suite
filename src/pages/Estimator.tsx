@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef, lazy, Suspense } from "react";
 import Sidebar from "@/components/Sidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ import {
   exportCustomersCSV,
   downloadTextFile,
 } from "@/services/exporters";
-import RealMapComponent from "@/components/map/RealMapComponent";
+const RealMapComponent = lazy(() => import("@/components/map/RealMapComponent"));
 import { geocodeAddress } from "@/lib/geo";
 import { listProjects, saveProject, type Project } from "@/services/projects";
 
@@ -936,43 +936,44 @@ const Estimator = () => {
             </CardHeader>
             <CardContent>
               <div className="h-64 w-full rounded overflow-hidden border border-border/30">
-                <RealMapComponent
+                <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">Loading map…</div>}>
+                  <RealMapComponent
                   center={jobCoords ? [jobCoords.lon, jobCoords.lat] : [-74.006, 40.7128]}
                   zoom={jobCoords ? 10 : 3}
                   styleUrl={"mapbox://styles/mapbox/streets-v12"}
                 >
-                  {/* Draw simple line using a GeoJSON source if both coords are present */}
-                  {jobCoords &&
-                    supplierCoords &&
-                    (() => {
-                      const map = (window as any).mapMethods?.getMap?.();
-                      if (map && map.isStyleLoaded()) {
-                        const route = {
-                          type: "Feature",
-                          geometry: {
-                            type: "LineString",
-                            coordinates: [
-                              [supplierCoords.lon, supplierCoords.lat],
-                              [jobCoords.lon, jobCoords.lat],
-                            ],
-                          },
-                        } as any;
-                        const srcId = "route-preview";
-                        if (!map.getSource(srcId)) {
-                          map.addSource(srcId, { type: "geojson", data: route });
-                          map.addLayer({
-                            id: "route-line",
-                            type: "line",
-                            source: srcId,
-                            paint: { "line-color": "#22d3ee", "line-width": 3 },
-                          });
-                        } else {
-                          (map.getSource(srcId) as any).setData(route);
-                        }
+                  {(() => {
+                    if (!jobCoords) return null;
+                    // Draw simple line using a GeoJSON source if both coords are present */
+                    const map = (window as any).mapMethods?.getMap?.();
+                    if (map && map.isStyleLoaded()) {
+                      const route = {
+                        type: "Feature",
+                        geometry: {
+                          type: "LineString",
+                          coordinates: [
+                            [supplierCoords.lon, supplierCoords.lat],
+                            [jobCoords.lon, jobCoords.lat],
+                          ],
+                        },
+                      } as any;
+                      const srcId = "route-preview";
+                      if (!map.getSource(srcId)) {
+                        map.addSource(srcId, { type: "geojson", data: route });
+                        map.addLayer({
+                          id: "route-line",
+                          type: "line",
+                          source: srcId,
+                          paint: { "line-color": "#22d3ee", "line-width": 3 },
+                        });
+                      } else {
+                        (map.getSource(srcId) as any).setData(route);
                       }
-                      return null;
-                    })()}
+                    }
+                    return null;
+                  })()}
                 </RealMapComponent>
+                </Suspense>
               </div>
             </CardContent>
           </Card>
