@@ -126,6 +126,11 @@ const Settings = () => {
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
               <TabsTrigger value="display">Display</TabsTrigger>
+              <TabsTrigger value="wallpapers">Wallpapers</TabsTrigger>
+              <TabsTrigger value="audio">Audio</TabsTrigger>
+              <TabsTrigger value="navigation">Navigation</TabsTrigger>
+              <TabsTrigger value="business">Business</TabsTrigger>
+              <TabsTrigger value="backup">Backup</TabsTrigger>
               <TabsTrigger value="veteran">Veteran</TabsTrigger>
               <TabsTrigger value="data">Data</TabsTrigger>
             </TabsList>
@@ -1229,6 +1234,10 @@ const Settings = () => {
                           <div className="flex items-center gap-2">
                             <span className="w-40">Profit %</span>
                             <Input type="number" step="0.01" defaultValue={profile.pricing.profitPct} onBlur={(e) => save({ pricing: { ...profile.pricing, profitPct: Number(e.target.value) } })} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-40">Sales Tax %</span>
+                            <Input type="number" step="0.01" defaultValue={profile.pricing.salesTaxPct ?? 0} onBlur={(e) => save({ pricing: { ...profile.pricing, salesTaxPct: Number(e.target.value) } })} />
                           </div>
                         </div>
                       </div>
