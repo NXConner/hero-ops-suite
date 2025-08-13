@@ -548,8 +548,8 @@ const IntelReports = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex gap-3">
-                    <Button variant="outline" onClick={async () => { try { await axios.post('/intel/scrape', { kind: 'competitors' }); } catch {} }}>Refresh Competitors</Button>
-                    <Button variant="outline" onClick={async () => { try { await axios.post('/intel/scrape', { kind: 'trends' }); } catch {} }}>Refresh Trends</Button>
+                    <Button variant="outline" onClick={async () => { try { await axios.post('/intel/scrape', { kind: 'competitors' }); } catch (_e) { /* ignore */ } }}>Refresh Competitors</Button>
+                    <Button variant="outline" onClick={async () => { try { await axios.post('/intel/scrape', { kind: 'trends' }); } catch (_e) { /* ignore */ } }}>Refresh Trends</Button>
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>

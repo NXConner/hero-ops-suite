@@ -39,6 +39,10 @@ export interface EstimateInput {
   trailerMpgModifierPct?: number; // e.g., -0.1 reduces mpg by 10%
   fuelPricePerGallon: number; // current fuel price
   legBasedRouting?: boolean; // if true, cost legs separately (supplier->job->return)
+  // Optional leg details (if legBasedRouting is true)
+  legC30TotalMiles?: number;
+  legC30LoadedMiles?: number;
+  legDakotaTotalMiles?: number;
   // Equipment operation
   sealerActiveHours?: number; // hours machine actively used
   equipmentActiveFuelGph?: number; // gallons per hour when active (default 2)
@@ -125,7 +129,7 @@ export function computeSealcoatMaterials(
   oilSpotSqft: number
 ) {
   const effectiveCoverage = DEFAULTS.mixedSealerCoverageSqftPerGal / (porosityFactor || 1);
-  let mixedGallonsNeeded = squareFeet / effectiveCoverage;
+  const mixedGallonsNeeded = squareFeet / effectiveCoverage;
   const concentrateGallons = mixedGallonsNeeded / (1 + DEFAULTS.waterPercent);
   const sandBags = (concentrateGallons / 100) * DEFAULTS.sandBagsPer100GalConcentrate;
   const fastDryGallons = (concentrateGallons / 125) * DEFAULTS.fastDryGalPer125GalConcentrate;
@@ -291,14 +295,37 @@ export function computeFuelAndEquipment(
   const degrade = BUSINESS_PROFILE.fuel.mpgDegradeLoadedPct ?? 0;
   const trailerMod = input.trailerMpgModifierPct ?? 0;
 
-  const c30Miles = input.roundTripMilesSupplier + input.roundTripMilesJob;
-  const dakotaMiles = input.roundTripMilesJob;
-  const c30MpgEffective = c30Miles > 0 ? c30MpgBase * (1 - degrade) * (1 + trailerMod) : c30MpgBase;
-  const dakotaMpgEffective = dakotaMiles > 0 ? dakotaMpgBase * (1 + trailerMod) : dakotaMpgBase;
-  const c30Fuel = c30Miles / c30MpgEffective;
-  const dakotaFuel = dakotaMiles / dakotaMpgEffective;
-  const travelFuelGallons = c30Fuel + dakotaFuel;
-  const travelFuelCost = roundToTwo(travelFuelGallons * fuelRate);
+  let travelFuelGallons = 0;
+  let travelFuelCost = 0;
+  let travelNotes = '';
+
+  if (input.legBasedRouting && typeof input.legC30TotalMiles === 'number' && typeof input.legDakotaTotalMiles === 'number') {
+    const c30Loaded = Math.max(0, input.legC30LoadedMiles ?? 0);
+    const c30Total = Math.max(0, input.legC30TotalMiles);
+    const c30Unloaded = Math.max(0, c30Total - c30Loaded);
+    const dakotaMiles = Math.max(0, input.legDakotaTotalMiles);
+
+    const c30MpgLoadedEff = c30MpgBase * (1 - degrade) * (1 + trailerMod);
+    const c30MpgUnloadedEff = c30MpgBase * (1 + trailerMod);
+    const dakotaMpgEff = dakotaMpgBase * (1 + trailerMod);
+
+    const c30Fuel = (c30Loaded / c30MpgLoadedEff) + (c30Unloaded / c30MpgUnloadedEff);
+    const dakotaFuel = dakotaMiles / dakotaMpgEff;
+    travelFuelGallons = c30Fuel + dakotaFuel;
+    travelFuelCost = roundToTwo(travelFuelGallons * fuelRate);
+    travelNotes = `${roundToTwo(travelFuelGallons)} gal @ $${fuelRate}/gal (leg-based)`;
+  } else {
+    // Fallback to round-trip miles fields
+    const c30Miles = input.roundTripMilesSupplier + input.roundTripMilesJob;
+    const dakotaMiles = input.roundTripMilesJob;
+    const c30MpgEffective = c30Miles > 0 ? c30MpgBase * (1 - degrade) * (1 + trailerMod) : c30MpgBase;
+    const dakotaMpgEffective = dakotaMiles > 0 ? dakotaMpgBase * (1 + trailerMod) : dakotaMpgBase;
+    const c30Fuel = c30Miles / c30MpgEffective;
+    const dakotaFuel = dakotaMiles / dakotaMpgEffective;
+    travelFuelGallons = c30Fuel + dakotaFuel;
+    travelFuelCost = roundToTwo(travelFuelGallons * fuelRate);
+    travelNotes = `${roundToTwo(travelFuelGallons)} gal @ $${fuelRate}/gal`;
+  }
 
   const activeHours = input.sealerActiveHours ?? 0;
   const activeGph = input.equipmentActiveFuelGph ?? DEFAULTS.equipmentActiveFuelGph;
@@ -310,7 +337,7 @@ export function computeFuelAndEquipment(
   const idleCost = roundToTwo(idleHours * idleCostRate);
 
   const items: EstimateBreakdownItem[] = [
-    { label: 'Travel Fuel (both vehicles)', cost: travelFuelCost, notes: `${roundToTwo(travelFuelGallons)} gal @ $${fuelRate}/gal` },
+    { label: input.legBasedRouting ? 'Travel Fuel (leg-based, both vehicles)' : 'Travel Fuel (both vehicles)', cost: travelFuelCost, notes: travelNotes },
   ];
   if (activeFuelCost > 0) items.push({ label: 'Equipment Fuel (active operation)', cost: activeFuelCost, notes: `${roundToTwo(activeFuel)} gal @ $${fuelRate}/gal` });
   if (idleCost > 0) items.push({ label: 'Equipment Excessive Idle', cost: idleCost, notes: `${idleHours} hr @ $${idleCostRate}/hr` });

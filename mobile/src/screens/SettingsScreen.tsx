@@ -13,7 +13,7 @@ export default function SettingsScreen({ navigation }: any) {
       try {
         const b = await getBranding();
         setBrandingState(b);
-      } catch {}
+      } catch (_e) { /* ignore */ }
     })();
   }, []);
 

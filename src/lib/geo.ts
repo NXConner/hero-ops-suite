@@ -5,6 +5,7 @@ export interface LatLng {
 
 const GEOCODE_CACHE_KEY = "geocodeCache";
 const REVERSE_CACHE_KEY = "reverseGeocodeCache";
+const AUTOCOMPLETE_CACHE_KEY = "geocodeAutocompleteCache";
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 type CacheEntry<T> = { v: T; t: number } | T;
@@ -111,4 +112,26 @@ export async function computeRoundTripMilesBetween(addrA: string, addrB: string)
   if (!a || !b) return null;
   const oneWay = haversineMiles(a, b);
   return Math.round(oneWay * 2);
+}
+
+// New: address autocomplete using Nominatim search
+export type AddressCandidate = { displayName: string; lat: number; lon: number };
+
+export async function searchAddressCandidates(query: string, limit = 5): Promise<AddressCandidate[]> {
+  const q = query.trim();
+  if (q.length < 3) return [];
+  const cache = loadCache(AUTOCOMPLETE_CACHE_KEY);
+  const key = `${q.toLowerCase()}::${limit}`;
+  const cached = getCacheValue<AddressCandidate[]>(cache, key);
+  if (cached) return cached;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=${limit}&q=${encodeURIComponent(q)}`;
+  const resp = await fetchWithRetry(url, { headers: { "Accept": "application/json", "User-Agent": "OverWatch-Estimator/1.0" } });
+  if (!resp.ok) return [];
+  const data = await resp.json();
+  const results: AddressCandidate[] = Array.isArray(data)
+    ? data.map((d: any) => ({ displayName: d.display_name as string, lat: parseFloat(d.lat), lon: parseFloat(d.lon) }))
+    : [];
+  setCacheValue(cache, key, results);
+  saveCache(AUTOCOMPLETE_CACHE_KEY, cache);
+  return results;
 }

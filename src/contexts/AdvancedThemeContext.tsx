@@ -433,17 +433,17 @@ export function AdvancedThemeProvider({
 
   const setIsVeteran = useCallback((value: boolean) => {
     setIsVeteranState(value);
-    try { localStorage.setItem('is-veteran', value ? '1' : '0'); } catch {}
+    try { localStorage.setItem('is-veteran', value ? '1' : '0'); } catch (_e) { /* ignore */ }
   }, []);
 
   const setVeteranBranch = useCallback((branch: string) => {
     setVeteranBranchState(branch);
-    try { localStorage.setItem('veteran-branch', branch); } catch {}
+    try { localStorage.setItem('veteran-branch', branch); } catch (_e) { /* ignore */ }
   }, []);
 
   const setIsBranchWallpaperPersistent = useCallback((enabled: boolean) => {
     setIsBranchWallpaperPersistentState(enabled);
-    try { localStorage.setItem('branch-wallpaper-persistent', enabled ? '1' : '0'); } catch {}
+    try { localStorage.setItem('branch-wallpaper-persistent', enabled ? '1' : '0'); } catch (_e) { /* ignore */ }
   }, []);
 
   // Handle window resize for responsive themes

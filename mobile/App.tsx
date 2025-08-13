@@ -28,7 +28,7 @@ export default function App() {
     window.addEventListener('message', handler);
     try {
       window.parent?.postMessage({ type: 'mobile_event', payload: { ready: true } }, window.location.origin);
-    } catch {}
+    } catch (_e) { void 0; }
     return () => window.removeEventListener('message', handler);
   }, []);
 

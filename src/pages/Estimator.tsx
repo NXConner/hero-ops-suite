@@ -11,6 +11,7 @@ import { buildEstimate } from '@/lib/estimator';
 import { BUSINESS_PROFILE } from '@/data/business';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { computeRoundTripMilesBetween, reverseGeocode } from '@/lib/geo';
+import { searchAddressCandidates, type AddressCandidate } from '@/lib/geo';
 import { saveJob, listJobs, type StoredJob } from '@/services/jobs';
 import { listCustomers, saveCustomer, type Customer } from '@/services/customers';
 import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile } from '@/services/exporters';
@@ -38,6 +39,9 @@ const Estimator = () => {
     paintColor: 'yellow',
   });
   const [jobAddress, setJobAddress] = useState(BUSINESS_PROFILE.address.full);
+  const [addressSearch, setAddressSearch] = useState('');
+  const [addressCandidates, setAddressCandidates] = useState<AddressCandidate[]>([]);
+  const [showCandidates, setShowCandidates] = useState(false);
   const [jobStreet, setJobStreet] = useState('');
   const [jobCity, setJobCity] = useState('');
   const [jobState, setJobState] = useState('');
@@ -47,6 +51,10 @@ const Estimator = () => {
   const [roundTripMilesSupplier, setRoundTripMilesSupplier] = useState(BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier); // Stuart, VA ↔ Madison, NC approx
   const [roundTripMilesJob, setRoundTripMilesJob] = useState(0); // default same as business if unknown
   const [fuelPrice, setFuelPrice] = useState(DEFAULT_FUEL_PRICE);
+  const [legBased, setLegBased] = useState(false);
+  const [legC30Total, setLegC30Total] = useState<number | ''>('');
+  const [legC30Loaded, setLegC30Loaded] = useState<number | ''>('');
+  const [legDakotaTotal, setLegDakotaTotal] = useState<number | ''>('');
 
   const [laborRate, setLaborRate] = useState(BUSINESS_PROFILE.crew.hourlyRatePerPerson);
   const [numFullTime, setNumFullTime] = useState(BUSINESS_PROFILE.crew.numFullTime);
@@ -98,6 +106,10 @@ const Estimator = () => {
     roundTripMilesSupplier: Number(roundTripMilesSupplier) || 0,
     roundTripMilesJob: Number(roundTripMilesJob) || 0,
     fuelPricePerGallon: Number(fuelPrice) || DEFAULT_FUEL_PRICE,
+    legBasedRouting: legBased,
+    legC30TotalMiles: typeof legC30Total === 'number' ? legC30Total : undefined,
+    legC30LoadedMiles: typeof legC30Loaded === 'number' ? legC30Loaded : undefined,
+    legDakotaTotalMiles: typeof legDakotaTotal === 'number' ? legDakotaTotal : undefined,
     sealerActiveHours: Number(sealerActiveHours) || 0,
     excessiveIdleHours: Number(excessiveIdleHours) || 0,
     pmmPricePerGallon: Number(pmmPrice) || BUSINESS_PROFILE.materials.pmmPricePerGallon,
@@ -108,7 +120,7 @@ const Estimator = () => {
     propanePerTank: BUSINESS_PROFILE.materials.propanePerTank,
     includeTransportWeightCheck: includeWeightCheck,
     applySalesTax: (params as any).applySalesTax === true
-  }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, pmmPrice, includeWeightCheck, sealerActiveHours, excessiveIdleHours]);
+  }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, legBased, legC30Total, legC30Loaded, legDakotaTotal, pmmPrice, includeWeightCheck, sealerActiveHours, excessiveIdleHours]);
 
   const result = useMemo(() => buildEstimate(estimateInput), [estimateInput]);
 
@@ -186,6 +198,10 @@ const Estimator = () => {
         roundTripMilesSupplier,
         roundTripMilesJob,
         fuelPrice,
+        legBased,
+        legC30Total,
+        legC30Loaded,
+        legDakotaTotal,
         laborRate,
         numFullTime,
         numPartTime,
@@ -223,6 +239,10 @@ const Estimator = () => {
     setRoundTripMilesSupplier(j.params.roundTripMilesSupplier ?? BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier);
     setRoundTripMilesJob(j.params.roundTripMilesJob ?? 0);
     setFuelPrice(j.params.fuelPrice ?? DEFAULT_FUEL_PRICE);
+    setLegBased(!!j.params.legBased);
+    setLegC30Total(j.params.legC30Total ?? '');
+    setLegC30Loaded(j.params.legC30Loaded ?? '');
+    setLegDakotaTotal(j.params.legDakotaTotal ?? '');
     setLaborRate(j.params.laborRate ?? BUSINESS_PROFILE.crew.hourlyRatePerPerson);
     setNumFullTime(j.params.numFullTime ?? BUSINESS_PROFILE.crew.numFullTime);
     setNumPartTime(j.params.numPartTime ?? BUSINESS_PROFILE.crew.numPartTime);
@@ -335,12 +355,65 @@ const Estimator = () => {
                 </div>
                 <div className="mt-2">
                   <Label className="text-xs text-muted-foreground">Full Address</Label>
-                  <Input value={jobAddress} onChange={e => setJobAddress(e.target.value)} onBlur={async () => { const res = await geocodeAddress(jobAddress); setJobCoords(res); }} />
+                  <Input
+                    value={addressSearch || jobAddress}
+                    onChange={async (e) => {
+                      const v = e.target.value;
+                      setAddressSearch(v);
+                      setShowCandidates(true);
+                      const c = await searchAddressCandidates(v, 5);
+                      setAddressCandidates(c);
+                    }}
+                    onBlur={async () => {
+                      // On blur, if user typed custom, set and geocode
+                      const full = addressSearch || jobAddress;
+                      setJobAddress(full);
+                      const res = await geocodeAddress(full);
+                      setJobCoords(res);
+                      setTimeout(() => setShowCandidates(false), 150);
+                    }}
+                    onFocus={() => setShowCandidates(true)}
+                  />
+                  {showCandidates && addressCandidates.length > 0 && (
+                    <div className="mt-1 border border-border/40 rounded bg-background shadow-lg max-h-48 overflow-auto">
+                      {addressCandidates.map((c, idx) => (
+                        <div
+                          key={idx}
+                          className="px-2 py-1 text-sm hover:bg-accent cursor-pointer"
+                          onMouseDown={() => {
+                            setJobAddress(c.displayName);
+                            setAddressSearch('');
+                            setAddressCandidates([]);
+                            setShowCandidates(false);
+                            setJobCoords({ lat: c.lat, lon: c.lon });
+                          }}
+                        >
+                          {c.displayName}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <div className="text-xs text-muted-foreground mt-1">Use My Location will override structured fields.</div>
                 </div>
                 <div className="mt-2 flex gap-2">
                   <Button type="button" variant="outline" onClick={handleUseMyLocation}>Use My Location</Button>
                   <Button type="button" variant="outline" onClick={handleComputeJobMiles}>Auto Miles</Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div>
+                  <Label>Presets</Label>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    <Button type="button" size="sm" variant="outline" onClick={() => {
+                      setServiceType('combo_driveway');
+                      setParams(p => ({ ...p, sealcoatSquareFeet: 2500, patchSquareFeet: 50, crackLinearFeet: 120 }));
+                    }}>Driveway</Button>
+                    <Button type="button" size="sm" variant="outline" onClick={() => {
+                      setServiceType('combo_parkinglot');
+                      setParams(p => ({ ...p, sealcoatSquareFeet: 18000, patchSquareFeet: 200, crackLinearFeet: 800, numStandardStalls: 90, numDoubleStalls: 10 }));
+                    }}>Parking Lot</Button>
+                  </div>
                 </div>
               </div>
 
@@ -464,6 +537,21 @@ const Estimator = () => {
                 <div>
                   <Label>Trailer MPG modifier (%)</Label>
                   <Input type="number" step="1" placeholder="e.g., -10 for -10%" onBlur={e => setParams(p => ({ ...p, trailerMpgModifierPct: (Number(e.target.value) || 0) / 100 }))} />
+                </div>
+                <div className="col-span-1 md:col-span-2">
+                  <Label>Leg-based routing</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-2 items-end">
+                    <Select value={legBased ? 'yes' : 'no'} onValueChange={v => setLegBased(v === 'yes')}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="no">Disabled</SelectItem>
+                        <SelectItem value="yes">Enabled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input disabled={!legBased} placeholder="C30 total miles" value={legC30Total} onChange={e => setLegC30Total(Number(e.target.value) || '')} />
+                    <Input disabled={!legBased} placeholder="C30 loaded miles" value={legC30Loaded} onChange={e => setLegC30Loaded(Number(e.target.value) || '')} />
+                    <Input disabled={!legBased} placeholder="Dakota total miles" value={legDakotaTotal} onChange={e => setLegDakotaTotal(Number(e.target.value) || '')} />
+                  </div>
                 </div>
                 <div>
                   <Label>Application method</Label>

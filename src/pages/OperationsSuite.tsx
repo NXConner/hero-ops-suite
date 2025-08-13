@@ -31,7 +31,7 @@ const OperationsSuite = () => {
     const onLoad = () => {
       try {
         iframeRef.current?.contentWindow?.postMessage(initialContext, window.location.origin);
-      } catch {}
+      } catch (_e) { /* ignore */ }
     };
     const iframe = iframeRef.current;
     if (iframe) iframe.addEventListener('load', onLoad);
@@ -43,7 +43,7 @@ const OperationsSuite = () => {
       if (event.origin !== window.location.origin) return;
       if (typeof event.data !== 'object' || !event.data) return;
       if (event.data.type === 'suite_event') {
-        // handle suite events if needed
+        void 0;
       }
     };
     window.addEventListener('message', onMessage);

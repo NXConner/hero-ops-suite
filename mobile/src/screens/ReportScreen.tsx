@@ -16,7 +16,7 @@ export default function ReportScreen({ route }: any) {
       try {
         const b = await getBranding();
         setBrand(b);
-      } catch {}
+      } catch (_e) { /* ignore */ }
     })();
   }, []);
 
