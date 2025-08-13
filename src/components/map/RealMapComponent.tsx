@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+import { area as turfArea } from '@turf/turf';
 
 // Mapbox access token - should be set via environment variable
 const MAPBOX_TOKEN: string = (typeof import.meta !== 'undefined' && (import.meta as ImportMeta).env?.VITE_MAPBOX_TOKEN) ?? 'pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example';
@@ -29,6 +31,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const drawRef = useRef<any>(null);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -70,6 +73,44 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     map.current.on('load', () => {
       setMapLoaded(true);
       onMapLoad?.(map.current!);
+      // Lazy-load Mapbox Draw to enable polygon drawing and area calculation
+      (async () => {
+        try {
+          const Draw = (await import('@mapbox/mapbox-gl-draw')).default as any;
+          const draw = new Draw({
+            displayControlsDefault: false,
+            controls: { polygon: true, trash: true },
+          });
+          drawRef.current = draw;
+          map.current?.addControl(draw, 'top-right');
+          const updateArea = () => {
+            try {
+              const data = draw.getAll();
+              let sqFt = 0;
+              if (data && data.features && data.features.length > 0) {
+                // Use the last feature drawn that is a Polygon
+                const last = [...data.features].reverse().find((f: any) => f.geometry?.type === 'Polygon');
+                if (last) {
+                  const sqMeters = turfArea(last as any);
+                  sqFt = Math.max(0, Math.round(sqMeters * 10.7639));
+                }
+              }
+              (window as any).mapMethods = {
+                ...(window as any).mapMethods,
+                lastAreaSqFt: sqFt,
+              };
+            } catch (_e) { /* ignore */ }
+          };
+          map.current?.on('draw.create', updateArea);
+          map.current?.on('draw.update', updateArea);
+          map.current?.on('draw.delete', () => {
+            (window as any).mapMethods = {
+              ...(window as any).mapMethods,
+              lastAreaSqFt: 0,
+            };
+          });
+        } catch (_e) { /* ignore draw load */ }
+      })();
     });
 
     map.current.on('click', (e) => {

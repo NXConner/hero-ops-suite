@@ -17,7 +17,7 @@ Status key: [NS] Not Started, [IP] In Progress, [P] Completed
   - [P] Patching: tack coat/additives toggles; productivity curves by thickness/material (basic)
   - [P] Crack: propane by hours; deep/wide sand prefill
   - [P] Sealcoat: multi-coat, waste factor, method productivity
-  - [NS] Oil-spot polygon input with per-area prep-seal calculation (wire map to provide lastAreaSqFt)
+  - [P] Oil-spot polygon input with per-area prep-seal calculation (map polygon → area)
 - Striping
   - [IP] Stencil catalog (sizes, prices, colors) and UI picker; per-color price deltas (basic color delta and stall size present; full catalog UI pending)
 - Persistence & Data

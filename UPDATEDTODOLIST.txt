@@ -103,7 +103,7 @@ leave other maps pages ect currently implemented untouched
 
 ### Actionable To-Do Checklist 
 - Estimator
-  - [ ] Oil-spot polygon input and per-area prep-seal calculation
+  - [x] Oil-spot polygon input and per-area prep-seal calculation (draw polygon on map to set area)
   - [ ] Finalized branded PDF templates for estimates
   - [ ] Estimate-to-Project conversion and change orders
   - [ ] Route optimization and multi-job supplier routing
