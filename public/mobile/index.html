@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Mobile Companion (Dev Placeholder)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style>body{font-family:system-ui, sans-serif;padding:16px} .note{background:#eef;border:1px solid #99c;padding:12px;border-radius:8px}</style>
+  </head>
+  <body>
+    <h1>Mobile Companion</h1>
+    <p class="note">Dev placeholder served from <code>/mobile/</code>. Build Expo web to replace this.</p>
+    <script>
+      window.addEventListener(message, (e) => {
+        if (e.origin !== window.location.origin) return;
+        if (e.data && e.data.type === mobile_context) {
+          console.log(Received

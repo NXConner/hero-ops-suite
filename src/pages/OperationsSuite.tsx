@@ -50,6 +50,10 @@ const OperationsSuite = () => {
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
+  const iframeSrc = import.meta.env.DEV
+    ? (path.endsWith('/') ? `${path}index.html` : `${path}/index.html`)
+    : path;
+
   return (
     <div className="p-4 space-y-3">
       <div className="flex gap-2">
@@ -57,10 +61,10 @@ const OperationsSuite = () => {
         <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/fleet/')}>Fleet Focus Manager</button>
       </div>
       <iframe
-        key={path}
+        key={iframeSrc}
         ref={iframeRef}
         title="Fleet & Field Ops"
-        src={path}
+        src={iframeSrc}
         style={{ width: '100%', height }}
         className="rounded-md border border-border bg-background"
       />

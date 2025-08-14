@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Operations Suite (Dev Placeholder)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  </head>
+  <body>
+    <h1>Operations Suite</h1>
+    <p>Dev placeholder served from <code>/suite/</code>.</p>
+    <a href="/suite/fleet/">Go to Fleet Focus Manager</a>
+    <script>
+      window.addEventListener(message, (e) => {
+        if (e.origin !== window.location.origin) return;
+        if (e.data && e.data.type === suite_context) {
+          console.log(Suite
