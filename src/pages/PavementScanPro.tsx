@@ -183,7 +183,7 @@ const PavementScanPro = () => {
     <div className="flex h-screen bg-background">
       <Sidebar />
       
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto relative z-0">
         <div className="max-w-7xl mx-auto space-y-6 p-6">
           {/* Header */}
           <div className="flex items-center justify-between">

@@ -373,7 +373,7 @@ const OverWatch: React.FC = () => {
     <div className="flex h-screen bg-slate-950">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col relative">
+      <div className="flex-1 flex flex-col relative z-0">
         {/* Header Controls */}
         <div className="bg-slate-900/95 border-b border-cyan-500/30 p-4">
           <div className="flex items-center justify-between">
