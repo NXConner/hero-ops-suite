@@ -109,17 +109,12 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
 
   // Real weather data integration
   useEffect(() => {
-    const loadWeatherData = async () => {
+    const loadWeatherData = async (lat: number, lon: number) => {
       try {
-        // Get current location (defaulting to NYC for demo)
-        const lat = 40.7128;
-        const lon = -74.0060;
-        
-        // Fetch real weather data
         const weatherResponse = await weatherService.getCurrentWeather(lat, lon);
         const radarResponse = await weatherService.getRadarData();
-        
-        // Convert API response to internal format
+        const forecastResponse = await weatherService.getWeatherForecast(lat, lon, forecastHours);
+
         const weatherData: WeatherData = {
           temperature: Math.round(weatherResponse.main.temp),
           humidity: weatherResponse.main.humidity,
@@ -127,26 +122,39 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
           windDirection: weatherResponse.wind.deg,
           pressure: weatherResponse.main.pressure,
           uvIndex: 6, // Not available in free API
-          visibility: Math.round(weatherResponse.visibility / 1609.34), // Convert to miles
+          visibility: Math.round(weatherResponse.visibility / 1609.34),
           conditions: weatherResponse.weather[0].main.toLowerCase() as WeatherData['conditions'],
-          precipitation: 0, // Would need additional API call
+          precipitation: weatherResponse.rain?.['1h'] ?? 0,
           timestamp: new Date(weatherResponse.dt * 1000)
         };
-        
+
         setCurrentWeather(weatherData);
-        
-        // Convert radar data
-        const radarFrames: RadarFrame[] = radarResponse.radar.past.map(frame => ({
-          timestamp: new Date(frame.time * 1000),
-          imageUrl: `https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`,
-          precipitationLevel: Math.random() * 0.5 // Would be calculated from actual radar data
-        }));
-        
-        setRadarFrames(radarFrames);
-        
-        // Generate alerts based on real weather conditions
+
+        const forecastList = (forecastResponse as any)?.list || [];
+        const popAt = (t: number) => {
+          if (!forecastList.length) return 0;
+          let nearest = forecastList[0];
+          let minDiff = Math.abs((nearest.dt || nearest.time || 0) * 1000 - t);
+          for (const f of forecastList) {
+            const ft = (f.dt || f.time || 0) * 1000;
+            const diff = Math.abs(ft - t);
+            if (diff < minDiff) { nearest = f; minDiff = diff; }
+          }
+          return typeof nearest.pop === 'number' ? nearest.pop : 0;
+        };
+
+        const frames: RadarFrame[] = radarResponse.radar.past.map((frame: any) => {
+          const ts = frame.time * 1000;
+          return {
+            timestamp: new Date(ts),
+            imageUrl: `https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`,
+            precipitationLevel: popAt(ts)
+          };
+        });
+
+        setRadarFrames(frames);
+
         const alerts: WeatherAlert[] = [];
-        
         if (weatherResponse.weather[0].main === 'Rain') {
           alerts.push({
             id: 'rain-alert',
@@ -157,7 +165,6 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
             validUntil: new Date(Date.now() + 2 * 60 * 60 * 1000)
           });
         }
-        
         if (weatherResponse.wind.speed > 15) {
           alerts.push({
             id: 'wind-alert',
@@ -168,7 +175,6 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
             validUntil: new Date(Date.now() + 4 * 60 * 60 * 1000)
           });
         }
-        
         if (weatherResponse.main.temp < 50) {
           alerts.push({
             id: 'temp-alert',
@@ -179,43 +185,31 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
             validUntil: new Date(Date.now() + 6 * 60 * 60 * 1000)
           });
         }
-        
+
         setWeatherAlerts(alerts);
-        
       } catch (error) {
         console.error('Failed to load weather data:', error);
-        // Fallback to mock data
-        setCurrentWeather({
-          temperature: 72,
-          humidity: 65,
-          windSpeed: 8,
-          windDirection: 45,
-          pressure: 1013.2,
-          uvIndex: 6,
-          visibility: 10,
-          conditions: 'cloudy',
-          precipitation: 0.1,
-          timestamp: new Date()
-        });
-        
-        setWeatherAlerts([{
-          id: 'api-error',
-          type: 'severe-weather',
-          severity: 'low',
-          message: 'Weather data unavailable - using cached data',
-          recommendation: 'Check internet connection and retry',
-          validUntil: new Date(Date.now() + 30 * 60 * 1000)
-        }]);
+        // Keep previous state; do not inject random data
       }
     };
 
-    loadWeatherData();
+    const init = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => loadWeatherData(pos.coords.latitude, pos.coords.longitude),
+          () => loadWeatherData(40.7128, -74.0060),
+          { enableHighAccuracy: false, timeout: 5000 }
+        );
+      } else {
+        loadWeatherData(40.7128, -74.0060);
+      }
+    };
 
-    // Update weather data every 10 minutes
-    const weatherInterval = setInterval(loadWeatherData, 10 * 60 * 1000);
+    init();
 
+    const weatherInterval = setInterval(init, 10 * 60 * 1000);
     return () => clearInterval(weatherInterval);
-  }, []);
+  }, [forecastHours]);
 
   // Radar animation
   useEffect(() => {
@@ -438,7 +432,7 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
                 />
               </div>
 
-              {radarFrames.length > 0 && (
+              {radarFrames.length > 0 && radarFrames[currentRadarFrame] && (
                 <div className="bg-slate-800 p-2 rounded text-xs">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-slate-300">Frame {currentRadarFrame + 1} of {radarFrames.length}</span>
@@ -447,7 +441,7 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
                     </span>
                   </div>
                   <div className="text-slate-400">
-                    Precipitation: {(radarFrames[currentRadarFrame]?.precipitationLevel * 100 || 0).toFixed(1)}%
+                    Precipitation chance: {(radarFrames[currentRadarFrame]?.precipitationLevel * 100 || 0).toFixed(0)}%
                   </div>
                 </div>
               )}
@@ -490,7 +484,7 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
         <div style={{ opacity: radarOpacity / 100 }}>
           {/* Simulated radar overlay - in production this would use real radar tiles */}
           <div className="absolute inset-0 pointer-events-none" style={{ 
-            background: `radial-gradient(circle at 40.7128% 25.994%, rgba(59, 130, 246, 0.${radarFrames[currentRadarFrame].precipitationLevel * 100}) 0%, transparent 70%)`,
+            background: `radial-gradient(circle at 40.7128% 25.994%, rgba(59, 130, 246, ${radarFrames[currentRadarFrame].precipitationLevel}))`,
             zIndex: 100
           }} />
         </div>
