@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import Sidebar from '@/components/Sidebar';
 import { Radar, Map, Layers, Navigation, Crosshair, Ruler, Camera, Users, Truck, Cloud, Thermometer, Eye, Settings, Target, RadioIcon as Radio, Activity, AlertTriangle, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import MapTools from '@/components/map/MapTools';
 import FleetTracking from '@/components/map/FleetTracking';
@@ -135,6 +135,7 @@ const OverWatch: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [weatherRecommendations, setWeatherRecommendations] = useState<string[]>([]);
   const [showVoiceInterface, setShowVoiceInterface] = useState(false);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     try {
@@ -158,6 +159,14 @@ const OverWatch: React.FC = () => {
       }));
     } catch { /* ignore */ }
   }, [selectedMapService, terminologyMode, activeOverlays, mapCenter, mapZoom]);
+
+  // Auto-enable pavement overlay when opened with a scan_id link
+  useEffect(() => {
+    const id = searchParams.get('scan_id');
+    if (id) {
+      setActiveOverlays(prev => (prev.includes('pavement') ? prev : [...prev, 'pavement']));
+    }
+  }, [searchParams]);
 
   const currentService = mapServices.find(service => service.id === selectedMapService) || mapServices[0];
   const mapboxStyleForService: Record<string, string> = {

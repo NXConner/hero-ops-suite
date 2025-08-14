@@ -32,6 +32,9 @@ import ReportGeneration from "@/components/pavement-scan/ReportGeneration";
 import SystemIntegration from "@/components/pavement-scan/SystemIntegration";
 import MarketplaceIntegration from "@/components/pavement-scan/MarketplaceIntegration";
 import Sidebar from '@/components/Sidebar';
+import { pavementScanService } from '@/services/api';
+import { buildOverlayFromDefects } from '@/lib/overlay';
+import { useNavigate } from 'react-router-dom';
 
 export interface DefectData {
   id: string;
@@ -68,16 +71,20 @@ const PavementScanPro = () => {
   const [detectedDefects, setDetectedDefects] = useState<DefectData[]>([]);
   const [capturedFrames, setCapturedFrames] = useState<string[]>([]);
   const [scanCoverage, setScanCoverage] = useState(0);
+  const [scanId, setScanId] = useState<string | null>(null);
+  const [estimate, setEstimate] = useState<any | null>(null);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const navigate = useNavigate();
 
-  const startScanning = useCallback(() => {
+  const startScanning = useCallback(async () => {
     setIsScanning(true);
     setScanProgress(0);
     setScanCoverage(0);
     setDetectedDefects([]);
     setCapturedFrames([]);
+    setEstimate(null);
     
     // Initialize new scan
     const newScan: ScanData = {
@@ -89,12 +96,32 @@ const PavementScanPro = () => {
       images: [],
     };
     setCurrentScan(newScan);
+
+    try {
+      const res = await pavementScanService.createScan({});
+      if (res?.scan_id) setScanId(res.scan_id);
+    } catch (e) {
+      // proceed in offline/mock mode
+      console.warn('Create scan failed, continuing locally:', e);
+    }
   }, []);
 
-  const stopScanning = useCallback(() => {
+  const stopScanning = useCallback(async () => {
     setIsScanning(false);
     setScanProgress(100);
-  }, []);
+
+    // Build and upload overlay if we have a server scan id
+    try {
+      if (scanId) {
+        const overlay = buildOverlayFromDefects(detectedDefects);
+        await pavementScanService.uploadOverlay(scanId, overlay);
+        const est = await pavementScanService.estimate(scanId);
+        setEstimate(est);
+      }
+    } catch (e) {
+      console.warn('Overlay upload/estimate failed:', e);
+    }
+  }, [scanId, detectedDefects]);
 
   const resetScan = useCallback(() => {
     setIsScanning(false);
@@ -104,6 +131,8 @@ const PavementScanPro = () => {
     setDetectedDefects([]);
     setCapturedFrames([]);
     setScanningMode('perimeter');
+    setScanId(null);
+    setEstimate(null);
   }, []);
 
   // Simulate scanning progress
@@ -338,29 +367,34 @@ const PavementScanPro = () => {
                 </CardContent>
               </Card>
 
-              {/* Measurements */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Ruler className="h-5 w-5" />
-                    Measurements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Area:</span>
-                    <span className="font-medium">{currentScan?.area.toFixed(1) || '0.0'} sq ft</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Perimeter:</span>
-                    <span className="font-medium">{currentScan?.perimeter.toFixed(1) || '0.0'} ft</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Frames Captured:</span>
-                    <span className="font-medium">{capturedFrames.length}</span>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Estimate Summary (if available) */}
+              {estimate && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Estimate Summary</CardTitle>
+                    <CardDescription>Computed from saved overlay</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm">
+                    {Array.isArray(estimate.lines) && estimate.lines.length > 0 ? (
+                      <div className="space-y-1">
+                        {estimate.lines.map((line: any, idx: number) => (
+                          <div key={idx} className="flex items-center justify-between">
+                            <span>{line.description}</span>
+                            <span className="font-mono">${Number(line.total).toFixed(2)}</span>
+                          </div>
+                        ))}
+                        <Separator />
+                        <div className="flex items-center justify-between font-semibold">
+                          <span>Total</span>
+                          <span className="font-mono">${Number(estimate.total || 0).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-muted-foreground">No lines returned</div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Quick Actions */}
               <Card>
@@ -368,7 +402,10 @@ const PavementScanPro = () => {
                   <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                    const el = document.querySelector('#pavement-3d-tab');
+                    if (el) (el as HTMLElement).click();
+                  }}>
                     <Layers className="h-4 w-4 mr-1" />
                     View 3D Model
                   </Button>
@@ -376,11 +413,19 @@ const PavementScanPro = () => {
                     <Download className="h-4 w-4 mr-1" />
                     Generate Report
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button variant="outline" size="sm" className="w-full" disabled={!scanId} onClick={() => {
+                    if (scanId) {
+                      window.open(`/overwatch?scan_id=${encodeURIComponent(scanId)}`, '_blank');
+                    }
+                  }}>
                     <Share className="h-4 w-4 mr-1" />
-                    Share Results
+                    Open in OverWatch
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button variant="outline" size="sm" className="w-full" disabled={!scanId} onClick={() => {
+                    if (scanId) {
+                      navigate(`/overwatch?scan_id=${encodeURIComponent(scanId)}`);
+                    }
+                  }}>
                     <MapPin className="h-4 w-4 mr-1" />
                     Send to OverWatch
                   </Button>
@@ -395,7 +440,7 @@ const PavementScanPro = () => {
               <Tabs defaultValue="defects" className="w-full">
                 <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="defects">Defect Analysis</TabsTrigger>
-                  <TabsTrigger value="model3d">3D Model</TabsTrigger>
+                  <TabsTrigger value="model3d" id="pavement-3d-tab">3D Model</TabsTrigger>
                   <TabsTrigger value="report">Report</TabsTrigger>
                   <TabsTrigger value="integration">System Integration</TabsTrigger>
                   <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
