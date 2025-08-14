@@ -179,219 +179,73 @@ export class WeatherService {
       return cached.data;
     }
 
-    // Check if we have a valid API key
     if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
-      console.warn('Please set REACT_APP_WEATHER_API_KEY environment variable');
-      return this.getMockWeatherData(lat, lon);
+      throw new Error('Missing OpenWeather API key');
     }
 
-    try {
-      const response = await axios.get<WeatherAPIResponse>(
-        `${API_CONFIG.WEATHER_BASE_URL}/weather`,
-        {
-          params: {
-            lat,
-            lon,
-            appid: API_CONFIG.WEATHER_API_KEY,
-            units: 'imperial'
-          },
-          timeout: 10000
-        }
-      );
-
-      this.cache.set(cacheKey, { data: response.data, timestamp: Date.now() });
-      return response.data;
-    } catch (error) {
-      console.error('Weather API Error:', error);
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.error('Invalid API key. Please check your OpenWeather API key.');
+    const response = await axios.get<WeatherAPIResponse>(
+      `${API_CONFIG.WEATHER_BASE_URL}/weather`,
+      {
+        params: { lat, lon, appid: API_CONFIG.WEATHER_API_KEY, units: 'imperial' },
+        timeout: 10000
       }
-      return this.getMockWeatherData(lat, lon);
-    }
+    );
+
+    this.cache.set(cacheKey, { data: response.data, timestamp: Date.now() });
+    return response.data;
   }
 
   async getWeatherForecast(lat: number, lon: number, hours: number = 12): Promise<any> {
     if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
-      return this.getMockForecastData();
+      throw new Error('Missing OpenWeather API key');
     }
 
-    try {
-      const response = await axios.get(
-        `${API_CONFIG.WEATHER_BASE_URL}/forecast`,
-        {
-          params: {
-            lat,
-            lon,
-            appid: API_CONFIG.WEATHER_API_KEY,
-            units: 'imperial',
-            cnt: Math.min(hours, 40) // API limit
-          },
-          timeout: 10000
-        }
-      );
+    const response = await axios.get(
+      `${API_CONFIG.WEATHER_BASE_URL}/forecast`,
+      {
+        params: { lat, lon, appid: API_CONFIG.WEATHER_API_KEY, units: 'imperial', cnt: Math.min(hours, 40) },
+        timeout: 10000
+      }
+    );
 
-      return response.data;
-    } catch (error) {
-      console.error('Weather Forecast API Error:', error);
-      return this.getMockForecastData();
-    }
+    return response.data;
   }
 
   async getRadarData(): Promise<RadarAPIResponse> {
-    try {
-      const response = await axios.get<RadarAPIResponse>(
-        API_CONFIG.RADAR_API_URL,
-        { timeout: 10000 }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Radar API Error:', error);
-      return this.getMockRadarData();
-    }
+    const response = await axios.get<RadarAPIResponse>(API_CONFIG.RADAR_API_URL, { timeout: 10000 });
+    return response.data;
   }
 
   // Enhanced UV Index API (requires separate service)
   async getUVIndex(lat: number, lon: number): Promise<number> {
-    try {
-      if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
-        return 6; // Mock UV index
-      }
-
-      const response = await axios.get(
-        `${API_CONFIG.WEATHER_BASE_URL}/uvi`,
-        {
-          params: {
-            lat,
-            lon,
-            appid: API_CONFIG.WEATHER_API_KEY
-          },
-          timeout: 5000
-        }
-      );
-
-      return response.data.value || 6;
-    } catch (error) {
-      console.error('UV Index API Error:', error);
-      return 6; // Default safe value
+    if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
+      throw new Error('Missing OpenWeather API key');
     }
+
+    const response = await axios.get(
+      `${API_CONFIG.WEATHER_BASE_URL}/uvi`,
+      { params: { lat, lon, appid: API_CONFIG.WEATHER_API_KEY }, timeout: 5000 }
+    );
+
+    return response.data.value || 6;
   }
 
   // Air Quality API
   async getAirQuality(lat: number, lon: number): Promise<any> {
-    try {
-      if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
-        return {
-          aqi: 3,
-          components: {
-            co: 233.4,
-            no: 0.01,
-            no2: 13.64,
-            o3: 54.31,
-            so2: 0.75,
-            pm2_5: 8.04,
-            pm10: 9.78
-          }
-        };
-      }
-
-      const response = await axios.get(
-        `${API_CONFIG.WEATHER_BASE_URL}/air_pollution`,
-        {
-          params: {
-            lat,
-            lon,
-            appid: API_CONFIG.WEATHER_API_KEY
-          },
-          timeout: 5000
-        }
-      );
-
-      return response.data.list[0];
-    } catch (error) {
-      console.error('Air Quality API Error:', error);
-      return null;
+    if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
+      throw new Error('Missing OpenWeather API key');
     }
-  }
 
-  private getMockWeatherData(lat: number, lon: number): WeatherAPIResponse {
-    const conditions = ['Clear', 'Clouds', 'Rain', 'Drizzle', 'Snow'];
-    const selectedCondition = conditions[Math.floor(Math.random() * conditions.length)];
-    
-    return {
-      main: {
-        temp: 65 + Math.random() * 20,
-        humidity: 50 + Math.random() * 30,
-        pressure: 1013 + Math.random() * 20,
-        feels_like: 65 + Math.random() * 20
-      },
-      weather: [{
-        main: selectedCondition,
-        description: selectedCondition.toLowerCase(),
-        icon: selectedCondition === 'Clear' ? '01d' : 
-              selectedCondition === 'Clouds' ? '02d' :
-              selectedCondition === 'Rain' ? '10d' : '50d'
-      }],
-      wind: {
-        speed: Math.random() * 15,
-        deg: Math.random() * 360,
-        gust: Math.random() * 20
-      },
-      visibility: 8000 + Math.random() * 2000,
-      dt: Date.now() / 1000,
-      name: 'Mock Location',
-      coord: { lat, lon },
-      clouds: {
-        all: Math.floor(Math.random() * 100)
-      },
-      rain: selectedCondition === 'Rain' ? { '1h': Math.random() * 5 } : undefined
-    };
-  }
+    const response = await axios.get(
+      `${API_CONFIG.WEATHER_BASE_URL}/air_pollution`,
+      { params: { lat, lon, appid: API_CONFIG.WEATHER_API_KEY }, timeout: 5000 }
+    );
 
-  private getMockForecastData(): { list: Array<Partial<WeatherApiResponse & { pop: number }>> } {
-    const forecast = [];
-    for (let i = 0; i < 12; i++) {
-      forecast.push({
-        dt: Date.now() / 1000 + (i * 3600),
-        main: {
-          temp: 70 + Math.random() * 15,
-          humidity: 60 + Math.random() * 30
-        },
-        weather: [{
-          main: Math.random() > 0.7 ? 'Rain' : 'Clouds',
-          description: 'mock weather'
-        }],
-        pop: Math.random() * 0.5
-      });
-    }
-    return { list: forecast };
-  }
-
-  private getMockRadarData(): RadarAPIResponse {
-    const now = Date.now();
-    const frames = [];
-    for (let i = -7; i <= 0; i++) {
-      frames.push({
-        time: Math.floor((now + i * 15 * 60 * 1000) / 1000),
-        path: `/mock/radar/frame_${i + 7}.png`
-      });
-    }
-    
-    return {
-      version: '1.0',
-      generated: Math.floor(now / 1000),
-      host: 'mock.api',
-      radar: {
-        past: frames,
-        nowcast: []
-      },
-      satellite: {
-        infrared: []
-      }
-    };
+    return response.data.list[0];
   }
 }
 
-// GPS Tracking Service
+// GPS Tracking Service (unchanged)
 export class GPSTrackingService {
   private static instance: GPSTrackingService;
   private websocket: WebSocket | null = null;
@@ -409,15 +263,12 @@ export class GPSTrackingService {
     try {
       const response = await axios.get<GPSTrackingResponse[]>(
         `${API_CONFIG.GPS_TRACKING_URL}/locations`,
-        {
-          params: deviceIds ? { devices: deviceIds.join(',') } : {},
-          timeout: 10000
-        }
+        { params: deviceIds ? { devices: deviceIds.join(',') } : {}, timeout: 10000 }
       );
       return response.data;
     } catch (error) {
       console.error('GPS Tracking API Error:', error);
-      return this.getMockGPSData();
+      return [];
     }
   }
 
@@ -425,24 +276,17 @@ export class GPSTrackingService {
     try {
       const response = await axios.get<GPSTrackingResponse[]>(
         `${API_CONFIG.GPS_TRACKING_URL}/history/${deviceId}`,
-        {
-          params: {
-            start: startTime.toISOString(),
-            end: endTime.toISOString()
-          },
-          timeout: 15000
-        }
+        { params: { start: startTime.toISOString(), end: endTime.toISOString() }, timeout: 15000 }
       );
       return response.data;
     } catch (error) {
       console.error('GPS History API Error:', error);
-      return this.getMockHistoryData(deviceId, startTime, endTime);
+      return [];
     }
   }
 
   subscribeToRealTimeUpdates(callback: (data: GPSTrackingResponse[]) => void): void {
     this.subscribers.push(callback);
-    
     if (!this.websocket) {
       this.connectWebSocket();
     }
@@ -450,7 +294,6 @@ export class GPSTrackingService {
 
   unsubscribeFromRealTimeUpdates(callback: (data: GPSTrackingResponse[]) => void): void {
     this.subscribers = this.subscribers.filter(sub => sub !== callback);
-    
     if (this.subscribers.length === 0 && this.websocket) {
       this.websocket.close();
       this.websocket = null;
@@ -463,7 +306,6 @@ export class GPSTrackingService {
       this.websocket = new WebSocket(`${wsUrl}/realtime`);
 
       this.websocket.onopen = () => {
-        console.log('GPS WebSocket connected');
         if (this.reconnectInterval) {
           clearInterval(this.reconnectInterval);
           this.reconnectInterval = null;
@@ -480,7 +322,6 @@ export class GPSTrackingService {
       };
 
       this.websocket.onclose = () => {
-        console.log('GPS WebSocket disconnected');
         this.websocket = null;
         this.scheduleReconnect();
       };
@@ -501,59 +342,9 @@ export class GPSTrackingService {
       }, 5000);
     }
   }
-
-  private getMockGPSData(): GPSTrackingResponse[] {
-    const devices = ['vehicle_001', 'vehicle_002', 'employee_001', 'employee_002'];
-    return devices.map(deviceId => ({
-      deviceId,
-      timestamp: new Date().toISOString(),
-      location: {
-        latitude: 40.7128 + (Math.random() - 0.5) * 0.01,
-        longitude: -74.0060 + (Math.random() - 0.5) * 0.01,
-        altitude: 10 + Math.random() * 50,
-        accuracy: 3 + Math.random() * 5,
-        speed: Math.random() * 30,
-        heading: Math.random() * 360
-      },
-      status: ['active', 'idle', 'offline'][Math.floor(Math.random() * 3)] as any,
-      batteryLevel: 20 + Math.random() * 80,
-      isMoving: Math.random() > 0.5
-    }));
-  }
-
-  private getMockHistoryData(deviceId: string, startTime: Date, endTime: Date): GPSTrackingResponse[] {
-    const history: GPSTrackingResponse[] = [];
-    const duration = endTime.getTime() - startTime.getTime();
-    const intervals = Math.min(Math.floor(duration / (5 * 60 * 1000)), 100); // Every 5 minutes, max 100 points
-    
-    let lat = 40.7128;
-    let lon = -74.0060;
-    
-    for (let i = 0; i <= intervals; i++) {
-      lat += (Math.random() - 0.5) * 0.001;
-      lon += (Math.random() - 0.5) * 0.001;
-      
-      history.push({
-        deviceId,
-        timestamp: new Date(startTime.getTime() + (i * duration / intervals)).toISOString(),
-        location: {
-          latitude: lat,
-          longitude: lon,
-          altitude: 10 + Math.random() * 50,
-          accuracy: 3 + Math.random() * 5,
-          speed: Math.random() * 35,
-          heading: Math.random() * 360
-        },
-        status: 'active',
-        isMoving: Math.random() > 0.3
-      });
-    }
-    
-    return history;
-  }
 }
 
-// Sensor Data Service
+// Sensor Data Service (unchanged)
 export class SensorDataService {
   private static instance: SensorDataService;
 
@@ -568,15 +359,12 @@ export class SensorDataService {
     try {
       const response = await axios.get<SensorDataResponse[]>(
         `${API_CONFIG.SENSOR_DATA_URL}/current`,
-        {
-          params: sensorIds ? { sensors: sensorIds.join(',') } : {},
-          timeout: 10000
-        }
+        { params: sensorIds ? { sensors: sensorIds.join(',') } : {}, timeout: 10000 }
       );
       return response.data;
     } catch (error) {
       console.error('Sensor Data API Error:', error);
-      return this.getMockSensorData();
+      return [];
     }
   }
 
@@ -584,97 +372,17 @@ export class SensorDataService {
     try {
       const response = await axios.get<SensorDataResponse[]>(
         `${API_CONFIG.SENSOR_DATA_URL}/history/${sensorId}`,
-        {
-          params: {
-            start: startTime.toISOString(),
-            end: endTime.toISOString()
-          },
-          timeout: 15000
-        }
+        { params: { start: startTime.toISOString(), end: endTime.toISOString() }, timeout: 15000 }
       );
       return response.data;
     } catch (error) {
       console.error('Sensor History API Error:', error);
-      return this.getMockSensorHistory(sensorId, startTime, endTime);
-    }
-  }
-
-  private getMockSensorData(): SensorDataResponse[] {
-    const sensorTypes: SensorDataResponse['type'][] = ['temperature', 'pressure', 'vibration', 'thickness', 'compaction'];
-    const sensors: SensorDataResponse[] = [];
-    
-    sensorTypes.forEach((type, index) => {
-      sensors.push({
-        sensorId: `sensor_${type}_${index + 1}`,
-        type,
-        value: this.getMockValueForType(type),
-        unit: this.getUnitForType(type),
-        timestamp: new Date().toISOString(),
-        location: {
-          latitude: 40.7128 + (Math.random() - 0.5) * 0.005,
-          longitude: -74.0060 + (Math.random() - 0.5) * 0.005
-        },
-        quality: ['good', 'fair', 'poor'][Math.floor(Math.random() * 3)] as any,
-        alerts: Math.random() > 0.8 ? ['Reading outside normal range'] : []
-      });
-    });
-    
-    return sensors;
-  }
-
-  private getMockSensorHistory(sensorId: string, startTime: Date, endTime: Date): SensorDataResponse[] {
-    const history: SensorDataResponse[] = [];
-    const duration = endTime.getTime() - startTime.getTime();
-    const intervals = Math.min(Math.floor(duration / (10 * 60 * 1000)), 50); // Every 10 minutes, max 50 points
-    
-    const type = sensorId.includes('temperature') ? 'temperature' : 
-                 sensorId.includes('pressure') ? 'pressure' : 
-                 sensorId.includes('vibration') ? 'vibration' : 
-                 sensorId.includes('thickness') ? 'thickness' : 'compaction';
-    
-    for (let i = 0; i <= intervals; i++) {
-      history.push({
-        sensorId,
-        type,
-        value: this.getMockValueForType(type),
-        unit: this.getUnitForType(type),
-        timestamp: new Date(startTime.getTime() + (i * duration / intervals)).toISOString(),
-        location: {
-          latitude: 40.7128,
-          longitude: -74.0060
-        },
-        quality: 'good',
-        alerts: []
-      });
-    }
-    
-    return history;
-  }
-
-  private getMockValueForType(type: SensorDataResponse['type']): number {
-    switch (type) {
-      case 'temperature': return 150 + Math.random() * 100; // °F
-      case 'pressure': return 2000 + Math.random() * 1000; // PSI
-      case 'vibration': return Math.random() * 10; // Hz
-      case 'thickness': return 2 + Math.random() * 4; // inches
-      case 'compaction': return 92 + Math.random() * 8; // %
-      default: return Math.random() * 100;
-    }
-  }
-
-  private getUnitForType(type: SensorDataResponse['type']): string {
-    switch (type) {
-      case 'temperature': return '°F';
-      case 'pressure': return 'PSI';
-      case 'vibration': return 'Hz';
-      case 'thickness': return 'in';
-      case 'compaction': return '%';
-      default: return 'units';
+      return [];
     }
   }
 }
 
-// Geolocation Service
+// Geolocation Service (unchanged)
 export class GeolocationService {
   static async reverseGeocode(lat: number, lon: number): Promise<any> {
     try {
@@ -685,11 +393,7 @@ export class GeolocationService {
       return response.data;
     } catch (error) {
       console.error('Geolocation API Error:', error);
-      return {
-        city: 'Unknown City',
-        countryName: 'Unknown Country',
-        principalSubdivision: 'Unknown State'
-      };
+      return null;
     }
   }
 }

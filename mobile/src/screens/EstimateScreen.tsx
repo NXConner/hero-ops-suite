@@ -1,19 +1,36 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
 import { estimateCosts } from '../utils/costEstimator';
 import { Overlay } from '../types/overlay';
-import { demoOverlay as defaultOverlay } from '../data/demoOverlay';
-
-const demoPricing = {
-  CRACK_SEAL: { item_code: 'CRACK_SEAL', unit: 'ft' as const, unit_cost: 1.5 },
-  POTHOLE_PATCH: { item_code: 'POTHOLE_PATCH', unit: 'sqft' as const, unit_cost: 12 },
-  GATOR_REPAIR: { item_code: 'GATOR_REPAIR', unit: 'sqft' as const, unit_cost: 6.5 },
-  REGRADING: { item_code: 'REGRADING', unit: 'sqft' as const, unit_cost: 4 }
-};
+import { getPricing } from '../services/api';
 
 export default function EstimateScreen({ route }: any) {
-  const overlay: Overlay = route?.params?.overlay || defaultOverlay;
-  const estimate = useMemo(() => estimateCosts(overlay, demoPricing), [overlay]);
+  const overlay: Overlay | undefined = route?.params?.overlay;
+  const pricingQuery = useQuery({ queryKey: ['pricing'], queryFn: getPricing });
+
+  const estimate = useMemo(() => {
+    if (!overlay || !pricingQuery.data) return null;
+    return estimateCosts(overlay, pricingQuery.data);
+  }, [overlay, pricingQuery.data]);
+
+  if (!overlay) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Estimate</Text>
+        <Text>No overlay selected. Open a scan and generate analysis first.</Text>
+      </View>
+    );
+  }
+
+  if (pricingQuery.isLoading || !estimate) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Estimate</Text>
+        <Text>Loading…</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

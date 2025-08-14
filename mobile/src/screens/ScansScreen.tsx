@@ -1,30 +1,23 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet, FlatList, Alert } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { listScans, createScan, uploadOverlay, getScan } from '../services/api';
-import { demoOverlay } from '../data/demoOverlay';
+import { listScans, createScan, getScan } from '../services/api';
 import { enqueue } from '../services/offlineQueue';
 
 export default function ScansScreen({ navigation }: any) {
   const qc = useQueryClient();
   const scansQuery = useQuery({ queryKey: ['scans'], queryFn: listScans });
 
-  const createDemo = useMutation({
+  const create = useMutation({
     mutationFn: async () => {
-      const { scan_id } = await createScan({ perimeter_ft: demoOverlay.dimensions?.perimeter_ft, area_sqft: demoOverlay.dimensions?.area_sqft });
-      const overlay = { ...demoOverlay, scan_id };
-      try {
-        await uploadOverlay(scan_id, overlay);
-      } catch (e) {
-        await enqueue({ method: 'POST', url: `/scans/${scan_id}/overlay`, body: overlay });
-      }
+      const { scan_id } = await createScan({});
       return scan_id;
     },
     onSuccess: async (scan_id) => {
       await qc.invalidateQueries({ queryKey: ['scans'] });
-      Alert.alert('Demo created', `Scan ${scan_id}`);
+      Alert.alert('Scan created', `${scan_id}`);
     },
-    onError: (e: any) => Alert.alert('Error', e.message || 'Failed to create demo'),
+    onError: (e: any) => Alert.alert('Error', e.message || 'Failed to create scan'),
   });
 
   const openScan = async (scan_id: string) => {
@@ -40,7 +33,7 @@ export default function ScansScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Scans</Text>
-      <Button title={createDemo.isPending ? 'Creating…' : 'Create Demo Scan'} onPress={() => createDemo.mutate()} disabled={createDemo.isPending} />
+      <Button title={create.isPending ? 'Creating…' : 'Create Scan'} onPress={() => create.mutate()} disabled={create.isPending} />
       <FlatList
         style={{ marginTop: 12 }}
         data={scansQuery.data?.scans || []}

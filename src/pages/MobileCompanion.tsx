@@ -30,6 +30,8 @@ const MobileCompanion = () => {
     return () => iframe?.removeEventListener('load', onLoad);
   }, [initialContext]);
 
+  const mobileSrc = import.meta.env.DEV ? "/mobile/index.html" : "/mobile/";
+
   return (
     <div className="p-4">
       <div className="mb-2 text-sm text-muted-foreground">
@@ -38,7 +40,7 @@ const MobileCompanion = () => {
       <iframe
         ref={iframeRef}
         title="Mobile Companion"
-        src="/mobile/"
+        src={mobileSrc}
         style={{ width: '100%', height }}
         className="rounded-md border border-border bg-background"
       />
