@@ -67,7 +67,7 @@ The Blacktop Blackout OverWatch System was thoroughly analyzed and multiple crit
 - Invalid regex character class in voice commands
 - Build pipeline broken
 - **Fixed**: 
-  - Corrected regex syntax: `[\d.-,\s]` → `[\d.,\s-]`
+  - Corrected regex syntax: `[^]` class adjustments
   - Validated all regex patterns
 - **Result**: Production builds work perfectly
 
@@ -188,3 +188,22 @@ The project has been transformed from a problematic state with multiple critical
 - ✅ **Code Quality**: Much improved type safety and structure
 
 The application is now ready for continued development and can be safely deployed to production environments with the security improvements outlined in the authentication roadmap.
+
+### 🛰️ **7. Routing & Mobile Companion 404 (CRITICAL)**
+**Issue**: `/mobile-companion` returned 404 in development; `/mobile/` assets missing.
+- **Fixed**:
+  - `src/pages/MobileCompanion.tsx` now uses a dev-safe src (`/mobile/index.html`) and `/mobile/` in production.
+  - Exported Expo web build to `public/mobile/` and embedded at `/mobile-companion`.
+  - Added dev fallbacks for `/mobile/`, `/suite/`, and `/suite/fleet/` to avoid 404s.
+
+### 🌐 **8. Real data wiring (Mocks removed)**
+- Mobile screens now use backend data instead of demo placeholders:
+  - `ScansScreen`: creates real scans; removed demo overlay.
+  - `EstimateScreen`: fetches pricing via `/config/pricing`.
+  - `ReportScreen`: uses real branding + pricing.
+- Web Weather overlay now uses real OpenWeather data and forecast POP; removed random fallbacks.
+- Service layer updated: weather/GPS/sensor services no longer return mock data; they use real API or return empty on error.
+
+### 🔧 **9. Environment configuration**
+- Added `.env.local` support with `VITE_WEATHER_API_KEY` for OpenWeather.
+- Documented environment and mobile web export flow in README.

@@ -68,7 +68,7 @@ This document summarizes the Division-inspired theming/effects implementation de
   - P Settings (API base, branding), Pricing editor, Analytics (summary + prioritized), Login screen scaffold
   - R Auth gating across screens; session persistence; slope heatmap shader; production Supabase wiring (auth/RLS)
 
-- P Server (Node dev API on 3002)
+- P Server (Node dev API on 3001)
   - P Scans CRUD (create, update), overlay upload/retrieval, persistence to disk
   - P Config endpoints: pricing/branding; analytics (summary/prioritized); estimate from pricing; jobs/messages endpoints
   - R Hook CV analysis endpoint to generate overlays; auth; production DB (Supabase) equivalent routes
@@ -78,6 +78,16 @@ This document summarizes the Division-inspired theming/effects implementation de
   - R Auth gating, role-based views, messaging UI polish; link to interactive 3D where applicable
 
 The rest of this document reflects the original theme/effects plan and remains valid. Items above are additive to that plan.
+
+## Implemented, current state
+
+- Weather overlay
+  - Uses real OpenWeather data (requires `VITE_WEATHER_API_KEY` in root `.env.local`).
+  - Forecast POP drives radar precipitation display; geolocation used when available.
+
+- Mobile Companion web build
+  - Expo web export is served from `public/mobile/` and embedded at `/mobile-companion`.
+  - Rebuild with: `cd mobile && npx expo export --platform web --output-dir ../public/mobile`.
 
 ## Implemented, current state
 

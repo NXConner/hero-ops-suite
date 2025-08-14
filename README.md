@@ -74,3 +74,17 @@ Per-component UI tokens are now supported and persisted in themes:
 - Borders: border width, focus ring width, focus ring offset
 
 Components are wired to CSS vars, enabling live preview and persistence across reloads.
+
+## Environment
+
+- Set `VITE_WEATHER_API_KEY` in a root `.env.local` to enable live weather data in the OverWatch Weather overlay.
+  - Example: `VITE_WEATHER_API_KEY=your_openweather_key`
+- Other optional endpoints (GPS/sensors) can be set via corresponding `VITE_*` vars as implemented in `src/services/api.ts`.
+
+## Mobile Companion web build
+
+- The embedded Mobile Companion uses a static web export served from `public/mobile/`.
+- To rebuild after changes to the Expo app:
+  1) `cd mobile && npm install`
+  2) `npx expo export --platform web --output-dir ../public/mobile`
+- During development, static fallbacks exist for `/mobile/`, `/suite/`, and `/suite/fleet/` to avoid 404s. Production serving is handled by Nginx (see `docker/nginx.conf`).
