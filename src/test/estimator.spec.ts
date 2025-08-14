@@ -93,4 +93,15 @@ describe('estimator helpers', () => {
     const mat = out.materials.find(m => m.label.includes('Propane (hours)'));
     expect(mat?.cost).toBe(20);
   });
+
+  it('supports leg-based routing fuel costing', () => {
+    const input = baseInput();
+    (input as any).legBasedRouting = true;
+    (input as any).legC30TotalMiles = 100;
+    (input as any).legC30LoadedMiles = 60;
+    (input as any).legDakotaTotalMiles = 40;
+    const out = buildEstimate(input);
+    const travel = out.equipmentAndFuel.find(i => i.label.includes('leg-based'));
+    expect(travel).toBeTruthy();
+  });
 });

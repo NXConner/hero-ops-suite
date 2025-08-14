@@ -10,14 +10,14 @@ try {
     // dynamic import to avoid bundling if not used
     import('@sentry/browser').then(Sentry => {
       Sentry.init({ dsn });
-    }).catch(() => {});
+    }).catch((_e) => { /* ignore */ });
   }
-} catch {}
+} catch (_e) { /* ignore */ }
 
 // Minimal PWA service worker registration (if present)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch((_e) => { /* ignore */ });
   });
 }
 

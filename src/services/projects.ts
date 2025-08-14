@@ -7,6 +7,7 @@ export type Project = {
   status: ProjectStatus;
   serviceType?: string;
   estimate?: any;
+  changeOrders?: { id: string; createdAt: number; description: string }[];
   createdAt: number;
   updatedAt: number;
 };
@@ -38,13 +39,14 @@ export async function saveProject(input: Omit<Project, 'id' | 'createdAt' | 'upd
   const now = Date.now();
   const id = input.id ?? crypto.randomUUID?.() ?? `${now}-${Math.random().toString(36).slice(2)}`;
   const idx = list.findIndex(p => p.id === id);
-  const record: Project = { id, name: input.name, address: input.address, status: input.status, serviceType: input.serviceType, estimate: input.estimate, createdAt: idx >= 0 ? list[idx].createdAt : now, updatedAt: now };
+  const previous = idx >= 0 ? list[idx] : undefined;
+  const record: Project = { id, name: input.name, address: input.address, status: input.status, serviceType: input.serviceType, estimate: input.estimate, changeOrders: previous?.changeOrders ?? input.changeOrders ?? [], createdAt: idx >= 0 ? list[idx].createdAt : now, updatedAt: now };
   if (idx >= 0) list.splice(idx, 1, record); else list.unshift(record);
   saveAll(list);
   const supabase = await getSupabaseClient();
   if (supabase) {
     try {
-      await supabase.from('projects').upsert({ id: record.id, name: record.name, address: record.address, status: record.status, service_type: record.serviceType, estimate: record.estimate, created_at: new Date(record.createdAt).toISOString(), updated_at: new Date(record.updatedAt).toISOString() });
+      await supabase.from('projects').upsert({ id: record.id, name: record.name, address: record.address, status: record.status, service_type: record.serviceType, estimate: record.estimate, change_orders: record.changeOrders, created_at: new Date(record.createdAt).toISOString(), updated_at: new Date(record.updatedAt).toISOString() });
     } catch { /* ignore */ }
   }
   return record;
@@ -55,4 +57,17 @@ export async function deleteProject(id: string) {
   saveAll(list);
   const supabase = await getSupabaseClient();
   if (supabase) { try { await supabase.from('projects').delete().eq('id', id); } catch { /* ignore */ } }
+}
+
+export async function addChangeOrder(projectId: string, description: string): Promise<Project | null> {
+  const list = loadAll();
+  const idx = list.findIndex(p => p.id === projectId);
+  if (idx < 0) return null;
+  const co = { id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`, createdAt: Date.now(), description };
+  const updated: Project = { ...list[idx], changeOrders: [...(list[idx].changeOrders ?? []), co], updatedAt: Date.now() };
+  list.splice(idx, 1, updated);
+  saveAll(list);
+  const supabase = await getSupabaseClient();
+  if (supabase) { try { await supabase.from('projects').upsert({ id: updated.id, change_orders: updated.changeOrders, updated_at: new Date(updated.updatedAt).toISOString() }); } catch { /* ignore */ } }
+  return updated;
 }

@@ -44,7 +44,7 @@ export default function OverlayViewer3D({ meshUrl, overlay }: Props) {
               const gltf = await loader.loadAsync(meshUrl);
               root = gltf.scene;
               scene.add(root);
-            } catch {}
+            } catch (_e) { /* ignore mesh load errors */ }
           }
 
           if (!root) {

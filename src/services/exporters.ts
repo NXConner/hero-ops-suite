@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import type { StoredJob } from '@/services/jobs';
 import type { Customer } from '@/services/customers';
+import { BUSINESS_PROFILE } from '@/data/business';
 
 export function exportInvoicePDF(invoiceText: string, jobName: string = 'invoice'): void {
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
@@ -9,10 +10,18 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = 'invoice
   // Header
   doc.setFillColor('#0f172a');
   doc.rect(0, 0, 612, 70, 'F');
+  const company = BUSINESS_PROFILE.businessName || 'Asphalt Company';
+  const addr = BUSINESS_PROFILE.address?.full || '';
   doc.setTextColor('#22d3ee');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(16);
-  doc.text('Blackout Asphalt LLC', margin, 45);
+  doc.text(company, margin, 40);
+  if (addr) {
+    doc.setTextColor('#cbd5e1');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(addr, margin, 56);
+  }
   doc.setTextColor('#94a3b8');
   doc.setFontSize(10);
   doc.text('Estimate / Invoice', 480, 45, { align: 'right' });
@@ -24,13 +33,27 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = 'invoice
   doc.setFontSize(11);
   let y = margin + 50;
   lines.forEach((line: string) => {
-    if (y > 750) {
+    if (y > 700) {
       doc.addPage();
       y = margin;
     }
     doc.text(line, margin, y);
     y += 16;
   });
+
+  // Footer: terms and signature
+  const terms = 'Terms: Net 30. Prices valid 30 days. Work scheduled weather permitting.';
+  y += 12;
+  if (y > 730) { doc.addPage(); y = margin; }
+  doc.setDrawColor('#94a3b8');
+  doc.line(margin, y, 612 - margin, y);
+  y += 16;
+  doc.setTextColor('#475569');
+  doc.setFontSize(10);
+  doc.text(terms, margin, y);
+  y += 28;
+  doc.setTextColor('#0f172a');
+  doc.text('Customer Signature: ________________________________   Date: ____________', margin, y);
   doc.save(`${sanitize(jobName)}.pdf`);
 }
 

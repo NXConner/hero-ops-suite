@@ -23,7 +23,7 @@ const MobileCompanion = () => {
     const onLoad = () => {
       try {
         iframeRef.current?.contentWindow?.postMessage(initialContext, window.location.origin);
-      } catch {}
+      } catch (_e) { /* ignore */ }
     };
     const iframe = iframeRef.current;
     if (iframe) iframe.addEventListener('load', onLoad);

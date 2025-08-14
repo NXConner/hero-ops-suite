@@ -103,7 +103,7 @@ leave other maps pages ect currently implemented untouched
 
 ### Actionable To-Do Checklist 
 - Estimator
-  - [ ] Oil-spot polygon input and per-area prep-seal calculation
+  - [x] Oil-spot polygon input and per-area prep-seal calculation (draw polygon on map to set area)
   - [ ] Finalized branded PDF templates for estimates
   - [ ] Estimate-to-Project conversion and change orders
   - [ ] Route optimization and multi-job supplier routing
@@ -189,6 +189,10 @@ leave other maps pages ect currently implemented untouched
     - Analytics: employee movement state + mph, travel time accrual, phone usage timers (approx via visibility)
     - Admin geofence alerts with offline queueing
     - AI assist (demo): image segmentation request to Hugging Face (mask reception), ready for polygon vectorization next
+- Estimator UX & Calculators
+  - Added address autocomplete (Nominatim) with cached suggestions in `Estimator`.
+  - Added Driveway/Parking Lot presets to prefill inputs.
+  - Added leg-based routing inputs and calculator support (C30 loaded/unloaded, Dakota total); included in fuel line item when enabled.
 
 ---
 
@@ -329,11 +333,11 @@ leave other maps pages ect currently implemented untouched
   - [ ] Add per‑job `applySalesTax` flag; compute and include tax in `total`
   - [ ] Persist tax flag in job params; surface in UI and invoice text
 - Estimator inputs
-  - [ ] Add structured address inputs + geocode autocomplete
+  - [x] Add structured address inputs + geocode autocomplete
   - [ ] Add route map preview (supplier→job→return)
-  - [ ] Add preset templates (Driveway / Parking Lot) to prefill relevant fields
+  - [x] Add preset templates (Driveway / Parking Lot) to prefill relevant fields
 - Calculators
-  - [ ] Trailer MPG modifiers and leg‑based route fuel costing
+  - [x] Trailer MPG modifiers and leg‑based route fuel costing
   - [ ] Patching: tack coat/additives toggles and productivity curves by thickness
   - [ ] Crack: propane by hours; deep/wide sand prefill factor tuning
   - [ ] Sealcoat: multi‑coat, waste factor, application method productivity
