@@ -91,7 +91,7 @@ const Sidebar = () => {
 
   return (
     <div className={cn(
-      "fixed left-0 top-0 z-40 h-screen bg-card/50 backdrop-blur-sm border-r border-border transition-all duration-300",
+      "fixed left-0 top-0 z-[1500] h-screen bg-card/80 backdrop-blur-sm border-r border-border transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
       <div className="flex h-full flex-col">
