@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBusinessProfile } from "@/hooks/useBusinessProfile";
-import { exportAll, importAll } from "@/services/exportImport";
+import { exportAll, importAll, importCSVWithMapping, type CSVMapping } from "@/services/exportImport";
+import { saveJob, type StoredJob } from "@/services/jobs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,6 +49,10 @@ const Settings = () => {
   const [pushNotifications, setPushNotifications] = useState(false);
   const [autoBackup, setAutoBackup] = useState(true);
   const [twoFactorAuth, setTwoFactorAuth] = useState(false);
+  const [csvPreview, setCsvPreview] = useState<string>("");
+  const [csvErrors, setCsvErrors] = useState<{ row: number; message: string }[]>([]);
+  const [csvMappedCount, setCsvMappedCount] = useState<number>(0);
+  const [mapping, setMapping] = useState<CSVMapping>({ columns: { name: 'name', address: 'address', serviceType: 'serviceType' } });
 
   const userProfile = {
     name: "Commander Johnson",
@@ -1063,6 +1068,79 @@ const Settings = () => {
                         <Upload className="h-4 w-4 mr-2" />
                         Restore from Backup
                       </Button>
+                      <Separator className="my-2" />
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">CSV Import (Jobs)</div>
+                        <div className="text-xs text-muted-foreground">Map CSV columns to fields and validate before import.</div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                          {Object.entries(mapping.columns).map(([incoming, field]) => (
+                            <div key={incoming} className="flex items-center gap-2">
+                              <Input defaultValue={incoming} onBlur={(e) => {
+                                const newIncoming = e.target.value.trim();
+                                setMapping(m => {
+                                  const entries = Object.entries(m.columns).filter(([k]) => k !== incoming);
+                                  return { columns: Object.fromEntries([...entries, [newIncoming || incoming, field]]) } as CSVMapping;
+                                });
+                              }} />
+                              <Select defaultValue={field} onValueChange={(v) => {
+                                setMapping(m => ({ columns: { ...m.columns, [incoming]: v } }));
+                              }}>
+                                <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="name">name</SelectItem>
+                                  <SelectItem value="address">address</SelectItem>
+                                  <SelectItem value="serviceType">serviceType</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          ))}
+                        </div>
+                        <Textarea rows={6} placeholder="Paste CSV rows here (header required)" value={csvPreview} onChange={(e) => setCsvPreview(e.target.value)} />
+                        <div className="flex gap-2">
+                          <Button variant="outline" onClick={() => {
+                            const validator = (row: Record<string,string>) => {
+                              if (!row.name) return 'Missing name';
+                              if (!row.address) return 'Missing address';
+                              return null;
+                            };
+                            const projector = (row: Record<string,string>) => ({
+                              name: row.name,
+                              address: row.address,
+                              serviceType: row.serviceType || 'sealcoating'
+                            }) as any;
+                            const res = importCSVWithMapping(csvPreview, mapping, validator, projector);
+                            setCsvErrors(res.errors);
+                            setCsvMappedCount(res.rows.length);
+                          }}>Validate</Button>
+                          <Button onClick={() => {
+                            const validator = (row: Record<string,string>) => {
+                              if (!row.name) return 'Missing name';
+                              if (!row.address) return 'Missing address';
+                              return null;
+                            };
+                            const projector = (row: Record<string,string>) => ({
+                              name: row.name,
+                              address: row.address,
+                              serviceType: row.serviceType || 'sealcoating'
+                            }) as any;
+                            const res = importCSVWithMapping(csvPreview, mapping, validator, projector);
+                            res.rows.forEach((r: any) => {
+                              const job: Partial<StoredJob> = { name: r.name, address: r.address, serviceType: r.serviceType, params: {} };
+                              void saveJob(job as any);
+                            });
+                            setCsvErrors(res.errors);
+                            setCsvMappedCount(res.rows.length);
+                          }}>Import</Button>
+                        </div>
+                        <div className="text-xs text-muted-foreground">Mapped rows: {csvMappedCount} {csvErrors.length ? `• Errors: ${csvErrors.length}` : ''}</div>
+                        {!!csvErrors.length && (
+                          <div className="border border-destructive/30 rounded p-2 max-h-40 overflow-auto text-xs">
+                            {csvErrors.map((e,i) => (
+                              <div key={i}>Row {e.row}: {e.message}</div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
