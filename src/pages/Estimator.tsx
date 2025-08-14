@@ -18,6 +18,7 @@ import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile }
 import RealMapComponent from '@/components/map/RealMapComponent';
 import { geocodeAddress } from '@/lib/geo';
 import { listProjects, saveProject, type Project } from '@/services/projects';
+import { addChangeOrder } from '@/services/projects';
 
 const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
@@ -73,6 +74,9 @@ const Estimator = () => {
   const [customers, setCustomers] = useState<Customer[]>(listCustomers());
   const [customerName, setCustomerName] = useState('');
   const [projects, setProjects] = useState<Project[]>(listProjects());
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [arrowCounts, setArrowCounts] = useState<Record<string, number>>({});
+  const [textCounts, setTextCounts] = useState<Record<string, number>>({});
 
   // React to business profile changes
   useMemo(() => {
@@ -97,7 +101,11 @@ const Estimator = () => {
     numDoubleStalls: Number(params.numDoubleStalls) || 0,
     numHandicapSpots: Number(params.numHandicapSpots) || 0,
     hasCrosswalks: params.hasCrosswalks || (Number(params.numCrosswalks) || 0) > 0,
-    numArrows: Number(params.numArrows) || 0,
+    numArrows: (() => {
+      const manual = Number(params.numArrows) || 0;
+      const sum = Object.values(arrowCounts).reduce((s, n) => s + (Number(n) || 0), 0);
+      return sum || manual;
+    })(),
     oilSpotSquareFeet: Number(params.oilSpotSquareFeet) || 0,
     surfacePorosityFactor: Number(params.surfacePorosityFactor) || 1,
     numFullTime,
@@ -120,7 +128,7 @@ const Estimator = () => {
     propanePerTank: BUSINESS_PROFILE.materials.propanePerTank,
     includeTransportWeightCheck: includeWeightCheck,
     applySalesTax: (params as any).applySalesTax === true
-  }), [serviceType, params, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, legBased, legC30Total, legC30Loaded, legDakotaTotal, pmmPrice, includeWeightCheck, sealerActiveHours, excessiveIdleHours]);
+  }), [serviceType, params, arrowCounts, numFullTime, numPartTime, laborRate, roundTripMilesSupplier, roundTripMilesJob, fuelPrice, legBased, legC30Total, legC30Loaded, legDakotaTotal, pmmPrice, includeWeightCheck, sealerActiveHours, excessiveIdleHours]);
 
   const result = useMemo(() => buildEstimate(estimateInput), [estimateInput]);
 
@@ -294,6 +302,13 @@ const Estimator = () => {
     });
     setProjects(listProjects());
     setJobName(record.name);
+    setCurrentProjectId(record.id);
+  };
+
+  const handleAddChangeOrder = async () => {
+    if (!currentProjectId) return;
+    await addChangeOrder(currentProjectId, `${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`);
+    setProjects(listProjects());
   };
 
   return (
@@ -654,6 +669,44 @@ const Estimator = () => {
                 </div>
               </div>
 
+              {(serviceType === 'line_striping' || serviceType === 'combo_parkinglot') && (
+                <div className="mt-2">
+                  <Label>Stencil Catalog</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Arrows</div>
+                      {(BUSINESS_PROFILE.pricing.stencilCatalog?.arrows.types || []).map(t => (
+                        <div key={t} className="flex items-center gap-2">
+                          <span className="w-24 capitalize">{t}</span>
+                          <Input type="number" min={0} value={arrowCounts[t] || 0} onChange={e => setArrowCounts(prev => ({ ...prev, [t]: Math.max(0, Number(e.target.value) || 0) }))} />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Text</div>
+                      {(BUSINESS_PROFILE.pricing.stencilCatalog?.text.items || []).map(it => (
+                        <div key={it} className="flex items-center gap-2">
+                          <span className="w-32">{it}</span>
+                          <Input type="number" min={0} value={textCounts[it] || 0} onChange={e => {
+                            const n = Math.max(0, Number(e.target.value) || 0);
+                            setTextCounts(prev => ({ ...prev, [it]: n }));
+                            const total = Object.values({ ...textCounts, [it]: n }).reduce((s, v) => s + (Number(v) || 0), 0);
+                            setParams(p => ({ ...p, numTextStencils: total }));
+                          }} />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Handicap Symbols</div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-24">Count</span>
+                        <Input type="number" min={0} value={params.numHandicapSpots} onChange={e => setParams(p => ({ ...p, numHandicapSpots: Math.max(0, Number(e.target.value) || 0) }))} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <Label>Additional notes</Label>
                 <Textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} />
@@ -732,6 +785,9 @@ ${textInvoiceRounded}`}
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportJobsCSV(jobs), 'jobs.csv', 'text/csv')}>Jobs CSV</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportCustomersCSV(customers), 'customers.csv', 'text/csv')}>Customers CSV</Button>
                 <Button type="button" onClick={handleConvertToProject}>Convert to Project</Button>
+                {currentProjectId && (
+                  <Button type="button" variant="outline" onClick={handleAddChangeOrder}>Add as Change Order</Button>
+                )}
               </div>
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
