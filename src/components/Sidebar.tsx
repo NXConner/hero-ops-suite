@@ -47,6 +47,7 @@ const iconMap: Record<string, any> = {
 const defaultNav: NavItemConfig[] = [
   { name: 'Dashboard', href: '/dashboard', icon: 'LayoutDashboard' },
   { name: 'OverWatch Map', href: '/overwatch', icon: 'Radar', badge: 'LIVE' },
+  { name: 'Maps (All Features)', href: '/maps', icon: 'Radar' },
   { name: 'Mission Planning', href: '/mission-planning', icon: 'Target' },
   { name: 'Team Management', href: '/team-management', icon: 'Users' },
   { name: 'Analytics', href: '/analytics', icon: 'BarChart3' },
