@@ -2,6 +2,8 @@ import { jsPDF } from 'jspdf';
 import type { StoredJob } from '@/services/jobs';
 import type { Customer } from '@/services/customers';
 import { BUSINESS_PROFILE } from '@/data/business';
+import type { StateCode } from '@/data/state-compliance';
+import { getComplianceProfile } from '@/data/state-compliance';
 
 export function exportInvoicePDF(invoiceText: string, jobName: string = 'invoice'): void {
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
@@ -145,3 +147,66 @@ export function downloadTextFile(data: string, filename: string, mime = 'text/pl
   a.click();
   URL.revokeObjectURL(url);
 }
+
+export function exportComplianceChecklistPDF(state: StateCode, jobName: string = 'compliance'): void {
+  const profile = getComplianceProfile(state);
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const margin = 40;
+  const maxWidth = 612 - margin * 2;
+
+  // Header
+  doc.setFillColor('#0f172a');
+  doc.rect(0, 0, 612, 70, 'F');
+  doc.setTextColor('#22d3ee');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text(`${BUSINESS_PROFILE.businessName || 'Company'} — ${profile.name} Compliance Checklist`, margin, 40);
+
+  let y = margin + 60;
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor('#0f172a');
+  doc.setFontSize(11);
+
+  const categoryOrder: Array<ReturnType<typeof groupBy>[number]['category']> = [
+    'licensing', 'permits', 'standards', 'safety', 'environment', 'transport', 'tax', 'insurance'
+  ];
+
+  const groups = groupBy(profile.items, 'category');
+  for (const cat of categoryOrder) {
+    const items = groups.filter(g => g.category === cat)[0]?.items || [];
+    if (items.length === 0) continue;
+    if (y > 720) { doc.addPage(); y = margin; }
+    // category heading
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor('#334155');
+    doc.text(capitalize(cat), margin, y);
+    y += 14;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor('#0f172a');
+    for (const item of items) {
+      if (y > 740) { doc.addPage(); y = margin; }
+      const line = `□ ${item.label}${item.required ? ' (Required)' : ''}`;
+      const lines = doc.splitTextToSize(line, maxWidth);
+      lines.forEach((ln: string) => {
+        doc.text(ln, margin, y);
+        y += 14;
+      });
+    }
+    y += 6;
+  }
+
+  doc.save(`${sanitize(jobName)}_${profile.state}_compliance.pdf`);
+}
+
+function groupBy<T extends Record<string, any>>(arr: T[], key: keyof T): Array<{ category: any, items: T[] }> {
+  const map = new Map<any, T[]>();
+  for (const el of arr) {
+    const k = el[key];
+    if (!map.has(k)) map.set(k, []);
+    map.get(k)!.push(el);
+  }
+  return Array.from(map.entries()).map(([category, items]) => ({ category, items }))
+    .sort((a, b) => String(a.category).localeCompare(String(b.category)));
+}
+
+function capitalize(s: string): string { return s.charAt(0).toUpperCase() + s.slice(1); }

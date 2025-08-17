@@ -10,3 +10,6 @@
 [submodule "odoo/asphalt-odoo-prime"]
 	path = odoo/asphalt-odoo-prime
 	url = https://github.com/NXConner/asphalt-odoo-prime.git
+[submodule "suite/pave-wise-weather-cast"]
+	path = suite/pave-wise-weather-cast
+	url = https://github.com/NXConner/pave-wise-weather-cast.git

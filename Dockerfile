@@ -84,6 +84,20 @@ COPY suite/patrick-county-mapper/ .
 # Build mapper with base path for subdirectory hosting
 RUN npm run build -- --base=/suite/mapper/
 
+# --- Builder ---
+FROM node:20-alpine AS builder_weather
+WORKDIR /app_weather
+
+# Install deps for PaveWise Weather Cast
+COPY suite/pave-wise-weather-cast/package.json suite/pave-wise-weather-cast/package-lock.json* suite/pave-wise-weather-cast/bun.lockb* ./
+RUN npm ci --no-audit --no-fund --legacy-peer-deps || npm ci --no-audit --no-fund --legacy-peer-deps
+
+# Copy weather sources
+COPY suite/pave-wise-weather-cast/ .
+
+# Build weather with base path for subdirectory hosting
+RUN npm run build -- --base=/suite/weather/
+
 # --- Runtime ---
 FROM nginx:alpine AS runtime
 WORKDIR /usr/share/nginx/html
@@ -95,6 +109,7 @@ COPY --from=builder_mobile /app_mobile/dist /usr/share/nginx/html/mobile
 COPY --from=builder_fleet /app_fleet/dist /usr/share/nginx/html/suite/fleet
 COPY --from=builder_atlas /app_atlas/dist /usr/share/nginx/html/suite/atlas
 COPY --from=builder_mapper /app_mapper/dist /usr/share/nginx/html/suite/mapper
+COPY --from=builder_weather /app_weather/dist /usr/share/nginx/html/suite/weather
 
 # Copy nginx config for SPA fallback
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
