@@ -14,7 +14,8 @@ import { computeRoundTripMilesBetween, reverseGeocode } from '@/lib/geo';
 import { searchAddressCandidates, type AddressCandidate } from '@/lib/geo';
 import { saveJob, listJobs, type StoredJob } from '@/services/jobs';
 import { listCustomers, saveCustomer, type Customer } from '@/services/customers';
-import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile } from '@/services/exporters';
+import { exportInvoicePDF, exportJobsCSV, exportCustomersCSV, downloadTextFile, exportComplianceChecklistPDF } from '@/services/exporters';
+import type { StateCode } from '@/data/state-compliance';
 import RealMapComponent from '@/components/map/RealMapComponent';
 import { geocodeAddress } from '@/lib/geo';
 import { listProjects, saveProject, type Project } from '@/services/projects';
@@ -77,6 +78,7 @@ const Estimator = () => {
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [arrowCounts, setArrowCounts] = useState<Record<string, number>>({});
   const [textCounts, setTextCounts] = useState<Record<string, number>>({});
+  const [complianceState, setComplianceState] = useState<StateCode>('VA');
 
   // React to business profile changes
   useMemo(() => {
@@ -203,6 +205,7 @@ const Estimator = () => {
       serviceType,
       params: {
         ...params,
+        stateCode: complianceState,
         roundTripMilesSupplier,
         roundTripMilesJob,
         fuelPrice,
@@ -260,6 +263,7 @@ const Estimator = () => {
     setPmmPrice(j.params.pmmPrice ?? BUSINESS_PROFILE.materials.pmmPricePerGallon);
     setNotes(j.params.notes ?? '');
     setParams(p => ({ ...p, applySalesTax: !!(j as any).params?.applySalesTax }));
+    setComplianceState(((j.params as any).stateCode as StateCode) ?? 'VA');
   };
 
   const handleUseMyLocation = async () => {
@@ -782,6 +786,17 @@ ${textInvoiceRounded}`}
               </pre>
               <div className="mt-3 flex gap-2 justify-end">
                 <Button type="button" variant="outline" onClick={() => exportInvoicePDF(`${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`, jobName || 'invoice')}>Export PDF</Button>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs">Compliance State</Label>
+                  <Select value={complianceState} onValueChange={(v) => setComplianceState(v as StateCode)}>
+                    <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="VA">Virginia</SelectItem>
+                      <SelectItem value="NC">North Carolina</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="button" variant="outline" onClick={() => exportComplianceChecklistPDF(complianceState, jobName || 'compliance')}>Compliance PDF</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportJobsCSV(jobs), 'jobs.csv', 'text/csv')}>Jobs CSV</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportCustomersCSV(customers), 'customers.csv', 'text/csv')}>Customers CSV</Button>
                 <Button type="button" variant="outline" onClick={() => {
