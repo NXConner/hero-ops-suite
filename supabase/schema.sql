@@ -126,3 +126,41 @@ create table if not exists pricing_items (
 --   for all using (auth.uid() = created_by);
 
 -- Buckets (create in Supabase UI/CLI): meshes/, raw_images/, snapshots/, tiles/, reports/
+
+-- App configuration & estimator mirrors
+create table if not exists business_overrides (
+  id text primary key,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+
+create table if not exists customers (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  address text not null,
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists jobs_estimator (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  address text not null,
+  service_type text not null,
+  params jsonb not null,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists projects (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  address text not null,
+  status text not null,
+  service_type text,
+  estimate jsonb,
+  change_orders jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
