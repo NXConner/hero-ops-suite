@@ -131,3 +131,26 @@ This guide summarizes common licensing, permitting, safety, environmental, tax, 
 
 Note: Requirements change. Always verify current rules on official state sites (DPOR/VDOT/DEQ in VA; NCLBGC/NCDOT/NCDEQ in NC) and consult your legal/professional advisors.
 
+---
+
+## Authoritative resources
+
+- Virginia
+  - DPOR (Contractors): https://www.dpor.virginia.gov/
+  - Virginia SCC (Business Registration): https://scc.virginia.gov/
+  - VDOT (Permits/Specs/Traffic Control): https://www.virginiadot.org/
+  - VOSH (Safety): https://www.doli.virginia.gov/occupational-safety-and-health/
+  - DEQ (Environment/Stormwater): https://www.deq.virginia.gov/
+  - Virginia Tax: https://www.tax.virginia.gov/
+  - Virginia Employment Commission: https://www.vec.virginia.gov/
+
+- North Carolina
+  - NC Secretary of State (Business Registration): https://www.sosnc.gov/
+  - NCLBGC (Contractors): https://nclbgc.org/
+  - NCDOT (Permits/Specs/Traffic Control): https://www.ncdot.gov/
+  - NC DOL OSH (Safety): https://www.labor.nc.gov/safety-and-health/occupational-safety-and-health
+  - NCDEQ (Environment/Stormwater): https://deq.nc.gov/
+  - NC Department of Revenue: https://www.ncdor.gov/
+  - NC DES (Unemployment): https://des.nc.gov/
+  - NC Industrial Commission (Workers’ Comp): https://www.ic.nc.gov/
+
