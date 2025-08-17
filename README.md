@@ -6,6 +6,8 @@ This repository contains:
 - `mobile/`: React Native (Expo) mobile app skeleton with overlay handling, cost estimator, PDF report, and a stub 3D viewer.
 - `odoo/asphalt-odoo-prime`: Integrated sub-application (Fleet & Field Ops) built and served under `/suite/` in production. Access via main route `/fleet-field-ops`.
 - `suite/fleet-focus-manager`: Integrated Fleet Focus Manager sub-app, served under `/suite/fleet/` and accessible within Fleet & Field Ops.
+- `suite/asphalt-atlas-hub`: Integrated Asphalt Atlas Hub sub-app, served under `/suite/atlas/`.
+- `suite/patrick-county-mapper`: Integrated Patrick County Mapper sub-app, served under `/suite/mapper/`.
 
 ## Quick start
 
@@ -35,6 +37,8 @@ This repository contains:
   - Within Fleet & Field Ops, you can open Fleet Focus Manager.
 - Fleet Focus Manager (from `suite/fleet-focus-manager`) is built and served at `/suite/fleet/`.
   - Accessible inside Fleet & Field Ops or directly at `/suite/fleet/`.
+- Asphalt Atlas Hub (from `suite/asphalt-atlas-hub`) is built and served at `/suite/atlas/`.
+- Patrick County Mapper (from `suite/patrick-county-mapper`) is built and served at `/suite/mapper/`.
 - Mobile Companion (Expo web build) is served at `/mobile/` and embedded at `/mobile-companion`.
 
 ## Modules
@@ -87,4 +91,4 @@ Components are wired to CSS vars, enabling live preview and persistence across r
 - To rebuild after changes to the Expo app:
   1) `cd mobile && npm install`
   2) `npx expo export --platform web --output-dir ../public/mobile`
-- During development, static fallbacks exist for `/mobile/`, `/suite/`, and `/suite/fleet/` to avoid 404s. Production serving is handled by Nginx (see `docker/nginx.conf`).
+- During development, static fallbacks exist for `/mobile/`, `/suite/`, `/suite/fleet/`, `/suite/atlas/`, and `/suite/mapper/` to avoid 404s. Production serving is handled by Nginx (see `docker/nginx.conf`).

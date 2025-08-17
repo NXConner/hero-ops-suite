@@ -8,7 +8,10 @@ const OperationsSuite = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('app') === 'fleet') setPath('/suite/fleet/');
+    const app = params.get('app');
+    if (app === 'fleet') setPath('/suite/fleet/');
+    else if (app === 'atlas') setPath('/suite/atlas/');
+    else if (app === 'mapper') setPath('/suite/mapper/');
   }, []);
 
   const initialContext = useMemo(() => ({
@@ -59,11 +62,13 @@ const OperationsSuite = () => {
       <div className="flex gap-2">
         <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/')}>Operations Home</button>
         <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/fleet/')}>Fleet Focus Manager</button>
+        <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/atlas/')}>Atlas Hub</button>
+        <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/mapper/')}>Patrick County Mapper</button>
       </div>
       <iframe
         key={iframeSrc}
         ref={iframeRef}
-        title="Fleet & Field Ops"
+        title="Operations Suite App"
         src={iframeSrc}
         style={{ width: '100%', height }}
         className="rounded-md border border-border bg-background"
