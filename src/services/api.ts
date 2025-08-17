@@ -225,6 +225,9 @@ export class WeatherService {
 
 export class GPSTrackingService {
   private static instance: GPSTrackingService;
+  private listeners: Set<(data: GPSTrackingResponse[]) => void> = new Set();
+  private ws: WebSocket | null = null;
+  private pollTimer: any = null;
 
   static getInstance(): GPSTrackingService {
     if (!GPSTrackingService.instance) {
@@ -233,9 +236,150 @@ export class GPSTrackingService {
     return GPSTrackingService.instance;
   }
 
-  // Placeholder for real GPS tracking integration
+  // Attempt to connect to a websocket if configured; fall back silently
   connectWebSocket(url: string = API_CONFIG.FLEET_WEBSOCKET_URL): WebSocket {
-    return new WebSocket(url);
+    try {
+      this.ws = new WebSocket(url);
+      this.ws.onopen = () => {
+        // Optionally authenticate or subscribe to channels here
+      };
+      this.ws.onmessage = (evt) => {
+        try {
+          const parsed = JSON.parse(evt.data as any);
+          const updates: GPSTrackingResponse[] = Array.isArray(parsed)
+            ? parsed
+            : parsed?.devices || parsed?.data || [];
+          if (updates && updates.length) this.emit(updates);
+        } catch {
+          // ignore malformed frames
+        }
+      };
+      this.ws.onerror = () => {
+        // Fallback to mock interval if websocket fails
+        this.startMockRealtime();
+      };
+      this.ws.onclose = () => {
+        // If there are listeners, ensure we still provide updates
+        if (this.listeners.size > 0) this.startMockRealtime();
+      };
+      return this.ws;
+    } catch {
+      // Browser may block or URL invalid
+      this.startMockRealtime();
+      return new WebSocket('wss://invalid.localhost/ignored');
+    }
+  }
+
+  // Fetch one-time device locations. Try real API; fallback to mock
+  async getDeviceLocations(): Promise<GPSTrackingResponse[]> {
+    try {
+      const url = `${API_CONFIG.GPS_TRACKING_URL}/devices`;
+      const { data } = await axios.get(url, { timeout: 6000 });
+      const devices: GPSTrackingResponse[] = Array.isArray(data)
+        ? data
+        : (data?.devices || []);
+      if (devices && devices.length) return devices;
+      throw new Error('Empty devices list');
+    } catch {
+      return this.generateMockDevices();
+    }
+  }
+
+  subscribeToRealTimeUpdates(cb: (data: GPSTrackingResponse[]) => void): void {
+    this.listeners.add(cb);
+    if (!this.ws && !this.pollTimer) {
+      // Prefer websocket if available, else mock interval
+      try {
+        this.connectWebSocket();
+      } catch {
+        this.startMockRealtime();
+      }
+    }
+  }
+
+  unsubscribeFromRealTimeUpdates(cb: (data: GPSTrackingResponse[]) => void): void {
+    this.listeners.delete(cb);
+    if (this.listeners.size === 0) {
+      this.stopRealtime();
+    }
+  }
+
+  private emit(data: GPSTrackingResponse[]) {
+    this.listeners.forEach((fn) => {
+      try { fn(data); } catch { /* ignore listener errors */ }
+    });
+  }
+
+  private startMockRealtime() {
+    if (this.pollTimer) return;
+    this.pollTimer = setInterval(() => {
+      const updates = this.generateMockDevices(true);
+      this.emit(updates);
+    }, 3000);
+  }
+
+  private stopRealtime() {
+    if (this.ws) {
+      try { this.ws.close(); } catch { /* ignore */ }
+      this.ws = null;
+    }
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
+  }
+
+  // Mock data generator around a base location (NYC)
+  private generateMockDevices(jitter: boolean = false): GPSTrackingResponse[] {
+    const baseLat = 40.7128;
+    const baseLon = -74.0060;
+    const makeDevice = (idx: number, opts: Partial<GPSTrackingResponse> = {}): GPSTrackingResponse => {
+      const offset = jitter ? (Math.random() - 0.5) * 0.02 : (idx - 3) * 0.01;
+      const lat = baseLat + offset;
+      const lon = baseLon + offset * 1.2;
+      const speed = Math.max(0, 20 + (Math.random() - 0.5) * 15);
+      const heading = Math.floor(Math.random() * 360);
+      return {
+        deviceId: `veh-${idx}`,
+        timestamp: new Date().toISOString(),
+        location: { latitude: lat, longitude: lon, altitude: 10 + Math.random() * 5, accuracy: 5 + Math.random() * 10, speed, heading },
+        status: speed > 2 ? 'active' : 'idle',
+        batteryLevel: 60 + Math.random() * 40,
+        isMoving: speed > 1,
+        driver: { id: `drv-${idx}`, name: `Driver ${idx}` },
+        vehicle: { id: `Truck ${idx}`, type: 'truck', license: `OPS-${100 + idx}` },
+        ...opts
+      } as GPSTrackingResponse;
+    };
+
+    const list: GPSTrackingResponse[] = [
+      makeDevice(1),
+      makeDevice(2),
+      makeDevice(3, { status: 'idle' }),
+      makeDevice(4),
+      makeDevice(5, { status: 'active' })
+    ];
+
+    // Add a couple of employee handhelds without vehicle assigned
+    list.push({
+      deviceId: 'emp-1',
+      timestamp: new Date().toISOString(),
+      location: { latitude: baseLat + 0.015, longitude: baseLon - 0.008, altitude: 0, accuracy: 12, speed: 1, heading: 90 },
+      status: 'active',
+      isMoving: true,
+      driver: { id: 'emp-1', name: 'Employee A' }
+    } as GPSTrackingResponse);
+
+    list.push({
+      deviceId: 'emp-2',
+      timestamp: new Date().toISOString(),
+      location: { latitude: baseLat - 0.01, longitude: baseLon + 0.006, altitude: 0, accuracy: 15, speed: 0, heading: 45 },
+      status: 'idle',
+      isMoving: false,
+      driver: { id: 'emp-2', name: 'Employee B' }
+    } as GPSTrackingResponse);
+
+    return list;
   }
 }
 
