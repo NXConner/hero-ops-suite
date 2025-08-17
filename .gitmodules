@@ -7,3 +7,6 @@
 [submodule "suite/fleet-focus-manager"]
 	path = suite/fleet-focus-manager
 	url = https://github.com/NXConner/fleet-focus-manager.git
+[submodule "odoo/asphalt-odoo-prime"]
+	path = odoo/asphalt-odoo-prime
+	url = https://github.com/NXConner/asphalt-odoo-prime.git
