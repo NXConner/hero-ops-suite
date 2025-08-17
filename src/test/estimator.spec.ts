@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { computeSealcoatMaterials, computeCrackFill, computeStriping, computeFuelAndEquipment, computeTransportLoad } from '@/lib/estimator';
 import { buildEstimate, type EstimateInput } from '@/lib/estimator';
+import { importCSVWithMapping } from '@/services/exportImport';
 
 function baseInput(): EstimateInput {
   return {
@@ -103,5 +104,14 @@ describe('estimator helpers', () => {
     const out = buildEstimate(input);
     const travel = out.equipmentAndFuel.find(i => i.label.includes('leg-based'));
     expect(travel).toBeTruthy();
+  });
+
+  it('imports CSV with mapping and validation', () => {
+    const csv = 'id,name,address,notes\n1,Acme,123 Main,VIP';
+    const mapping = { columns: { id: 'id', name: 'name', address: 'address', notes: 'notes' } } as any;
+    const res = importCSVWithMapping(csv, mapping, (row) => (!row.name || !row.address ? 'Missing name or address' : null), (row: any) => row);
+    expect(res.rows.length).toBe(1);
+    expect(res.errors.length).toBe(0);
+    expect((res.rows[0] as any).name).toBe('Acme');
   });
 });

@@ -9,18 +9,51 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = 'invoice
   const maxWidth = 612 - margin * 2; // letter width in pts
   // Header
   doc.setFillColor('#0f172a');
-  doc.rect(0, 0, 612, 70, 'F');
+  doc.rect(0, 0, 612, 90, 'F');
   const company = BUSINESS_PROFILE.businessName || 'Asphalt Company';
   const addr = BUSINESS_PROFILE.address?.full || '';
+  const branding = BUSINESS_PROFILE.branding || {};
+  // Optional logo
+  const hasLogo = !!branding.logoUrl;
+  if (hasLogo) {
+    try {
+      // Note: jsPDF needs a data URL. If a URL is provided, attempt fetch and convert.
+      // This is best-effort and will be ignored on CORS failure.
+      // Consumers can set branding.logoUrl to a data URL for reliability.
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      (async () => {
+        try {
+          if (branding.logoUrl && branding.logoUrl.startsWith('data:')) {
+            doc.addImage(branding.logoUrl, 'PNG', margin, 12, 120, 60, undefined, 'FAST');
+          } else if (branding.logoUrl) {
+            const res = await fetch(branding.logoUrl);
+            const blob = await res.blob();
+            const reader = new FileReader();
+            reader.onload = () => {
+              try { doc.addImage(String(reader.result), 'PNG', margin, 12, 120, 60, undefined, 'FAST'); } catch {}
+            };
+            reader.readAsDataURL(blob);
+          }
+        } catch {}
+      })();
+    } catch {}
+  }
   doc.setTextColor('#22d3ee');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text(company, margin, 40);
+  doc.setFontSize(18);
+  doc.text(company, hasLogo ? margin + 130 : margin, 40);
   if (addr) {
     doc.setTextColor('#cbd5e1');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(addr, margin, 56);
+    doc.text(addr, hasLogo ? margin + 130 : margin, 56);
+  }
+  const contactLine = [branding.phone, branding.email, branding.website].filter(Boolean).join('  •  ');
+  if (contactLine) {
+    doc.setTextColor('#a3b2c2');
+    doc.setFontSize(9);
+    doc.text(contactLine, hasLogo ? margin + 130 : margin, 72);
   }
   doc.setTextColor('#94a3b8');
   doc.setFontSize(10);
@@ -31,7 +64,7 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = 'invoice
   doc.setTextColor('#0f172a');
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11);
-  let y = margin + 50;
+  let y = margin + 70;
   lines.forEach((line: string) => {
     if (y > 700) {
       doc.addPage();

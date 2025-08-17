@@ -1195,6 +1195,10 @@ const Settings = () => {
                   <CardContent className="space-y-6 text-sm">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
+                        <Label>Business Name</Label>
+                        <Input defaultValue={profile.businessName || ''} onBlur={(e) => save({ businessName: e.target.value })} />
+                      </div>
+                      <div>
                         <Label>Business Address</Label>
                         <Input defaultValue={profile.address.full} onBlur={(e) => save({ address: { ...profile.address, full: e.target.value } })} />
                       </div>
@@ -1205,6 +1209,22 @@ const Settings = () => {
                           const [name, ...rest] = val.split(',');
                           save({ supplier: { name: name?.trim() || profile.supplier.name, address: { ...profile.supplier.address, full: rest.join(',').trim() || profile.supplier.address.full } } });
                         }} />
+                      </div>
+                      <div>
+                        <Label>Logo URL (data URL recommended)</Label>
+                        <Input defaultValue={profile.branding?.logoUrl || ''} onBlur={(e) => save({ branding: { ...(profile.branding || {}), logoUrl: e.target.value } as any })} />
+                      </div>
+                      <div>
+                        <Label>Phone</Label>
+                        <Input defaultValue={profile.branding?.phone || ''} onBlur={(e) => save({ branding: { ...(profile.branding || {}), phone: e.target.value } as any })} />
+                      </div>
+                      <div>
+                        <Label>Email</Label>
+                        <Input defaultValue={profile.branding?.email || ''} onBlur={(e) => save({ branding: { ...(profile.branding || {}), email: e.target.value } as any })} />
+                      </div>
+                      <div>
+                        <Label>Website</Label>
+                        <Input defaultValue={profile.branding?.website || ''} onBlur={(e) => save({ branding: { ...(profile.branding || {}), website: e.target.value } as any })} />
                       </div>
                       <div>
                         <Label>Crew (FT / PT)</Label>
@@ -1424,6 +1444,38 @@ const Settings = () => {
                       for (const j of result.rows) { await saveJob(j as any); }
                       alert(`Imported ${result.rows.length} jobs. Errors: ${result.errors.length}`);
                     }} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>CSV Import (Customers)</Label>
+                    <input type="file" accept=".csv,text/csv" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const text = await file.text();
+                      const { importCSVWithMapping } = await import('@/services/exportImport');
+                      const mapping = { columns: { id: 'id', name: 'name', address: 'address', notes: 'notes' } };
+                      const result = importCSVWithMapping(text, mapping, (row) => (!row.name || !row.address ? 'Missing name or address' : null), (row: any) => ({
+                        id: row.id || undefined,
+                        name: row.name,
+                        address: row.address,
+                        notes: row.notes,
+                        createdAt: Date.now(),
+                        updatedAt: Date.now(),
+                      }));
+                      const { saveCustomer } = await import('@/services/customers');
+                      for (const c of result.rows) { await saveCustomer(c as any); }
+                      alert(`Imported ${result.rows.length} customers. Errors: ${result.errors.length}`);
+                    }} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Sync Projects to Supabase</Label>
+                    <p className="text-sm text-muted-foreground">Push local projects and change orders</p>
+                    <Button type="button" onClick={async () => {
+                      const { listProjects, saveProject } = await import('@/services/projects');
+                      const projects = listProjects();
+                      for (const p of projects) { await saveProject(p as any); }
+                    }}>Push Projects</Button>
                   </div>
                 </CardContent>
               </Card>

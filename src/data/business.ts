@@ -109,4 +109,10 @@ export const BUSINESS_PROFILE: BusinessProfile = {
   travelDefaults: {
     roundTripMilesSupplier: 96, // approx Stuart, VA <-> Madison, NC
   },
+  branding: {
+    logoUrl: '',
+    phone: '',
+    email: '',
+    website: ''
+  }
 };

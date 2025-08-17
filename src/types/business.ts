@@ -94,6 +94,13 @@ export interface TrailerSpec {
   notes?: string;
 }
 
+export interface BrandingInfo {
+  logoUrl?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+}
+
 export interface BusinessProfile {
   businessName?: string;
   address: Address;
@@ -115,4 +122,5 @@ export interface BusinessProfile {
   travelDefaults: {
     roundTripMilesSupplier: number;
   };
+  branding?: BrandingInfo;
 }

@@ -64,7 +64,7 @@ export async function saveJob(job: Omit<StoredJob, "id" | "createdAt" | "updated
   const supabase = await getSupabaseClient();
   if (supabase) {
     try {
-      await supabase.from('jobs').upsert({ id: record.id, name: record.name, address: record.address, service_type: record.serviceType, params: record.params, created_at: new Date(record.createdAt).toISOString(), updated_at: new Date(record.updatedAt).toISOString() });
+      await supabase.from('jobs_estimator').upsert({ id: record.id, name: record.name, address: record.address, service_type: record.serviceType, params: record.params, created_at: new Date(record.createdAt).toISOString(), updated_at: new Date(record.updatedAt).toISOString() });
     } catch {
       // ignore cloud errors
     }
@@ -86,6 +86,6 @@ export async function deleteJob(id: string) {
   saveAll(list);
   const supabase = await getSupabaseClient();
   if (supabase) {
-    try { await supabase.from('jobs').delete().eq('id', id); } catch { /* ignore */ }
+    try { await supabase.from('jobs_estimator').delete().eq('id', id); } catch { /* ignore */ }
   }
 }
