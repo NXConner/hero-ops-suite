@@ -4,3 +4,6 @@
 [submodule "suite/patrick-county-mapper"]
 	path = suite/patrick-county-mapper
 	url = https://github.com/NXConner/patrick-county-mapper.git
+[submodule "suite/fleet-focus-manager"]
+	path = suite/fleet-focus-manager
+	url = https://github.com/NXConner/fleet-focus-manager.git
