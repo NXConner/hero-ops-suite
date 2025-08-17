@@ -22,6 +22,7 @@ import {
   Check
 } from 'lucide-react';
 // Removed leaflet import
+import { useTerminology } from '@/contexts/TerminologyContext';
 
 // Placeholder types to replace Leaflet
 interface LatLng {
@@ -51,7 +52,7 @@ interface MapToolsProps {
   isMeasurementMode: boolean;
   onDrawingComplete: (feature: any) => void;
   onMeasurementComplete: (measurement: Measurement) => void;
-  terminologyMode: 'military' | 'civilian' | 'both';
+  terminologyMode?: 'military' | 'civilian' | 'both';
 }
 
 const MapTools: React.FC<MapToolsProps> = ({
@@ -71,9 +72,11 @@ const MapTools: React.FC<MapToolsProps> = ({
   const [activeDrawings, setActiveDrawings] = useState<any[]>([]);
   const [activeMeasurements, setActiveMeasurements] = useState<Measurement[]>([]);
   const [showToolPanel, setShowToolPanel] = useState(false);
+  const { terminologyMode: globalMode } = useTerminology();
+  const mode = terminologyMode || globalMode;
 
   const getTerminology = (military: string, civilian: string) => {
-    switch (terminologyMode) {
+    switch (mode) {
       case 'military': return military;
       case 'civilian': return civilian;
       case 'both': return `${military} / ${civilian}`;

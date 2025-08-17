@@ -21,23 +21,31 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = 'invoice
       // This is best-effort and will be ignored on CORS failure.
       // Consumers can set branding.logoUrl to a data URL for reliability.
       // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+       
       (async () => {
         try {
           if (branding.logoUrl && branding.logoUrl.startsWith('data:')) {
             doc.addImage(branding.logoUrl, 'PNG', margin, 12, 120, 60, undefined, 'FAST');
           } else if (branding.logoUrl) {
-            const res = await fetch(branding.logoUrl);
-            const blob = await res.blob();
-            const reader = new FileReader();
-            reader.onload = () => {
-              try { doc.addImage(String(reader.result), 'PNG', margin, 12, 120, 60, undefined, 'FAST'); } catch {}
-            };
-            reader.readAsDataURL(blob);
+            try {
+              const res = await fetch(branding.logoUrl);
+              const blob = await res.blob();
+              const reader = new FileReader();
+              reader.onload = () => {
+                try { doc.addImage(String(reader.result), 'PNG', margin, 12, 120, 60, undefined, 'FAST'); } catch (e) { /* ignore addImage failure */ }
+              };
+              reader.readAsDataURL(blob);
+            } catch (e) {
+              // ignore logo fetch errors
+            }
           }
-        } catch {}
+        } catch (e) {
+          // ignore inner logo processing errors
+        }
       })();
-    } catch {}
+    } catch (e) {
+      // ignore outer logo rendering errors
+    }
   }
   doc.setTextColor('#22d3ee');
   doc.setFont('helvetica', 'bold');

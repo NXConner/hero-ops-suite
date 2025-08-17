@@ -39,3 +39,17 @@ Focus next on data, persistence, and exports to reach production-readiness:
   - Add auth gating across web + mobile, token storage improvements (httpOnly cookies), and session persistence.
 
 Provide required env keys at runtime/build and add wallpaper/video assets to `public/` as needed.
+
+- Global terminology toggle is now implemented:
+  - New `src/contexts/TerminologyContext.tsx` provides a global `terminologyMode` with `useTerminology()`.
+  - Wrapped the app in `TerminologyProvider` in `src/App.tsx`.
+  - Added Settings > System > Terminology selector (Military / Civilian / Both).
+  - OverWatch and overlays/widgets (Fleet, Weather, MapTools, PavementScan3D, Voice UI) now consume the global mode (props remain optional for backward compatibility).
+
+Suggested follow-ups
+- Add jest/vitest smoke tests for terminology toggling:
+  - Verify Settings selector updates context and persists to localStorage.
+  - Ensure OverWatch title and button labels swap as expected.
+- Consider persisting per-user server-side in `databaseService` preferences when user id is known.
+- Expand terminology coverage to remaining pages where "mission/project" or similar dual terms appear.
+- Add a quick-access terminology switcher in the top header for faster context switching during demos.

@@ -15,6 +15,7 @@ import SoundManager from "./components/effects/SoundManager";
 import UiSoundBindings from "./components/effects/UiSoundBindings";
 import RouteSound from "./components/effects/RouteSound";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
+import { TerminologyProvider } from "@/contexts/TerminologyContext";
 
 // Lazy load heavy components that use 3D libraries, maps, or ML
 const MissionPlanning = lazy(() => import("./pages/MissionPlanning"));
@@ -73,26 +74,28 @@ function RoutedApp() {
 
 const App = () => (
   <AdvancedThemeProvider defaultTheme="military-tactical">
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <SoundManager />
-          <UiSoundBindings />
-          <EffectsOverlay />
-          <ThemeBackground />
-          <BrowserRouter>
-            <RoutedApp />
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <TerminologyProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <SoundManager />
+            <UiSoundBindings />
+            <EffectsOverlay />
+            <ThemeBackground />
+            <BrowserRouter>
+              <RoutedApp />
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </TerminologyProvider>
   </AdvancedThemeProvider>
 );
 

@@ -20,6 +20,7 @@ import WeatherOverlay from '@/components/map/WeatherOverlay';
 import PavementScan3D from '@/components/pavement/PavementScan3D';
 import VoiceCommandInterface from '@/components/ai/VoiceCommandInterface';
 import RealMapComponent from '@/components/map/RealMapComponent';
+import { useTerminology } from '@/contexts/TerminologyContext';
 
 // Removed leaflet icon configuration
 
@@ -123,7 +124,7 @@ interface WidgetConfig {
 
 const OverWatch: React.FC = () => {
   const [selectedMapService, setSelectedMapService] = useState('osm');
-  const [terminologyMode, setTerminologyMode] = useState<'military' | 'civilian' | 'both'>('military');
+  const { terminologyMode, setTerminologyMode, getTerm } = useTerminology();
   const [activeOverlays, setActiveOverlays] = useState<string[]>(['fleet', 'weather']);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
@@ -183,12 +184,7 @@ const OverWatch: React.FC = () => {
   };
 
   const getTerminology = (military: string, civilian: string) => {
-    switch (terminologyMode) {
-      case 'military': return military;
-      case 'civilian': return civilian;
-      case 'both': return `${military} / ${civilian}`;
-      default: return military;
-    }
+    return getTerm(military, civilian);
   };
 
   const toggleOverlay = (overlayId: string) => {

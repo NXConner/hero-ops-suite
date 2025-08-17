@@ -209,6 +209,13 @@ The rest of this document reflects the original theme/effects plan and remains v
   - Added `src/test/effects.preset.spec.ts` to smoke-test the `owEffects` API shape (get/set/reset/preset). All tests pass.
   - Production builds complete successfully (Vite). Chunk size warnings remain for large feature bundles.
 
+- Global terminology toggle (new)
+  - Introduced `TerminologyContext` with global provider and hook `useTerminology()`; persisted to `localStorage` and inferred default via `authService.getTerminologyForUser()`.
+  - Wired `App` to wrap providers with `TerminologyProvider`.
+  - Added global selector under Settings > System > Terminology.
+  - Updated `OverWatch`, `FleetTracking`, `WeatherOverlay`, `MapTools`, `PavementScan3D`, and `VoiceCommandInterface` to use context-driven terms; props now optional and fallback to global mode.
+  - Maintained `overwatch-prefs` persistence/back-compat for local page settings.
+
 ## Consolidated to‑do list (from chat + project‑wide)
 
 - Customizer
@@ -248,6 +255,7 @@ The rest of this document reflects the original theme/effects plan and remains v
   - [x] Add smoke test for Sidebar Minimal/Full buttons affecting `owEffects.get().minimal`.
   - [x] Add smoke tests for Customizer UI token sliders persisting into theme and reflected via CSS vars.
   - [x] Update README and HOWTOs for routes, Settings tabs, performance toggles, and theming tokens.
+  - [x] Global terminology toggle provider and Settings control; wire major overlays and pages to respect it.
 
 ## Items added in this chat
 
@@ -258,6 +266,7 @@ The rest of this document reflects the original theme/effects plan and remains v
 - Customizer UI Tokens section with live sliders (card/button/input radii, focus ring width).
 - New test: `src/test/effects.preset.spec.ts`.
 - Lint policy alignment and cleanup; fixed Settings tabs JSX; ensured all builds/tests pass.
+- Global terminology context/provider, Settings selector, and overlay wiring.
 
 ## Current plan to finish
 

@@ -31,6 +31,7 @@ import {
   Ruler,
   Target
 } from 'lucide-react';
+import { useTerminology } from '@/contexts/TerminologyContext';
 
 // Placeholder types to replace Three.js
 interface Vector3 {
@@ -76,7 +77,7 @@ interface PavementScan3DProps {
   scanData?: ScanData;
   onDefectSelect?: (defect: DefectData) => void;
   onAnalysisComplete?: (analysis: any) => void;
-  terminologyMode: 'military' | 'civilian' | 'both';
+  terminologyMode?: 'military' | 'civilian' | 'both';
 }
 
 // Analysis moved to Real3DPavementViewer component
@@ -97,9 +98,11 @@ const PavementScan3D: React.FC<PavementScan3DProps> = ({
   const [showGrid, setShowGrid] = useState(true);
   const [showAnalysis, setShowAnalysis] = useState(true);
   const [viewMode, setViewMode] = useState<'top' | 'perspective' | 'side'>('perspective');
+  const { terminologyMode: globalMode } = useTerminology();
+  const mode = terminologyMode || globalMode;
 
   const getTerminology = (military: string, civilian: string) => {
-    switch (terminologyMode) {
+    switch (mode) {
       case 'military': return military;
       case 'civilian': return civilian;
       case 'both': return `${military} / ${civilian}`;
