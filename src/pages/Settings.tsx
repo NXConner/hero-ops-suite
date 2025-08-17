@@ -1368,7 +1368,7 @@ const Settings = () => {
                     <div className="flex gap-2 justify-between pt-2">
                       <div className="flex gap-2">
                         <Button variant="outline" onClick={reset}>Reset Defaults</Button>
-                        <Button onClick={() => save({})}>Save Changes</Button>
+                        <Button onClick={() => { save({}); (window as any).owSounds?.ui?.confirm?.(); }}>Save Changes</Button>
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" onClick={() => {
