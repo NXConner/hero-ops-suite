@@ -41,6 +41,7 @@ import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
 import ColorPicker from "@/components/theme/ColorPicker";
+import { useTerminology } from "@/contexts/TerminologyContext";
 
 const Settings = () => {
   const { profile, save, reset } = useBusinessProfile();
@@ -83,6 +84,7 @@ const Settings = () => {
     availableThemes,
     setTheme
   } = useAdvancedTheme();
+  const { terminologyMode, setTerminologyMode } = useTerminology();
 
   return (
     <div className="flex h-screen bg-background">
@@ -479,6 +481,20 @@ const Settings = () => {
                           <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
                           <SelectItem value="ymd">YYYY-MM-DD</SelectItem>
                           <SelectItem value="iso">ISO 8601</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label>Terminology</Label>
+                      <Select value={terminologyMode} onValueChange={(v: any) => setTerminologyMode(v)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="military">Military</SelectItem>
+                          <SelectItem value="civilian">Civilian</SelectItem>
+                          <SelectItem value="both">Both</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1160,7 +1176,7 @@ const Settings = () => {
                         { date: "Today, 3:00 AM", size: "2.4 GB", status: "Complete", type: "Automatic" },
                         { date: "Yesterday, 3:00 AM", size: "2.3 GB", status: "Complete", type: "Automatic" },
                         { date: "Jan 17, 3:00 AM", size: "2.2 GB", status: "Complete", type: "Automatic" },
-                        { date: "Jan 16, 2:15 PM", size: "2.1 GB", status: "Complete", type: "Manual" }
+                        { date: "Jan 16, 2:15 PM", size: "2.1 GB", status: "Complete", type: "Automatic" }
                       ].map((backup, index) => (
                         <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30">
                           <div>

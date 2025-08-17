@@ -19,6 +19,7 @@ import {
   Brain,
   Shield
 } from 'lucide-react';
+import { useTerminology } from '@/contexts/TerminologyContext';
 
 interface VoiceCommand {
   id: string;
@@ -32,7 +33,7 @@ interface VoiceCommand {
 interface VoiceCommandInterfaceProps {
   isVisible: boolean;
   onClose: () => void;
-  terminologyMode: 'military' | 'civilian' | 'both';
+  terminologyMode?: 'military' | 'civilian' | 'both';
   onCommand?: (command: any) => void;
 }
 
@@ -53,9 +54,11 @@ const VoiceCommandInterface: React.FC<VoiceCommandInterfaceProps> = ({
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  const { terminologyMode: globalMode } = useTerminology();
+  const mode = terminologyMode || globalMode;
 
   const getTerminology = (military: string, civilian: string) => {
-    switch (terminologyMode) {
+    switch (mode) {
       case 'military': return military;
       case 'civilian': return civilian;
       case 'both': return `${military} / ${civilian}`;

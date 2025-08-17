@@ -24,6 +24,7 @@ import {
   Pause,
   RotateCcw
 } from 'lucide-react';
+import { useTerminology } from '@/contexts/TerminologyContext';
 
 interface WeatherData {
   temperature: number;
@@ -55,7 +56,7 @@ interface RadarFrame {
 
 interface WeatherOverlayProps {
   isVisible: boolean;
-  terminologyMode: 'military' | 'civilian' | 'both';
+  terminologyMode?: 'military' | 'civilian' | 'both';
   onRecommendationChange?: (recommendations: string[]) => void;
 }
 
@@ -74,6 +75,8 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
   const [showTemperatureOverlay, setShowTemperatureOverlay] = useState(false);
   const [showWindOverlay, setShowWindOverlay] = useState(false);
   const [forecastHours, setForecastHours] = useState(12);
+  const { terminologyMode: globalMode } = useTerminology();
+  const mode = terminologyMode || globalMode;
 
   const radarIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -99,7 +102,7 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
   }, [radarOpacity, showTemperatureOverlay, showWindOverlay, forecastHours]);
 
   const getTerminology = (military: string, civilian: string) => {
-    switch (terminologyMode) {
+    switch (mode) {
       case 'military': return military;
       case 'civilian': return civilian;
       case 'both': return `${military} / ${civilian}`;

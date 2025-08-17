@@ -24,6 +24,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import VehicleChecklists from '@/components/fleet/VehicleChecklists';
+import { useTerminology } from '@/contexts/TerminologyContext';
 
 interface Vehicle {
   id: string;
@@ -62,7 +63,7 @@ interface Employee {
   };
   status: 'clocked-in' | 'clocked-out' | 'break' | 'out-of-bounds';
   phoneUsage?: {
-    isUsingPhone: boolean;
+    isUsingPhone: boolean; // minutes
     nonWorkUsage: number; // minutes
     appUsage: number; // minutes with Blacktop Blackout app active
   };
@@ -88,7 +89,7 @@ interface HistoricalPosition {
 }
 
 interface FleetTrackingProps {
-  terminologyMode: 'military' | 'civilian' | 'both';
+  terminologyMode?: 'military' | 'civilian' | 'both';
   isVisible: boolean;
 }
 
@@ -105,12 +106,15 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
   const [showTrails, setShowTrails] = useState(false);
   const [realTimeData, setRealTimeData] = useState<GPSTrackingResponse[]>([]);
   const [isConnectedToAPI, setIsConnectedToAPI] = useState(false);
+  const { terminologyMode: globalMode } = useTerminology();
 
   const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const markersRef = useRef<any[]>([]);
 
+  const mode = terminologyMode || globalMode;
+
   const getTerminology = (military: string, civilian: string) => {
-    switch (terminologyMode) {
+    switch (mode) {
       case 'military': return military;
       case 'civilian': return civilian;
       case 'both': return `${military} / ${civilian}`;
@@ -177,7 +181,7 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
     return () => {
       gpsTrackingService.unsubscribeFromRealTimeUpdates(handleRealTimeUpdate);
     };
-  }, [isVisible, terminologyMode]);
+  }, [isVisible, mode]);
 
   // Convert GPS data to vehicle format
   const convertGPSToVehicle = (gpsData: GPSTrackingResponse): Vehicle => {
@@ -230,7 +234,7 @@ const FleetTracking: React.FC<FleetTrackingProps> = ({ terminologyMode, isVisibl
       status: gpsData.isMoving ? 'clocked-in' : 
                gpsData.status === 'idle' ? 'break' : 'clocked-out',
       phoneUsage: {
-        isUsingPhone: false, // Would need additional data source
+        isUsingPhone: false,
         nonWorkUsage: Math.floor(Math.random() * 30),
         appUsage: Math.floor(Math.random() * 120)
       },
