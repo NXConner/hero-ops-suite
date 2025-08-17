@@ -121,7 +121,7 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
           windSpeed: Math.round(weatherResponse.wind.speed),
           windDirection: weatherResponse.wind.deg,
           pressure: weatherResponse.main.pressure,
-          uvIndex: 6, // Not available in free API
+          uvIndex: await weatherService.getUVIndex(lat, lon),
           visibility: Math.round(weatherResponse.visibility / 1609.34),
           conditions: weatherResponse.weather[0].main.toLowerCase() as WeatherData['conditions'],
           precipitation: weatherResponse.rain?.['1h'] ?? 0,
