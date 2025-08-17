@@ -94,3 +94,7 @@ Components are wired to CSS vars, enabling live preview and persistence across r
   1) `cd mobile && npm install`
   2) `npx expo export --platform web --output-dir ../public/mobile`
 - During development, static fallbacks exist for `/mobile/`, `/suite/`, `/suite/fleet/`, `/suite/atlas/`, `/suite/mapper/`, and `/suite/weather/` to avoid 404s. Production serving is handled by Nginx (see `docker/nginx.conf`).
+
+## Documentation
+
+- State compliance (Virginia and North Carolina): see `docs/STATE_COMPLIANCE.md`.
