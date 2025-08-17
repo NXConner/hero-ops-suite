@@ -1195,6 +1195,10 @@ const Settings = () => {
                   <CardContent className="space-y-6 text-sm">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
+                        <Label>Business Name</Label>
+                        <Input defaultValue={profile.businessName || ''} onBlur={(e) => save({ businessName: e.target.value })} />
+                      </div>
+                      <div>
                         <Label>Business Address</Label>
                         <Input defaultValue={profile.address.full} onBlur={(e) => save({ address: { ...profile.address, full: e.target.value } })} />
                       </div>
@@ -1205,6 +1209,22 @@ const Settings = () => {
                           const [name, ...rest] = val.split(',');
                           save({ supplier: { name: name?.trim() || profile.supplier.name, address: { ...profile.supplier.address, full: rest.join(',').trim() || profile.supplier.address.full } } });
                         }} />
+                      </div>
+                      <div>
+                        <Label>Logo URL (data URL recommended)</Label>
+                        <Input defaultValue={profile.branding?.logoUrl || ''} onBlur={(e) => save({ branding: { ...(profile.branding || {}), logoUrl: e.target.value } as any })} />
+                      </div>
+                      <div>
+                        <Label>Phone</Label>
+                        <Input defaultValue={profile.branding?.phone || ''} onBlur={(e) => save({ branding: { ...(profile.branding || {}), phone: e.target.value } as any })} />
+                      </div>
+                      <div>
+                        <Label>Email</Label>
+                        <Input defaultValue={profile.branding?.email || ''} onBlur={(e) => save({ branding: { ...(profile.branding || {}), email: e.target.value } as any })} />
+                      </div>
+                      <div>
+                        <Label>Website</Label>
+                        <Input defaultValue={profile.branding?.website || ''} onBlur={(e) => save({ branding: { ...(profile.branding || {}), website: e.target.value } as any })} />
                       </div>
                       <div>
                         <Label>Crew (FT / PT)</Label>
