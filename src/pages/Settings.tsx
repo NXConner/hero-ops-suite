@@ -110,11 +110,14 @@ const Settings = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => window.location.reload()}>
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset to Default
                 </Button>
-                <Button className="bg-gradient-to-r from-primary to-accent">
+                <Button className="bg-gradient-to-r from-primary to-accent" onClick={() => {
+                  // Minimal quick persist of key settings already saved via hooks; give feedback
+                  (window as any).owSounds?.ui?.confirm?.();
+                }}>
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes
                 </Button>

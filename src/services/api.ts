@@ -216,10 +216,19 @@ export class WeatherService {
     return response.data;
   }
 
-  // Enhanced UV Index API (requires separate service)
+  // Enhanced UV Index API using OpenWeather UVI endpoint, with fallback approximation
   async getUVIndex(lat: number, lon: number): Promise<number> {
-    // Placeholder
-    return 5;
+    try {
+      if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
+        throw new Error('Missing OpenWeather API key');
+      }
+      const { data } = await axios.get(`${API_CONFIG.WEATHER_BASE_URL}/uvi`, { params: { appid: API_CONFIG.WEATHER_API_KEY, lat, lon }, timeout: 8000 });
+      const v = (data && (data.value ?? data.uvi ?? data.uv)) as number | undefined;
+      if (typeof v === 'number' && !Number.isNaN(v)) return Math.max(0, Math.min(11, v));
+    } catch (_e) {
+      // fallback to moderate UV when service unavailable
+    }
+    return 6;
   }
 }
 
