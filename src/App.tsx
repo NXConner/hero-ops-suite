@@ -52,6 +52,7 @@ function RoutedApp() {
             <Route path="/intel-reports" element={<IntelReports />} />
             <Route path="/pavement-scan-pro" element={<PavementScanPro />} />
             <Route path="/overwatch" element={<OverWatch />} />
+            <Route path="/maps" element={<OverWatch />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/pavement-estimator" element={<Estimator />} />
             <Route path="/client-portal" element={<ClientPortal />} />

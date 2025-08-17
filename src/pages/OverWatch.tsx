@@ -469,6 +469,14 @@ const OverWatch: React.FC = () => {
               variant="outline"
               size="sm"
               className="bg-slate-800 border-slate-600 text-cyan-400"
+              onClick={() => {
+                html2canvas(document.body).then(canvas => {
+                  const link = document.createElement('a');
+                  link.download = `overwatch-screenshot-${Date.now()}.png`;
+                  link.href = canvas.toDataURL();
+                  link.click();
+                });
+              }}
             >
               <Camera className="w-4 h-4 mr-2" />
               Snap Picture
