@@ -164,3 +164,11 @@ create table if not exists projects (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+-- Optional: Enable RLS for app tables and scope by auth.uid() via a user_id column.
+-- alter table business_overrides enable row level security;
+-- alter table customers enable row level security;
+-- alter table jobs_estimator enable row level security;
+-- alter table projects enable row level security;
+-- Example policy once a user_id column exists:
+-- create policy "own_rows" on customers for all using (auth.uid() = user_id);

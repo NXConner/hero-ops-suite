@@ -784,6 +784,11 @@ ${textInvoiceRounded}`}
                 <Button type="button" variant="outline" onClick={() => exportInvoicePDF(`${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`, jobName || 'invoice')}>Export PDF</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportJobsCSV(jobs), 'jobs.csv', 'text/csv')}>Jobs CSV</Button>
                 <Button type="button" variant="outline" onClick={() => downloadTextFile(exportCustomersCSV(customers), 'customers.csv', 'text/csv')}>Customers CSV</Button>
+                <Button type="button" variant="outline" onClick={() => {
+                  const subject = encodeURIComponent(`${jobName || 'Estimate'} - Asphalt Estimate`);
+                  const body = encodeURIComponent(`${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`);
+                  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                }}>Share via Email</Button>
                 <Button type="button" onClick={handleConvertToProject}>Convert to Project</Button>
                 {currentProjectId && (
                   <Button type="button" variant="outline" onClick={handleAddChangeOrder}>Add as Change Order</Button>
