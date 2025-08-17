@@ -12,6 +12,7 @@ const OperationsSuite = () => {
     if (app === 'fleet') setPath('/suite/fleet/');
     else if (app === 'atlas') setPath('/suite/atlas/');
     else if (app === 'mapper') setPath('/suite/mapper/');
+    else if (app === 'weather') setPath('/suite/weather/');
   }, []);
 
   const initialContext = useMemo(() => ({
@@ -64,6 +65,7 @@ const OperationsSuite = () => {
         <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/fleet/')}>Fleet Focus Manager</button>
         <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/atlas/')}>Atlas Hub</button>
         <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/mapper/')}>Patrick County Mapper</button>
+        <button className="px-3 py-1 rounded bg-secondary" onClick={() => setPath('/suite/weather/')}>Weather Cast</button>
       </div>
       <iframe
         key={iframeSrc}

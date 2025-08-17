@@ -8,6 +8,7 @@ This repository contains:
 - `suite/fleet-focus-manager`: Integrated Fleet Focus Manager sub-app, served under `/suite/fleet/` and accessible within Fleet & Field Ops.
 - `suite/asphalt-atlas-hub`: Integrated Asphalt Atlas Hub sub-app, served under `/suite/atlas/`.
 - `suite/patrick-county-mapper`: Integrated Patrick County Mapper sub-app, served under `/suite/mapper/`.
+- `suite/pave-wise-weather-cast`: Integrated PaveWise Weather Cast sub-app, served under `/suite/weather/`.
 
 ## Quick start
 
@@ -39,6 +40,7 @@ This repository contains:
   - Accessible inside Fleet & Field Ops or directly at `/suite/fleet/`.
 - Asphalt Atlas Hub (from `suite/asphalt-atlas-hub`) is built and served at `/suite/atlas/`.
 - Patrick County Mapper (from `suite/patrick-county-mapper`) is built and served at `/suite/mapper/`.
+- PaveWise Weather Cast (from `suite/pave-wise-weather-cast`) is built and served at `/suite/weather/`.
 - Mobile Companion (Expo web build) is served at `/mobile/` and embedded at `/mobile-companion`.
 
 ## Modules
@@ -91,4 +93,4 @@ Components are wired to CSS vars, enabling live preview and persistence across r
 - To rebuild after changes to the Expo app:
   1) `cd mobile && npm install`
   2) `npx expo export --platform web --output-dir ../public/mobile`
-- During development, static fallbacks exist for `/mobile/`, `/suite/`, `/suite/fleet/`, `/suite/atlas/`, and `/suite/mapper/` to avoid 404s. Production serving is handled by Nginx (see `docker/nginx.conf`).
+- During development, static fallbacks exist for `/mobile/`, `/suite/`, `/suite/fleet/`, `/suite/atlas/`, `/suite/mapper/`, and `/suite/weather/` to avoid 404s. Production serving is handled by Nginx (see `docker/nginx.conf`).
