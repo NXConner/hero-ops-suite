@@ -2711,8 +2711,6 @@ export const getDefaultThemes = (): Theme[] => [
     wallpaper: {
       type: 'image',
       source: '/hero-bg.jpg',
-      position: 'center',
-      size: 'cover',
       overlay: { color: color(193, 100, 58), opacity: 0.08, blendMode: 'screen' }
     },
     typography: {
@@ -2959,6 +2957,107 @@ export const getDefaultThemes = (): Theme[] => [
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     tags: ['tech', 'darkzone', 'uv', 'purple'],
+    featured: true,
+    public: true
+  },
+  {
+    id: 'deus-ex-augmented',
+    name: 'Deus Ex: Augmented',
+    description: 'Classic modernized: noir cyberpunk gold/onyx palette, augmented HUD glows, and choice-driven ambience.',
+    category: 'tech',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(45, 25, 6),
+      foreground: color(45, 18, 88),
+      primary: color(45, 95, 55), // gold accent
+      primaryForeground: color(45, 25, 6),
+      secondary: color(45, 25, 14),
+      secondaryForeground: color(45, 18, 88),
+      accent: color(200, 15, 55), // muted cyan tech hints
+      accentForeground: color(45, 25, 6),
+      destructive: color(0, 80, 60),
+      destructiveForeground: color(45, 18, 88),
+      success: color(120, 60, 45),
+      successForeground: color(45, 25, 6),
+      warning: color(45, 100, 60),
+      warningForeground: color(45, 25, 6),
+      info: color(200, 50, 55),
+      infoForeground: color(45, 25, 6),
+      muted: color(45, 15, 10),
+      mutedForeground: color(45, 15, 60),
+      border: color(45, 20, 14),
+      input: color(45, 20, 14),
+      ring: color(45, 95, 55),
+      card: color(45, 25, 6),
+      cardForeground: color(45, 18, 88),
+      popover: color(45, 25, 6),
+      popoverForeground: color(45, 18, 88),
+      sidebar: color(42, 24, 5),
+      sidebarForeground: color(45, 18, 88),
+      sidebarPrimary: color(45, 95, 55),
+      sidebarPrimaryForeground: color(45, 25, 6),
+      sidebarAccent: color(45, 20, 9),
+      sidebarAccentForeground: color(45, 18, 88),
+      sidebarBorder: color(45, 20, 9),
+      sidebarRing: color(45, 95, 55)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 22, color: color(45, 95, 55), intensity: 0.55 },
+        inner: { type: 'inner', x: 0, y: 2, blur: 8, color: color(0, 0, 0), intensity: 0.12 }
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 120, brightness: 75 },
+        overlay: { enabled: true, radius: 6, saturation: 110, brightness: 82 },
+        card: { enabled: true, radius: 3, saturation: 108, brightness: 88 }
+      },
+      particles: {
+        enabled: true,
+        type: 'fog',
+        count: 24,
+        speed: 0.15,
+        size: { min: 2, max: 6 },
+        color: color(45, 30, 40),
+        opacity: { min: 0.04, max: 0.12 },
+        direction: 0,
+        wind: 0.02
+      },
+      animations: {
+        ...commonAnimations,
+        glow: { name: 'augmentedPulse', duration: 2600, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' }
+      },
+      gradients: {
+        primary: { type: 'linear', angle: 120, stops: [{ color: color(45, 95, 60), position: 0 }, { color: color(45, 95, 45), position: 100 }] },
+        secondary: { type: 'linear', angle: 60, stops: [{ color: color(45, 25, 16), position: 0 }, { color: color(45, 25, 10), position: 100 }] },
+        hero: { type: 'linear', angle: 180, stops: [{ color: color(45, 25, 8), position: 0 }, { color: color(45, 20, 6), position: 100 }] },
+        card: { type: 'linear', angle: 145, stops: [{ color: color(45, 25, 7), position: 0 }, { color: color(42, 22, 6), position: 100 }] },
+        button: { type: 'linear', angle: 90, stops: [{ color: color(45, 95, 60), position: 0 }, { color: color(45, 95, 45), position: 100 }] },
+        border: { type: 'conic', angle: 0, stops: [{ color: color(45, 95, 55, 0.6), position: 0 }, { color: color(200, 15, 50, 0.4), position: 100 }] }
+      }
+    },
+    wallpaper: {
+      type: 'image',
+      source: '/hero-bg.jpg',
+      overlay: { color: color(45, 95, 50), opacity: 0.12, blendMode: 'screen' },
+      filters: { hue: 0, brightness: 95 },
+      parallax: true,
+      parallaxStrength: 12
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.035, lineHeight: 1.1, textShadow: { type: 'text', x: 0, y: 2, blur: 8, color: color(45, 95, 55), intensity: 0.25 } },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.005, lineHeight: 1.65 },
+      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0.01, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.02, lineHeight: 1.3 }
+    },
+    performance: { enableAnimations: true, enableParticles: true, enableBlur: true, enableShadows: true, enableGradients: true, quality: 'high' },
+    accessibility: { highContrast: true, reducedMotion: false, largeText: false, focusVisible: true },
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    tags: ['tech', 'deus-ex', 'cyberpunk', 'noir', 'gold'],
     featured: true,
     public: true
   },
