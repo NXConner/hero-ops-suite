@@ -21,6 +21,7 @@ import PavementScan3D from '@/components/pavement/PavementScan3D';
 import VoiceCommandInterface from '@/components/ai/VoiceCommandInterface';
 import RealMapComponent from '@/components/map/RealMapComponent';
 import { useTerminology } from '@/contexts/TerminologyContext';
+import CustomOverlayManager from '@/components/map/CustomOverlayManager';
 
 // Removed leaflet icon configuration
 
@@ -137,6 +138,7 @@ const OverWatch: React.FC = () => {
   const [weatherRecommendations, setWeatherRecommendations] = useState<string[]>([]);
   const [showVoiceInterface, setShowVoiceInterface] = useState(false);
   const [searchParams] = useSearchParams();
+  const [showCustomOverlayManager, setShowCustomOverlayManager] = useState<boolean>(false);
 
   useEffect(() => {
     try {
@@ -146,6 +148,7 @@ const OverWatch: React.FC = () => {
       if (Array.isArray(saved.activeOverlays)) setActiveOverlays(saved.activeOverlays);
       if (Array.isArray(saved.mapCenter) && saved.mapCenter.length === 2) setMapCenter(saved.mapCenter);
       if (typeof saved.mapZoom === 'number') setMapZoom(saved.mapZoom);
+      if (typeof saved.showCustomOverlayManager === 'boolean') setShowCustomOverlayManager(saved.showCustomOverlayManager);
     } catch { /* ignore */ }
   }, []);
 
@@ -157,9 +160,10 @@ const OverWatch: React.FC = () => {
         activeOverlays,
         mapCenter,
         mapZoom,
+        showCustomOverlayManager,
       }));
     } catch { /* ignore */ }
-  }, [selectedMapService, terminologyMode, activeOverlays, mapCenter, mapZoom]);
+  }, [selectedMapService, terminologyMode, activeOverlays, mapCenter, mapZoom, showCustomOverlayManager]);
 
   // Auto-enable pavement overlay when opened with a scan_id link
   useEffect(() => {
@@ -495,13 +499,23 @@ const OverWatch: React.FC = () => {
                 { id: 'fleet', label: getTerminology('Assets', 'Fleet'), icon: Truck },
                 { id: 'weather', label: 'Weather', icon: Cloud },
                 { id: 'pavement', label: getTerminology('Surface Intel', 'Pavement'), icon: Activity },
-                { id: 'alerts', label: 'Alerts', icon: AlertTriangle }
+                { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
+                { id: 'custom', label: getTerminology('Custom', 'Custom'), icon: Layers },
               ].map(({ id, label, icon: Icon }) => (
                 <Button
                   key={id}
                   variant={activeOverlays.includes(id) ? "default" : "outline"}
                   size="sm"
-                  onClick={() => toggleOverlay(id)}
+                  onClick={() => {
+                    if (id === 'custom') {
+                      setShowCustomOverlayManager(v => !v);
+                      if (!activeOverlays.includes('custom')) {
+                        setActiveOverlays(prev => [...prev, 'custom']);
+                      }
+                    } else {
+                      toggleOverlay(id);
+                    }
+                  }}
                   className="bg-slate-800 border-slate-600 text-xs"
                 >
                   <Icon className="w-3 h-3 mr-1" />
@@ -578,6 +592,9 @@ const OverWatch: React.FC = () => {
                 onMeasurementComplete={handleMeasurementComplete}
                 terminologyMode={terminologyMode}
               />
+              {showCustomOverlayManager && (
+                <CustomOverlayManager isVisible={activeOverlays.includes('custom')} />
+              )}
             </RealMapComponent>
           </div>
 
