@@ -28,6 +28,7 @@
     "server": "node server/index.js"
   },
   "dependencies": {
+    "maplibre-gl": "^4.7.1",
     "@babylonjs/core": "^8.21.1",
     "@babylonjs/gui": "^8.21.1",
     "@hookform/resolvers": "^3.10.0",

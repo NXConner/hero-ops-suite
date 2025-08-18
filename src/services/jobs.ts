@@ -34,18 +34,20 @@ async function getSupabaseClient(): Promise<any | null> {
     const url = (import.meta as any).env?.VITE_SUPABASE_URL;
     const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
     if (!url || !key) return null;
-    const { createClient } = await import('@supabase/supabase-js');
+    const { createClient } = await import("@supabase/supabase-js");
     return createClient(url, key);
   } catch {
     return null;
   }
 }
 
-export async function saveJob(job: Omit<StoredJob, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<StoredJob> {
+export async function saveJob(
+  job: Omit<StoredJob, "id" | "createdAt" | "updatedAt"> & { id?: string },
+): Promise<StoredJob> {
   const list = loadAll();
   const now = Date.now();
   const id = job.id ?? crypto.randomUUID?.() ?? `${now}-${Math.random().toString(36).slice(2)}`;
-  const existingIndex = list.findIndex(j => j.id === id);
+  const existingIndex = list.findIndex((j) => j.id === id);
   const record: StoredJob = {
     id,
     name: job.name,
@@ -64,7 +66,17 @@ export async function saveJob(job: Omit<StoredJob, "id" | "createdAt" | "updated
   const supabase = await getSupabaseClient();
   if (supabase) {
     try {
-      await supabase.from('jobs_estimator').upsert({ id: record.id, name: record.name, address: record.address, service_type: record.serviceType, params: record.params, created_at: new Date(record.createdAt).toISOString(), updated_at: new Date(record.updatedAt).toISOString() });
+      await supabase
+        .from("jobs_estimator")
+        .upsert({
+          id: record.id,
+          name: record.name,
+          address: record.address,
+          service_type: record.serviceType,
+          params: record.params,
+          created_at: new Date(record.createdAt).toISOString(),
+          updated_at: new Date(record.updatedAt).toISOString(),
+        });
     } catch {
       // ignore cloud errors
     }
@@ -78,14 +90,18 @@ export function listJobs(): StoredJob[] {
 }
 
 export function getJob(id: string): StoredJob | undefined {
-  return loadAll().find(j => j.id === id);
+  return loadAll().find((j) => j.id === id);
 }
 
 export async function deleteJob(id: string) {
-  const list = loadAll().filter(j => j.id !== id);
+  const list = loadAll().filter((j) => j.id !== id);
   saveAll(list);
   const supabase = await getSupabaseClient();
   if (supabase) {
-    try { await supabase.from('jobs_estimator').delete().eq('id', id); } catch { /* ignore */ }
+    try {
+      await supabase.from("jobs_estimator").delete().eq("id", id);
+    } catch {
+      /* ignore */
+    }
   }
 }

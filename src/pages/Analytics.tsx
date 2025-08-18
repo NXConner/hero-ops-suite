@@ -3,15 +3,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   LineChart,
   Line,
@@ -19,14 +25,14 @@ import {
   Pie,
   Cell,
   AreaChart,
-  Area
+  Area,
 } from "recharts";
-import { 
-  TrendingUp, 
-  Target, 
-  Users, 
-  Clock, 
-  Shield, 
+import {
+  TrendingUp,
+  Target,
+  Users,
+  Clock,
+  Shield,
   Activity,
   ArrowLeft,
   Download,
@@ -35,7 +41,7 @@ import {
   BarChart3,
   PieChart as PieChartIcon,
   LineChart as LineChartIcon,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
@@ -46,43 +52,43 @@ const Analytics = () => {
 
   // Sample data for charts
   const missionData = [
-    { month: 'Jan', successful: 24, failed: 2, pending: 3 },
-    { month: 'Feb', successful: 28, failed: 1, pending: 4 },
-    { month: 'Mar', successful: 32, failed: 3, pending: 2 },
-    { month: 'Apr', successful: 29, failed: 1, pending: 5 },
-    { month: 'May', successful: 35, failed: 2, pending: 3 },
-    { month: 'Jun', successful: 38, failed: 1, pending: 4 }
+    { month: "Jan", successful: 24, failed: 2, pending: 3 },
+    { month: "Feb", successful: 28, failed: 1, pending: 4 },
+    { month: "Mar", successful: 32, failed: 3, pending: 2 },
+    { month: "Apr", successful: 29, failed: 1, pending: 5 },
+    { month: "May", successful: 35, failed: 2, pending: 3 },
+    { month: "Jun", successful: 38, failed: 1, pending: 4 },
   ];
 
   const teamPerformanceData = [
-    { team: 'Alpha', missions: 45, successRate: 95, efficiency: 92 },
-    { team: 'Bravo', missions: 38, successRate: 92, efficiency: 88 },
-    { team: 'Charlie', missions: 42, successRate: 98, efficiency: 95 },
-    { team: 'Delta', missions: 33, successRate: 89, efficiency: 85 }
+    { team: "Alpha", missions: 45, successRate: 95, efficiency: 92 },
+    { team: "Bravo", missions: 38, successRate: 92, efficiency: 88 },
+    { team: "Charlie", missions: 42, successRate: 98, efficiency: 95 },
+    { team: "Delta", missions: 33, successRate: 89, efficiency: 85 },
   ];
 
   const threatLevelData = [
-    { name: 'Low', value: 45, color: '#22c55e' },
-    { name: 'Medium', value: 35, color: '#f59e0b' },
-    { name: 'High', value: 15, color: '#ef4444' },
-    { name: 'Critical', value: 5, color: '#991b1b' }
+    { name: "Low", value: 45, color: "#22c55e" },
+    { name: "Medium", value: 35, color: "#f59e0b" },
+    { name: "High", value: 15, color: "#ef4444" },
+    { name: "Critical", value: 5, color: "#991b1b" },
   ];
 
   const operationalEfficiencyData = [
-    { day: 'Mon', efficiency: 85, alerts: 3, response: 12 },
-    { day: 'Tue', efficiency: 92, alerts: 1, response: 8 },
-    { day: 'Wed', efficiency: 88, alerts: 4, response: 15 },
-    { day: 'Thu', efficiency: 95, alerts: 2, response: 9 },
-    { day: 'Fri', efficiency: 90, alerts: 3, response: 11 },
-    { day: 'Sat', efficiency: 87, alerts: 5, response: 18 },
-    { day: 'Sun', efficiency: 82, alerts: 2, response: 14 }
+    { day: "Mon", efficiency: 85, alerts: 3, response: 12 },
+    { day: "Tue", efficiency: 92, alerts: 1, response: 8 },
+    { day: "Wed", efficiency: 88, alerts: 4, response: 15 },
+    { day: "Thu", efficiency: 95, alerts: 2, response: 9 },
+    { day: "Fri", efficiency: 90, alerts: 3, response: 11 },
+    { day: "Sat", efficiency: 87, alerts: 5, response: 18 },
+    { day: "Sun", efficiency: 82, alerts: 2, response: 14 },
   ];
 
   const resourceUtilizationData = [
-    { resource: 'Personnel', allocated: 85, available: 15 },
-    { resource: 'Vehicles', allocated: 70, available: 30 },
-    { resource: 'Equipment', allocated: 92, available: 8 },
-    { resource: 'Facilities', allocated: 65, available: 35 }
+    { resource: "Personnel", allocated: 85, available: 15 },
+    { resource: "Vehicles", allocated: 70, available: 30 },
+    { resource: "Equipment", allocated: 92, available: 8 },
+    { resource: "Facilities", allocated: 65, available: 35 },
   ];
 
   const kpiData = [
@@ -92,7 +98,7 @@ const Analytics = () => {
       change: "+2.3%",
       trend: "up",
       target: "95%",
-      icon: Target
+      icon: Target,
     },
     {
       title: "Average Response Time",
@@ -100,7 +106,7 @@ const Analytics = () => {
       change: "-1.2 min",
       trend: "down",
       target: "10 min",
-      icon: Clock
+      icon: Clock,
     },
     {
       title: "Team Efficiency",
@@ -108,7 +114,7 @@ const Analytics = () => {
       change: "+3.1%",
       trend: "up",
       target: "90%",
-      icon: Users
+      icon: Users,
     },
     {
       title: "System Uptime",
@@ -116,14 +122,14 @@ const Analytics = () => {
       change: "+0.02%",
       trend: "up",
       target: "99.95%",
-      icon: Shield
-    }
+      icon: Shield,
+    },
   ];
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
-      
+
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <div className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -181,12 +187,12 @@ const Analytics = () => {
                 <CardContent>
                   <div className="text-2xl font-bold">{kpi.value}</div>
                   <div className="flex items-center justify-between">
-                    <p className={`text-xs ${kpi.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+                    <p
+                      className={`text-xs ${kpi.trend === "up" ? "text-green-500" : "text-red-500"}`}
+                    >
                       {kpi.change} from last period
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      Target: {kpi.target}
-                    </p>
+                    <p className="text-xs text-muted-foreground">Target: {kpi.target}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -220,7 +226,13 @@ const Analytics = () => {
                         <XAxis dataKey="day" />
                         <YAxis />
                         <Tooltip />
-                        <Area type="monotone" dataKey="efficiency" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                        <Area
+                          type="monotone"
+                          dataKey="efficiency"
+                          stroke="#3b82f6"
+                          fill="#3b82f6"
+                          fillOpacity={0.3}
+                        />
                       </AreaChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -306,7 +318,7 @@ const Analytics = () => {
                           <div className="text-sm text-muted-foreground">Failed</div>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
                           <span className="text-sm">Average Duration</span>
@@ -364,12 +376,14 @@ const Analytics = () => {
                         { name: "Combat Gear", operational: 95, maintenance: 3, offline: 2 },
                         { name: "Vehicles", operational: 87, maintenance: 8, offline: 5 },
                         { name: "Communications", operational: 98, maintenance: 2, offline: 0 },
-                        { name: "Medical Equipment", operational: 92, maintenance: 6, offline: 2 }
+                        { name: "Medical Equipment", operational: 92, maintenance: 6, offline: 2 },
                       ].map((equipment, index) => (
                         <div key={index} className="space-y-2">
                           <div className="flex justify-between">
                             <span className="text-sm font-medium">{equipment.name}</span>
-                            <span className="text-sm text-muted-foreground">{equipment.operational}% operational</span>
+                            <span className="text-sm text-muted-foreground">
+                              {equipment.operational}% operational
+                            </span>
                           </div>
                           <Progress value={equipment.operational} className="h-2" />
                         </div>
@@ -388,12 +402,14 @@ const Analytics = () => {
                         { status: "Combat Ready", count: 156, percentage: 78 },
                         { status: "Training", count: 32, percentage: 16 },
                         { status: "On Leave", count: 8, percentage: 4 },
-                        { status: "Medical", count: 4, percentage: 2 }
+                        { status: "Medical", count: 4, percentage: 2 },
                       ].map((status, index) => (
                         <div key={index} className="flex justify-between items-center">
                           <div>
                             <div className="font-medium">{status.status}</div>
-                            <div className="text-sm text-muted-foreground">{status.count} personnel</div>
+                            <div className="text-sm text-muted-foreground">
+                              {status.count} personnel
+                            </div>
                           </div>
                           <div className="text-right">
                             <div className="font-medium">{status.percentage}%</div>
@@ -414,12 +430,20 @@ const Analytics = () => {
                         { item: "Ammunition", level: 85, status: "Good" },
                         { item: "Medical Supplies", level: 92, status: "Excellent" },
                         { item: "Rations", level: 67, status: "Adequate" },
-                        { item: "Fuel", level: 45, status: "Low" }
+                        { item: "Fuel", level: 45, status: "Low" },
                       ].map((supply, index) => (
                         <div key={index} className="space-y-2">
                           <div className="flex justify-between">
                             <span className="text-sm font-medium">{supply.item}</span>
-                            <Badge variant={supply.level > 80 ? "default" : supply.level > 50 ? "secondary" : "destructive"}>
+                            <Badge
+                              variant={
+                                supply.level > 80
+                                  ? "default"
+                                  : supply.level > 50
+                                    ? "secondary"
+                                    : "destructive"
+                              }
+                            >
                               {supply.status}
                             </Badge>
                           </div>
@@ -475,39 +499,48 @@ const Analytics = () => {
                   <CardContent>
                     <div className="space-y-4">
                       {[
-                        { 
-                          time: "2 hours ago", 
-                          threat: "Elevated activity in Sector 12", 
+                        {
+                          time: "2 hours ago",
+                          threat: "Elevated activity in Sector 12",
                           level: "Medium",
-                          response: "Surveillance increased"
+                          response: "Surveillance increased",
                         },
-                        { 
-                          time: "6 hours ago", 
-                          threat: "Communication intercept detected", 
+                        {
+                          time: "6 hours ago",
+                          threat: "Communication intercept detected",
                           level: "High",
-                          response: "Analysis in progress"
+                          response: "Analysis in progress",
                         },
-                        { 
-                          time: "1 day ago", 
-                          threat: "Unusual vehicle movement", 
+                        {
+                          time: "1 day ago",
+                          threat: "Unusual vehicle movement",
                           level: "Low",
-                          response: "Monitored and cleared"
+                          response: "Monitored and cleared",
                         },
-                        { 
-                          time: "2 days ago", 
-                          threat: "Perimeter breach attempt", 
+                        {
+                          time: "2 days ago",
+                          threat: "Perimeter breach attempt",
                           level: "Critical",
-                          response: "Security enhanced"
-                        }
+                          response: "Security enhanced",
+                        },
                       ].map((threat, index) => (
-                        <div key={index} className="p-3 rounded-lg bg-secondary/10 border border-border/30">
+                        <div
+                          key={index}
+                          className="p-3 rounded-lg bg-secondary/10 border border-border/30"
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <span className="font-medium">{threat.threat}</span>
-                            <Badge variant={
-                              threat.level === "Critical" ? "destructive" :
-                              threat.level === "High" ? "destructive" :
-                              threat.level === "Medium" ? "default" : "secondary"
-                            }>
+                            <Badge
+                              variant={
+                                threat.level === "Critical"
+                                  ? "destructive"
+                                  : threat.level === "High"
+                                    ? "destructive"
+                                    : threat.level === "Medium"
+                                      ? "default"
+                                      : "secondary"
+                              }
+                            >
                               {threat.level}
                             </Badge>
                           </div>

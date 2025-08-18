@@ -1,13 +1,13 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
-import { estimateCosts } from '../utils/costEstimator';
-import { Overlay } from '../types/overlay';
-import { getPricing } from '../services/api';
+import React, { useMemo } from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { estimateCosts } from "../utils/costEstimator";
+import { Overlay } from "../types/overlay";
+import { getPricing } from "../services/api";
 
 export default function EstimateScreen({ route }: any) {
   const overlay: Overlay | undefined = route?.params?.overlay;
-  const pricingQuery = useQuery({ queryKey: ['pricing'], queryFn: getPricing });
+  const pricingQuery = useQuery({ queryKey: ["pricing"], queryFn: getPricing });
 
   const estimate = useMemo(() => {
     if (!overlay || !pricingQuery.data) return null;
@@ -41,15 +41,29 @@ export default function EstimateScreen({ route }: any) {
         renderItem={({ item }) => (
           <View style={styles.row}>
             <Text style={styles.cell}>{item.description}</Text>
-            <Text style={styles.cell}>{item.quantity.toFixed(1)} {item.unit}</Text>
+            <Text style={styles.cell}>
+              {item.quantity.toFixed(1)} {item.unit}
+            </Text>
             <Text style={styles.cell}>${item.total.toFixed(2)}</Text>
           </View>
         )}
         ListFooterComponent={() => (
           <View>
-            <View style={styles.row}><Text style={styles.cell}>Mobilization</Text><Text style={styles.cell}></Text><Text style={styles.cell}>${estimate.mobilization.toFixed(2)}</Text></View>
-            <View style={styles.row}><Text style={styles.cell}>Contingency</Text><Text style={styles.cell}></Text><Text style={styles.cell}>{(estimate.contingencyPercent * 100).toFixed(0)}%</Text></View>
-            <View style={styles.row}><Text style={styles.cellBold}>Total</Text><Text style={styles.cell}></Text><Text style={styles.cellBold}>${estimate.total.toFixed(2)}</Text></View>
+            <View style={styles.row}>
+              <Text style={styles.cell}>Mobilization</Text>
+              <Text style={styles.cell}></Text>
+              <Text style={styles.cell}>${estimate.mobilization.toFixed(2)}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.cell}>Contingency</Text>
+              <Text style={styles.cell}></Text>
+              <Text style={styles.cell}>{(estimate.contingencyPercent * 100).toFixed(0)}%</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.cellBold}>Total</Text>
+              <Text style={styles.cell}></Text>
+              <Text style={styles.cellBold}>${estimate.total.toFixed(2)}</Text>
+            </View>
           </View>
         )}
       />
@@ -59,8 +73,14 @@ export default function EstimateScreen({ route }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  title: { fontSize: 20, fontWeight: '600', marginBottom: 8 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderColor: '#eee' },
+  title: { fontSize: 20, fontWeight: "600", marginBottom: 8 },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderColor: "#eee",
+  },
   cell: { flex: 1, paddingRight: 8 },
-  cellBold: { flex: 1, paddingRight: 8, fontWeight: '700' },
+  cellBold: { flex: 1, paddingRight: 8, fontWeight: "700" },
 });

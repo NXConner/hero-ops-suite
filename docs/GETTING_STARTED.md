@@ -9,8 +9,10 @@ Prereqs: Node 20+, npm 10+
 5. Lint/format: `npm run lint` / `npm run format`
 
 Docker (prod build):
+
 - `docker compose up --build`
 - App available at http://localhost:8080
 
 Load test (k6):
+
 - `k6 run loadtest/k6-smoke.js` (set `TARGET_URL`)

@@ -1,6 +1,6 @@
 // @ts-nocheck
-import React, { useEffect, useMemo, useState } from 'react';
-import { useAdvancedTheme } from '@/contexts/AdvancedThemeContext';
+import React, { useEffect, useMemo, useState } from "react";
+import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
 
 interface EffectSettings {
   scanlines: boolean;
@@ -40,7 +40,7 @@ const defaultSettings: EffectSettings = {
 function useEffectSettings() {
   const [settings, setSettings] = useState<EffectSettings>(() => {
     try {
-      const raw = localStorage.getItem('effects-settings');
+      const raw = localStorage.getItem("effects-settings");
       return raw ? { ...defaultSettings, ...JSON.parse(raw) } : defaultSettings;
     } catch {
       return defaultSettings;
@@ -49,36 +49,118 @@ function useEffectSettings() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('effects-settings', JSON.stringify(settings));
-    } catch { /* ignore */ }
+      localStorage.setItem("effects-settings", JSON.stringify(settings));
+    } catch {
+      /* ignore */
+    }
   }, [settings]);
 
   useEffect(() => {
     (window as any).owEffects = {
       get: () => settings,
-      set: (s: Partial<EffectSettings>) => setSettings(prev => ({ ...prev, ...s })),
+      set: (s: Partial<EffectSettings>) => setSettings((prev) => ({ ...prev, ...s })),
       reset: () => setSettings(defaultSettings),
-      preset: (name: 'isac' | 'disavowed' | 'darkzone' | 'minimal' | 'vivid') => {
+      preset: (name: "isac" | "disavowed" | "darkzone" | "minimal" | "vivid") => {
         switch (name) {
-          case 'minimal':
-            setSettings({ ...defaultSettings, scanlines: false, refreshBarH: false, refreshBarV: false, radarSweep: false, vignette: false, glitch: false, uvVignette: false, ticker: false, minimal: true, hexMesh: false, telemetryColumns: false, contaminationFog: false });
+          case "minimal":
+            setSettings({
+              ...defaultSettings,
+              scanlines: false,
+              refreshBarH: false,
+              refreshBarV: false,
+              radarSweep: false,
+              vignette: false,
+              glitch: false,
+              uvVignette: false,
+              ticker: false,
+              minimal: true,
+              hexMesh: false,
+              telemetryColumns: false,
+              contaminationFog: false,
+            });
             break;
-          case 'isac':
-            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: true, refreshBarV: false, radarSweep: false, vignette: true, glitch: false, uvVignette: false, ticker: false, scanlineSpacing: 3, glitchLevel: 0.2, hexMesh: false, telemetryColumns: true, contaminationFog: false }));
+          case "isac":
+            setSettings((prev) => ({
+              ...prev,
+              minimal: false,
+              scanlines: true,
+              refreshBarH: true,
+              refreshBarV: false,
+              radarSweep: false,
+              vignette: true,
+              glitch: false,
+              uvVignette: false,
+              ticker: false,
+              scanlineSpacing: 3,
+              glitchLevel: 0.2,
+              hexMesh: false,
+              telemetryColumns: true,
+              contaminationFog: false,
+            }));
             break;
-          case 'disavowed':
-            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: false, refreshBarV: true, radarSweep: false, vignette: true, glitch: true, uvVignette: false, ticker: true, scanlineSpacing: 2, glitchLevel: 0.5, hexMesh: true, telemetryColumns: false, contaminationFog: false }));
+          case "disavowed":
+            setSettings((prev) => ({
+              ...prev,
+              minimal: false,
+              scanlines: true,
+              refreshBarH: false,
+              refreshBarV: true,
+              radarSweep: false,
+              vignette: true,
+              glitch: true,
+              uvVignette: false,
+              ticker: true,
+              scanlineSpacing: 2,
+              glitchLevel: 0.5,
+              hexMesh: true,
+              telemetryColumns: false,
+              contaminationFog: false,
+            }));
             break;
-          case 'darkzone':
-            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: false, refreshBarV: false, radarSweep: true, vignette: true, glitch: true, uvVignette: true, ticker: true, scanlineSpacing: 3, glitchLevel: 0.4, hexMesh: true, telemetryColumns: false, contaminationFog: true }));
+          case "darkzone":
+            setSettings((prev) => ({
+              ...prev,
+              minimal: false,
+              scanlines: true,
+              refreshBarH: false,
+              refreshBarV: false,
+              radarSweep: true,
+              vignette: true,
+              glitch: true,
+              uvVignette: true,
+              ticker: true,
+              scanlineSpacing: 3,
+              glitchLevel: 0.4,
+              hexMesh: true,
+              telemetryColumns: false,
+              contaminationFog: true,
+            }));
             break;
-          case 'vivid':
-            setSettings(prev => ({ ...prev, minimal: false, scanlines: true, refreshBarH: true, refreshBarV: true, radarSweep: true, vignette: true, glitch: true, uvVignette: true, ticker: true, scanlineSpacing: 2, glitchLevel: 0.6, hexMesh: true, telemetryColumns: true, contaminationFog: true }));
+          case "vivid":
+            setSettings((prev) => ({
+              ...prev,
+              minimal: false,
+              scanlines: true,
+              refreshBarH: true,
+              refreshBarV: true,
+              radarSweep: true,
+              vignette: true,
+              glitch: true,
+              uvVignette: true,
+              ticker: true,
+              scanlineSpacing: 2,
+              glitchLevel: 0.6,
+              hexMesh: true,
+              telemetryColumns: true,
+              contaminationFog: true,
+            }));
             break;
         }
-      }
+      },
     };
-    return () => { delete (window as any).owEffects; };
+    return () => {
+      delete (window as any).owEffects;
+    };
   }, [settings]);
 
   return { settings, setSettings } as const;
@@ -90,18 +172,19 @@ export default function EffectsOverlay() {
 
   const [reducedMotion, setReducedMotion] = useState(false);
   useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onChange = () => setReducedMotion(media.matches);
     onChange();
-    media.addEventListener('change', onChange);
-    return () => media.removeEventListener('change', onChange);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
   }, []);
 
   // If theme is not yet available, do not render overlay
   if (!currentTheme) return null;
 
-  const isLowPower = currentTheme?.performance?.quality === 'low';
-  const enableVisuals = !!currentTheme?.performance?.enableAnimations && !isLowPower && !reducedMotion;
+  const isLowPower = currentTheme?.performance?.quality === "low";
+  const enableVisuals =
+    !!currentTheme?.performance?.enableAnimations && !isLowPower && !reducedMotion;
 
   if (!enableVisuals || settings.minimal) return null;
 
@@ -116,9 +199,9 @@ export default function EffectsOverlay() {
           aria-hidden
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(rgba(0,0,0,0.08) 1px, rgba(0,0,0,0) ${spacing-1}px)` ,
+            background: `linear-gradient(rgba(0,0,0,0.08) 1px, rgba(0,0,0,0) ${spacing - 1}px)`,
             backgroundSize: `100% ${spacing}px`,
-            mixBlendMode: 'multiply'
+            mixBlendMode: "multiply",
           }}
         />
       )}
@@ -129,9 +212,10 @@ export default function EffectsOverlay() {
           aria-hidden
           className="absolute inset-x-0 h-16 opacity-20"
           style={{
-            top: '-64px',
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%)',
-            animation: 'ow-refresh-bar 6s linear infinite'
+            top: "-64px",
+            background:
+              "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%)",
+            animation: "ow-refresh-bar 6s linear infinite",
           }}
         />
       )}
@@ -142,9 +226,10 @@ export default function EffectsOverlay() {
           aria-hidden
           className="absolute inset-y-0 w-12 opacity-10"
           style={{
-            left: '-48px',
-            background: 'linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%)',
-            animation: 'ow-refresh-bar-v 8s linear infinite'
+            left: "-48px",
+            background:
+              "linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%)",
+            animation: "ow-refresh-bar-v 8s linear infinite",
           }}
         />
       )}
@@ -152,60 +237,98 @@ export default function EffectsOverlay() {
       {/* Radar sweep */}
       {settings.radarSweep && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative" style={{ width: '80vmin', height: '80vmin' }}>
+          <div className="relative" style={{ width: "80vmin", height: "80vmin" }}>
             <div className="absolute inset-0 rounded-full border border-cyan-400/20" />
-            <div className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(from 0deg, rgba(40,216,255,0.25), rgba(40,216,255,0) 45deg)' , animation: 'ow-radar-sweep 10s linear infinite' }} />
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background:
+                  "conic-gradient(from 0deg, rgba(40,216,255,0.25), rgba(40,216,255,0) 45deg)",
+                animation: "ow-radar-sweep 10s linear infinite",
+              }}
+            />
           </div>
         </div>
       )}
 
       {/* Vignette */}
       {settings.vignette && (
-        <div aria-hidden className="absolute inset-0" style={{ boxShadow: 'inset 0 0 200px rgba(0,0,0,0.6)' }} />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ boxShadow: "inset 0 0 200px rgba(0,0,0,0.6)" }}
+        />
       )}
 
       {/* UV Vignette */}
       {settings.uvVignette && (
-        <div aria-hidden className="absolute inset-0" style={{ boxShadow: 'inset 0 0 260px rgba(122,0,255,0.35)' }} />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ boxShadow: "inset 0 0 260px rgba(122,0,255,0.35)" }}
+        />
       )}
 
       {/* Simple glitch */}
       {settings.glitch && (
-        <div aria-hidden className="absolute inset-0 mix-blend-screen" style={{ animation: `ow-glitch ${glitchDur}ms steps(1,end) infinite` }} />
+        <div
+          aria-hidden
+          className="absolute inset-0 mix-blend-screen"
+          style={{ animation: `ow-glitch ${glitchDur}ms steps(1,end) infinite` }}
+        />
       )}
 
       {/* Telemetry ticker */}
       {settings.ticker && (
-        <div aria-hidden className="absolute bottom-0 left-0 right-0 text-[10px] text-cyan-300/80 tracking-wider">
-          <div className="whitespace-nowrap" style={{ animation: 'ow-ticker 20s linear infinite' }}>
-            ▷ ISAC SYSTEM ONLINE ▷ LINK STABLE ▷ TELEMETRY: OK ▷ SCANLNS: ON ▷ RADAR: STBY ▷ EFFECTS: OPT ▷ 
+        <div
+          aria-hidden
+          className="absolute bottom-0 left-0 right-0 text-[10px] text-cyan-300/80 tracking-wider"
+        >
+          <div className="whitespace-nowrap" style={{ animation: "ow-ticker 20s linear infinite" }}>
+            ▷ ISAC SYSTEM ONLINE ▷ LINK STABLE ▷ TELEMETRY: OK ▷ SCANLNS: ON ▷ RADAR: STBY ▷
+            EFFECTS: OPT ▷
           </div>
         </div>
       )}
 
       {/* Hex mesh overlay */}
       {settings.hexMesh && (
-        <div aria-hidden className="absolute inset-0 opacity-10" style={{
-          backgroundImage: 'repeating-conic-gradient(from 0deg at 25px 43px, rgba(0,255,255,0.15) 0deg 60deg, transparent 60deg 120deg)',
-          backgroundSize: '50px 86px',
-          mixBlendMode: 'screen'
-        }} />
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              "repeating-conic-gradient(from 0deg at 25px 43px, rgba(0,255,255,0.15) 0deg 60deg, transparent 60deg 120deg)",
+            backgroundSize: "50px 86px",
+            mixBlendMode: "screen",
+          }}
+        />
       )}
 
       {/* Telemetry columns */}
       {settings.telemetryColumns && (
-        <div aria-hidden className="absolute inset-0" style={{
-          background: 'repeating-linear-gradient(90deg, rgba(0,255,200,0.05) 0px, rgba(0,255,200,0.05) 1px, transparent 1px, transparent 12px)',
-          mixBlendMode: 'overlay'
-        }} />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "repeating-linear-gradient(90deg, rgba(0,255,200,0.05) 0px, rgba(0,255,200,0.05) 1px, transparent 1px, transparent 12px)",
+            mixBlendMode: "overlay",
+          }}
+        />
       )}
 
       {/* Contamination fog */}
       {settings.contaminationFog && (
-        <div aria-hidden className="absolute inset-0" style={{
-          background: 'radial-gradient( circle at 20% 80%, rgba(120,255,0,0.08), transparent 40% ), radial-gradient( circle at 80% 20%, rgba(120,255,0,0.08), transparent 40% )',
-          filter: 'blur(2px)'
-        }} />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient( circle at 20% 80%, rgba(120,255,0,0.08), transparent 40% ), radial-gradient( circle at 80% 20%, rgba(120,255,0,0.08), transparent 40% )",
+            filter: "blur(2px)",
+          }}
+        />
       )}
 
       <style>{`

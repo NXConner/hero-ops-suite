@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,22 +7,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { useAdvancedTheme } from '@/contexts/AdvancedThemeContext';
-import { Shuffle, Ghost, Flame, Building2, Radiation } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
+import { Shuffle, Ghost, Flame, Building2, Radiation } from "lucide-react";
 
 const LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
-  stealth: { label: 'Stealth', icon: <Ghost className="h-3 w-3" /> },
-  aggressive: { label: 'Aggressive', icon: <Flame className="h-3 w-3" /> },
-  corporate: { label: 'Corporate', icon: <Building2 className="h-3 w-3" /> },
-  anarchist: { label: 'Anarchist', icon: <Radiation className="h-3 w-3" /> },
+  stealth: { label: "Stealth", icon: <Ghost className="h-3 w-3" /> },
+  aggressive: { label: "Aggressive", icon: <Flame className="h-3 w-3" /> },
+  corporate: { label: "Corporate", icon: <Building2 className="h-3 w-3" /> },
+  anarchist: { label: "Anarchist", icon: <Radiation className="h-3 w-3" /> },
 };
 
 export function ChoicePathToggle() {
   const { choicePath, setChoicePath, currentTheme } = useAdvancedTheme();
 
-  const activeLabel = choicePath && LABELS[choicePath] ? LABELS[choicePath].label : 'Neutral';
+  const activeLabel = choicePath && LABELS[choicePath] ? LABELS[choicePath].label : "Neutral";
 
   return (
     <DropdownMenu>
@@ -31,7 +31,10 @@ export function ChoicePathToggle() {
           <Shuffle className="h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">Choice path</span>
           {choicePath && (
-            <Badge variant="secondary" className="absolute -bottom-1 -right-1 h-4 px-1 text-[10px] leading-3">
+            <Badge
+              variant="secondary"
+              className="absolute -bottom-1 -right-1 h-4 px-1 text-[10px] leading-3"
+            >
               {activeLabel}
             </Badge>
           )}
@@ -46,7 +49,11 @@ export function ChoicePathToggle() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {Object.entries(LABELS).map(([key, meta]) => (
-          <DropdownMenuItem key={key} onClick={() => setChoicePath(key)} className="flex items-center gap-2">
+          <DropdownMenuItem
+            key={key}
+            onClick={() => setChoicePath(key)}
+            className="flex items-center gap-2"
+          >
             {meta.icon}
             {meta.label}
           </DropdownMenuItem>
@@ -57,4 +64,3 @@ export function ChoicePathToggle() {
 }
 
 export default ChoicePathToggle;
-

@@ -1,28 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 // Removed react-leaflet dependency - using placeholder
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Pentagon, 
-  Move, 
-  Ruler, 
-  Square, 
-  Circle, 
-  Play, 
-  Trash2, 
-  Download, 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Pentagon,
+  Move,
+  Ruler,
+  Square,
+  Circle,
+  Play,
+  Trash2,
+  Download,
   Upload,
   Save,
   X as CloseIcon,
-  Check
-} from 'lucide-react';
+  Check,
+} from "lucide-react";
 // Removed leaflet import
-import { useTerminology } from '@/contexts/TerminologyContext';
+import { useTerminology } from "@/contexts/TerminologyContext";
 
 // Placeholder types to replace Leaflet
 interface LatLng {
@@ -33,14 +33,14 @@ interface LatLng {
 
 interface DrawingState {
   isActive: boolean;
-  mode: 'polygon' | 'polyline' | 'rectangle' | 'circle' | 'marker';
+  mode: "polygon" | "polyline" | "rectangle" | "circle" | "marker";
   currentPoints: LatLng[];
   measurements: Measurement[];
 }
 
 interface Measurement {
   id: string;
-  type: 'distance' | 'area' | 'perimeter';
+  type: "distance" | "area" | "perimeter";
   value: number;
   unit: string;
   coordinates: LatLng[];
@@ -52,7 +52,7 @@ interface MapToolsProps {
   isMeasurementMode: boolean;
   onDrawingComplete: (feature: any) => void;
   onMeasurementComplete: (measurement: Measurement) => void;
-  terminologyMode?: 'military' | 'civilian' | 'both';
+  terminologyMode?: "military" | "civilian" | "both";
 }
 
 const MapTools: React.FC<MapToolsProps> = ({
@@ -60,14 +60,14 @@ const MapTools: React.FC<MapToolsProps> = ({
   isMeasurementMode,
   onDrawingComplete,
   onMeasurementComplete,
-  terminologyMode
+  terminologyMode,
 }) => {
   // Note: Map integration removed due to leaflet dependency removal
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isActive: false,
-    mode: 'polygon',
+    mode: "polygon",
     currentPoints: [],
-    measurements: []
+    measurements: [],
   });
   const [activeDrawings, setActiveDrawings] = useState<any[]>([]);
   const [activeMeasurements, setActiveMeasurements] = useState<Measurement[]>([]);
@@ -77,10 +77,14 @@ const MapTools: React.FC<MapToolsProps> = ({
 
   const getTerminology = (military: string, civilian: string) => {
     switch (mode) {
-      case 'military': return military;
-      case 'civilian': return civilian;
-      case 'both': return `${military} / ${civilian}`;
-      default: return military;
+      case "military":
+        return military;
+      case "civilian":
+        return civilian;
+      case "both":
+        return `${military} / ${civilian}`;
+      default:
+        return military;
     }
   };
 
@@ -125,52 +129,52 @@ const MapTools: React.FC<MapToolsProps> = ({
     return `${acres.toFixed(2)} acres`;
   };
 
-  const startDrawing = (mode: DrawingState['mode']) => {
+  const startDrawing = (mode: DrawingState["mode"]) => {
     setDrawingState({
       isActive: true,
       mode,
       currentPoints: [],
-      measurements: []
+      measurements: [],
     });
   };
 
   const finishDrawing = () => {
     const { mode, currentPoints } = drawingState;
-    
+
     if (currentPoints.length > 0) {
       // Calculate measurements
       const distance = calculateDistance(currentPoints);
-      const area = mode === 'polygon' ? calculateArea(currentPoints) : 0;
-      
+      const area = mode === "polygon" ? calculateArea(currentPoints) : 0;
+
       onDrawingComplete({
         type: mode,
         coordinates: currentPoints,
         distance,
-        area
+        area,
       });
     }
-    
+
     setDrawingState({
       isActive: false,
-      mode: 'polygon',
+      mode: "polygon",
       currentPoints: [],
-      measurements: []
+      measurements: [],
     });
   };
 
-  const addMeasurement = (points: LatLng[], type: 'distance' | 'area') => {
-    const value = type === 'distance' ? calculateDistance(points) : calculateArea(points);
-    const unit = type === 'distance' ? 'm' : 'm²';
-    
+  const addMeasurement = (points: LatLng[], type: "distance" | "area") => {
+    const value = type === "distance" ? calculateDistance(points) : calculateArea(points);
+    const unit = type === "distance" ? "m" : "m²";
+
     const measurement: Measurement = {
       id: Date.now().toString(),
       type,
       value,
       unit,
-      coordinates: points
+      coordinates: points,
     };
-    
-    setActiveMeasurements(prev => [...prev, measurement]);
+
+    setActiveMeasurements((prev) => [...prev, measurement]);
     onMeasurementComplete(measurement);
   };
 
@@ -183,19 +187,19 @@ const MapTools: React.FC<MapToolsProps> = ({
     const data = {
       drawings: activeDrawings.map((layer, index) => ({
         id: index,
-        type: 'feature'
+        type: "feature",
       })),
-      measurements: activeMeasurements
+      measurements: activeMeasurements,
     };
-    
+
     const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json'
+      type: "application/json",
     });
-    
+
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `overwatch-${getTerminology('mission', 'project')}-data.json`;
+    a.download = `overwatch-${getTerminology("mission", "project")}-data.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -204,28 +208,29 @@ const MapTools: React.FC<MapToolsProps> = ({
 
   // Map click handler
   useEffect(() => {
-    const handleMapClick = (e: any) => { // Placeholder for LeafletMouseEvent
+    const handleMapClick = (e: any) => {
+      // Placeholder for LeafletMouseEvent
       if (isDrawingMode && drawingState.isActive) {
         const newPoints = [...drawingState.currentPoints, e]; // Placeholder for e.latlng
-        setDrawingState(prev => ({
+        setDrawingState((prev) => ({
           ...prev,
-          currentPoints: newPoints
+          currentPoints: newPoints,
         }));
       }
-      
+
       if (isMeasurementMode) {
         // Add point for measurement
         const newPoints = [...drawingState.currentPoints, e]; // Placeholder for e.latlng
-        setDrawingState(prev => ({
+        setDrawingState((prev) => ({
           ...prev,
-          currentPoints: newPoints
+          currentPoints: newPoints,
         }));
-        
+
         if (newPoints.length >= 2) {
-          addMeasurement(newPoints, 'distance');
-          setDrawingState(prev => ({
+          addMeasurement(newPoints, "distance");
+          setDrawingState((prev) => ({
             ...prev,
-            currentPoints: []
+            currentPoints: [],
           }));
         }
       }
@@ -239,7 +244,7 @@ const MapTools: React.FC<MapToolsProps> = ({
 
     // Placeholder for map.on('click', handleMapClick);
     // Placeholder for map.on('dblclick', handleMapDoubleClick);
-    
+
     return () => {
       // Placeholder for map.off('click', handleMapClick);
       // Placeholder for map.off('dblclick', handleMapDoubleClick);
@@ -265,7 +270,7 @@ const MapTools: React.FC<MapToolsProps> = ({
         <div className="flex items-center justify-between">
           <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
             <Move className="w-4 h-4" />
-            {getTerminology('Tactical Tools', 'Map Tools')}
+            {getTerminology("Tactical Tools", "Map Tools")}
           </CardTitle>
           <Button
             variant="ghost"
@@ -281,59 +286,57 @@ const MapTools: React.FC<MapToolsProps> = ({
         <Tabs defaultValue="drawing" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-slate-800">
             <TabsTrigger value="drawing" className="text-xs">
-              {getTerminology('Draw AOI', 'Drawing')}
+              {getTerminology("Draw AOI", "Drawing")}
             </TabsTrigger>
             <TabsTrigger value="measurement" className="text-xs">
               Measurement
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="drawing" className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <Button
-                variant={drawingState.mode === 'polygon' ? "default" : "outline"}
+                variant={drawingState.mode === "polygon" ? "default" : "outline"}
                 size="sm"
-                onClick={() => startDrawing('polygon')}
+                onClick={() => startDrawing("polygon")}
                 className="text-xs"
               >
                 <Pentagon className="w-3 h-3 mr-1" />
                 Polygon
               </Button>
               <Button
-                variant={drawingState.mode === 'polyline' ? "default" : "outline"}
+                variant={drawingState.mode === "polyline" ? "default" : "outline"}
                 size="sm"
-                onClick={() => startDrawing('polyline')}
+                onClick={() => startDrawing("polyline")}
                 className="text-xs"
               >
                 <Move className="w-3 h-3 mr-1" />
                 Line
               </Button>
               <Button
-                variant={drawingState.mode === 'rectangle' ? "default" : "outline"}
+                variant={drawingState.mode === "rectangle" ? "default" : "outline"}
                 size="sm"
-                onClick={() => startDrawing('rectangle')}
+                onClick={() => startDrawing("rectangle")}
                 className="text-xs"
               >
                 <Square className="w-3 h-3 mr-1" />
                 Rectangle
               </Button>
               <Button
-                variant={drawingState.mode === 'circle' ? "default" : "outline"}
+                variant={drawingState.mode === "circle" ? "default" : "outline"}
                 size="sm"
-                onClick={() => startDrawing('circle')}
+                onClick={() => startDrawing("circle")}
                 className="text-xs"
               >
                 <Circle className="w-3 h-3 mr-1" />
                 Circle
               </Button>
             </div>
-            
+
             {drawingState.isActive && (
               <div className="bg-slate-800 p-2 rounded border border-cyan-500/30">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-cyan-400">
-                    Drawing {drawingState.mode}...
-                  </span>
+                  <span className="text-xs text-cyan-400">Drawing {drawingState.mode}...</span>
                   <Badge variant="outline" className="text-xs">
                     {drawingState.currentPoints.length} points
                   </Badge>
@@ -350,7 +353,9 @@ const MapTools: React.FC<MapToolsProps> = ({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => setDrawingState(prev => ({ ...prev, isActive: false, currentPoints: [] }))}
+                    onClick={() =>
+                      setDrawingState((prev) => ({ ...prev, isActive: false, currentPoints: [] }))
+                    }
                     className="text-xs"
                   >
                     Cancel
@@ -359,12 +364,12 @@ const MapTools: React.FC<MapToolsProps> = ({
               </div>
             )}
           </TabsContent>
-          
+
           <TabsContent value="measurement" className="space-y-3">
             <div className="text-xs text-slate-300">
               Click two points to measure distance, or create a polygon for area measurement.
             </div>
-            
+
             {activeMeasurements.length > 0 && (
               <div className="space-y-2">
                 <Label className="text-xs text-cyan-400">Active Measurements:</Label>
@@ -373,13 +378,12 @@ const MapTools: React.FC<MapToolsProps> = ({
                     <div key={measurement.id} className="bg-slate-800 p-2 rounded text-xs">
                       <div className="flex items-center justify-between">
                         <span className="text-slate-300">
-                          {measurement.type === 'distance' ? 'Distance' : 'Area'}
+                          {measurement.type === "distance" ? "Distance" : "Area"}
                         </span>
                         <span className="text-cyan-400 font-mono">
-                          {measurement.type === 'distance' 
+                          {measurement.type === "distance"
                             ? formatDistance(measurement.value)
-                            : formatArea(measurement.value)
-                          }
+                            : formatArea(measurement.value)}
                         </span>
                       </div>
                     </div>
@@ -389,34 +393,23 @@ const MapTools: React.FC<MapToolsProps> = ({
             )}
           </TabsContent>
         </Tabs>
-        
+
         <Separator className="my-3 bg-slate-600" />
-        
+
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={clearAll}
-            className="text-xs flex-1"
-          >
+          <Button size="sm" variant="outline" onClick={clearAll} className="text-xs flex-1">
             <Trash2 className="w-3 h-3 mr-1" />
             Clear All
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={exportData}
-            className="text-xs flex-1"
-          >
+          <Button size="sm" variant="outline" onClick={exportData} className="text-xs flex-1">
             <Download className="w-3 h-3 mr-1" />
             Export
           </Button>
         </div>
-        
+
         <div className="mt-3 text-xs text-slate-400">
-          • Double-click to finish drawing
-          • Single-click for measurement points
-          • {getTerminology('Right-click for context menu', 'Use tools above for actions')}
+          • Double-click to finish drawing • Single-click for measurement points •{" "}
+          {getTerminology("Right-click for context menu", "Use tools above for actions")}
         </div>
       </CardContent>
     </Card>

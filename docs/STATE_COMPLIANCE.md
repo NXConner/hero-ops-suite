@@ -3,6 +3,7 @@
 This guide summarizes common licensing, permitting, safety, environmental, tax, and recordkeeping considerations for small asphalt/paving/sealcoat businesses operating in Virginia and North Carolina. It is not legal advice. Verify with the relevant agencies before acting.
 
 ### How this maps into the platform
+
 - Operations Suite and Fleet Focus Manager: track compliance tasks, expirations (licenses, insurance, permits), and safety training.
 - Asphalt Atlas Hub: surface state specs, best practices, and links to authoritative resources.
 - Estimator/Jobs: attach permits/COIs, add environmental controls (BMPs) and traffic control plans to job packets.
@@ -153,4 +154,3 @@ Note: Requirements change. Always verify current rules on official state sites (
   - NC Department of Revenue: https://www.ncdor.gov/
   - NC DES (Unemployment): https://des.nc.gov/
   - NC Industrial Commission (Workers’ Comp): https://www.ic.nc.gov/
-

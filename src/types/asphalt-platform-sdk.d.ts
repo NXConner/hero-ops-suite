@@ -1,4 +1,3 @@
-
 declare module "@asphalt/platform-sdk" {
   export interface Scan {
     scan_id: string;

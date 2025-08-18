@@ -15,7 +15,7 @@ export function exportSettingsOverrides(): string {
 }
 
 export function importSettingsOverrides(data: any) {
-  if (!data || typeof data !== 'object') return;
+  if (!data || typeof data !== "object") return;
   saveOverrides(data);
   applyOverridesToGlobal(data);
 }
@@ -26,7 +26,7 @@ export function exportJobs(): string {
 
 export function importJobs(jobs: StoredJob[]) {
   if (!Array.isArray(jobs)) return;
-  jobs.forEach(j => {
+  jobs.forEach((j) => {
     // Save will upsert; keep original timestamps
     saveJob({
       id: j.id,
@@ -44,7 +44,7 @@ export function exportCustomers(): string {
 
 export function importCustomers(customers: Customer[]) {
   if (!Array.isArray(customers)) return;
-  customers.forEach(c => {
+  customers.forEach((c) => {
     saveCustomer({ id: c.id, name: c.name, address: c.address, notes: c.notes });
   });
 }
@@ -61,7 +61,7 @@ export function exportAll(): string {
 }
 
 export function importAll(bundle: ExportBundle) {
-  if (!bundle || typeof bundle !== 'object') return;
+  if (!bundle || typeof bundle !== "object") return;
   if (bundle.settingsOverrides) importSettingsOverrides(bundle.settingsOverrides);
   if (Array.isArray(bundle.jobs)) importJobs(bundle.jobs);
   if (Array.isArray(bundle.customers)) importCustomers(bundle.customers);
@@ -88,33 +88,42 @@ export function parseCSV(raw: string): { header: string[]; rows: string[][] } {
 
 function splitCsvLine(line: string): string[] {
   const result: string[] = [];
-  let current = '';
+  let current = "";
   let inQuotes = false;
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
     if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
-      else inQuotes = !inQuotes;
-    } else if (ch === ',' && !inQuotes) {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else inQuotes = !inQuotes;
+    } else if (ch === "," && !inQuotes) {
       result.push(current);
-      current = '';
+      current = "";
     } else {
       current += ch;
     }
   }
   result.push(current);
-  return result.map(s => s.trim());
+  return result.map((s) => s.trim());
 }
 
-export function importCSVWithMapping<T = any>(raw: string, mapping: CSVMapping, validator: (row: CSVRow) => string | null, projector: (row: CSVRow) => T): CSVImportResult<T> {
+export function importCSVWithMapping<T = any>(
+  raw: string,
+  mapping: CSVMapping,
+  validator: (row: CSVRow) => string | null,
+  projector: (row: CSVRow) => T,
+): CSVImportResult<T> {
   const { header, rows } = parseCSV(raw);
   const errors: { row: number; message: string }[] = [];
-  if (header.length === 0) return { rows: [], errors: [{ row: 0, message: 'Missing header' }] };
+  if (header.length === 0) return { rows: [], errors: [{ row: 0, message: "Missing header" }] };
   const headerSet = new Set(header);
   const mappedRows: T[] = [];
   rows.forEach((cols, idx) => {
     const rowObj: CSVRow = {};
-    header.forEach((h, i) => { rowObj[h] = cols[i] ?? ''; });
+    header.forEach((h, i) => {
+      rowObj[h] = cols[i] ?? "";
+    });
     const error = validator(rowObj);
     if (error) {
       errors.push({ row: idx + 2, message: error });
@@ -122,12 +131,12 @@ export function importCSVWithMapping<T = any>(raw: string, mapping: CSVMapping, 
     }
     const projected: any = {};
     Object.entries(mapping.columns).forEach(([incoming, field]) => {
-      projected[field] = rowObj[incoming] ?? '';
+      projected[field] = rowObj[incoming] ?? "";
     });
     try {
       mappedRows.push(projector(projected));
     } catch (e: any) {
-      errors.push({ row: idx + 2, message: e?.message || 'Projection error' });
+      errors.push({ row: idx + 2, message: e?.message || "Projection error" });
     }
   });
   return { rows: mappedRows, errors };

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button, ActivityIndicator } from 'react-native';
-import OverlayViewer3D from '../components/OverlayViewer3D';
-import { getScan } from '../services/api';
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Button, ActivityIndicator } from "react-native";
+import OverlayViewer3D from "../components/OverlayViewer3D";
+import { getScan } from "../services/api";
 
 export default function ViewerScreen({ navigation, route }: any) {
   const [data, setData] = useState<{ scan: any; overlay: any } | null>(route?.params || null);
@@ -20,7 +20,7 @@ export default function ViewerScreen({ navigation, route }: any) {
 
   if (loading) {
     return (
-      <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+      <View style={[styles.container, { alignItems: "center", justifyContent: "center" }]}>
         <ActivityIndicator />
       </View>
     );
@@ -36,18 +36,21 @@ export default function ViewerScreen({ navigation, route }: any) {
       <OverlayViewer3D meshUrl={meshUrl} overlay={overlay} />
       {overlay && (
         <View style={{ marginTop: 12 }}>
-          <Text>Cracks: {overlay.cracks?.length || 0} | Potholes: {overlay.potholes?.length || 0} | Zones: {overlay.distress_zones?.length || 0}</Text>
+          <Text>
+            Cracks: {overlay.cracks?.length || 0} | Potholes: {overlay.potholes?.length || 0} |
+            Zones: {overlay.distress_zones?.length || 0}
+          </Text>
         </View>
       )}
       <View style={{ height: 16 }} />
-      <Button title="Estimate" onPress={() => navigation.navigate('Estimate', { overlay })} />
+      <Button title="Estimate" onPress={() => navigation.navigate("Estimate", { overlay })} />
       <View style={{ height: 8 }} />
-      <Button title="Report" onPress={() => navigation.navigate('Report', { overlay })} />
+      <Button title="Report" onPress={() => navigation.navigate("Report", { overlay })} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  title: { fontSize: 20, fontWeight: '600', marginBottom: 8 },
+  title: { fontSize: 20, fontWeight: "600", marginBottom: 8 },
 });

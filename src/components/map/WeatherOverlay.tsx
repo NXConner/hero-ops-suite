@@ -1,30 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 // Removed react-leaflet dependency - using placeholder
-import { weatherService, WeatherAPIResponse } from '@/services/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Cloud, 
-  CloudRain, 
-  Sun, 
-  Wind, 
-  Thermometer, 
-  Eye, 
-  Droplets, 
-  Zap, 
+import { weatherService, WeatherAPIResponse } from "@/services/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Cloud,
+  CloudRain,
+  Sun,
+  Wind,
+  Thermometer,
+  Eye,
+  Droplets,
+  Zap,
   AlertTriangle,
   CheckCircle,
   XCircle,
   Play,
   Pause,
-  RotateCcw
-} from 'lucide-react';
-import { useTerminology } from '@/contexts/TerminologyContext';
+  RotateCcw,
+} from "lucide-react";
+import { useTerminology } from "@/contexts/TerminologyContext";
 
 interface WeatherData {
   temperature: number;
@@ -34,15 +34,15 @@ interface WeatherData {
   pressure: number;
   uvIndex: number;
   visibility: number;
-  conditions: 'clear' | 'cloudy' | 'rainy' | 'stormy' | 'foggy';
+  conditions: "clear" | "cloudy" | "rainy" | "stormy" | "foggy";
   precipitation: number;
   timestamp: Date;
 }
 
 interface WeatherAlert {
   id: string;
-  type: 'severe-weather' | 'temperature' | 'wind' | 'precipitation';
-  severity: 'low' | 'medium' | 'high' | 'extreme';
+  type: "severe-weather" | "temperature" | "wind" | "precipitation";
+  severity: "low" | "medium" | "high" | "extreme";
   message: string;
   recommendation: string;
   validUntil: Date;
@@ -56,14 +56,14 @@ interface RadarFrame {
 
 interface WeatherOverlayProps {
   isVisible: boolean;
-  terminologyMode?: 'military' | 'civilian' | 'both';
+  terminologyMode?: "military" | "civilian" | "both";
   onRecommendationChange?: (recommendations: string[]) => void;
 }
 
-const WeatherOverlay: React.FC<WeatherOverlayProps> = ({ 
-  isVisible, 
-  terminologyMode, 
-  onRecommendationChange 
+const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
+  isVisible,
+  terminologyMode,
+  onRecommendationChange,
 }) => {
   // Note: Map integration removed due to leaflet dependency removal
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
@@ -82,31 +82,43 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
 
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem('weather-overlay-prefs') || '{}');
-      if (typeof saved.radarOpacity === 'number') setRadarOpacity(saved.radarOpacity);
-      if (typeof saved.showTemperatureOverlay === 'boolean') setShowTemperatureOverlay(saved.showTemperatureOverlay);
-      if (typeof saved.showWindOverlay === 'boolean') setShowWindOverlay(saved.showWindOverlay);
-      if (typeof saved.forecastHours === 'number') setForecastHours(saved.forecastHours);
-    } catch { /* ignore */ }
+      const saved = JSON.parse(localStorage.getItem("weather-overlay-prefs") || "{}");
+      if (typeof saved.radarOpacity === "number") setRadarOpacity(saved.radarOpacity);
+      if (typeof saved.showTemperatureOverlay === "boolean")
+        setShowTemperatureOverlay(saved.showTemperatureOverlay);
+      if (typeof saved.showWindOverlay === "boolean") setShowWindOverlay(saved.showWindOverlay);
+      if (typeof saved.forecastHours === "number") setForecastHours(saved.forecastHours);
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   useEffect(() => {
     try {
-      localStorage.setItem('weather-overlay-prefs', JSON.stringify({
-        radarOpacity,
-        showTemperatureOverlay,
-        showWindOverlay,
-        forecastHours,
-      }));
-    } catch { /* ignore */ }
+      localStorage.setItem(
+        "weather-overlay-prefs",
+        JSON.stringify({
+          radarOpacity,
+          showTemperatureOverlay,
+          showWindOverlay,
+          forecastHours,
+        }),
+      );
+    } catch {
+      /* ignore */
+    }
   }, [radarOpacity, showTemperatureOverlay, showWindOverlay, forecastHours]);
 
   const getTerminology = (military: string, civilian: string) => {
     switch (mode) {
-      case 'military': return military;
-      case 'civilian': return civilian;
-      case 'both': return `${military} / ${civilian}`;
-      default: return military;
+      case "military":
+        return military;
+      case "civilian":
+        return civilian;
+      case "both":
+        return `${military} / ${civilian}`;
+      default:
+        return military;
     }
   };
 
@@ -126,9 +138,9 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
           pressure: weatherResponse.main.pressure,
           uvIndex: await weatherService.getUVIndex(lat, lon),
           visibility: Math.round(weatherResponse.visibility / 1609.34),
-          conditions: weatherResponse.weather[0].main.toLowerCase() as WeatherData['conditions'],
-          precipitation: weatherResponse.rain?.['1h'] ?? 0,
-          timestamp: new Date(weatherResponse.dt * 1000)
+          conditions: weatherResponse.weather[0].main.toLowerCase() as WeatherData["conditions"],
+          precipitation: weatherResponse.rain?.["1h"] ?? 0,
+          timestamp: new Date(weatherResponse.dt * 1000),
         };
 
         setCurrentWeather(weatherData);
@@ -141,9 +153,12 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
           for (const f of forecastList) {
             const ft = (f.dt || f.time || 0) * 1000;
             const diff = Math.abs(ft - t);
-            if (diff < minDiff) { nearest = f; minDiff = diff; }
+            if (diff < minDiff) {
+              nearest = f;
+              minDiff = diff;
+            }
           }
-          return typeof nearest.pop === 'number' ? nearest.pop : 0;
+          return typeof nearest.pop === "number" ? nearest.pop : 0;
         };
 
         const frames: RadarFrame[] = radarResponse.radar.past.map((frame: any) => {
@@ -151,47 +166,47 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
           return {
             timestamp: new Date(ts),
             imageUrl: `https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`,
-            precipitationLevel: popAt(ts)
+            precipitationLevel: popAt(ts),
           };
         });
 
         setRadarFrames(frames);
 
         const alerts: WeatherAlert[] = [];
-        if (weatherResponse.weather[0].main === 'Rain') {
+        if (weatherResponse.weather[0].main === "Rain") {
           alerts.push({
-            id: 'rain-alert',
-            type: 'precipitation',
-            severity: 'high',
-            message: 'Active precipitation detected',
-            recommendation: 'Avoid sealcoating and paving operations',
-            validUntil: new Date(Date.now() + 2 * 60 * 60 * 1000)
+            id: "rain-alert",
+            type: "precipitation",
+            severity: "high",
+            message: "Active precipitation detected",
+            recommendation: "Avoid sealcoating and paving operations",
+            validUntil: new Date(Date.now() + 2 * 60 * 60 * 1000),
           });
         }
         if (weatherResponse.wind.speed > 15) {
           alerts.push({
-            id: 'wind-alert',
-            type: 'wind',
-            severity: 'medium',
+            id: "wind-alert",
+            type: "wind",
+            severity: "medium",
             message: `High winds detected: ${Math.round(weatherResponse.wind.speed)} mph`,
-            recommendation: 'Implement dust control measures',
-            validUntil: new Date(Date.now() + 4 * 60 * 60 * 1000)
+            recommendation: "Implement dust control measures",
+            validUntil: new Date(Date.now() + 4 * 60 * 60 * 1000),
           });
         }
         if (weatherResponse.main.temp < 50) {
           alerts.push({
-            id: 'temp-alert',
-            type: 'temperature',
-            severity: 'medium',
+            id: "temp-alert",
+            type: "temperature",
+            severity: "medium",
             message: `Low temperature: ${Math.round(weatherResponse.main.temp)}°F`,
-            recommendation: 'Monitor asphalt temperature and workability',
-            validUntil: new Date(Date.now() + 6 * 60 * 60 * 1000)
+            recommendation: "Monitor asphalt temperature and workability",
+            validUntil: new Date(Date.now() + 6 * 60 * 60 * 1000),
           });
         }
 
         setWeatherAlerts(alerts);
       } catch (error) {
-        console.error('Failed to load weather data:', error);
+        console.error("Failed to load weather data:", error);
         // Keep previous state; do not inject random data
       }
     };
@@ -200,11 +215,11 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => loadWeatherData(pos.coords.latitude, pos.coords.longitude),
-          () => loadWeatherData(40.7128, -74.0060),
-          { enableHighAccuracy: false, timeout: 5000 }
+          () => loadWeatherData(40.7128, -74.006),
+          { enableHighAccuracy: false, timeout: 5000 },
         );
       } else {
-        loadWeatherData(40.7128, -74.0060);
+        loadWeatherData(40.7128, -74.006);
       }
     };
 
@@ -218,7 +233,7 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
   useEffect(() => {
     if (isRadarPlaying && radarFrames.length > 0) {
       radarIntervalRef.current = setInterval(() => {
-        setCurrentRadarFrame(prev => (prev + 1) % radarFrames.length);
+        setCurrentRadarFrame((prev) => (prev + 1) % radarFrames.length);
       }, 500);
     } else if (radarIntervalRef.current) {
       clearInterval(radarIntervalRef.current);
@@ -238,50 +253,61 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
     const recommendations: string[] = [];
 
     if (currentWeather.precipitation > 0.05) {
-      recommendations.push('⚠️ Avoid sealcoating operations due to precipitation');
+      recommendations.push("⚠️ Avoid sealcoating operations due to precipitation");
     }
 
     if (currentWeather.temperature < 50) {
-      recommendations.push('❄️ Cold weather may affect asphalt workability');
+      recommendations.push("❄️ Cold weather may affect asphalt workability");
     }
 
     if (currentWeather.temperature > 95) {
-      recommendations.push('🔥 High temperature - monitor crew hydration');
+      recommendations.push("🔥 High temperature - monitor crew hydration");
     }
 
     if (currentWeather.windSpeed > 15) {
-      recommendations.push('💨 High winds - implement dust control measures');
+      recommendations.push("💨 High winds - implement dust control measures");
     }
 
     if (currentWeather.uvIndex > 7) {
-      recommendations.push('☀️ High UV - ensure crew sun protection');
+      recommendations.push("☀️ High UV - ensure crew sun protection");
     }
 
     if (recommendations.length === 0) {
-      recommendations.push('✅ Weather conditions optimal for operations');
+      recommendations.push("✅ Weather conditions optimal for operations");
     }
 
     onRecommendationChange?.(recommendations);
   }, [currentWeather, onRecommendationChange]);
 
-  const getConditionIcon = (condition: WeatherData['conditions']) => {
+  const getConditionIcon = (condition: WeatherData["conditions"]) => {
     switch (condition) {
-      case 'clear': return <Sun className="w-5 h-5 text-yellow-400" />;
-      case 'cloudy': return <Cloud className="w-5 h-5 text-slate-400" />;
-      case 'rainy': return <CloudRain className="w-5 h-5 text-blue-400" />;
-      case 'stormy': return <Zap className="w-5 h-5 text-purple-400" />;
-      case 'foggy': return <Cloud className="w-5 h-5 text-gray-400" />;
-      default: return <Cloud className="w-5 h-5 text-slate-400" />;
+      case "clear":
+        return <Sun className="w-5 h-5 text-yellow-400" />;
+      case "cloudy":
+        return <Cloud className="w-5 h-5 text-slate-400" />;
+      case "rainy":
+        return <CloudRain className="w-5 h-5 text-blue-400" />;
+      case "stormy":
+        return <Zap className="w-5 h-5 text-purple-400" />;
+      case "foggy":
+        return <Cloud className="w-5 h-5 text-gray-400" />;
+      default:
+        return <Cloud className="w-5 h-5 text-slate-400" />;
     }
   };
 
-  const getAlertSeverityColor = (severity: WeatherAlert['severity']) => {
+  const getAlertSeverityColor = (severity: WeatherAlert["severity"]) => {
     switch (severity) {
-      case 'low': return 'text-blue-400 border-blue-400';
-      case 'medium': return 'text-yellow-400 border-yellow-400';
-      case 'high': return 'text-orange-400 border-orange-400';
-      case 'extreme': return 'text-red-400 border-red-400';
-      default: return 'text-slate-400 border-slate-400';
+      case "low":
+        return "text-blue-400 border-blue-400";
+      case "medium":
+        return "text-yellow-400 border-yellow-400";
+      case "high":
+        return "text-orange-400 border-orange-400";
+      case "extreme":
+        return "text-red-400 border-red-400";
+      default:
+        return "text-slate-400 border-slate-400";
     }
   };
 
@@ -303,15 +329,21 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
         <CardHeader className="pb-2">
           <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
             <Cloud className="w-4 h-4" />
-            {getTerminology('Environmental Intel', 'Weather Center')}
+            {getTerminology("Environmental Intel", "Weather Center")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="current" className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-slate-800">
-              <TabsTrigger value="current" className="text-xs">Current</TabsTrigger>
-              <TabsTrigger value="radar" className="text-xs">Radar</TabsTrigger>
-              <TabsTrigger value="alerts" className="text-xs">Alerts</TabsTrigger>
+              <TabsTrigger value="current" className="text-xs">
+                Current
+              </TabsTrigger>
+              <TabsTrigger value="radar" className="text-xs">
+                Radar
+              </TabsTrigger>
+              <TabsTrigger value="alerts" className="text-xs">
+                Alerts
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="current" className="space-y-3">
@@ -373,10 +405,7 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
                 </div>
                 <div className="flex items-center justify-between">
                   <Label className="text-xs text-slate-300">Wind Overlay</Label>
-                  <Switch
-                    checked={showWindOverlay}
-                    onCheckedChange={setShowWindOverlay}
-                  />
+                  <Switch checked={showWindOverlay} onCheckedChange={setShowWindOverlay} />
                 </div>
               </div>
             </TabsContent>
@@ -387,20 +416,10 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
                   Rain Radar ({forecastHours}h forecast)
                 </Label>
                 <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleRadarPlayback}
-                    className="p-1"
-                  >
+                  <Button variant="ghost" size="sm" onClick={toggleRadarPlayback} className="p-1">
                     {isRadarPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={resetRadar}
-                    className="p-1"
-                  >
+                  <Button variant="ghost" size="sm" onClick={resetRadar} className="p-1">
                     <RotateCcw className="w-3 h-3" />
                   </Button>
                 </div>
@@ -438,13 +457,16 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
               {radarFrames.length > 0 && radarFrames[currentRadarFrame] && (
                 <div className="bg-slate-800 p-2 rounded text-xs">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-slate-300">Frame {currentRadarFrame + 1} of {radarFrames.length}</span>
+                    <span className="text-slate-300">
+                      Frame {currentRadarFrame + 1} of {radarFrames.length}
+                    </span>
                     <span className="text-cyan-400 font-mono">
                       {radarFrames[currentRadarFrame]?.timestamp.toLocaleTimeString()}
                     </span>
                   </div>
                   <div className="text-slate-400">
-                    Precipitation chance: {(radarFrames[currentRadarFrame]?.precipitationLevel * 100 || 0).toFixed(0)}%
+                    Precipitation chance:{" "}
+                    {(radarFrames[currentRadarFrame]?.precipitationLevel * 100 || 0).toFixed(0)}%
                   </div>
                 </div>
               )}
@@ -454,13 +476,19 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
               {weatherAlerts.length > 0 ? (
                 <div className="space-y-2">
                   {weatherAlerts.map((alert) => (
-                    <div key={alert.id} className="bg-slate-800 border border-slate-600 rounded p-2">
+                    <div
+                      key={alert.id}
+                      className="bg-slate-800 border border-slate-600 rounded p-2"
+                    >
                       <div className="flex items-center justify-between mb-1">
-                        <Badge variant="outline" className={`text-xs ${getAlertSeverityColor(alert.severity)}`}>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${getAlertSeverityColor(alert.severity)}`}
+                        >
                           {alert.severity.toUpperCase()}
                         </Badge>
                         <span className="text-xs text-slate-400">
-                          {alert.type.replace('-', ' ').toUpperCase()}
+                          {alert.type.replace("-", " ").toUpperCase()}
                         </span>
                       </div>
                       <div className="text-xs text-slate-300 mb-1">{alert.message}</div>
@@ -486,10 +514,13 @@ const WeatherOverlay: React.FC<WeatherOverlayProps> = ({
       {radarFrames.length > 0 && radarFrames[currentRadarFrame] && (
         <div style={{ opacity: radarOpacity / 100 }}>
           {/* Simulated radar overlay - in production this would use real radar tiles */}
-          <div className="absolute inset-0 pointer-events-none" style={{ 
-            background: `radial-gradient(circle at 40.7128% 25.994%, rgba(59, 130, 246, ${radarFrames[currentRadarFrame].precipitationLevel}))`,
-            zIndex: 100
-          }} />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at 40.7128% 25.994%, rgba(59, 130, 246, ${radarFrames[currentRadarFrame].precipitationLevel}))`,
+              zIndex: 100,
+            }}
+          />
         </div>
       )}
     </>

@@ -1,21 +1,27 @@
 // @ts-nocheck
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AdvancedThemeProvider } from '@/contexts/AdvancedThemeContext';
-import { ThemeProvider } from '@/components/ThemeProvider';
-import '@testing-library/jest-dom';
-import OverWatchReal from '../../pages/OverWatch';
-import RealMapComponent from '@/components/map/RealMapComponent';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { BrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AdvancedThemeProvider } from "@/contexts/AdvancedThemeContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import "@testing-library/jest-dom";
+import OverWatchReal from "../../pages/OverWatch";
+import RealMapComponent from "@/components/map/RealMapComponent";
 
 const OverWatch: React.FC = () => {
   return (
     <div className="flex h-screen bg-slate-950">
       <div className="flex-1 relative">
         <div className="absolute inset-0">
-          <RealMapComponent center={[-74.0060, 40.7128]} zoom={13} className="h-full w-full" />
+          <RealMapComponent
+            center={[-74.006, 40.7128]}
+            zoom={13}
+            className="h-full w-full"
+            tileUrls={["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"]}
+            attribution={"© OpenStreetMap contributors"}
+          />
         </div>
       </div>
     </div>
@@ -23,14 +29,14 @@ const OverWatch: React.FC = () => {
 };
 
 // Mock external dependencies
-vi.mock('leaflet', () => ({
+vi.mock("leaflet", () => ({
   Map: vi.fn(),
   TileLayer: vi.fn(),
   Icon: {
     Default: {
       prototype: {},
-      mergeOptions: vi.fn()
-    }
+      mergeOptions: vi.fn(),
+    },
   },
   divIcon: vi.fn(),
   marker: vi.fn(),
@@ -38,55 +44,57 @@ vi.mock('leaflet', () => ({
   polyline: vi.fn(),
   rectangle: vi.fn(),
   circle: vi.fn(),
-  latLngBounds: vi.fn()
+  latLngBounds: vi.fn(),
 }));
 
-vi.mock('react-leaflet', () => ({
+vi.mock("react-leaflet", () => ({
   MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
   TileLayer: () => <div data-testid="tile-layer" />,
   Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
   Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
   Circle: () => <div data-testid="circle" />,
   useMap: () => ({
-    getCenter: () => ({ lat: 40.7128, lng: -74.0060 }),
+    getCenter: () => ({ lat: 40.7128, lng: -74.006 }),
     getZoom: () => 13,
     on: vi.fn(),
     off: vi.fn(),
-    getContainer: () => ({ style: {} })
+    getContainer: () => ({ style: {} }),
   }),
-  useMapEvents: vi.fn()
+  useMapEvents: vi.fn(),
 }));
 
-vi.mock('@react-three/fiber', () => ({
+vi.mock("@react-three/fiber", () => ({
   Canvas: ({ children }: any) => <div data-testid="three-canvas">{children}</div>,
   useFrame: vi.fn(),
   useLoader: vi.fn(),
-  useThree: () => ({ scene: {} })
+  useThree: () => ({ scene: {} }),
 }));
 
-vi.mock('@react-three/drei', () => ({
+vi.mock("@react-three/drei", () => ({
   OrbitControls: () => <div data-testid="orbit-controls" />,
   Text: () => <div data-testid="three-text" />,
   Html: ({ children }: any) => <div data-testid="three-html">{children}</div>,
   Environment: () => <div data-testid="environment" />,
   Grid: () => <div data-testid="grid" />,
-  Box: () => <div data-testid="box" />
+  Box: () => <div data-testid="box" />,
 }));
 
-vi.mock('html2canvas', () => ({
-  default: vi.fn(() => Promise.resolve({
-    toDataURL: () => 'data:image/png;base64,test'
-  }))
+vi.mock("html2canvas", () => ({
+  default: vi.fn(() =>
+    Promise.resolve({
+      toDataURL: () => "data:image/png;base64,test",
+    }),
+  ),
 }));
 
-vi.mock('mapbox-gl', () => ({
+vi.mock("maplibre-gl", () => ({
   default: {
     Map: vi.fn().mockImplementation(() => ({
       on: vi.fn((event: string, cb: () => void) => {
-        if (event === 'load') setTimeout(() => cb(), 0);
+        if (event === "load") setTimeout(() => cb(), 0);
       }),
       addControl: vi.fn(),
-      getCenter: vi.fn(() => ({ lng: -74.0060, lat: 40.7128 })),
+      getCenter: vi.fn(() => ({ lng: -74.006, lat: 40.7128 })),
       getZoom: vi.fn(() => 13),
       flyTo: vi.fn(),
       easeTo: vi.fn(),
@@ -106,56 +114,56 @@ vi.mock('mapbox-gl', () => ({
       setPopup: vi.fn().mockReturnThis(),
     })),
     Popup: vi.fn().mockImplementation(() => ({ setHTML: vi.fn().mockReturnThis() })),
-  }
+  },
 }));
 
 // Mock services
-vi.mock('../../services/api', () => ({
+vi.mock("../../services/api", () => ({
   weatherService: {
     getCurrentWeather: vi.fn().mockResolvedValue({
       main: { temp: 72, humidity: 65, pressure: 1013 },
-      weather: [{ main: 'Clear', description: 'clear sky', icon: '01d' }],
+      weather: [{ main: "Clear", description: "clear sky", icon: "01d" }],
       wind: { speed: 5, deg: 180 },
       visibility: 10000,
       dt: Date.now() / 1000,
-      name: 'Test Location',
-      coord: { lat: 40.7128, lon: -74.0060 }
+      name: "Test Location",
+      coord: { lat: 40.7128, lon: -74.006 },
     }),
     getRadarData: vi.fn().mockResolvedValue({
-      version: '1.0',
+      version: "1.0",
       generated: Date.now() / 1000,
-      host: 'test',
+      host: "test",
       radar: { past: [], nowcast: [] },
-      satellite: { infrared: [] }
-    })
+      satellite: { infrared: [] },
+    }),
   },
   gpsTrackingService: {
     getDeviceLocations: vi.fn().mockResolvedValue([]),
-    subscribeToRealTimeUpdates: vi.fn()
-  }
+    subscribeToRealTimeUpdates: vi.fn(),
+  },
 }));
 
-vi.mock('../../services/database', () => ({
+vi.mock("../../services/database", () => ({
   databaseService: {
     saveUserPreferences: vi.fn(),
     getUserPreferences: vi.fn(),
     saveWidgetLayout: vi.fn(),
-    getWidgetLayouts: vi.fn().mockResolvedValue([])
-  }
+    getWidgetLayouts: vi.fn().mockResolvedValue([]),
+  },
 }));
 
 // Mock authentication
-vi.mock('../../services/auth', () => ({
+vi.mock("../../services/auth", () => ({
   authService: {
     isAuthenticated: vi.fn().mockReturnValue(true),
     getCurrentUser: vi.fn().mockReturnValue({
-      id: 'test-user',
-      role: 'supervisor',
-      firstName: 'Test',
-      lastName: 'User'
+      id: "test-user",
+      role: "supervisor",
+      firstName: "Test",
+      lastName: "User",
     }),
-    hasPermission: vi.fn().mockReturnValue(true)
-  }
+    hasPermission: vi.fn().mockReturnValue(true),
+  },
 }));
 
 // Test wrapper component
@@ -165,42 +173,40 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
     <AdvancedThemeProvider defaultTheme="military-tactical">
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            {children}
-          </BrowserRouter>
+          <BrowserRouter>{children}</BrowserRouter>
         </QueryClientProvider>
       </ThemeProvider>
     </AdvancedThemeProvider>
   );
 };
 
-describe('OverWatch Map Interface', () => {
+describe("OverWatch Map Interface", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Mock window objects
-    Object.defineProperty(window, 'SpeechRecognition', {
+    Object.defineProperty(window, "SpeechRecognition", {
       writable: true,
       value: vi.fn().mockImplementation(() => ({
         continuous: true,
         interimResults: true,
-        lang: 'en-US',
+        lang: "en-US",
         start: vi.fn(),
         stop: vi.fn(),
         onstart: vi.fn(),
         onresult: vi.fn(),
         onerror: vi.fn(),
-        onend: vi.fn()
-      }))
+        onend: vi.fn(),
+      })),
     });
 
-    Object.defineProperty(window, 'speechSynthesis', {
+    Object.defineProperty(window, "speechSynthesis", {
       writable: true,
       value: {
         speak: vi.fn(),
         cancel: vi.fn(),
-        getVoices: vi.fn().mockReturnValue([])
-      }
+        getVoices: vi.fn().mockReturnValue([]),
+      },
     });
   });
 
@@ -208,186 +214,186 @@ describe('OverWatch Map Interface', () => {
     vi.restoreAllMocks();
   });
 
-  describe('Component Rendering', () => {
-    it('renders the main OverWatch interface', async () => {
+  describe("Component Rendering", () => {
+    it("renders the main OverWatch interface", async () => {
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText(/OverWatch Command Center/i)).toBeInTheDocument();
-      expect(screen.getByTestId('map-container')).toBeInTheDocument();
-      expect(screen.getByText('OPERATIONAL')).toBeInTheDocument();
+      expect(screen.getByTestId("map-container")).toBeInTheDocument();
+      expect(screen.getByText("OPERATIONAL")).toBeInTheDocument();
     });
 
-    it('displays map service selection dropdown', async () => {
+    it("displays map service selection dropdown", async () => {
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      expect(screen.getByText('Map Service:')).toBeInTheDocument();
+      expect(screen.getByText("Map Service:")).toBeInTheDocument();
     });
 
-    it('shows terminology toggle options', async () => {
+    it("shows terminology toggle options", async () => {
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      expect(screen.getByText('Terminology:')).toBeInTheDocument();
+      expect(screen.getByText("Terminology:")).toBeInTheDocument();
     });
   });
 
-  describe('Map Functionality', () => {
-    it('allows switching between map services', async () => {
+  describe("Map Functionality", () => {
+    it("allows switching between map services", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Click on map service selector
-      const mapServiceSelect = screen.getByRole('combobox');
+      const mapServiceSelect = screen.getByRole("combobox");
       await user.click(mapServiceSelect);
 
       // Should show map service options
       await waitFor(() => {
-        expect(screen.getByText('OpenStreetMap')).toBeInTheDocument();
+        expect(screen.getByText("OpenStreetMap")).toBeInTheDocument();
       });
     });
 
-    it('toggles drawing mode correctly', async () => {
+    it("toggles drawing mode correctly", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      const drawButton = screen.getByRole('button', { name: /Draw AOI|Draw Area/i });
+      const drawButton = screen.getByRole("button", { name: /Draw AOI|Draw Area/i });
       await user.click(drawButton);
 
       // Button should become active
-      expect(drawButton).toHaveClass('bg-primary');
+      expect(drawButton).toHaveClass("bg-primary");
     });
 
-    it('toggles measurement mode correctly', async () => {
+    it("toggles measurement mode correctly", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      const measureButton = screen.getByRole('button', { name: /Measure/i });
+      const measureButton = screen.getByRole("button", { name: /Measure/i });
       await user.click(measureButton);
 
-      expect(measureButton).toHaveClass('bg-primary');
+      expect(measureButton).toHaveClass("bg-primary");
     });
   });
 
-  describe('Overlay Controls', () => {
-    it('toggles fleet tracking overlay', async () => {
+  describe("Overlay Controls", () => {
+    it("toggles fleet tracking overlay", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      const fleetButton = screen.getByRole('button', { name: /Assets|Fleet/i });
+      const fleetButton = screen.getByRole("button", { name: /Assets|Fleet/i });
       await user.click(fleetButton);
 
       // Should toggle active state
-      expect(fleetButton).toHaveAttribute('variant', 'default');
+      expect(fleetButton).toHaveAttribute("variant", "default");
     });
 
-    it('toggles weather overlay', async () => {
+    it("toggles weather overlay", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      const weatherButton = screen.getByRole('button', { name: /Weather/i });
+      const weatherButton = screen.getByRole("button", { name: /Weather/i });
       await user.click(weatherButton);
 
-      expect(weatherButton).toHaveAttribute('variant', 'default');
+      expect(weatherButton).toHaveAttribute("variant", "default");
     });
 
-    it('toggles pavement analysis overlay', async () => {
+    it("toggles pavement analysis overlay", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      const pavementButton = screen.getByRole('button', { name: /Surface Intel|Pavement/i });
+      const pavementButton = screen.getByRole("button", { name: /Surface Intel|Pavement/i });
       await user.click(pavementButton);
 
-      expect(pavementButton).toHaveAttribute('variant', 'default');
+      expect(pavementButton).toHaveAttribute("variant", "default");
     });
   });
 
-  describe('Widget System', () => {
-    it('toggles widget dashboard visibility', async () => {
+  describe("Widget System", () => {
+    it("toggles widget dashboard visibility", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      const widgetsButton = screen.getByRole('button', { name: /Widgets/i });
+      const widgetsButton = screen.getByRole("button", { name: /Widgets/i });
       await user.click(widgetsButton);
 
       // Should toggle widget visibility
-      expect(widgetsButton).toHaveAttribute('variant', 'default');
+      expect(widgetsButton).toHaveAttribute("variant", "default");
     });
   });
 
-  describe('Voice Command Interface', () => {
-    it('toggles voice interface visibility', async () => {
+  describe("Voice Command Interface", () => {
+    it("toggles voice interface visibility", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
-      const voiceButton = screen.getByRole('button', { name: /Voice/i });
+      const voiceButton = screen.getByRole("button", { name: /Voice/i });
       await user.click(voiceButton);
 
-      expect(voiceButton).toHaveAttribute('variant', 'default');
+      expect(voiceButton).toHaveAttribute("variant", "default");
     });
 
-    it('processes voice commands correctly', async () => {
+    it("processes voice commands correctly", async () => {
       const mockOnCommand = vi.fn();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Simulate voice command
       const user = userEvent.setup();
-      const voiceButton = screen.getByRole('button', { name: /Voice/i });
+      const voiceButton = screen.getByRole("button", { name: /Voice/i });
       await user.click(voiceButton);
 
       // Voice interface should be visible
@@ -397,34 +403,34 @@ describe('OverWatch Map Interface', () => {
     });
   });
 
-  describe('Terminology Mode', () => {
-    it('switches between military and civilian terminology', async () => {
+  describe("Terminology Mode", () => {
+    it("switches between military and civilian terminology", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Find terminology selector
-      const terminologySelect = screen.getAllByRole('combobox')[0]; // First combobox should be terminology
+      const terminologySelect = screen.getAllByRole("combobox")[0]; // First combobox should be terminology
       await user.click(terminologySelect);
 
       await waitFor(() => {
-        expect(screen.getByText('Military')).toBeInTheDocument();
-        expect(screen.getByText('Civilian')).toBeInTheDocument();
-        expect(screen.getByText('Both')).toBeInTheDocument();
+        expect(screen.getByText("Military")).toBeInTheDocument();
+        expect(screen.getByText("Civilian")).toBeInTheDocument();
+        expect(screen.getByText("Both")).toBeInTheDocument();
       });
     });
 
-    it('updates UI text based on terminology mode', async () => {
+    it("updates UI text based on terminology mode", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Check for military terminology by default
@@ -432,61 +438,62 @@ describe('OverWatch Map Interface', () => {
     });
   });
 
-  describe('Error Handling', () => {
-    it('handles API errors gracefully', async () => {
+  describe("Error Handling", () => {
+    it("handles API errors gracefully", async () => {
       // Mock API failure
-      const mockWeatherService = await import('../../services/api');
-      vi.mocked(mockWeatherService.weatherService.getCurrentWeather)
-        .mockRejectedValueOnce(new Error('API Error'));
+      const mockWeatherService = await import("../../services/api");
+      vi.mocked(mockWeatherService.weatherService.getCurrentWeather).mockRejectedValueOnce(
+        new Error("API Error"),
+      );
 
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Should still render without crashing
-      expect(screen.getByTestId('map-container')).toBeInTheDocument();
+      expect(screen.getByTestId("map-container")).toBeInTheDocument();
     });
 
-    it('handles missing browser APIs gracefully', async () => {
+    it("handles missing browser APIs gracefully", async () => {
       // Remove speech recognition support
-      Object.defineProperty(window, 'SpeechRecognition', {
+      Object.defineProperty(window, "SpeechRecognition", {
         writable: true,
-        value: undefined
+        value: undefined,
       });
 
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Should still render
-      expect(screen.getByTestId('map-container')).toBeInTheDocument();
+      expect(screen.getByTestId("map-container")).toBeInTheDocument();
     });
   });
 
-  describe('Accessibility', () => {
-    it('has proper ARIA labels', () => {
+  describe("Accessibility", () => {
+    it("has proper ARIA labels", () => {
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Check for accessible buttons
-      expect(screen.getByRole('button', { name: /Draw/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Measure/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Draw/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Measure/i })).toBeInTheDocument();
     });
 
-    it('supports keyboard navigation', async () => {
+    it("supports keyboard navigation", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Tab through interactive elements
@@ -499,14 +506,14 @@ describe('OverWatch Map Interface', () => {
     });
   });
 
-  describe('Performance', () => {
-    it('renders within acceptable time', async () => {
+  describe("Performance", () => {
+    it("renders within acceptable time", async () => {
       const startTime = performance.now();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const endTime = performance.now();
@@ -516,11 +523,11 @@ describe('OverWatch Map Interface', () => {
       expect(renderTime).toBeLessThan(1000);
     });
 
-    it('does not cause memory leaks', async () => {
+    it("does not cause memory leaks", async () => {
       const { unmount } = render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Unmount component
@@ -531,35 +538,35 @@ describe('OverWatch Map Interface', () => {
     });
   });
 
-  describe('Integration Tests', () => {
-    it('integrates weather overlay with map controls', async () => {
+  describe("Integration Tests", () => {
+    it("integrates weather overlay with map controls", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Enable weather overlay
-      const weatherButton = screen.getByRole('button', { name: /Weather/i });
+      const weatherButton = screen.getByRole("button", { name: /Weather/i });
       await user.click(weatherButton);
 
       // Weather overlay should be active
-      expect(weatherButton).toHaveAttribute('variant', 'default');
+      expect(weatherButton).toHaveAttribute("variant", "default");
     });
 
-    it('integrates voice commands with map actions', async () => {
+    it("integrates voice commands with map actions", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Open voice interface
-      const voiceButton = screen.getByRole('button', { name: /Voice/i });
+      const voiceButton = screen.getByRole("button", { name: /Voice/i });
       await user.click(voiceButton);
 
       // Voice interface should open
@@ -568,18 +575,22 @@ describe('OverWatch Map Interface', () => {
       });
     });
 
-    it('saves and restores widget layouts', async () => {
+    it("saves and restores widget layouts", async () => {
       const mockSaveLayout = vi.fn();
       const mockGetLayouts = vi.fn().mockResolvedValue([]);
 
-      const databaseService = await import('../../services/database');
-      vi.mocked(databaseService.databaseService.saveWidgetLayout).mockImplementation(mockSaveLayout);
-      vi.mocked(databaseService.databaseService.getWidgetLayouts).mockImplementation(mockGetLayouts);
+      const databaseService = await import("../../services/database");
+      vi.mocked(databaseService.databaseService.saveWidgetLayout).mockImplementation(
+        mockSaveLayout,
+      );
+      vi.mocked(databaseService.databaseService.getWidgetLayouts).mockImplementation(
+        mockGetLayouts,
+      );
 
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Should attempt to load layouts on mount
@@ -589,60 +600,60 @@ describe('OverWatch Map Interface', () => {
     });
   });
 
-  describe('Data Validation', () => {
-    it('validates coordinate inputs', async () => {
+  describe("Data Validation", () => {
+    it("validates coordinate inputs", async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Test with voice command containing coordinates
-      const voiceButton = screen.getByRole('button', { name: /Voice/i });
+      const voiceButton = screen.getByRole("button", { name: /Voice/i });
       await user.click(voiceButton);
 
       // Should handle coordinate validation in voice commands
-      expect(screen.getByTestId('map-container')).toBeInTheDocument();
+      expect(screen.getByTestId("map-container")).toBeInTheDocument();
     });
 
-    it('handles invalid map service selections', async () => {
+    it("handles invalid map service selections", async () => {
       render(
         <TestWrapper>
           <OverWatch />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Should fallback to default service for invalid selections
-      expect(screen.getByTestId('map-container')).toBeInTheDocument();
+      expect(screen.getByTestId("map-container")).toBeInTheDocument();
     });
   });
 });
 
 // Custom test utilities
-export const createMockUser = (role = 'supervisor') => ({
-  id: 'test-user',
+export const createMockUser = (role = "supervisor") => ({
+  id: "test-user",
   email: `test-${role}@example.com`,
-  firstName: 'Test',
-  lastName: 'User',
+  firstName: "Test",
+  lastName: "User",
   role,
-  permissions: ['view_map', 'edit_map'],
-  department: 'Operations',
+  permissions: ["view_map", "edit_map"],
+  department: "Operations",
   isActive: true,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 });
 
 export const mockGeolocation = () => {
   const mockGeolocation = {
     getCurrentPosition: vi.fn(),
-    watchPosition: vi.fn()
+    watchPosition: vi.fn(),
   };
 
-  Object.defineProperty(global.navigator, 'geolocation', {
+  Object.defineProperty(global.navigator, "geolocation", {
     value: mockGeolocation,
-    writable: true
+    writable: true,
   });
 
   return mockGeolocation;
@@ -667,7 +678,7 @@ export const mockWebGL = () => {
     enableVertexAttribArray: vi.fn(),
     vertexAttribPointer: vi.fn(),
     drawArrays: vi.fn(),
-    canvas: { width: 800, height: 600 }
+    canvas: { width: 800, height: 600 },
   };
 
   HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(mockContext);

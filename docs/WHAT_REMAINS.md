@@ -1,6 +1,7 @@
 # What Remains – Project Status and To‑Do
 
 ## Completed (current state)
+
 - Business data centralized
   - `BUSINESS_PROFILE` with materials, mix ratios, coverage, pricing, fuel, vehicles, equipment, trailers, travel defaults
   - Types in `src/types/business.ts`
@@ -30,6 +31,7 @@
   - Docs updated (`ESTIMATING_GUIDE.md`); README section on business config
 
 ## What remains (functional)
+
 - Apply Sales Tax to totals
   - Add per‑job toggle and persist on job; include tax in computed total (not just line item)
 - Patching productivity & materials
@@ -44,22 +46,26 @@
   - Trailer‑specific towing MPG adjustments; route legs (supplier→job→return) vs current two‑leg simplification
 
 ## What remains (UX)
+
 - Address inputs as structured fields (street/city/state/zip) with autocomplete; route map preview
 - Better input validation messages, helper text, and presets (driveway vs lot templates)
 - Loading states and error handling for geocoding; manual override confirmation UI
 
 ## What remains (data & persistence)
+
 - Cloud sync (Supabase or similar)
   - Auth/roles; migrate local overrides/jobs/customers to cloud
   - Audit/version history for pricing changes and business profile edits
 
 ## What remains (exports & invoicing)
+
 - Branded PDF invoices
   - Logo, business name, terms (30‑day), signatures, optional tax line, per‑item notes
   - Email/share workflow (mailto or SMTP/API)
 - Import/export conflict resolution UI; CSV column mapping and validation
 
 ## What remains (engineering)
+
 - Testing
   - Expand unit tests to all estimator branches and edge cases
   - Add E2E smoke tests for Estimator and Settings (Playwright/Cypress)
@@ -75,6 +81,7 @@
   - Security pass for storage and exports; privacy note for geocoding usage; dependency updates
 
 ## To‑Do (actionable)
+
 - Totals & tax
   - [ ] Add per‑job `applySalesTax` flag; compute and include tax in `total`
   - [ ] Persist tax flag in job params; surface in UI and invoice text
@@ -107,6 +114,7 @@
   - [ ] Add content security policy; review data handling; update dependencies
 
 ## Files of interest (implemented)
+
 - `src/types/business.ts` – BusinessProfile and pricing/fuel extensions
 - `src/data/business.ts` – Defaults with materials, pricing, fuel, vehicles, equipment
 - `src/lib/estimator.ts` – Calculators (materials, fuel, striping, patching, transport, totals)
@@ -118,6 +126,7 @@
 - `docs/ESTIMATING_GUIDE.md` – Guide & config pointers
 
 ## Quick next steps
+
 1. Implement sales tax in totals with per‑job toggle (UI + calculator)
 2. Add stencil catalog and structured address UI with map preview
 3. Migrate to Supabase (schema + adapters + migration)
