@@ -222,17 +222,82 @@ const OverWatch: React.FC = () => {
 
   const currentService =
     mapServices.find((service) => service.id === selectedMapService) || mapServices[0];
-  const mapboxStyleForService: Record<string, string> = {
-    osm: "mapbox://styles/mapbox/streets-v12",
-    satellite: "mapbox://styles/mapbox/satellite-streets-v12",
-    terrain: "mapbox://styles/mapbox/outdoors-v12",
-    topo: "mapbox://styles/mapbox/outdoors-v12",
-    "google-satellite": "mapbox://styles/mapbox/satellite-v9",
-    "google-roads": "mapbox://styles/mapbox/streets-v12",
-    "mapbox-streets": "mapbox://styles/mapbox/streets-v12",
-    "mapbox-satellite": "mapbox://styles/mapbox/satellite-v9",
-    "carto-dark": "mapbox://styles/mapbox/dark-v11",
-    "qgis-local": "mapbox://styles/mapbox/streets-v12",
+  const serviceToTiles: Record<string, { tiles: string[]; attribution?: string }> = {
+    osm: {
+      tiles: [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      ],
+      attribution: "© OpenStreetMap contributors",
+    },
+    satellite: {
+      tiles: [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      ],
+      attribution: "© Esri",
+    },
+    terrain: {
+      tiles: [
+        "https://a.tile.stamen.com/terrain/{z}/{x}/{y}.jpg",
+        "https://b.tile.stamen.com/terrain/{z}/{x}/{y}.jpg",
+        "https://c.tile.stamen.com/terrain/{z}/{x}/{y}.jpg",
+      ],
+      attribution: "© Stamen Design",
+    },
+    topo: {
+      tiles: [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+      ],
+      attribution: "© Esri",
+    },
+    "google-satellite": {
+      tiles: [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      ],
+      attribution: "© OpenStreetMap contributors",
+    },
+    "google-roads": {
+      tiles: [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      ],
+      attribution: "© OpenStreetMap contributors",
+    },
+    "mapbox-streets": {
+      tiles: [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      ],
+      attribution: "© OpenStreetMap contributors",
+    },
+    "mapbox-satellite": {
+      tiles: [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      ],
+      attribution: "© Esri",
+    },
+    "carto-dark": {
+      tiles: [
+        "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+      ],
+      attribution: "© CARTO",
+    },
+    "qgis-local": {
+      tiles: [
+        (
+          (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_QGIS_SERVER_URL) ||
+          "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        ),
+      ],
+      attribution: "© Local QGIS Server",
+    },
   };
 
   const getTerminology = (military: string, civilian: string) => {
@@ -627,9 +692,8 @@ const OverWatch: React.FC = () => {
               center={mapCenter}
               zoom={mapZoom}
               className="h-full w-full"
-              styleUrl={
-                mapboxStyleForService[selectedMapService] || mapboxStyleForService["streets-v12"]
-              }
+              tileUrls={serviceToTiles[selectedMapService]?.tiles}
+              attribution={serviceToTiles[selectedMapService]?.attribution}
               onMapClick={(e) => {
                 if (isDrawingMode) {
                   console.log("Drawing mode click:", e.lngLat);

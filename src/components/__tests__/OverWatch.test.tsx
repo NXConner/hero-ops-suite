@@ -15,7 +15,13 @@ const OverWatch: React.FC = () => {
     <div className="flex h-screen bg-slate-950">
       <div className="flex-1 relative">
         <div className="absolute inset-0">
-          <RealMapComponent center={[-74.006, 40.7128]} zoom={13} className="h-full w-full" />
+          <RealMapComponent
+            center={[-74.006, 40.7128]}
+            zoom={13}
+            className="h-full w-full"
+            tileUrls={["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"]}
+            attribution={"© OpenStreetMap contributors"}
+          />
         </div>
       </div>
     </div>
@@ -81,7 +87,7 @@ vi.mock("html2canvas", () => ({
   ),
 }));
 
-vi.mock("mapbox-gl", () => ({
+vi.mock("maplibre-gl", () => ({
   default: {
     Map: vi.fn().mockImplementation(() => ({
       on: vi.fn((event: string, cb: () => void) => {

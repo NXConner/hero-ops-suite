@@ -1160,7 +1160,8 @@ const Estimator = () => {
                 <RealMapComponent
                   center={jobCoords ? [jobCoords.lon, jobCoords.lat] : [-74.006, 40.7128]}
                   zoom={jobCoords ? 10 : 3}
-                  styleUrl={"mapbox://styles/mapbox/streets-v12"}
+                  tileUrls={["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"]}
+                  attribution={"© OpenStreetMap contributors"}
                 >
                   {/* Draw simple line using a GeoJSON source if both coords are present */}
                   {jobCoords &&

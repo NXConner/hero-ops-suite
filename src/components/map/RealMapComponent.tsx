@@ -1,23 +1,42 @@
 import React, { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { area as turfArea } from "@turf/turf";
 
-// Mapbox access token - should be set via environment variable
-const MAPBOX_TOKEN: string =
-  (typeof import.meta !== "undefined" && (import.meta as ImportMeta).env?.VITE_MAPBOX_TOKEN) ??
-  "pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example";
+// Helper: Build a simple raster style for MapLibre from tile URLs
+function buildRasterStyle(tileUrls: string[], attribution?: string): any {
+  return {
+    version: 8,
+    sources: {
+      base: {
+        type: "raster",
+        tiles: tileUrls,
+        tileSize: 256,
+        attribution: attribution || "",
+      },
+    },
+    layers: [
+      {
+        id: "base",
+        type: "raster",
+        source: "base",
+      },
+    ],
+  };
+}
 
 interface RealMapComponentProps {
   center: [number, number];
   zoom: number;
   className?: string;
-  onMapLoad?: (map: mapboxgl.Map) => void;
-  onMapClick?: (e: mapboxgl.MapMouseEvent) => void;
+  onMapLoad?: (map: maplibregl.Map) => void;
+  onMapClick?: (e: any) => void;
   onMapMove?: (center: [number, number], zoom: number) => void;
   children?: React.ReactNode;
-  styleUrl?: string;
+  // Preferred: provide open/free raster tiles
+  tileUrls?: string[];
+  attribution?: string;
 }
 
 const RealMapComponent: React.FC<RealMapComponentProps> = ({
@@ -28,34 +47,33 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   onMapClick,
   onMapMove,
   children,
-  styleUrl = "mapbox://styles/mapbox/satellite-streets-v12",
+  tileUrls = ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+  attribution = "© OpenStreetMap contributors",
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const map = useRef<maplibregl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const drawRef = useRef<any>(null);
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Set mapbox access token
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-
-    // Initialize map
-    map.current = new mapboxgl.Map({
+    // Initialize map using MapLibre with a simple raster tile style
+    const initialStyle = buildRasterStyle(tileUrls, attribution);
+    map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: styleUrl,
+      style: initialStyle,
       center: center,
       zoom: zoom,
       attributionControl: true,
     });
 
     // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+    map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
     // Add geolocate control
     map.current.addControl(
-      new mapboxgl.GeolocateControl({
+      new maplibregl.GeolocateControl({
         positionOptions: {
           enableHighAccuracy: true,
         },
@@ -66,10 +84,10 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     );
 
     // Add scale control
-    map.current.addControl(new mapboxgl.ScaleControl(), "bottom-left");
+    map.current.addControl(new maplibregl.ScaleControl(), "bottom-left");
 
     // Add fullscreen control
-    map.current.addControl(new mapboxgl.FullscreenControl(), "top-right");
+    map.current.addControl(new maplibregl.FullscreenControl(), "top-right");
 
     // Set up event listeners
     map.current.on("load", () => {
@@ -153,12 +171,13 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     }
   }, [center, zoom, mapLoaded]);
 
-  // Update style when styleUrl changes
+  // Update style when tileUrls or attribution changes
   useEffect(() => {
-    if (map.current && mapLoaded && styleUrl) {
-      map.current.setStyle(styleUrl);
+    if (map.current && mapLoaded && tileUrls && tileUrls.length > 0) {
+      const newStyle = buildRasterStyle(tileUrls, attribution);
+      map.current.setStyle(newStyle as any);
     }
-  }, [styleUrl, mapLoaded]);
+  }, [tileUrls, attribution, mapLoaded]);
 
   const addMarker = (
     lng: number,
@@ -172,7 +191,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   ) => {
     if (!map.current) return null;
 
-    const marker = new mapboxgl.Marker({
+    const marker = new maplibregl.Marker({
       color: options?.color || "#3FB1CE",
       draggable: options?.draggable || false,
     })
@@ -180,7 +199,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       .addTo(map.current);
 
     if (options?.popup) {
-      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(options.popup);
+      const popup = new maplibregl.Popup({ offset: 25 }).setHTML(options.popup);
       marker.setPopup(popup);
     }
 
@@ -194,7 +213,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     if (!map.current || !mapLoaded) return;
 
     if (map.current.getSource(sourceId)) {
-      (map.current.getSource(sourceId) as mapboxgl.GeoJSONSource).setData(data);
+      (map.current.getSource(sourceId) as any).setData(data);
     } else {
       map.current.addSource(sourceId, {
         type: "geojson",
@@ -203,7 +222,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     }
   };
 
-  const addLayer = (layer: mapboxgl.LayerSpecification) => {
+  const addLayer = (layer: any) => {
     if (!map.current || !mapLoaded) return;
 
     if (!map.current.getLayer(layer.id)) {
