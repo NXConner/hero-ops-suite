@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,11 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Network, 
-  Share, 
-  CheckCircle, 
-  Clock, 
+import {
+  Network,
+  Share,
+  CheckCircle,
+  Clock,
   AlertCircle,
   Zap,
   Database,
@@ -24,9 +24,9 @@ import {
   Cloud,
   ArrowRight,
   Workflow,
-  RefreshCw
+  RefreshCw,
 } from "lucide-react";
-import { DefectData, ScanData } from '@/pages/PavementScanPro';
+import { DefectData, ScanData } from "@/pages/PavementScanPro";
 
 interface SystemIntegrationProps {
   scanData: ScanData | null;
@@ -37,7 +37,7 @@ interface IntegrationModule {
   id: string;
   name: string;
   description: string;
-  status: 'connected' | 'syncing' | 'error' | 'disabled';
+  status: "connected" | "syncing" | "error" | "disabled";
   icon: any;
   dataTypes: string[];
   lastSync?: Date;
@@ -48,82 +48,83 @@ interface DataDistribution {
   module: string;
   dataType: string;
   records: number;
-  status: 'pending' | 'syncing' | 'completed' | 'failed';
+  status: "pending" | "syncing" | "completed" | "failed";
   timestamp: Date;
 }
 
 const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects }) => {
   const [integrationModules, setIntegrationModules] = useState<IntegrationModule[]>([
     {
-      id: 'overwatch',
-      name: 'OverWatch Map',
-      description: 'Real-time visualization of defect locations with color-coded severity markers',
-      status: 'connected',
+      id: "overwatch",
+      name: "OverWatch Map",
+      description: "Real-time visualization of defect locations with color-coded severity markers",
+      status: "connected",
       icon: Map,
-      dataTypes: ['Defect Locations', 'Severity Levels', 'GPS Coordinates'],
+      dataTypes: ["Defect Locations", "Severity Levels", "GPS Coordinates"],
       lastSync: new Date(Date.now() - 30000),
-      enabled: true
+      enabled: true,
     },
     {
-      id: 'project-management',
-      name: 'Project Management',
-      description: 'Automatic creation of repair tasks and work orders based on detected defects',
-      status: 'connected',
+      id: "project-management",
+      name: "Project Management",
+      description: "Automatic creation of repair tasks and work orders based on detected defects",
+      status: "connected",
       icon: Calendar,
-      dataTypes: ['Work Orders', 'Task Priorities', 'Resource Requirements'],
+      dataTypes: ["Work Orders", "Task Priorities", "Resource Requirements"],
       lastSync: new Date(Date.now() - 60000),
-      enabled: true
+      enabled: true,
     },
     {
-      id: 'accounting',
-      name: 'Accounting Module',
-      description: 'Integration with cost estimation for repair work and budget planning',
-      status: 'syncing',
+      id: "accounting",
+      name: "Accounting Module",
+      description: "Integration with cost estimation for repair work and budget planning",
+      status: "syncing",
       icon: DollarSign,
-      dataTypes: ['Cost Estimates', 'Material Quantities', 'Labor Hours'],
+      dataTypes: ["Cost Estimates", "Material Quantities", "Labor Hours"],
       lastSync: new Date(Date.now() - 120000),
-      enabled: true
+      enabled: true,
     },
     {
-      id: 'ai-expert',
-      name: 'AI Expert System',
-      description: 'Enrichment of knowledge base with real-world defect data for improved recommendations',
-      status: 'connected',
+      id: "ai-expert",
+      name: "AI Expert System",
+      description:
+        "Enrichment of knowledge base with real-world defect data for improved recommendations",
+      status: "connected",
       icon: Brain,
-      dataTypes: ['Defect Patterns', 'ML Training Data', 'Prediction Models'],
+      dataTypes: ["Defect Patterns", "ML Training Data", "Prediction Models"],
       lastSync: new Date(Date.now() - 45000),
-      enabled: true
+      enabled: true,
     },
     {
-      id: 'predictive-maintenance',
-      name: 'Predictive Maintenance',
-      description: 'Input for analyzing defect progression and predicting future maintenance needs',
-      status: 'connected',
+      id: "predictive-maintenance",
+      name: "Predictive Maintenance",
+      description: "Input for analyzing defect progression and predicting future maintenance needs",
+      status: "connected",
       icon: Clock,
-      dataTypes: ['Progression Rates', 'Maintenance Schedules', 'Condition Forecasts'],
+      dataTypes: ["Progression Rates", "Maintenance Schedules", "Condition Forecasts"],
       lastSync: new Date(Date.now() - 90000),
-      enabled: true
+      enabled: true,
     },
     {
-      id: 'scheduling',
-      name: 'AI-Driven Scheduling',
-      description: 'Input for dynamic scheduling of repair crews and resource allocation',
-      status: 'connected',
+      id: "scheduling",
+      name: "AI-Driven Scheduling",
+      description: "Input for dynamic scheduling of repair crews and resource allocation",
+      status: "connected",
       icon: Truck,
-      dataTypes: ['Crew Assignments', 'Equipment Needs', 'Timeline Optimization'],
+      dataTypes: ["Crew Assignments", "Equipment Needs", "Timeline Optimization"],
       lastSync: new Date(Date.now() - 75000),
-      enabled: true
+      enabled: true,
     },
     {
-      id: 'asset-sync',
-      name: 'AssetSync Hub',
-      description: 'Automatic upload of 3D models and reports for digital asset management',
-      status: 'syncing',
+      id: "asset-sync",
+      name: "AssetSync Hub",
+      description: "Automatic upload of 3D models and reports for digital asset management",
+      status: "syncing",
       icon: Cloud,
-      dataTypes: ['3D Models', 'Reports', 'Metadata', 'Version Control'],
+      dataTypes: ["3D Models", "Reports", "Metadata", "Version Control"],
       lastSync: new Date(Date.now() - 180000),
-      enabled: true
-    }
+      enabled: true,
+    },
   ]);
 
   const [dataDistributions, setDataDistributions] = useState<DataDistribution[]>([]);
@@ -139,77 +140,74 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
 
   const simulateDataDistribution = () => {
     const distributions: DataDistribution[] = [];
-    
-    integrationModules.forEach(module => {
+
+    integrationModules.forEach((module) => {
       if (module.enabled) {
-        module.dataTypes.forEach(dataType => {
+        module.dataTypes.forEach((dataType) => {
           distributions.push({
             module: module.name,
             dataType,
             records: Math.floor(Math.random() * defects.length) + 1,
-            status: 'pending',
-            timestamp: new Date()
+            status: "pending",
+            timestamp: new Date(),
           });
         });
       }
     });
 
     setDataDistributions(distributions);
-    
+
     // Simulate progressive sync
     distributions.forEach((dist, index) => {
       setTimeout(() => {
-        setDataDistributions(prev => 
-          prev.map(d => 
-            d.module === dist.module && d.dataType === dist.dataType 
-              ? { ...d, status: 'syncing' } 
-              : d
-          )
+        setDataDistributions((prev) =>
+          prev.map((d) =>
+            d.module === dist.module && d.dataType === dist.dataType
+              ? { ...d, status: "syncing" }
+              : d,
+          ),
         );
-        
-        setTimeout(() => {
-          setDataDistributions(prev => 
-            prev.map(d => 
-              d.module === dist.module && d.dataType === dist.dataType 
-                ? { ...d, status: 'completed' } 
-                : d
-            )
-          );
-        }, 1000 + Math.random() * 2000);
+
+        setTimeout(
+          () => {
+            setDataDistributions((prev) =>
+              prev.map((d) =>
+                d.module === dist.module && d.dataType === dist.dataType
+                  ? { ...d, status: "completed" }
+                  : d,
+              ),
+            );
+          },
+          1000 + Math.random() * 2000,
+        );
       }, index * 500);
     });
   };
 
   const handleModuleToggle = (moduleId: string, enabled: boolean) => {
-    setIntegrationModules(prev => 
-      prev.map(module => 
-        module.id === moduleId 
-          ? { ...module, enabled, status: enabled ? 'connected' : 'disabled' }
-          : module
-      )
+    setIntegrationModules((prev) =>
+      prev.map((module) =>
+        module.id === moduleId
+          ? { ...module, enabled, status: enabled ? "connected" : "disabled" }
+          : module,
+      ),
     );
   };
 
   const handleManualSync = () => {
     setSyncInProgress(true);
-    
+
     // Simulate sync process
     setTimeout(() => {
-      setIntegrationModules(prev => 
-        prev.map(module => 
-          module.enabled 
-            ? { ...module, status: 'syncing', lastSync: new Date() }
-            : module
-        )
+      setIntegrationModules((prev) =>
+        prev.map((module) =>
+          module.enabled ? { ...module, status: "syncing", lastSync: new Date() } : module,
+        ),
       );
-      
+
       setTimeout(() => {
-        setIntegrationModules(prev => 
-          prev.map(module => 
-            module.enabled 
-              ? { ...module, status: 'connected' }
-              : module
-          )
+        setIntegrationModules((prev) =>
+          prev.map((module) => (module.enabled ? { ...module, status: "connected" } : module)),
         );
         setSyncInProgress(false);
         if (scanData && defects.length > 0) {
@@ -221,31 +219,49 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'connected': return 'text-green-600 bg-green-100';
-      case 'syncing': return 'text-blue-600 bg-blue-100';
-      case 'error': return 'text-red-600 bg-red-100';
-      case 'disabled': return 'text-gray-600 bg-gray-100';
-      case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'failed': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "connected":
+        return "text-green-600 bg-green-100";
+      case "syncing":
+        return "text-blue-600 bg-blue-100";
+      case "error":
+        return "text-red-600 bg-red-100";
+      case "disabled":
+        return "text-gray-600 bg-gray-100";
+      case "pending":
+        return "text-yellow-600 bg-yellow-100";
+      case "completed":
+        return "text-green-600 bg-green-100";
+      case "failed":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'connected': return CheckCircle;
-      case 'syncing': return RefreshCw;
-      case 'error': return AlertCircle;
-      case 'disabled': return AlertCircle;
-      case 'pending': return Clock;
-      case 'completed': return CheckCircle;
-      case 'failed': return AlertCircle;
-      default: return Clock;
+      case "connected":
+        return CheckCircle;
+      case "syncing":
+        return RefreshCw;
+      case "error":
+        return AlertCircle;
+      case "disabled":
+        return AlertCircle;
+      case "pending":
+        return Clock;
+      case "completed":
+        return CheckCircle;
+      case "failed":
+        return AlertCircle;
+      default:
+        return Clock;
     }
   };
 
-  const connectedModules = integrationModules.filter(m => m.enabled && m.status === 'connected').length;
+  const connectedModules = integrationModules.filter(
+    (m) => m.enabled && m.status === "connected",
+  ).length;
   const totalModules = integrationModules.length;
 
   return (
@@ -266,13 +282,11 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
             <div className="flex items-center gap-4">
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Connected Modules</p>
-                <p className="text-2xl font-bold text-green-600">{connectedModules}/{totalModules}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {connectedModules}/{totalModules}
+                </p>
               </div>
-              <Button 
-                onClick={handleManualSync}
-                disabled={syncInProgress}
-                variant="outline"
-              >
+              <Button onClick={handleManualSync} disabled={syncInProgress} variant="outline">
                 {syncInProgress ? (
                   <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
                 ) : (
@@ -294,24 +308,20 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3 p-3 border rounded-lg">
               <Zap className="h-8 w-8 text-green-500" />
               <div>
                 <p className="font-medium">Auto Sync</p>
                 <div className="flex items-center gap-2">
-                  <Switch 
-                    checked={autoSync}
-                    onCheckedChange={setAutoSync}
-                    size="sm"
-                  />
+                  <Switch checked={autoSync} onCheckedChange={setAutoSync} size="sm" />
                   <span className="text-sm text-muted-foreground">
-                    {autoSync ? 'Enabled' : 'Disabled'}
+                    {autoSync ? "Enabled" : "Disabled"}
                   </span>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3 p-3 border rounded-lg">
               <Workflow className="h-8 w-8 text-purple-500" />
               <div>
@@ -336,9 +346,9 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
             {integrationModules.map((module) => {
               const IconComponent = module.icon;
               const StatusIcon = getStatusIcon(module.status);
-              
+
               return (
-                <Card key={module.id} className={module.enabled ? '' : 'opacity-60'}>
+                <Card key={module.id} className={module.enabled ? "" : "opacity-60"}>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -350,7 +360,7 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
                           </CardDescription>
                         </div>
                       </div>
-                      <Switch 
+                      <Switch
                         checked={module.enabled}
                         onCheckedChange={(enabled) => handleModuleToggle(module.id, enabled)}
                       />
@@ -369,7 +379,7 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
                           </span>
                         )}
                       </div>
-                      
+
                       <div>
                         <p className="text-sm font-medium mb-1">Data Types:</p>
                         <div className="flex flex-wrap gap-1">
@@ -407,24 +417,27 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
                 <div className="space-y-3">
                   {dataDistributions.map((dist, index) => {
                     const StatusIcon = getStatusIcon(dist.status);
-                    
+
                     return (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="flex items-center gap-3">
-                          <StatusIcon className={`h-4 w-4 ${dist.status === 'syncing' ? 'animate-spin' : ''}`} />
+                          <StatusIcon
+                            className={`h-4 w-4 ${dist.status === "syncing" ? "animate-spin" : ""}`}
+                          />
                           <div>
                             <p className="font-medium text-sm">{dist.module}</p>
                             <p className="text-xs text-muted-foreground">{dist.dataType}</p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-3">
                           <Badge variant="outline" className="text-xs">
                             {dist.records} records
                           </Badge>
-                          <Badge className={getStatusColor(dist.status)}>
-                            {dist.status}
-                          </Badge>
+                          <Badge className={getStatusColor(dist.status)}>{dist.status}</Badge>
                           <ArrowRight className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </div>
@@ -447,10 +460,13 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
             <CardContent>
               <div className="space-y-3">
                 {integrationModules
-                  .filter(m => m.enabled && m.lastSync)
+                  .filter((m) => m.enabled && m.lastSync)
                   .sort((a, b) => (b.lastSync?.getTime() || 0) - (a.lastSync?.getTime() || 0))
                   .map((module, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="flex items-center gap-3">
                         <module.icon className="h-4 w-4 text-primary" />
                         <div>
@@ -460,11 +476,9 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="text-right">
-                        <Badge className={getStatusColor(module.status)}>
-                          {module.status}
-                        </Badge>
+                        <Badge className={getStatusColor(module.status)}>{module.status}</Badge>
                         <p className="text-xs text-muted-foreground mt-1">
                           {module.lastSync?.toLocaleString()}
                         </p>
@@ -482,16 +496,18 @@ const SystemIntegration: React.FC<SystemIntegrationProps> = ({ scanData, defects
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Auto-sync is disabled. Manual synchronization required to distribute data across modules.
+            Auto-sync is disabled. Manual synchronization required to distribute data across
+            modules.
           </AlertDescription>
         </Alert>
       )}
 
-      {integrationModules.some(m => m.status === 'error') && (
+      {integrationModules.some((m) => m.status === "error") && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Some integration modules have connection errors. Check module status and retry synchronization.
+            Some integration modules have connection errors. Check module status and retry
+            synchronization.
           </AlertDescription>
         </Alert>
       )}

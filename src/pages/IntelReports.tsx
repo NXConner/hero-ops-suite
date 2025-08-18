@@ -6,16 +6,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { 
-  FileText, 
-  Search, 
-  Filter, 
-  Download, 
-  Upload, 
-  Eye, 
+import {
+  FileText,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  Eye,
   AlertTriangle,
   TrendingUp,
   MapPin,
@@ -31,11 +37,18 @@ import {
   Plus,
   Star,
   Archive,
-  Flag
+  Flag,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import Sidebar from "@/components/Sidebar";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -45,7 +58,7 @@ const IntelReports = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReport, setSelectedReport] = useState(null);
   const [searchParams] = useSearchParams();
-  const initialTab = searchParams.get('tab') || 'reports';
+  const initialTab = searchParams.get("tab") || "reports";
 
   const reports = [
     {
@@ -57,10 +70,11 @@ const IntelReports = () => {
       status: "Active",
       date: "2024-01-19",
       author: "Intelligence Officer Martinez",
-      summary: "Elevated activity detected in Sector 12 with potential hostile reconnaissance operations.",
+      summary:
+        "Elevated activity detected in Sector 12 with potential hostile reconnaissance operations.",
       confidence: 85,
       sources: 3,
-      keywords: ["Sector 12", "Reconnaissance", "Hostile Activity"]
+      keywords: ["Sector 12", "Reconnaissance", "Hostile Activity"],
     },
     {
       id: "RPT-2024-002",
@@ -74,7 +88,7 @@ const IntelReports = () => {
       summary: "Intercepted communications suggest coordinated movement in northern regions.",
       confidence: 92,
       sources: 5,
-      keywords: ["SIGINT", "Communications", "Northern Sector"]
+      keywords: ["SIGINT", "Communications", "Northern Sector"],
     },
     {
       id: "RPT-2024-003",
@@ -88,7 +102,7 @@ const IntelReports = () => {
       summary: "Recent satellite imagery shows new infrastructure development in target areas.",
       confidence: 78,
       sources: 2,
-      keywords: ["Satellite", "Infrastructure", "Development"]
+      keywords: ["Satellite", "Infrastructure", "Development"],
     },
     {
       id: "RPT-2024-004",
@@ -102,47 +116,48 @@ const IntelReports = () => {
       summary: "Local contacts report unusual supply convoy movements near checkpoint Delta.",
       confidence: 71,
       sources: 4,
-      keywords: ["Field Report", "Supply Convoy", "Checkpoint Delta"]
-    }
+      keywords: ["Field Report", "Supply Convoy", "Checkpoint Delta"],
+    },
   ];
 
   const threatLevels = [
     { region: "Sector 12", level: "High", change: "+15%", incidents: 8 },
     { region: "Northern Zone", level: "Elevated", change: "+8%", incidents: 5 },
     { region: "Eastern Border", level: "Medium", change: "-2%", incidents: 3 },
-    { region: "Southern Perimeter", level: "Low", change: "-12%", incidents: 1 }
+    { region: "Southern Perimeter", level: "Low", change: "-12%", incidents: 1 },
   ];
 
   const intelSources = [
     { type: "HUMINT", active: 12, reliability: 92, reports: 45 },
     { type: "SIGINT", active: 8, reliability: 88, reports: 67 },
     { type: "GEOINT", active: 6, reliability: 95, reports: 23 },
-    { type: "OSINT", active: 15, reliability: 76, reports: 89 }
+    { type: "OSINT", active: 15, reliability: 76, reports: 89 },
   ];
 
   const { data: competitorsData } = useQuery({
-    queryKey: ['intel-competitors'],
-    queryFn: async () => (await axios.get('/intel/competitors')).data,
+    queryKey: ["intel-competitors"],
+    queryFn: async () => (await axios.get("/intel/competitors")).data,
   });
   const { data: trendsData } = useQuery({
-    queryKey: ['intel-trends'],
-    queryFn: async () => (await axios.get('/intel/trends')).data,
+    queryKey: ["intel-trends"],
+    queryFn: async () => (await axios.get("/intel/trends")).data,
   });
 
-  const filteredReports = reports.filter(report => {
-    const matchesSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.keywords.some(keyword => keyword.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+  const filteredReports = reports.filter((report) => {
+    const matchesSearch =
+      report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.keywords.some((keyword) => keyword.toLowerCase().includes(searchTerm.toLowerCase()));
+
     const matchesCategory = selectedCategory === "all" || report.category === selectedCategory;
-    
+
     return matchesSearch && matchesCategory;
   });
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
-      
+
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <div className="border-b border-border bg-card/50 backdrop-blur-sm">
@@ -198,7 +213,9 @@ const IntelReports = () => {
               <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
                 <CardHeader>
                   <CardTitle>Intelligence Database</CardTitle>
-                  <CardDescription>Search and filter classified intelligence reports</CardDescription>
+                  <CardDescription>
+                    Search and filter classified intelligence reports
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -234,28 +251,57 @@ const IntelReports = () => {
               {/* Reports Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {filteredReports.map((report) => (
-                  <Card key={report.id} className="bg-card/50 backdrop-blur-sm border border-border/50 hover:shadow-glow transition-all duration-300">
+                  <Card
+                    key={report.id}
+                    className="bg-card/50 backdrop-blur-sm border border-border/50 hover:shadow-glow transition-all duration-300"
+                  >
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Badge variant={report.classification === "Top Secret" ? "destructive" : report.classification === "Secret" ? "default" : "secondary"}>
+                          <Badge
+                            variant={
+                              report.classification === "Top Secret"
+                                ? "destructive"
+                                : report.classification === "Secret"
+                                  ? "default"
+                                  : "secondary"
+                            }
+                          >
                             {report.classification}
                           </Badge>
-                          <Badge variant={report.priority === "Critical" ? "destructive" : report.priority === "High" ? "default" : "secondary"}>
+                          <Badge
+                            variant={
+                              report.priority === "Critical"
+                                ? "destructive"
+                                : report.priority === "High"
+                                  ? "default"
+                                  : "secondary"
+                            }
+                          >
                             {report.priority}
                           </Badge>
                         </div>
-                        <Badge variant={report.status === "Active" ? "default" : report.status === "Analyzing" ? "secondary" : "outline"}>
+                        <Badge
+                          variant={
+                            report.status === "Active"
+                              ? "default"
+                              : report.status === "Analyzing"
+                                ? "secondary"
+                                : "outline"
+                          }
+                        >
                           {report.status}
                         </Badge>
                       </div>
                       <CardTitle className="text-lg">{report.title}</CardTitle>
-                      <CardDescription>{report.category} • {report.id}</CardDescription>
+                      <CardDescription>
+                        {report.category} • {report.id}
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
                         <p className="text-sm text-muted-foreground">{report.summary}</p>
-                        
+
                         <div className="flex items-center justify-between text-sm">
                           <span>Confidence Level:</span>
                           <div className="flex items-center gap-2">
@@ -326,20 +372,33 @@ const IntelReports = () => {
                   <CardContent>
                     <div className="space-y-4">
                       {threatLevels.map((threat, index) => (
-                        <div key={index} className="p-4 rounded-lg bg-secondary/10 border border-border/30">
+                        <div
+                          key={index}
+                          className="p-4 rounded-lg bg-secondary/10 border border-border/30"
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <div className="font-medium">{threat.region}</div>
-                            <Badge variant={
-                              threat.level === "High" ? "destructive" :
-                              threat.level === "Elevated" ? "default" :
-                              threat.level === "Medium" ? "secondary" : "outline"
-                            }>
+                            <Badge
+                              variant={
+                                threat.level === "High"
+                                  ? "destructive"
+                                  : threat.level === "Elevated"
+                                    ? "default"
+                                    : threat.level === "Medium"
+                                      ? "secondary"
+                                      : "outline"
+                              }
+                            >
                               {threat.level}
                             </Badge>
                           </div>
                           <div className="flex items-center justify-between text-sm text-muted-foreground">
                             <span>Incidents: {threat.incidents}</span>
-                            <span className={threat.change.startsWith('+') ? 'text-red-500' : 'text-green-500'}>
+                            <span
+                              className={
+                                threat.change.startsWith("+") ? "text-red-500" : "text-green-500"
+                              }
+                            >
                               {threat.change} from last week
                             </span>
                           </div>
@@ -365,15 +424,20 @@ const IntelReports = () => {
                           <AlertTriangle className="h-4 w-4 text-red-500" />
                           <span className="font-semibold text-red-500">CRITICAL ALERT</span>
                         </div>
-                        <p className="text-sm">Coordinated activity patterns suggest potential large-scale operation planning.</p>
+                        <p className="text-sm">
+                          Coordinated activity patterns suggest potential large-scale operation
+                          planning.
+                        </p>
                       </div>
-                      
+
                       <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                         <div className="flex items-center gap-2 mb-2">
                           <Flag className="h-4 w-4 text-yellow-500" />
                           <span className="font-semibold text-yellow-500">TREND ANALYSIS</span>
                         </div>
-                        <p className="text-sm">Increased communication intercepts in northern sectors over past 72 hours.</p>
+                        <p className="text-sm">
+                          Increased communication intercepts in northern sectors over past 72 hours.
+                        </p>
                       </div>
 
                       <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
@@ -381,7 +445,9 @@ const IntelReports = () => {
                           <Target className="h-4 w-4 text-blue-500" />
                           <span className="font-semibold text-blue-500">INTELLIGENCE UPDATE</span>
                         </div>
-                        <p className="text-sm">New satellite imagery confirms infrastructure changes in Sector 12.</p>
+                        <p className="text-sm">
+                          New satellite imagery confirms infrastructure changes in Sector 12.
+                        </p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/30">
@@ -407,10 +473,13 @@ const IntelReports = () => {
                     <CardHeader>
                       <CardTitle className="text-lg">{source.type}</CardTitle>
                       <CardDescription>
-                        {source.type === "HUMINT" ? "Human Intelligence" :
-                         source.type === "SIGINT" ? "Signals Intelligence" :
-                         source.type === "GEOINT" ? "Geospatial Intelligence" :
-                         "Open Source Intelligence"}
+                        {source.type === "HUMINT"
+                          ? "Human Intelligence"
+                          : source.type === "SIGINT"
+                            ? "Signals Intelligence"
+                            : source.type === "GEOINT"
+                              ? "Geospatial Intelligence"
+                              : "Open Source Intelligence"}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -437,27 +506,64 @@ const IntelReports = () => {
               <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
                 <CardHeader>
                   <CardTitle>Source Management</CardTitle>
-                  <CardDescription>Active intelligence collection assets and their status</CardDescription>
+                  <CardDescription>
+                    Active intelligence collection assets and their status
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {[
-                      { id: "SRC-001", type: "HUMINT", location: "Sector 12", status: "Active", lastContact: "2 hours ago", reliability: 95 },
-                      { id: "SRC-007", type: "SIGINT", location: "Northern Zone", status: "Monitoring", lastContact: "15 min ago", reliability: 88 },
-                      { id: "SRC-012", type: "GEOINT", location: "Satellite Coverage", status: "Active", lastContact: "30 min ago", reliability: 98 },
-                      { id: "SRC-023", type: "OSINT", location: "Multiple", status: "Collecting", lastContact: "5 min ago", reliability: 76 }
+                      {
+                        id: "SRC-001",
+                        type: "HUMINT",
+                        location: "Sector 12",
+                        status: "Active",
+                        lastContact: "2 hours ago",
+                        reliability: 95,
+                      },
+                      {
+                        id: "SRC-007",
+                        type: "SIGINT",
+                        location: "Northern Zone",
+                        status: "Monitoring",
+                        lastContact: "15 min ago",
+                        reliability: 88,
+                      },
+                      {
+                        id: "SRC-012",
+                        type: "GEOINT",
+                        location: "Satellite Coverage",
+                        status: "Active",
+                        lastContact: "30 min ago",
+                        reliability: 98,
+                      },
+                      {
+                        id: "SRC-023",
+                        type: "OSINT",
+                        location: "Multiple",
+                        status: "Collecting",
+                        lastContact: "5 min ago",
+                        reliability: 76,
+                      },
                     ].map((source, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary/10 border border-border/30">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-4 rounded-lg bg-secondary/10 border border-border/30"
+                      >
                         <div className="flex items-center gap-4">
                           <div>
                             <div className="font-medium">{source.id}</div>
-                            <div className="text-sm text-muted-foreground">{source.type} • {source.location}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {source.type} • {source.location}
+                            </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="text-right">
                             <div className="text-sm">Last Contact: {source.lastContact}</div>
-                            <div className="text-sm text-muted-foreground">Reliability: {source.reliability}%</div>
+                            <div className="text-sm text-muted-foreground">
+                              Reliability: {source.reliability}%
+                            </div>
                           </div>
                           <Badge variant={source.status === "Active" ? "default" : "secondary"}>
                             {source.status}
@@ -484,19 +590,44 @@ const IntelReports = () => {
                   <CardContent>
                     <div className="space-y-4">
                       {[
-                        { target: "Checkpoint Delta", type: "Visual", status: "Active", duration: "4h 23m", operator: "Agent Smith" },
-                        { target: "Supply Route 7", type: "Drone", status: "Active", duration: "2h 15m", operator: "Operator Jones" },
-                        { target: "Communications Hub", type: "Electronic", status: "Monitoring", duration: "12h 45m", operator: "Tech Specialist Davis" }
+                        {
+                          target: "Checkpoint Delta",
+                          type: "Visual",
+                          status: "Active",
+                          duration: "4h 23m",
+                          operator: "Agent Smith",
+                        },
+                        {
+                          target: "Supply Route 7",
+                          type: "Drone",
+                          status: "Active",
+                          duration: "2h 15m",
+                          operator: "Operator Jones",
+                        },
+                        {
+                          target: "Communications Hub",
+                          type: "Electronic",
+                          status: "Monitoring",
+                          duration: "12h 45m",
+                          operator: "Tech Specialist Davis",
+                        },
                       ].map((surveillance, index) => (
-                        <div key={index} className="p-3 rounded-lg bg-secondary/10 border border-border/30">
+                        <div
+                          key={index}
+                          className="p-3 rounded-lg bg-secondary/10 border border-border/30"
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <div className="font-medium">{surveillance.target}</div>
-                            <Badge variant={surveillance.status === "Active" ? "default" : "secondary"}>
+                            <Badge
+                              variant={surveillance.status === "Active" ? "default" : "secondary"}
+                            >
                               {surveillance.status}
                             </Badge>
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            <div>{surveillance.type} surveillance • {surveillance.duration}</div>
+                            <div>
+                              {surveillance.type} surveillance • {surveillance.duration}
+                            </div>
                             <div>Operator: {surveillance.operator}</div>
                           </div>
                         </div>
@@ -517,20 +648,45 @@ const IntelReports = () => {
                   <CardContent>
                     <div className="space-y-4">
                       {[
-                        { satellite: "RECON-7", coverage: "Northern Sectors", nextPass: "14:30 UTC", resolution: "0.5m", status: "Operational" },
-                        { satellite: "INTEL-3", coverage: "Eastern Border", nextPass: "16:45 UTC", resolution: "0.3m", status: "Operational" },
-                        { satellite: "SURVEY-12", coverage: "Global", nextPass: "22:15 UTC", resolution: "1.0m", status: "Maintenance" }
+                        {
+                          satellite: "RECON-7",
+                          coverage: "Northern Sectors",
+                          nextPass: "14:30 UTC",
+                          resolution: "0.5m",
+                          status: "Operational",
+                        },
+                        {
+                          satellite: "INTEL-3",
+                          coverage: "Eastern Border",
+                          nextPass: "16:45 UTC",
+                          resolution: "0.3m",
+                          status: "Operational",
+                        },
+                        {
+                          satellite: "SURVEY-12",
+                          coverage: "Global",
+                          nextPass: "22:15 UTC",
+                          resolution: "1.0m",
+                          status: "Maintenance",
+                        },
                       ].map((satellite, index) => (
-                        <div key={index} className="p-3 rounded-lg bg-secondary/10 border border-border/30">
+                        <div
+                          key={index}
+                          className="p-3 rounded-lg bg-secondary/10 border border-border/30"
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <div className="font-medium">{satellite.satellite}</div>
-                            <Badge variant={satellite.status === "Operational" ? "default" : "secondary"}>
+                            <Badge
+                              variant={satellite.status === "Operational" ? "default" : "secondary"}
+                            >
                               {satellite.status}
                             </Badge>
                           </div>
                           <div className="text-sm text-muted-foreground">
                             <div>Coverage: {satellite.coverage}</div>
-                            <div>Next Pass: {satellite.nextPass} • Resolution: {satellite.resolution}</div>
+                            <div>
+                              Next Pass: {satellite.nextPass} • Resolution: {satellite.resolution}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -544,30 +700,66 @@ const IntelReports = () => {
               <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
                 <CardHeader>
                   <CardTitle>Competitors & Trends</CardTitle>
-                  <CardDescription>OSINT pull of competitor sites and asphalt industry news</CardDescription>
+                  <CardDescription>
+                    OSINT pull of competitor sites and asphalt industry news
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex gap-3">
-                    <Button variant="outline" onClick={async () => { try { await axios.post('/intel/scrape', { kind: 'competitors' }); } catch (_e) { /* ignore */ } }}>Refresh Competitors</Button>
-                    <Button variant="outline" onClick={async () => { try { await axios.post('/intel/scrape', { kind: 'trends' }); } catch (_e) { /* ignore */ } }}>Refresh Trends</Button>
+                    <Button
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          await axios.post("/intel/scrape", { kind: "competitors" });
+                        } catch (_e) {
+                          /* ignore */
+                        }
+                      }}
+                    >
+                      Refresh Competitors
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          await axios.post("/intel/scrape", { kind: "trends" });
+                        } catch (_e) {
+                          /* ignore */
+                        }
+                      }}
+                    >
+                      Refresh Trends
+                    </Button>
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
                       <h3 className="font-semibold mb-2">Competitors</h3>
-                      <div className="text-sm text-muted-foreground mb-2">Scraped: {competitorsData?.scraped_at || '—'}</div>
+                      <div className="text-sm text-muted-foreground mb-2">
+                        Scraped: {competitorsData?.scraped_at || "—"}
+                      </div>
                       <div className="space-y-3 max-h-[420px] overflow-auto pr-2">
                         {(competitorsData?.competitors || []).map((c: any) => (
                           <div key={c.domain} className="border border-border/40 rounded-lg p-3">
                             <div className="flex items-center justify-between">
                               <div>
                                 <div className="font-medium">{c.company || c.domain}</div>
-                                <div className="text-xs text-muted-foreground">{c.region || ''} • {c.domain}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {c.region || ""} • {c.domain}
+                                </div>
                               </div>
                               <Badge variant="secondary">{c.pages?.length || 0} pages</Badge>
                             </div>
                             <div className="mt-2 grid grid-cols-2 gap-2">
                               {(c.pages || []).slice(0, 4).map((p: any) => (
-                                <a key={p.url} className="text-xs text-primary hover:underline truncate" href={p.url} target="_blank" rel="noreferrer">{p.title || p.url}</a>
+                                <a
+                                  key={p.url}
+                                  className="text-xs text-primary hover:underline truncate"
+                                  href={p.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {p.title || p.url}
+                                </a>
                               ))}
                             </div>
                           </div>
@@ -576,24 +768,39 @@ const IntelReports = () => {
                       <div className="mt-4">
                         <h4 className="text-sm font-semibold">Keyword Mentions</h4>
                         <div className="grid grid-cols-2 gap-2 mt-2">
-                          {Object.entries(competitorsData?.keyword_summary || {}).slice(0, 12).map(([k, v]: any) => (
-                            <div key={k} className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground">{k}</span>
-                              <Badge variant="outline">{v as any}</Badge>
-                            </div>
-                          ))}
+                          {Object.entries(competitorsData?.keyword_summary || {})
+                            .slice(0, 12)
+                            .map(([k, v]: any) => (
+                              <div key={k} className="flex items-center justify-between text-xs">
+                                <span className="text-muted-foreground">{k}</span>
+                                <Badge variant="outline">{v as any}</Badge>
+                              </div>
+                            ))}
                         </div>
                       </div>
                     </div>
                     <div>
                       <h3 className="font-semibold mb-2">Trends</h3>
-                      <div className="text-sm text-muted-foreground mb-2">Scraped: {trendsData?.scraped_at || '—'}</div>
+                      <div className="text-sm text-muted-foreground mb-2">
+                        Scraped: {trendsData?.scraped_at || "—"}
+                      </div>
                       <div className="space-y-3 max-h-[420px] overflow-auto pr-2">
                         {(trendsData?.items || []).slice(0, 25).map((i: any) => (
                           <div key={i.link} className="border border-border/40 rounded-lg p-3">
-                            <a className="font-medium hover:underline" href={i.link} target="_blank" rel="noreferrer">{i.title || i.link}</a>
-                            <div className="text-xs text-muted-foreground mt-1">{i.source} • {i.pubDate || i.isoDate || ''}</div>
-                            {i.summary && <div className="text-xs mt-1 line-clamp-2">{i.summary}</div>}
+                            <a
+                              className="font-medium hover:underline"
+                              href={i.link}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {i.title || i.link}
+                            </a>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {i.source} • {i.pubDate || i.isoDate || ""}
+                            </div>
+                            {i.summary && (
+                              <div className="text-xs mt-1 line-clamp-2">{i.summary}</div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -610,23 +817,58 @@ const IntelReports = () => {
                     <Archive className="h-5 w-5 text-primary" />
                     Intelligence Archive
                   </CardTitle>
-                  <CardDescription>Historical reports and declassified intelligence</CardDescription>
+                  <CardDescription>
+                    Historical reports and declassified intelligence
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {[
-                      { id: "RPT-2023-847", title: "Operation Nightwatch - Final Report", date: "2023-12-15", classification: "Declassified", category: "Operation Summary" },
-                      { id: "RPT-2023-832", title: "Eastern Border Assessment Q4", date: "2023-12-01", classification: "Confidential", category: "Threat Analysis" },
-                      { id: "RPT-2023-798", title: "Communication Protocol Analysis", date: "2023-11-20", classification: "Secret", category: "SIGINT" },
-                      { id: "RPT-2023-756", title: "Regional Infrastructure Survey", date: "2023-11-05", classification: "Declassified", category: "GEOINT" }
+                      {
+                        id: "RPT-2023-847",
+                        title: "Operation Nightwatch - Final Report",
+                        date: "2023-12-15",
+                        classification: "Declassified",
+                        category: "Operation Summary",
+                      },
+                      {
+                        id: "RPT-2023-832",
+                        title: "Eastern Border Assessment Q4",
+                        date: "2023-12-01",
+                        classification: "Confidential",
+                        category: "Threat Analysis",
+                      },
+                      {
+                        id: "RPT-2023-798",
+                        title: "Communication Protocol Analysis",
+                        date: "2023-11-20",
+                        classification: "Secret",
+                        category: "SIGINT",
+                      },
+                      {
+                        id: "RPT-2023-756",
+                        title: "Regional Infrastructure Survey",
+                        date: "2023-11-05",
+                        classification: "Declassified",
+                        category: "GEOINT",
+                      },
                     ].map((archived, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary/10 border border-border/30">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-4 rounded-lg bg-secondary/10 border border-border/30"
+                      >
                         <div>
                           <div className="font-medium">{archived.title}</div>
-                          <div className="text-sm text-muted-foreground">{archived.id} • {archived.category} • {archived.date}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {archived.id} • {archived.category} • {archived.date}
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={archived.classification === "Declassified" ? "outline" : "default"}>
+                          <Badge
+                            variant={
+                              archived.classification === "Declassified" ? "outline" : "default"
+                            }
+                          >
                             {archived.classification}
                           </Badge>
                           <Button size="sm" variant="outline">

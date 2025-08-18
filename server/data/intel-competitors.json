@@ -20,7 +20,13 @@
           "description": "Asphalt paving, sealcoating, and maintenance services.",
           "h1": ["Asphalt Services"],
           "h2": ["Sealcoating", "Crack Sealing"],
-          "keywords": {"asphalt": 10, "paving": 7, "sealcoating": 4, "crack sealing": 3, "parking lot": 2},
+          "keywords": {
+            "asphalt": 10,
+            "paving": 7,
+            "sealcoating": 4,
+            "crack sealing": 3,
+            "parking lot": 2
+          },
           "sample_links": ["/contact", "/estimate"]
         }
       ]
@@ -37,7 +43,13 @@
           "description": "Commercial and residential asphalt paving.",
           "h1": ["Asphalt Paving"],
           "h2": ["Parking Lot Paving", "Driveways"],
-          "keywords": {"asphalt": 8, "paving": 9, "sealcoating": 3, "crack sealing": 2, "parking lot": 4},
+          "keywords": {
+            "asphalt": 8,
+            "paving": 9,
+            "sealcoating": 3,
+            "crack sealing": 2,
+            "parking lot": 4
+          },
           "sample_links": ["/quote", "/projects"]
         }
       ]

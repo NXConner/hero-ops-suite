@@ -1,13 +1,13 @@
-import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import RSSParser from 'rss-parser';
+import fs from "fs-extra";
+import path from "path";
+import { fileURLToPath } from "url";
+import RSSParser from "rss-parser";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function readFeeds() {
-  const feedsPath = path.resolve(__dirname, '../config/feeds.json');
+  const feedsPath = path.resolve(__dirname, "../config/feeds.json");
   if (!(await fs.pathExists(feedsPath))) return [];
   const list = await fs.readJson(feedsPath);
   return list;
@@ -22,11 +22,11 @@ export async function scrapeTrends() {
       const feed = await parser.parseURL(f.url);
       const items = (feed.items || []).slice(0, 15).map((i) => ({
         source: f.name || feed.title || f.url,
-        title: i.title || '',
-        link: i.link || '',
+        title: i.title || "",
+        link: i.link || "",
         pubDate: i.pubDate || null,
         isoDate: i.isoDate || null,
-        summary: i.contentSnippet || '',
+        summary: i.contentSnippet || "",
       }));
       results.push({ feed: f.url, source: f.name || feed.title || f.url, items });
     } catch (e) {

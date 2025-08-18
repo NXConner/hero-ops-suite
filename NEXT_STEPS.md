@@ -47,6 +47,7 @@ Provide required env keys at runtime/build and add wallpaper/video assets to `pu
   - OverWatch and overlays/widgets (Fleet, Weather, MapTools, PavementScan3D, Voice UI) now consume the global mode (props remain optional for backward compatibility).
 
 Suggested follow-ups
+
 - Add jest/vitest smoke tests for terminology toggling:
   - Verify Settings selector updates context and persists to localStorage.
   - Ensure OverWatch title and button labels swap as expected.

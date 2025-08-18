@@ -1,22 +1,22 @@
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import fs from "fs-extra";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.json({ limit: "10mb" }));
 
-const dataDir = path.join(__dirname, 'data');
-const overlaysDir = path.join(dataDir, 'overlays');
-const scansFile = path.join(dataDir, 'scans.json');
-const pricingFile = path.join(dataDir, 'pricing.json');
-const brandingFile = path.join(dataDir, 'branding.json');
+const dataDir = path.join(__dirname, "data");
+const overlaysDir = path.join(dataDir, "overlays");
+const scansFile = path.join(dataDir, "scans.json");
+const pricingFile = path.join(dataDir, "pricing.json");
+const brandingFile = path.join(dataDir, "branding.json");
 await fs.ensureDir(overlaysDir);
 await fs.ensureDir(dataDir);
 
@@ -35,18 +35,18 @@ async function loadState() {
   }
   if (!(await fs.pathExists(pricingFile))) {
     const defaults = {
-      CRACK_SEAL: { item_code: 'CRACK_SEAL', unit: 'ft', unit_cost: 1.5 },
-      POTHOLE_PATCH: { item_code: 'POTHOLE_PATCH', unit: 'sqft', unit_cost: 12 },
-      GATOR_REPAIR: { item_code: 'GATOR_REPAIR', unit: 'sqft', unit_cost: 6.5 },
-      REGRADING: { item_code: 'REGRADING', unit: 'sqft', unit_cost: 4 },
+      CRACK_SEAL: { item_code: "CRACK_SEAL", unit: "ft", unit_cost: 1.5 },
+      POTHOLE_PATCH: { item_code: "POTHOLE_PATCH", unit: "sqft", unit_cost: 12 },
+      GATOR_REPAIR: { item_code: "GATOR_REPAIR", unit: "sqft", unit_cost: 6.5 },
+      REGRADING: { item_code: "REGRADING", unit: "sqft", unit_cost: 4 },
     };
     await fs.writeJson(pricingFile, defaults, { spaces: 2 });
   }
   if (!(await fs.pathExists(brandingFile))) {
     const defaults = {
-      companyName: 'Nate Asphalt Co.',
-      primary: '#0b6bcb',
-      footerDisclaimer: 'This report is an engineering aid. Field conditions may vary.',
+      companyName: "Nate Asphalt Co.",
+      primary: "#0b6bcb",
+      footerDisclaimer: "This report is an engineering aid. Field conditions may vary.",
     };
     await fs.writeJson(brandingFile, defaults, { spaces: 2 });
   }
@@ -59,38 +59,38 @@ async function saveScans() {
 
 await loadState();
 
-app.get('/health', (req, res) => res.json({ ok: true }));
+app.get("/health", (req, res) => res.json({ ok: true }));
 
 // Config endpoints
-app.get('/config/pricing', async (req, res) => {
+app.get("/config/pricing", async (req, res) => {
   const pricing = await fs.readJson(pricingFile);
   res.json(pricing);
 });
 
-app.put('/config/pricing', async (req, res) => {
+app.put("/config/pricing", async (req, res) => {
   const pricing = req.body || {};
   await fs.writeJson(pricingFile, pricing, { spaces: 2 });
   res.json({ ok: true });
 });
 
-app.get('/config/branding', async (req, res) => {
+app.get("/config/branding", async (req, res) => {
   const branding = await fs.readJson(brandingFile);
   res.json(branding);
 });
 
-app.put('/config/branding', async (req, res) => {
+app.put("/config/branding", async (req, res) => {
   const branding = req.body || {};
   await fs.writeJson(brandingFile, branding, { spaces: 2 });
   res.json({ ok: true });
 });
 
 // List scans
-app.get('/scans', async (req, res) => {
+app.get("/scans", async (req, res) => {
   const list = Array.from(scans.values());
   res.json({ scans: list });
 });
 
-app.post('/scans', async (req, res) => {
+app.post("/scans", async (req, res) => {
   const scan_id = id();
   const scan = {
     scan_id,
@@ -106,10 +106,10 @@ app.post('/scans', async (req, res) => {
   res.json({ scan_id, upload_urls: {} });
 });
 
-app.put('/scans/:id', async (req, res) => {
+app.put("/scans/:id", async (req, res) => {
   const scan_id = req.params.id;
   const scan = scans.get(scan_id);
-  if (!scan) return res.status(404).json({ error: 'not_found' });
+  if (!scan) return res.status(404).json({ error: "not_found" });
   const updates = req.body || {};
   const updated = { ...scan, ...updates };
   scans.set(scan_id, updated);
@@ -118,9 +118,9 @@ app.put('/scans/:id', async (req, res) => {
 });
 
 // Upload overlay
-app.post('/scans/:id/overlay', async (req, res) => {
+app.post("/scans/:id/overlay", async (req, res) => {
   const scan_id = req.params.id;
-  if (!scans.has(scan_id)) return res.status(404).json({ error: 'not_found' });
+  if (!scans.has(scan_id)) return res.status(404).json({ error: "not_found" });
   const overlay = req.body || {};
   const file = path.join(overlaysDir, `${scan_id}.json`);
   await fs.writeJson(file, overlay, { spaces: 2 });
@@ -128,59 +128,64 @@ app.post('/scans/:id/overlay', async (req, res) => {
 });
 
 // Get overlay only
-app.get('/scans/:id/overlay', async (req, res) => {
+app.get("/scans/:id/overlay", async (req, res) => {
   const scan_id = req.params.id;
-  if (!scans.has(scan_id)) return res.status(404).json({ error: 'not_found' });
+  if (!scans.has(scan_id)) return res.status(404).json({ error: "not_found" });
   const file = path.join(overlaysDir, `${scan_id}.json`);
-  if (!(await fs.pathExists(file))) return res.status(404).json({ error: 'no_overlay' });
+  if (!(await fs.pathExists(file))) return res.status(404).json({ error: "no_overlay" });
   const overlay = await fs.readJson(file);
   res.json(overlay);
 });
 
 // Get scan with overlay
-app.get('/scans/:id', async (req, res) => {
+app.get("/scans/:id", async (req, res) => {
   const scan_id = req.params.id;
   const scan = scans.get(scan_id);
-  if (!scan) return res.status(404).json({ error: 'not_found' });
+  if (!scan) return res.status(404).json({ error: "not_found" });
   const file = path.join(overlaysDir, `${scan_id}.json`);
   const overlay = (await fs.pathExists(file)) ? await fs.readJson(file) : null;
   res.json({ scan, overlay });
 });
 
-app.get('/scans/:id/report', async (req, res) => {
+app.get("/scans/:id/report", async (req, res) => {
   const scan_id = req.params.id;
-  if (!scans.has(scan_id)) return res.status(404).json({ error: 'not_found' });
+  if (!scans.has(scan_id)) return res.status(404).json({ error: "not_found" });
   res.json({ pdf_url: `https://example.com/reports/${scan_id}.pdf` });
 });
 
-app.post('/jobs', async (req, res) => {
+app.post("/jobs", async (req, res) => {
   const job_id = id();
-  jobs.set(job_id, { job_id, ...req.body, status: 'draft', created_at: new Date().toISOString() });
+  jobs.set(job_id, { job_id, ...req.body, status: "draft", created_at: new Date().toISOString() });
   res.json({ job_id });
 });
 
-app.get('/jobs', async (req, res) => {
+app.get("/jobs", async (req, res) => {
   const scan_id = req.query.scan_id;
   const list = Array.from(jobs.values()).filter((j) => (scan_id ? j.scan_id === scan_id : true));
   res.json({ jobs: list });
 });
 
 const messages = [];
-app.get('/messages', async (req, res) => {
+app.get("/messages", async (req, res) => {
   const scan_id = req.query.scan_id;
   const list = messages.filter((m) => (scan_id ? m.scan_id === scan_id : true));
   res.json({ messages: list });
 });
 
-app.post('/messages', async (req, res) => {
+app.post("/messages", async (req, res) => {
   const msg = { id: id(), ...req.body, timestamp: new Date().toISOString() };
   messages.push(msg);
   res.json({ message: msg });
 });
 
-app.post('/invoices', async (req, res) => {
+app.post("/invoices", async (req, res) => {
   const invoice_id = id();
-  invoices.set(invoice_id, { invoice_id, ...req.body, status: 'draft', created_at: new Date().toISOString() });
+  invoices.set(invoice_id, {
+    invoice_id,
+    ...req.body,
+    status: "draft",
+    created_at: new Date().toISOString(),
+  });
   res.json({ invoice_id });
 });
 
@@ -189,15 +194,22 @@ function computeOverlayStats(overlay) {
   const cracks_ft = (overlay.cracks || []).reduce((a, c) => a + (c.length_ft || 0), 0);
   const potholes_sqft = (overlay.potholes || []).reduce((a, p) => a + (p.area_sqft || 0), 0);
   const gator_sqft = (overlay.distress_zones || [])
-    .filter((d) => d.type === 'gatoring')
+    .filter((d) => d.type === "gatoring")
     .reduce((a, d) => a + (d.area_sqft || 0), 0);
   const pooling_sqft = overlay.slope_analysis?.pooling_area_sqft || 0;
   const score = cracks_ft * 0.5 + potholes_sqft * 2 + gator_sqft * 1.2 + pooling_sqft * 1.5;
   return { cracks_ft, potholes_sqft, gator_sqft, pooling_sqft, score };
 }
 
-app.get('/analytics/summary', async (req, res) => {
-  let totals = { sites: 0, cracks_ft: 0, potholes_sqft: 0, gator_sqft: 0, pooling_sqft: 0, score: 0 };
+app.get("/analytics/summary", async (req, res) => {
+  let totals = {
+    sites: 0,
+    cracks_ft: 0,
+    potholes_sqft: 0,
+    gator_sqft: 0,
+    pooling_sqft: 0,
+    score: 0,
+  };
   for (const scan of scans.values()) {
     totals.sites += 1;
     const file = path.join(overlaysDir, `${scan.scan_id}.json`);
@@ -212,7 +224,7 @@ app.get('/analytics/summary', async (req, res) => {
   res.json({ totals });
 });
 
-app.get('/analytics/prioritized', async (req, res) => {
+app.get("/analytics/prioritized", async (req, res) => {
   const rows = [];
   for (const scan of scans.values()) {
     const file = path.join(overlaysDir, `${scan.scan_id}.json`);
@@ -231,22 +243,52 @@ function estimateCosts(overlay, pricing) {
   const crackLengthFt = (overlay.cracks || []).reduce((acc, c) => acc + (c.length_ft || 0), 0);
   if (crackLengthFt > 0 && pricing.CRACK_SEAL) {
     const p = pricing.CRACK_SEAL;
-    lines.push({ item_code: 'CRACK_SEAL', description: 'Crack sealing (hot-pour)', quantity: crackLengthFt, unit: p.unit, unit_cost: p.unit_cost, total: crackLengthFt * p.unit_cost });
+    lines.push({
+      item_code: "CRACK_SEAL",
+      description: "Crack sealing (hot-pour)",
+      quantity: crackLengthFt,
+      unit: p.unit,
+      unit_cost: p.unit_cost,
+      total: crackLengthFt * p.unit_cost,
+    });
   }
   const potholeAreaSqft = (overlay.potholes || []).reduce((acc, p) => acc + (p.area_sqft || 0), 0);
   if (potholeAreaSqft > 0 && pricing.POTHOLE_PATCH) {
     const p = pricing.POTHOLE_PATCH;
-    lines.push({ item_code: 'POTHOLE_PATCH', description: 'Pothole patch', quantity: potholeAreaSqft, unit: p.unit, unit_cost: p.unit_cost, total: potholeAreaSqft * p.unit_cost });
+    lines.push({
+      item_code: "POTHOLE_PATCH",
+      description: "Pothole patch",
+      quantity: potholeAreaSqft,
+      unit: p.unit,
+      unit_cost: p.unit_cost,
+      total: potholeAreaSqft * p.unit_cost,
+    });
   }
-  const gatorAreaSqft = (overlay.distress_zones || []).filter((d) => d.type === 'gatoring').reduce((acc, d) => acc + (d.area_sqft || 0), 0);
+  const gatorAreaSqft = (overlay.distress_zones || [])
+    .filter((d) => d.type === "gatoring")
+    .reduce((acc, d) => acc + (d.area_sqft || 0), 0);
   if (gatorAreaSqft > 0 && pricing.GATOR_REPAIR) {
     const p = pricing.GATOR_REPAIR;
-    lines.push({ item_code: 'GATOR_REPAIR', description: 'Gatoring repair', quantity: gatorAreaSqft, unit: p.unit, unit_cost: p.unit_cost, total: gatorAreaSqft * p.unit_cost });
+    lines.push({
+      item_code: "GATOR_REPAIR",
+      description: "Gatoring repair",
+      quantity: gatorAreaSqft,
+      unit: p.unit,
+      unit_cost: p.unit_cost,
+      total: gatorAreaSqft * p.unit_cost,
+    });
   }
   const poolingAreaSqft = overlay.slope_analysis?.pooling_area_sqft || 0;
   if (poolingAreaSqft > 0 && pricing.REGRADING) {
     const p = pricing.REGRADING;
-    lines.push({ item_code: 'REGRADING', description: 'Regrading/leveling', quantity: poolingAreaSqft, unit: p.unit, unit_cost: p.unit_cost, total: poolingAreaSqft * p.unit_cost });
+    lines.push({
+      item_code: "REGRADING",
+      description: "Regrading/leveling",
+      quantity: poolingAreaSqft,
+      unit: p.unit,
+      unit_cost: p.unit_cost,
+      total: poolingAreaSqft * p.unit_cost,
+    });
   }
   const mobilization = 250;
   const contingencyPercent = 0.1;
@@ -255,33 +297,34 @@ function estimateCosts(overlay, pricing) {
   return { lines, mobilization, contingencyPercent, subtotal, total };
 }
 
-app.post('/estimate/:id', async (req, res) => {
+app.post("/estimate/:id", async (req, res) => {
   const scan_id = req.params.id;
-  if (!scans.has(scan_id)) return res.status(404).json({ error: 'not_found' });
+  if (!scans.has(scan_id)) return res.status(404).json({ error: "not_found" });
   const file = path.join(overlaysDir, `${scan_id}.json`);
-  if (!(await fs.pathExists(file))) return res.status(404).json({ error: 'no_overlay' });
+  if (!(await fs.pathExists(file))) return res.status(404).json({ error: "no_overlay" });
   const overlay = await fs.readJson(file);
   const pricing = await fs.readJson(pricingFile);
   const estimate = estimateCosts(overlay, pricing);
   res.json(estimate);
 });
 
-app.post('/intel/scrape', async (req, res) => {
+app.post("/intel/scrape", async (req, res) => {
   try {
-    const kind = (req.body && req.body.kind) || 'all';
-    const root = path.resolve(__dirname, '..');
+    const kind = (req.body && req.body.kind) || "all";
+    const root = path.resolve(__dirname, "..");
     // Prefer running via workspace script; for now, write a marker file and respond
     // The CLI can be run manually: npm run scrape:intel
-    res.json({ ok: true, message: 'Scrape triggered, run workspace script to execute', kind });
+    res.json({ ok: true, message: "Scrape triggered, run workspace script to execute", kind });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-app.get('/intel/competitors', async (req, res) => {
+app.get("/intel/competitors", async (req, res) => {
   try {
-    const file = path.join(dataDir, 'intel-competitors.json');
-    if (!(await fs.pathExists(file))) return res.json({ competitors: [], keyword_summary: {}, scraped_at: null });
+    const file = path.join(dataDir, "intel-competitors.json");
+    if (!(await fs.pathExists(file)))
+      return res.json({ competitors: [], keyword_summary: {}, scraped_at: null });
     const json = await fs.readJson(file);
     res.json(json);
   } catch (e) {
@@ -289,9 +332,9 @@ app.get('/intel/competitors', async (req, res) => {
   }
 });
 
-app.get('/intel/trends', async (req, res) => {
+app.get("/intel/trends", async (req, res) => {
   try {
-    const file = path.join(dataDir, 'intel-trends.json');
+    const file = path.join(dataDir, "intel-trends.json");
     if (!(await fs.pathExists(file))) return res.json({ feeds: [], items: [], scraped_at: null });
     const json = await fs.readJson(file);
     res.json(json);

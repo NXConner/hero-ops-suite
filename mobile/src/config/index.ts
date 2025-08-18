@@ -1,4 +1,4 @@
-let API_BASE_URL = 'http://localhost:3002';
+let API_BASE_URL = "http://localhost:3002";
 
 let SUPABASE_URL: string | undefined = undefined;
 let SUPABASE_ANON_KEY: string | undefined = undefined;

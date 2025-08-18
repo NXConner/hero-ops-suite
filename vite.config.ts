@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -19,9 +18,7 @@ export default defineConfig(({ mode }) => ({
       "/intel": "http://localhost:3001",
     },
   },
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -72,13 +69,7 @@ export default defineConfig(({ mode }) => ({
             "@babylonjs/core",
             "@babylonjs/gui",
           ],
-          charts_misc: [
-            "recharts",
-            "date-fns",
-            "jszip",
-            "html2canvas",
-            "jspdf",
-          ],
+          charts_misc: ["recharts", "date-fns", "jszip", "html2canvas", "jspdf"],
           shadcn_misc: [
             "class-variance-authority",
             "clsx",

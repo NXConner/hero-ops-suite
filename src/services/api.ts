@@ -1,29 +1,50 @@
 // @ts-nocheck
 // API Service Layer for Blacktop Blackout OverWatch System
-import axios from 'axios';
+import axios from "axios";
 
 // API Configuration
 const getEnv = (key: string): string | undefined => {
   try {
     // @ts-ignore
-    return typeof import.meta !== 'undefined' ? (import.meta as any).env?.[key] : undefined;
+    return typeof import.meta !== "undefined" ? (import.meta as any).env?.[key] : undefined;
   } catch {
     return undefined;
   }
 };
 const API_CONFIG = {
-  WEATHER_API_KEY: getEnv('VITE_WEATHER_API_KEY') || getEnv('REACT_APP_WEATHER_API_KEY') || 'YOUR_OPENWEATHER_API_KEY',
-  WEATHER_BASE_URL: 'https://api.openweathermap.org/data/2.5',
-  GPS_TRACKING_URL: getEnv('VITE_GPS_API_URL') || getEnv('REACT_APP_GPS_API_URL') || 'https://api.fleet-tracker.com/v1',
-  SENSOR_DATA_URL: getEnv('VITE_SENSOR_API_URL') || getEnv('REACT_APP_SENSOR_API_URL') || 'https://api.iot-sensors.com/v1',
-  RADAR_API_URL: 'https://api.rainviewer.com/public/weather-maps.json',
-  GEOLOCATION_API_URL: 'https://api.bigdatacloud.net/data/reverse-geocode-client',
+  WEATHER_API_KEY:
+    getEnv("VITE_WEATHER_API_KEY") ||
+    getEnv("REACT_APP_WEATHER_API_KEY") ||
+    "YOUR_OPENWEATHER_API_KEY",
+  WEATHER_BASE_URL: "https://api.openweathermap.org/data/2.5",
+  GPS_TRACKING_URL:
+    getEnv("VITE_GPS_API_URL") ||
+    getEnv("REACT_APP_GPS_API_URL") ||
+    "https://api.fleet-tracker.com/v1",
+  SENSOR_DATA_URL:
+    getEnv("VITE_SENSOR_API_URL") ||
+    getEnv("REACT_APP_SENSOR_API_URL") ||
+    "https://api.iot-sensors.com/v1",
+  RADAR_API_URL: "https://api.rainviewer.com/public/weather-maps.json",
+  GEOLOCATION_API_URL: "https://api.bigdatacloud.net/data/reverse-geocode-client",
   // Real IoT sensor endpoints
-  TEMPERATURE_SENSOR_URL: getEnv('VITE_TEMP_SENSOR_URL') || getEnv('REACT_APP_TEMP_SENSOR_URL') || 'http://localhost:8080/api/sensors/temperature',
-  PRESSURE_SENSOR_URL: getEnv('VITE_PRESSURE_SENSOR_URL') || getEnv('REACT_APP_PRESSURE_SENSOR_URL') || 'http://localhost:8080/api/sensors/pressure',
-  VIBRATION_SENSOR_URL: getEnv('VITE_VIBRATION_SENSOR_URL') || getEnv('REACT_APP_VIBRATION_SENSOR_URL') || 'http://localhost:8080/api/sensors/vibration',
+  TEMPERATURE_SENSOR_URL:
+    getEnv("VITE_TEMP_SENSOR_URL") ||
+    getEnv("REACT_APP_TEMP_SENSOR_URL") ||
+    "http://localhost:8080/api/sensors/temperature",
+  PRESSURE_SENSOR_URL:
+    getEnv("VITE_PRESSURE_SENSOR_URL") ||
+    getEnv("REACT_APP_PRESSURE_SENSOR_URL") ||
+    "http://localhost:8080/api/sensors/pressure",
+  VIBRATION_SENSOR_URL:
+    getEnv("VITE_VIBRATION_SENSOR_URL") ||
+    getEnv("REACT_APP_VIBRATION_SENSOR_URL") ||
+    "http://localhost:8080/api/sensors/vibration",
   // Real fleet tracking
-  FLEET_WEBSOCKET_URL: getEnv('VITE_FLEET_WS_URL') || getEnv('REACT_APP_FLEET_WS_URL') || 'ws://localhost:8080/ws/fleet'
+  FLEET_WEBSOCKET_URL:
+    getEnv("VITE_FLEET_WS_URL") ||
+    getEnv("REACT_APP_FLEET_WS_URL") ||
+    "ws://localhost:8080/ws/fleet",
 };
 
 // Types for API responses
@@ -55,10 +76,10 @@ export interface WeatherAPIResponse {
     all: number;
   };
   rain?: {
-    '1h': number;
+    "1h": number;
   };
   snow?: {
-    '1h': number;
+    "1h": number;
   };
 }
 
@@ -73,7 +94,7 @@ export interface GPSTrackingResponse {
     speed: number;
     heading: number;
   };
-  status: 'active' | 'idle' | 'offline';
+  status: "active" | "idle" | "offline";
   batteryLevel?: number;
   isMoving: boolean;
   driver?: {
@@ -89,7 +110,7 @@ export interface GPSTrackingResponse {
 
 export interface SensorDataResponse {
   sensorId: string;
-  type: 'temperature' | 'pressure' | 'vibration' | 'thickness' | 'compaction';
+  type: "temperature" | "pressure" | "vibration" | "thickness" | "compaction";
   value: number;
   unit: string;
   timestamp: string;
@@ -97,7 +118,7 @@ export interface SensorDataResponse {
     latitude: number;
     longitude: number;
   };
-  quality: 'good' | 'fair' | 'poor';
+  quality: "good" | "fair" | "poor";
   alerts?: string[];
   calibrationDate?: string;
   batteryLevel?: number;
@@ -179,52 +200,57 @@ export class WeatherService {
       return cached.data;
     }
 
-    if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
-      throw new Error('Missing OpenWeather API key');
+    if (API_CONFIG.WEATHER_API_KEY === "YOUR_OPENWEATHER_API_KEY") {
+      throw new Error("Missing OpenWeather API key");
     }
 
-    const response = await axios.get<WeatherAPIResponse>(
-      `${API_CONFIG.WEATHER_BASE_URL}/weather`,
-      {
-        params: { lat, lon, appid: API_CONFIG.WEATHER_API_KEY, units: 'imperial' },
-        timeout: 10000
-      }
-    );
+    const response = await axios.get<WeatherAPIResponse>(`${API_CONFIG.WEATHER_BASE_URL}/weather`, {
+      params: { lat, lon, appid: API_CONFIG.WEATHER_API_KEY, units: "imperial" },
+      timeout: 10000,
+    });
 
     this.cache.set(cacheKey, { data: response.data, timestamp: Date.now() });
     return response.data;
   }
 
   async getWeatherForecast(lat: number, lon: number, hours: number = 12): Promise<any> {
-    if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
-      throw new Error('Missing OpenWeather API key');
+    if (API_CONFIG.WEATHER_API_KEY === "YOUR_OPENWEATHER_API_KEY") {
+      throw new Error("Missing OpenWeather API key");
     }
 
-    const response = await axios.get(
-      `${API_CONFIG.WEATHER_BASE_URL}/forecast`,
-      {
-        params: { lat, lon, appid: API_CONFIG.WEATHER_API_KEY, units: 'imperial', cnt: Math.min(hours, 40) },
-        timeout: 10000
-      }
-    );
+    const response = await axios.get(`${API_CONFIG.WEATHER_BASE_URL}/forecast`, {
+      params: {
+        lat,
+        lon,
+        appid: API_CONFIG.WEATHER_API_KEY,
+        units: "imperial",
+        cnt: Math.min(hours, 40),
+      },
+      timeout: 10000,
+    });
 
     return response.data;
   }
 
   async getRadarData(): Promise<RadarAPIResponse> {
-    const response = await axios.get<RadarAPIResponse>(API_CONFIG.RADAR_API_URL, { timeout: 10000 });
+    const response = await axios.get<RadarAPIResponse>(API_CONFIG.RADAR_API_URL, {
+      timeout: 10000,
+    });
     return response.data;
   }
 
   // Enhanced UV Index API using OpenWeather UVI endpoint, with fallback approximation
   async getUVIndex(lat: number, lon: number): Promise<number> {
     try {
-      if (API_CONFIG.WEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY') {
-        throw new Error('Missing OpenWeather API key');
+      if (API_CONFIG.WEATHER_API_KEY === "YOUR_OPENWEATHER_API_KEY") {
+        throw new Error("Missing OpenWeather API key");
       }
-      const { data } = await axios.get(`${API_CONFIG.WEATHER_BASE_URL}/uvi`, { params: { appid: API_CONFIG.WEATHER_API_KEY, lat, lon }, timeout: 8000 });
+      const { data } = await axios.get(`${API_CONFIG.WEATHER_BASE_URL}/uvi`, {
+        params: { appid: API_CONFIG.WEATHER_API_KEY, lat, lon },
+        timeout: 8000,
+      });
       const v = (data && (data.value ?? data.uvi ?? data.uv)) as number | undefined;
-      if (typeof v === 'number' && !Number.isNaN(v)) return Math.max(0, Math.min(11, v));
+      if (typeof v === "number" && !Number.isNaN(v)) return Math.max(0, Math.min(11, v));
     } catch (_e) {
       // fallback to moderate UV when service unavailable
     }
@@ -275,7 +301,7 @@ export class GPSTrackingService {
     } catch {
       // Browser may block or URL invalid
       this.startMockRealtime();
-      return new WebSocket('wss://invalid.localhost/ignored');
+      return new WebSocket("wss://invalid.localhost/ignored");
     }
   }
 
@@ -284,11 +310,9 @@ export class GPSTrackingService {
     try {
       const url = `${API_CONFIG.GPS_TRACKING_URL}/devices`;
       const { data } = await axios.get(url, { timeout: 6000 });
-      const devices: GPSTrackingResponse[] = Array.isArray(data)
-        ? data
-        : (data?.devices || []);
+      const devices: GPSTrackingResponse[] = Array.isArray(data) ? data : data?.devices || [];
       if (devices && devices.length) return devices;
-      throw new Error('Empty devices list');
+      throw new Error("Empty devices list");
     } catch {
       return this.generateMockDevices();
     }
@@ -315,7 +339,11 @@ export class GPSTrackingService {
 
   private emit(data: GPSTrackingResponse[]) {
     this.listeners.forEach((fn) => {
-      try { fn(data); } catch { /* ignore listener errors */ }
+      try {
+        fn(data);
+      } catch {
+        /* ignore listener errors */
+      }
     });
   }
 
@@ -329,7 +357,11 @@ export class GPSTrackingService {
 
   private stopRealtime() {
     if (this.ws) {
-      try { this.ws.close(); } catch { /* ignore */ }
+      try {
+        this.ws.close();
+      } catch {
+        /* ignore */
+      }
       this.ws = null;
     }
     if (this.pollTimer) {
@@ -341,8 +373,11 @@ export class GPSTrackingService {
   // Mock data generator around a base location (NYC)
   private generateMockDevices(jitter: boolean = false): GPSTrackingResponse[] {
     const baseLat = 40.7128;
-    const baseLon = -74.0060;
-    const makeDevice = (idx: number, opts: Partial<GPSTrackingResponse> = {}): GPSTrackingResponse => {
+    const baseLon = -74.006;
+    const makeDevice = (
+      idx: number,
+      opts: Partial<GPSTrackingResponse> = {},
+    ): GPSTrackingResponse => {
       const offset = jitter ? (Math.random() - 0.5) * 0.02 : (idx - 3) * 0.01;
       const lat = baseLat + offset;
       const lon = baseLon + offset * 1.2;
@@ -351,41 +386,62 @@ export class GPSTrackingService {
       return {
         deviceId: `veh-${idx}`,
         timestamp: new Date().toISOString(),
-        location: { latitude: lat, longitude: lon, altitude: 10 + Math.random() * 5, accuracy: 5 + Math.random() * 10, speed, heading },
-        status: speed > 2 ? 'active' : 'idle',
+        location: {
+          latitude: lat,
+          longitude: lon,
+          altitude: 10 + Math.random() * 5,
+          accuracy: 5 + Math.random() * 10,
+          speed,
+          heading,
+        },
+        status: speed > 2 ? "active" : "idle",
         batteryLevel: 60 + Math.random() * 40,
         isMoving: speed > 1,
         driver: { id: `drv-${idx}`, name: `Driver ${idx}` },
-        vehicle: { id: `Truck ${idx}`, type: 'truck', license: `OPS-${100 + idx}` },
-        ...opts
+        vehicle: { id: `Truck ${idx}`, type: "truck", license: `OPS-${100 + idx}` },
+        ...opts,
       } as GPSTrackingResponse;
     };
 
     const list: GPSTrackingResponse[] = [
       makeDevice(1),
       makeDevice(2),
-      makeDevice(3, { status: 'idle' }),
+      makeDevice(3, { status: "idle" }),
       makeDevice(4),
-      makeDevice(5, { status: 'active' })
+      makeDevice(5, { status: "active" }),
     ];
 
     // Add a couple of employee handhelds without vehicle assigned
     list.push({
-      deviceId: 'emp-1',
+      deviceId: "emp-1",
       timestamp: new Date().toISOString(),
-      location: { latitude: baseLat + 0.015, longitude: baseLon - 0.008, altitude: 0, accuracy: 12, speed: 1, heading: 90 },
-      status: 'active',
+      location: {
+        latitude: baseLat + 0.015,
+        longitude: baseLon - 0.008,
+        altitude: 0,
+        accuracy: 12,
+        speed: 1,
+        heading: 90,
+      },
+      status: "active",
       isMoving: true,
-      driver: { id: 'emp-1', name: 'Employee A' }
+      driver: { id: "emp-1", name: "Employee A" },
     } as GPSTrackingResponse);
 
     list.push({
-      deviceId: 'emp-2',
+      deviceId: "emp-2",
       timestamp: new Date().toISOString(),
-      location: { latitude: baseLat - 0.01, longitude: baseLon + 0.006, altitude: 0, accuracy: 15, speed: 0, heading: 45 },
-      status: 'idle',
+      location: {
+        latitude: baseLat - 0.01,
+        longitude: baseLon + 0.006,
+        altitude: 0,
+        accuracy: 15,
+        speed: 0,
+        heading: 45,
+      },
+      status: "idle",
       isMoving: false,
-      driver: { id: 'emp-2', name: 'Employee B' }
+      driver: { id: "emp-2", name: "Employee B" },
     } as GPSTrackingResponse);
 
     return list;
@@ -408,21 +464,31 @@ export class SensorDataService {
       const response = await axios.get<SensorDataResponse[]>(
         `${API_CONFIG.SENSOR_DATA_URL}/current`,
         {
-          params: sensorIds && sensorIds.length ? { sensors: sensorIds.join(',') } : undefined,
-          timeout: 8000
-        }
+          params: sensorIds && sensorIds.length ? { sensors: sensorIds.join(",") } : undefined,
+          timeout: 8000,
+        },
       );
       return response.data;
     } catch (error) {
       // Fallback mock data
       return [
         {
-          sensorId: 'temp_01', type: 'temperature', value: 195, unit: '°F', timestamp: new Date().toISOString(),
-          location: { latitude: 40.7128, longitude: -74.0060 }, quality: 'good'
+          sensorId: "temp_01",
+          type: "temperature",
+          value: 195,
+          unit: "°F",
+          timestamp: new Date().toISOString(),
+          location: { latitude: 40.7128, longitude: -74.006 },
+          quality: "good",
         },
         {
-          sensorId: 'press_01', type: 'pressure', value: 1750, unit: 'PSI', timestamp: new Date().toISOString(),
-          location: { latitude: 40.7128, longitude: -74.0060 }, quality: 'good'
+          sensorId: "press_01",
+          type: "pressure",
+          value: 1750,
+          unit: "PSI",
+          timestamp: new Date().toISOString(),
+          location: { latitude: 40.7128, longitude: -74.006 },
+          quality: "good",
         },
       ];
     }
@@ -430,7 +496,8 @@ export class SensorDataService {
 }
 
 // Pavement Scan API client
-const API_BASE = getEnv('VITE_API_BASE_URL') || getEnv('REACT_APP_API_BASE_URL') || 'http://localhost:3001';
+const API_BASE =
+  getEnv("VITE_API_BASE_URL") || getEnv("REACT_APP_API_BASE_URL") || "http://localhost:3001";
 
 export class PavementScanService {
   private static instance: PavementScanService;
@@ -458,7 +525,10 @@ export class PavementScanService {
   }
 
   async uploadOverlay(scanId: string, overlay: any) {
-    const { data } = await axios.post(`${API_BASE}/scans/${encodeURIComponent(scanId)}/overlay`, overlay);
+    const { data } = await axios.post(
+      `${API_BASE}/scans/${encodeURIComponent(scanId)}/overlay`,
+      overlay,
+    );
     return data?.ok === true;
   }
 

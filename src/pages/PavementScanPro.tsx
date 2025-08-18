@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,13 +6,13 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Camera, 
-  Scan, 
-  Layers, 
-  Download, 
-  Share, 
-  AlertTriangle, 
+import {
+  Camera,
+  Scan,
+  Layers,
+  Download,
+  Share,
+  AlertTriangle,
   Activity,
   Ruler,
   MapPin,
@@ -23,7 +23,7 @@ import {
   Pause,
   Square,
   RotateCcw,
-  Grid
+  Grid,
 } from "lucide-react";
 import CameraInterface from "@/components/pavement-scan/CameraInterface";
 import DefectDetection from "@/components/pavement-scan/DefectDetection";
@@ -31,14 +31,22 @@ import ModelViewer3D from "@/components/pavement-scan/ModelViewer3D";
 import ReportGeneration from "@/components/pavement-scan/ReportGeneration";
 import SystemIntegration from "@/components/pavement-scan/SystemIntegration";
 import MarketplaceIntegration from "@/components/pavement-scan/MarketplaceIntegration";
-import Sidebar from '@/components/Sidebar';
-import { pavementScanService } from '@/services/api';
-import { buildOverlayFromDefects } from '@/lib/overlay';
-import { useNavigate } from 'react-router-dom';
+import Sidebar from "@/components/Sidebar";
+import { pavementScanService } from "@/services/api";
+import { buildOverlayFromDefects } from "@/lib/overlay";
+import { useNavigate } from "react-router-dom";
 
 export interface DefectData {
   id: string;
-  type: 'crack' | 'pothole' | 'alligator' | 'water_pooling' | 'gatoring' | 'broken_area' | 'weak_area' | 'subsurface';
+  type:
+    | "crack"
+    | "pothole"
+    | "alligator"
+    | "water_pooling"
+    | "gatoring"
+    | "broken_area"
+    | "weak_area"
+    | "subsurface";
   location: { x: number; y: number; z?: number };
   measurements: {
     length?: number;
@@ -46,7 +54,7 @@ export interface DefectData {
     depth?: number;
     area?: number;
   };
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   confidence: number;
   timestamp: Date;
   coordinates?: { lat: number; lng: number };
@@ -64,7 +72,9 @@ export interface ScanData {
 }
 
 const PavementScanPro = () => {
-  const [scanningMode, setScanningMode] = useState<'perimeter' | 'interior' | 'complete'>('perimeter');
+  const [scanningMode, setScanningMode] = useState<"perimeter" | "interior" | "complete">(
+    "perimeter",
+  );
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [currentScan, setCurrentScan] = useState<ScanData | null>(null);
@@ -73,7 +83,7 @@ const PavementScanPro = () => {
   const [scanCoverage, setScanCoverage] = useState(0);
   const [scanId, setScanId] = useState<string | null>(null);
   const [estimate, setEstimate] = useState<any | null>(null);
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const navigate = useNavigate();
@@ -85,7 +95,7 @@ const PavementScanPro = () => {
     setDetectedDefects([]);
     setCapturedFrames([]);
     setEstimate(null);
-    
+
     // Initialize new scan
     const newScan: ScanData = {
       id: `scan_${Date.now()}`,
@@ -102,7 +112,7 @@ const PavementScanPro = () => {
       if (res?.scan_id) setScanId(res.scan_id);
     } catch (e) {
       // proceed in offline/mock mode
-      console.warn('Create scan failed, continuing locally:', e);
+      console.warn("Create scan failed, continuing locally:", e);
     }
   }, []);
 
@@ -119,7 +129,7 @@ const PavementScanPro = () => {
         setEstimate(est);
       }
     } catch (e) {
-      console.warn('Overlay upload/estimate failed:', e);
+      console.warn("Overlay upload/estimate failed:", e);
     }
   }, [scanId, detectedDefects]);
 
@@ -130,7 +140,7 @@ const PavementScanPro = () => {
     setCurrentScan(null);
     setDetectedDefects([]);
     setCapturedFrames([]);
-    setScanningMode('perimeter');
+    setScanningMode("perimeter");
     setScanId(null);
     setEstimate(null);
   }, []);
@@ -139,7 +149,7 @@ const PavementScanPro = () => {
   useEffect(() => {
     if (isScanning) {
       const interval = setInterval(() => {
-        setScanProgress(prev => {
+        setScanProgress((prev) => {
           const newProgress = prev + 1;
           if (newProgress >= 100) {
             setIsScanning(false);
@@ -147,7 +157,7 @@ const PavementScanPro = () => {
           }
           return newProgress;
         });
-        setScanCoverage(prev => Math.min(prev + 0.5, 100));
+        setScanCoverage((prev) => Math.min(prev + 0.5, 100));
       }, 100);
       return () => clearInterval(interval);
     }
@@ -155,11 +165,11 @@ const PavementScanPro = () => {
 
   const getScanningModeDescription = () => {
     switch (scanningMode) {
-      case 'perimeter':
+      case "perimeter":
         return "Walk around the perimeter of the area to establish boundaries";
-      case 'interior':
+      case "interior":
         return "Scan the interior surface for detailed defect analysis";
-      case 'complete':
+      case "complete":
         return "Comprehensive scan combining perimeter and interior data";
       default:
         return "";
@@ -169,10 +179,10 @@ const PavementScanPro = () => {
   const getDefectStats = () => {
     const stats = {
       total: detectedDefects.length,
-      critical: detectedDefects.filter(d => d.severity === 'critical').length,
-      high: detectedDefects.filter(d => d.severity === 'high').length,
-      medium: detectedDefects.filter(d => d.severity === 'medium').length,
-      low: detectedDefects.filter(d => d.severity === 'low').length,
+      critical: detectedDefects.filter((d) => d.severity === "critical").length,
+      high: detectedDefects.filter((d) => d.severity === "high").length,
+      medium: detectedDefects.filter((d) => d.severity === "medium").length,
+      low: detectedDefects.filter((d) => d.severity === "low").length,
     };
     return stats;
   };
@@ -182,7 +192,7 @@ const PavementScanPro = () => {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
-      
+
       <div className="flex-1 overflow-auto relative z-0">
         <div className="max-w-7xl mx-auto space-y-6 p-6">
           {/* Header */}
@@ -214,14 +224,17 @@ const PavementScanPro = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${isScanning ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
+                    <div
+                      className={`w-3 h-3 rounded-full ${isScanning ? "bg-green-500 animate-pulse" : "bg-gray-300"}`}
+                    />
                     <span className="font-medium">
-                      {isScanning ? 'Scanning Active' : 'Ready to Scan'}
+                      {isScanning ? "Scanning Active" : "Ready to Scan"}
                     </span>
                   </div>
                   <Separator orientation="vertical" className="h-6" />
                   <div className="text-sm text-muted-foreground">
-                    Mode: <span className="font-medium capitalize">{scanningMode.replace('_', ' ')}</span>
+                    Mode:{" "}
+                    <span className="font-medium capitalize">{scanningMode.replace("_", " ")}</span>
                   </div>
                   <Separator orientation="vertical" className="h-6" />
                   <div className="text-sm text-muted-foreground">
@@ -247,9 +260,7 @@ const PavementScanPro = () => {
                     <Camera className="h-5 w-5" />
                     Live Camera Feed
                   </CardTitle>
-                  <CardDescription>
-                    {getScanningModeDescription()}
-                  </CardDescription>
+                  <CardDescription>{getScanningModeDescription()}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <CameraInterface
@@ -257,8 +268,8 @@ const PavementScanPro = () => {
                     canvasRef={canvasRef}
                     isScanning={isScanning}
                     scanningMode={scanningMode}
-                    onFrameCapture={(frame) => setCapturedFrames(prev => [...prev, frame])}
-                    onDefectDetected={(defect) => setDetectedDefects(prev => [...prev, defect])}
+                    onFrameCapture={(frame) => setCapturedFrames((prev) => [...prev, frame])}
+                    onDefectDetected={(defect) => setDetectedDefects((prev) => [...prev, defect])}
                   />
                 </CardContent>
               </Card>
@@ -267,40 +278,38 @@ const PavementScanPro = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Scan Controls</CardTitle>
-                  <CardDescription>
-                    Control the scanning process and mode selection
-                  </CardDescription>
+                  <CardDescription>Control the scanning process and mode selection</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-2">
                     <Button
-                      variant={scanningMode === 'perimeter' ? 'default' : 'outline'}
-                      onClick={() => setScanningMode('perimeter')}
+                      variant={scanningMode === "perimeter" ? "default" : "outline"}
+                      onClick={() => setScanningMode("perimeter")}
                       disabled={isScanning}
                     >
                       <Grid className="h-4 w-4 mr-1" />
                       Perimeter
                     </Button>
                     <Button
-                      variant={scanningMode === 'interior' ? 'default' : 'outline'}
-                      onClick={() => setScanningMode('interior')}
+                      variant={scanningMode === "interior" ? "default" : "outline"}
+                      onClick={() => setScanningMode("interior")}
                       disabled={isScanning}
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       Interior
                     </Button>
                     <Button
-                      variant={scanningMode === 'complete' ? 'default' : 'outline'}
-                      onClick={() => setScanningMode('complete')}
+                      variant={scanningMode === "complete" ? "default" : "outline"}
+                      onClick={() => setScanningMode("complete")}
                       disabled={isScanning}
                     >
                       <Layers className="h-4 w-4 mr-1" />
                       Complete
                     </Button>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div className="flex gap-2">
                     {!isScanning ? (
                       <Button onClick={startScanning} className="flex-1">
@@ -323,7 +332,8 @@ const PavementScanPro = () => {
                     <Alert>
                       <Activity className="h-4 w-4" />
                       <AlertDescription>
-                        Keep the device steady and maintain consistent scanning speed for optimal results.
+                        Keep the device steady and maintain consistent scanning speed for optimal
+                        results.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -353,15 +363,21 @@ const PavementScanPro = () => {
                     </div>
                     <div className="flex justify-between">
                       <span>High:</span>
-                      <Badge variant="secondary" className="bg-orange-100">{defectStats.high}</Badge>
+                      <Badge variant="secondary" className="bg-orange-100">
+                        {defectStats.high}
+                      </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span>Medium:</span>
-                      <Badge variant="secondary" className="bg-yellow-100">{defectStats.medium}</Badge>
+                      <Badge variant="secondary" className="bg-yellow-100">
+                        {defectStats.medium}
+                      </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span>Low:</span>
-                      <Badge variant="secondary" className="bg-green-100">{defectStats.low}</Badge>
+                      <Badge variant="secondary" className="bg-green-100">
+                        {defectStats.low}
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -386,7 +402,9 @@ const PavementScanPro = () => {
                         <Separator />
                         <div className="flex items-center justify-between font-semibold">
                           <span>Total</span>
-                          <span className="font-mono">${Number(estimate.total || 0).toFixed(2)}</span>
+                          <span className="font-mono">
+                            ${Number(estimate.total || 0).toFixed(2)}
+                          </span>
                         </div>
                       </div>
                     ) : (
@@ -402,10 +420,15 @@ const PavementScanPro = () => {
                   <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full" onClick={() => {
-                    const el = document.querySelector('#pavement-3d-tab');
-                    if (el) (el as HTMLElement).click();
-                  }}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      const el = document.querySelector("#pavement-3d-tab");
+                      if (el) (el as HTMLElement).click();
+                    }}
+                  >
                     <Layers className="h-4 w-4 mr-1" />
                     View 3D Model
                   </Button>
@@ -413,19 +436,31 @@ const PavementScanPro = () => {
                     <Download className="h-4 w-4 mr-1" />
                     Generate Report
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full" disabled={!scanId} onClick={() => {
-                    if (scanId) {
-                      window.open(`/overwatch?scan_id=${encodeURIComponent(scanId)}`, '_blank');
-                    }
-                  }}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    disabled={!scanId}
+                    onClick={() => {
+                      if (scanId) {
+                        window.open(`/overwatch?scan_id=${encodeURIComponent(scanId)}`, "_blank");
+                      }
+                    }}
+                  >
                     <Share className="h-4 w-4 mr-1" />
                     Open in OverWatch
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full" disabled={!scanId} onClick={() => {
-                    if (scanId) {
-                      navigate(`/overwatch?scan_id=${encodeURIComponent(scanId)}`);
-                    }
-                  }}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    disabled={!scanId}
+                    onClick={() => {
+                      if (scanId) {
+                        navigate(`/overwatch?scan_id=${encodeURIComponent(scanId)}`);
+                      }
+                    }}
+                  >
                     <MapPin className="h-4 w-4 mr-1" />
                     Send to OverWatch
                   </Button>
@@ -440,45 +475,38 @@ const PavementScanPro = () => {
               <Tabs defaultValue="defects" className="w-full">
                 <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="defects">Defect Analysis</TabsTrigger>
-                  <TabsTrigger value="model3d" id="pavement-3d-tab">3D Model</TabsTrigger>
+                  <TabsTrigger value="model3d" id="pavement-3d-tab">
+                    3D Model
+                  </TabsTrigger>
                   <TabsTrigger value="report">Report</TabsTrigger>
                   <TabsTrigger value="integration">System Integration</TabsTrigger>
                   <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
                   <TabsTrigger value="export">Export</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="defects" className="mt-6">
-                  <DefectDetection 
+                  <DefectDetection
                     defects={detectedDefects}
                     onDefectUpdate={(updatedDefects) => setDetectedDefects(updatedDefects)}
                   />
                 </TabsContent>
-                
+
                 <TabsContent value="model3d" className="mt-6">
-                  <ModelViewer3D 
-                    scanData={currentScan}
-                    defects={detectedDefects}
-                  />
+                  <ModelViewer3D scanData={currentScan} defects={detectedDefects} />
                 </TabsContent>
-                
+
                 <TabsContent value="report" className="mt-6">
-                  <ReportGeneration 
-                    scanData={currentScan}
-                    defects={detectedDefects}
-                  />
+                  <ReportGeneration scanData={currentScan} defects={detectedDefects} />
                 </TabsContent>
-                
+
                 <TabsContent value="integration" className="mt-6">
-                  <SystemIntegration 
-                    scanData={currentScan}
-                    defects={detectedDefects}
-                  />
+                  <SystemIntegration scanData={currentScan} defects={detectedDefects} />
                 </TabsContent>
-                
+
                 <TabsContent value="marketplace" className="mt-6">
                   <MarketplaceIntegration />
                 </TabsContent>
-                
+
                 <TabsContent value="export" className="mt-6">
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Export Options</h3>

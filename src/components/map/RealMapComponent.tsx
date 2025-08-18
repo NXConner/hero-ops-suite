@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
-import { area as turfArea } from '@turf/turf';
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import { area as turfArea } from "@turf/turf";
 
 // Mapbox access token - should be set via environment variable
-const MAPBOX_TOKEN: string = (typeof import.meta !== 'undefined' && (import.meta as ImportMeta).env?.VITE_MAPBOX_TOKEN) ?? 'pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example';
+const MAPBOX_TOKEN: string =
+  (typeof import.meta !== "undefined" && (import.meta as ImportMeta).env?.VITE_MAPBOX_TOKEN) ??
+  "pk.eyJ1IjoieW91cm1hcGJveHVzZXJuYW1lIiwiYSI6InlvdXJhY2Nlc3N0b2tlbiJ9.example";
 
 interface RealMapComponentProps {
   center: [number, number];
@@ -21,12 +23,12 @@ interface RealMapComponentProps {
 const RealMapComponent: React.FC<RealMapComponentProps> = ({
   center,
   zoom,
-  className = '',
+  className = "",
   onMapLoad,
   onMapClick,
   onMapMove,
   children,
-  styleUrl = 'mapbox://styles/mapbox/satellite-streets-v12'
+  styleUrl = "mapbox://styles/mapbox/satellite-streets-v12",
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -45,51 +47,53 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       style: styleUrl,
       center: center,
       zoom: zoom,
-      attributionControl: true
+      attributionControl: true,
     });
 
     // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     // Add geolocate control
     map.current.addControl(
       new mapboxgl.GeolocateControl({
         positionOptions: {
-          enableHighAccuracy: true
+          enableHighAccuracy: true,
         },
         trackUserLocation: true,
-        showUserHeading: true
+        showUserHeading: true,
       }),
-      'top-right'
+      "top-right",
     );
 
     // Add scale control
-    map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+    map.current.addControl(new mapboxgl.ScaleControl(), "bottom-left");
 
     // Add fullscreen control
-    map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+    map.current.addControl(new mapboxgl.FullscreenControl(), "top-right");
 
     // Set up event listeners
-    map.current.on('load', () => {
+    map.current.on("load", () => {
       setMapLoaded(true);
       onMapLoad?.(map.current!);
       // Lazy-load Mapbox Draw to enable polygon drawing and area calculation
       (async () => {
         try {
-          const Draw = (await import('@mapbox/mapbox-gl-draw')).default as any;
+          const Draw = (await import("@mapbox/mapbox-gl-draw")).default as any;
           const draw = new Draw({
             displayControlsDefault: false,
             controls: { polygon: true, trash: true },
           });
           drawRef.current = draw;
-          map.current?.addControl(draw, 'top-right');
+          map.current?.addControl(draw, "top-right");
           const updateArea = () => {
             try {
               const data = draw.getAll();
               let sqFt = 0;
               if (data && data.features && data.features.length > 0) {
                 // Use the last feature drawn that is a Polygon
-                const last = [...data.features].reverse().find((f: any) => f.geometry?.type === 'Polygon');
+                const last = [...data.features]
+                  .reverse()
+                  .find((f: any) => f.geometry?.type === "Polygon");
                 if (last) {
                   const sqMeters = turfArea(last as any);
                   sqFt = Math.max(0, Math.round(sqMeters * 10.7639));
@@ -99,25 +103,29 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
                 ...(window as any).mapMethods,
                 lastAreaSqFt: sqFt,
               };
-            } catch (_e) { /* ignore */ }
+            } catch (_e) {
+              /* ignore */
+            }
           };
-          map.current?.on('draw.create', updateArea);
-          map.current?.on('draw.update', updateArea);
-          map.current?.on('draw.delete', () => {
+          map.current?.on("draw.create", updateArea);
+          map.current?.on("draw.update", updateArea);
+          map.current?.on("draw.delete", () => {
             (window as any).mapMethods = {
               ...(window as any).mapMethods,
               lastAreaSqFt: 0,
             };
           });
-        } catch (_e) { /* ignore draw load */ }
+        } catch (_e) {
+          /* ignore draw load */
+        }
       })();
     });
 
-    map.current.on('click', (e) => {
+    map.current.on("click", (e) => {
       onMapClick?.(e);
     });
 
-    map.current.on('moveend', () => {
+    map.current.on("moveend", () => {
       if (map.current) {
         const newCenter = map.current.getCenter();
         const newZoom = map.current.getZoom();
@@ -140,7 +148,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       map.current.easeTo({
         center: center,
         zoom: zoom,
-        duration: 1000
+        duration: 1000,
       });
     }
   }, [center, zoom, mapLoaded]);
@@ -152,24 +160,27 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     }
   }, [styleUrl, mapLoaded]);
 
-  const addMarker = (lng: number, lat: number, options?: { 
-    color?: string; 
-    popup?: string;
-    draggable?: boolean;
-    className?: string;
-  }) => {
+  const addMarker = (
+    lng: number,
+    lat: number,
+    options?: {
+      color?: string;
+      popup?: string;
+      draggable?: boolean;
+      className?: string;
+    },
+  ) => {
     if (!map.current) return null;
 
     const marker = new mapboxgl.Marker({
-      color: options?.color || '#3FB1CE',
-      draggable: options?.draggable || false
+      color: options?.color || "#3FB1CE",
+      draggable: options?.draggable || false,
     })
       .setLngLat([lng, lat])
       .addTo(map.current);
 
     if (options?.popup) {
-      const popup = new mapboxgl.Popup({ offset: 25 })
-        .setHTML(options.popup);
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(options.popup);
       marker.setPopup(popup);
     }
 
@@ -178,7 +189,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
 
   const addGeoJSONSource = (
     sourceId: string,
-    data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>
+    data: GeoJSON.Feature<GeoJSON.Geometry> | GeoJSON.FeatureCollection<GeoJSON.Geometry>,
   ) => {
     if (!map.current || !mapLoaded) return;
 
@@ -186,8 +197,8 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       (map.current.getSource(sourceId) as mapboxgl.GeoJSONSource).setData(data);
     } else {
       map.current.addSource(sourceId, {
-        type: 'geojson',
-        data: data
+        type: "geojson",
+        data: data,
       });
     }
   };
@@ -206,7 +217,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     map.current.flyTo({
       center: center,
       zoom: zoom || map.current.getZoom(),
-      duration: 2000
+      duration: 2000,
     });
   };
 
@@ -228,7 +239,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   return (
     <div className={`relative w-full h-full ${className}`}>
       <div ref={mapContainer} data-testid="map-container" className="w-full h-full" />
-      
+
       {/* Loading indicator */}
       {!mapLoaded && (
         <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">

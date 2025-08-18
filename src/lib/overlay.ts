@@ -19,21 +19,21 @@ export function buildOverlayFromDefects(defects, extras = {}) {
     const lengthFt = d.measurements?.length || undefined;
     const areaSqft = d.measurements?.area || undefined;
 
-    if (type === 'crack') {
+    if (type === "crack") {
       if (lengthFt && lengthFt > 0) {
         cracks.push({ id: d.id, length_ft: lengthFt, severity: d.severity });
       }
       continue;
     }
 
-    if (type === 'pothole') {
+    if (type === "pothole") {
       if (areaSqft && areaSqft > 0) {
         potholes.push({ id: d.id, area_sqft: areaSqft, severity: d.severity });
       }
       continue;
     }
 
-    if (type === 'water_pooling') {
+    if (type === "water_pooling") {
       if (areaSqft && areaSqft > 0) pooling_area_sqft += areaSqft;
       continue;
     }
@@ -45,7 +45,7 @@ export function buildOverlayFromDefects(defects, extras = {}) {
   }
 
   // Allow callers to add/override pooling via extras
-  if (typeof extras.poolingAreaSqft === 'number') {
+  if (typeof extras.poolingAreaSqft === "number") {
     pooling_area_sqft += extras.poolingAreaSqft;
   }
 
@@ -54,8 +54,8 @@ export function buildOverlayFromDefects(defects, extras = {}) {
     potholes,
     distress_zones,
     slope_analysis: {
-      pooling_area_sqft
-    }
+      pooling_area_sqft,
+    },
   };
 
   return overlay;

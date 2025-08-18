@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 
 type CustomOverlay = {
   id: string;
@@ -14,14 +14,18 @@ type CustomOverlay = {
   visible: boolean;
 };
 
-const STORAGE_KEY = 'custom-overlays-library';
+const STORAGE_KEY = "custom-overlays-library";
 
 interface CustomOverlayManagerProps {
   isVisible: boolean;
 }
 
 function getMap(): any | null {
-  try { return (window as any).mapMethods?.getMap?.() ?? null; } catch { return null; }
+  try {
+    return (window as any).mapMethods?.getMap?.() ?? null;
+  } catch {
+    return null;
+  }
 }
 
 function ensureRasterOverlay(map: any, overlay: CustomOverlay) {
@@ -31,23 +35,27 @@ function ensureRasterOverlay(map: any, overlay: CustomOverlay) {
   try {
     if (!map.getSource(sourceId)) {
       map.addSource(sourceId, {
-        type: 'raster',
+        type: "raster",
         tiles: [overlay.urlTemplate],
         tileSize: 256,
-        attribution: 'Custom layer'
+        attribution: "Custom layer",
       });
     }
     if (!map.getLayer(layerId)) {
       map.addLayer({
         id: layerId,
-        type: 'raster',
+        type: "raster",
         source: sourceId,
-        paint: { 'raster-opacity': Math.max(0, Math.min(1, overlay.opacity / 100)) }
+        paint: { "raster-opacity": Math.max(0, Math.min(1, overlay.opacity / 100)) },
       });
     } else {
-      map.setPaintProperty(layerId, 'raster-opacity', Math.max(0, Math.min(1, overlay.opacity / 100)));
+      map.setPaintProperty(
+        layerId,
+        "raster-opacity",
+        Math.max(0, Math.min(1, overlay.opacity / 100)),
+      );
     }
-    map.setLayoutProperty(layerId, 'visibility', overlay.visible ? 'visible' : 'none');
+    map.setLayoutProperty(layerId, "visibility", overlay.visible ? "visible" : "none");
   } catch {
     // best-effort; ignore rendering errors
   }
@@ -59,31 +67,44 @@ function removeRasterOverlay(map: any, overlayId: string) {
   const layerId = `custom-overlay-lyr-${overlayId}`;
   try {
     if (map.getLayer(layerId)) map.removeLayer(layerId);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   try {
     if (map.getSource(sourceId)) map.removeSource(sourceId);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 const CustomOverlayManager: React.FC<CustomOverlayManagerProps> = ({ isVisible }) => {
   const [overlays, setOverlays] = useState<CustomOverlay[]>([]);
-  const [name, setName] = useState('');
-  const [url, setUrl] = useState('');
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
   const [opacity, setOpacity] = useState<number>(80);
   const mountedRef = useRef(false);
 
   // Load saved overlays
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') as CustomOverlay[];
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]") as CustomOverlay[];
       if (Array.isArray(saved)) setOverlays(saved);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   // Persist overlays
   useEffect(() => {
-    if (!mountedRef.current) { mountedRef.current = true; return; }
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(overlays)); } catch { /* ignore */ }
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(overlays));
+    } catch {
+      /* ignore */
+    }
   }, [overlays]);
 
   // Sync overlays to map whenever list changes
@@ -91,16 +112,22 @@ const CustomOverlayManager: React.FC<CustomOverlayManagerProps> = ({ isVisible }
     const map = getMap();
     if (!map) return;
     const syncAll = () => {
-      overlays.forEach(o => ensureRasterOverlay(map, o));
+      overlays.forEach((o) => ensureRasterOverlay(map, o));
     };
     if (map.isStyleLoaded?.()) syncAll();
     // Re-sync on style reloads (e.g., basemap change)
     const onStyleLoad = () => syncAll();
     try {
-      map.on('style.load', onStyleLoad);
-    } catch { /* ignore */ }
+      map.on("style.load", onStyleLoad);
+    } catch {
+      /* ignore */
+    }
     return () => {
-      try { map.off('style.load', onStyleLoad); } catch { /* ignore */ }
+      try {
+        map.off("style.load", onStyleLoad);
+      } catch {
+        /* ignore */
+      }
     };
   }, [overlays]);
 
@@ -108,26 +135,26 @@ const CustomOverlayManager: React.FC<CustomOverlayManagerProps> = ({ isVisible }
     if (!url || !name) return;
     const id = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const o: CustomOverlay = { id, name, urlTemplate: url, opacity, visible: true };
-    setOverlays(prev => [o, ...prev]);
+    setOverlays((prev) => [o, ...prev]);
     // Apply immediately
     const map = getMap();
     if (map) ensureRasterOverlay(map, o);
-    setName('');
-    setUrl('');
+    setName("");
+    setUrl("");
     setOpacity(80);
   };
 
   const removeOverlayById = (id: string) => {
-    setOverlays(prev => prev.filter(o => o.id !== id));
+    setOverlays((prev) => prev.filter((o) => o.id !== id));
     const map = getMap();
     if (map) removeRasterOverlay(map, id);
   };
 
   const updateOverlay = (id: string, patch: Partial<CustomOverlay>) => {
-    setOverlays(prev => prev.map(o => o.id === id ? { ...o, ...patch } : o));
+    setOverlays((prev) => prev.map((o) => (o.id === id ? { ...o, ...patch } : o)));
     const map = getMap();
     if (map) {
-      const next = overlays.find(o => o.id === id);
+      const next = overlays.find((o) => o.id === id);
       if (next) ensureRasterOverlay(map, { ...next, ...patch });
     }
   };
@@ -144,20 +171,38 @@ const CustomOverlayManager: React.FC<CustomOverlayManagerProps> = ({ isVisible }
             <div className="space-y-2">
               <div className="grid grid-cols-4 gap-2 items-center">
                 <Label className="col-span-1 text-xs">Name</Label>
-                <Input className="col-span-3 h-8" placeholder="My Tiles" value={name} onChange={e => setName(e.target.value)} />
+                <Input
+                  className="col-span-3 h-8"
+                  placeholder="My Tiles"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="grid grid-cols-4 gap-2 items-center">
                 <Label className="col-span-1 text-xs">URL</Label>
-                <Input className="col-span-3 h-8" placeholder="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" value={url} onChange={e => setUrl(e.target.value)} />
+                <Input
+                  className="col-span-3 h-8"
+                  placeholder="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
               </div>
               <div className="grid grid-cols-4 gap-2 items-center">
                 <Label className="col-span-1 text-xs">Opacity</Label>
                 <div className="col-span-3">
-                  <Slider value={[opacity]} onValueChange={(v) => setOpacity(v[0] ?? 80)} min={0} max={100} step={1} />
+                  <Slider
+                    value={[opacity]}
+                    onValueChange={(v) => setOpacity(v[0] ?? 80)}
+                    min={0}
+                    max={100}
+                    step={1}
+                  />
                 </div>
               </div>
               <div className="flex justify-end">
-                <Button size="sm" onClick={addOverlay}>Add Layer</Button>
+                <Button size="sm" onClick={addOverlay}>
+                  Add Layer
+                </Button>
               </div>
             </div>
           )}
@@ -165,21 +210,38 @@ const CustomOverlayManager: React.FC<CustomOverlayManagerProps> = ({ isVisible }
           {/* Existing overlays */}
           <div className="space-y-3">
             {overlays.length === 0 && (
-              <div className="text-xs text-slate-400">No custom layers yet. Add a tile URL template above.</div>
+              <div className="text-xs text-slate-400">
+                No custom layers yet. Add a tile URL template above.
+              </div>
             )}
-            {overlays.map(o => (
+            {overlays.map((o) => (
               <div key={o.id} className="rounded border border-slate-700 p-2">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-medium text-slate-200 truncate mr-2" title={o.name}>{o.name}</div>
+                  <div className="text-xs font-medium text-slate-200 truncate mr-2" title={o.name}>
+                    {o.name}
+                  </div>
                   <div className="flex items-center gap-2">
-                    <Switch checked={o.visible} onCheckedChange={(v) => updateOverlay(o.id, { visible: v })} />
-                    <Button variant="outline" size="xs" onClick={() => removeOverlayById(o.id)}>Remove</Button>
+                    <Switch
+                      checked={o.visible}
+                      onCheckedChange={(v) => updateOverlay(o.id, { visible: v })}
+                    />
+                    <Button variant="outline" size="xs" onClick={() => removeOverlayById(o.id)}>
+                      Remove
+                    </Button>
                   </div>
                 </div>
                 <div className="mt-2">
-                  <div className="text-[10px] text-slate-500 truncate" title={o.urlTemplate}>{o.urlTemplate}</div>
+                  <div className="text-[10px] text-slate-500 truncate" title={o.urlTemplate}>
+                    {o.urlTemplate}
+                  </div>
                   <div className="mt-1">
-                    <Slider value={[o.opacity]} onValueChange={(v) => updateOverlay(o.id, { opacity: v[0] ?? o.opacity })} min={0} max={100} step={1} />
+                    <Slider
+                      value={[o.opacity]}
+                      onValueChange={(v) => updateOverlay(o.id, { opacity: v[0] ?? o.opacity })}
+                      min={0}
+                      max={100}
+                      step={1}
+                    />
                   </div>
                 </div>
               </div>
@@ -192,4 +254,3 @@ const CustomOverlayManager: React.FC<CustomOverlayManagerProps> = ({ isVisible }
 };
 
 export default CustomOverlayManager;
-
