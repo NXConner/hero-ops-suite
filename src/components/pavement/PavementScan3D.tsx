@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 // Removed React Three.js dependencies - using real 3D implementation
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Real3DPavementViewer from "./Real3DPavementViewer";
+const Real3DPavementViewer = React.lazy(() => import("./Real3DPavementViewer"));
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";

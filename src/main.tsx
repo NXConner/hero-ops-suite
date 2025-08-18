@@ -20,13 +20,27 @@ try {
   /* ignore */
 }
 
-// Minimal PWA service worker registration (if present)
-if ("serviceWorker" in navigator) {
+// Robust service worker handling: enable only in production to avoid dev cache issues
+const SW_VERSION = "v3";
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch((_e) => {
+    const swUrl = `/sw.js?v=${SW_VERSION}`;
+    navigator.serviceWorker.register(swUrl).catch((_e) => {
       /* ignore */
     });
   });
+} else if ("serviceWorker" in navigator) {
+  // In development, unregister any existing SW and clear caches to prevent stale module issues
+  navigator.serviceWorker.getRegistrations().then((regs) => {
+    for (const reg of regs) reg.unregister();
+  });
+  if ("caches" in window) {
+    caches.keys().then((keys) => {
+      for (const key of keys) {
+        if (key.startsWith("ow-cache-")) caches.delete(key);
+      }
+    });
+  }
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
