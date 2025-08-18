@@ -80,7 +80,14 @@ function useNavConfig() {
 }
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    try {
+      const raw = localStorage.getItem('sidebar-collapsed');
+      return raw ? JSON.parse(raw) : true; // start minimized by default
+    } catch {
+      return true;
+    }
+  });
   const location = useLocation();
   const { config } = useNavConfig();
   const { isVeteran, veteranBranch, setLowPower, lowPowerMode } = useAdvancedTheme();
@@ -94,6 +101,10 @@ const Sidebar = () => {
   const computedWidth = useMemo(() => (
     isCollapsed ? 'clamp(3rem, 4vw, 4rem)' : 'clamp(14rem, 18vw, 22rem)'
   ), [isCollapsed]);
+
+  useEffect(() => {
+    try { localStorage.setItem('sidebar-collapsed', JSON.stringify(isCollapsed)); } catch { /* ignore */ }
+  }, [isCollapsed]);
 
   return (
     <>
