@@ -59,16 +59,11 @@ export default defineConfig(({ mode }) => ({
             "@radix-ui/react-toggle-group",
             "@radix-ui/react-tooltip",
           ],
-          maps_ml_3d: [
-            "mapbox-gl",
-            "@tensorflow/tfjs",
-            "three",
-            "@react-three/fiber",
-            "@react-three/drei",
-            "babylonjs",
-            "@babylonjs/core",
-            "@babylonjs/gui",
-          ],
+          // Split heavy libs into separate chunks so pages only load what they use
+          three: ["three", "@react-three/fiber", "@react-three/drei"],
+          babylon: ["babylonjs", "@babylonjs/core", "@babylonjs/gui"],
+          tfjs: ["@tensorflow/tfjs"],
+          mapbox: ["mapbox-gl"],
           charts_misc: ["recharts", "date-fns", "jszip", "html2canvas", "jspdf"],
           shadcn_misc: [
             "class-variance-authority",

@@ -27,7 +27,8 @@ import {
 } from "lucide-react";
 import CameraInterface from "@/components/pavement-scan/CameraInterface";
 import DefectDetection from "@/components/pavement-scan/DefectDetection";
-import ModelViewer3D from "@/components/pavement-scan/ModelViewer3D";
+import { Suspense, lazy } from "react";
+const ModelViewer3D = lazy(() => import("@/components/pavement-scan/ModelViewer3D"));
 import ReportGeneration from "@/components/pavement-scan/ReportGeneration";
 import SystemIntegration from "@/components/pavement-scan/SystemIntegration";
 import MarketplaceIntegration from "@/components/pavement-scan/MarketplaceIntegration";
@@ -492,7 +493,9 @@ const PavementScanPro = () => {
                 </TabsContent>
 
                 <TabsContent value="model3d" className="mt-6">
-                  <ModelViewer3D scanData={currentScan} defects={detectedDefects} />
+                  <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Loading 3D viewer…</div>}>
+                    <ModelViewer3D scanData={currentScan} defects={detectedDefects} />
+                  </Suspense>
                 </TabsContent>
 
                 <TabsContent value="report" className="mt-6">

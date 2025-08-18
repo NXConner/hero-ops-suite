@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense, lazy } from "react";
 // Removed react-leaflet dependency - using placeholder
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ import DraggableWidgets from "@/components/map/DraggableWidgets";
 import WeatherOverlay from "@/components/map/WeatherOverlay";
 import PavementScan3D from "@/components/pavement/PavementScan3D";
 import VoiceCommandInterface from "@/components/ai/VoiceCommandInterface";
-import RealMapComponent from "@/components/map/RealMapComponent";
+const RealMapComponent = lazy(() => import("@/components/map/RealMapComponent"));
 import { useTerminology } from "@/contexts/TerminologyContext";
 import CustomOverlayManager from "@/components/map/CustomOverlayManager";
 
@@ -688,7 +688,7 @@ const OverWatch: React.FC = () => {
         <div className="flex-1 relative">
           {/* Map Container */}
           <div className="absolute inset-0">
-            <RealMapComponent
+            <Suspense fallback={<div className="grid place-items-center h-full text-sm text-muted-foreground">Loading map…</div>}><RealMapComponent
               center={mapCenter}
               zoom={mapZoom}
               className="h-full w-full"
@@ -732,7 +732,7 @@ const OverWatch: React.FC = () => {
               {showCustomOverlayManager && (
                 <CustomOverlayManager isVisible={activeOverlays.includes("custom")} />
               )}
-            </RealMapComponent>
+            </RealMapComponent></Suspense>
           </div>
 
           {/* Draggable Widgets System */}
