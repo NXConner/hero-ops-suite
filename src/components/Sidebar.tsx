@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdvancedThemeToggle } from "@/components/theme/AdvancedThemeToggle";
+import { ChoicePathToggle } from "@/components/theme/ChoicePathToggle";
 import { 
   LayoutDashboard, 
   Target, 
@@ -80,7 +81,14 @@ function useNavConfig() {
 }
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    try {
+      const raw = localStorage.getItem('sidebar-collapsed');
+      return raw ? JSON.parse(raw) : true; // start minimized by default
+    } catch {
+      return true;
+    }
+  });
   const location = useLocation();
   const { config } = useNavConfig();
   const { isVeteran, veteranBranch, setLowPower, lowPowerMode } = useAdvancedTheme();
@@ -94,6 +102,10 @@ const Sidebar = () => {
   const computedWidth = useMemo(() => (
     isCollapsed ? 'clamp(3rem, 4vw, 4rem)' : 'clamp(14rem, 18vw, 22rem)'
   ), [isCollapsed]);
+
+  useEffect(() => {
+    try { localStorage.setItem('sidebar-collapsed', JSON.stringify(isCollapsed)); } catch { /* ignore */ }
+  }, [isCollapsed]);
 
   return (
     <>
@@ -214,7 +226,10 @@ const Sidebar = () => {
                   </div>
                 )}
                 <div className="flex items-center justify-between">
-                  <AdvancedThemeToggle />
+                  <div className="flex items-center gap-2">
+                    <AdvancedThemeToggle />
+                    <ChoicePathToggle />
+                  </div>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <Bell className="h-4 w-4" />
                   </Button>

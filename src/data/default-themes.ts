@@ -570,6 +570,63 @@ export const getDefaultThemes = (): Theme[] => [
       largeText: false,
       focusVisible: true
     },
+    // Dynamic choice variants to reflect player choices
+    choiceVariants: {
+      stealth: {
+        id: 'deus-ex-augment:stealth',
+        name: 'Stealth Path',
+        colors: {
+          accent: color(210, 30, 55),
+          accentForeground: color(0, 0, 100),
+          ring: color(210, 60, 55),
+          border: color(210, 12, 18)
+        },
+        effects: {
+          particles: { enabled: true, type: 'dust', count: 12, speed: 0.15, size: { min: 0.5, max: 1.5 }, color: color(210, 60, 55), opacity: { min: 0.04, max: 0.12 }, direction: 30, wind: 0.03 },
+          shadows: { glow: { type: 'glow', x: 0, y: 0, blur: 14, color: color(210, 60, 55), intensity: 0.25 } } as any
+        }
+      },
+      aggressive: {
+        id: 'deus-ex-augment:aggressive',
+        name: 'Aggressive Path',
+        colors: {
+          primary: color(10, 90, 58),
+          warning: color(10, 100, 58),
+          destructive: color(0, 90, 62)
+        },
+        effects: {
+          particles: { enabled: true, type: 'sparks', count: 70, speed: 1.4, size: { min: 1, max: 4 }, color: color(10, 100, 60), opacity: { min: 0.25, max: 0.7 }, direction: 0, wind: 0.2 },
+          animations: { glow: { name: 'ragePulse', duration: 1800, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } } as any
+        }
+      },
+      corporate: {
+        id: 'deus-ex-augment:corporate',
+        name: 'Corporate Alignment',
+        colors: {
+          background: color(45, 10, 8),
+          card: color(45, 10, 8),
+          border: color(45, 14, 22),
+          primary: color(45, 88, 52)
+        },
+        effects: {
+          particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+          blur: { overlay: { enabled: true, radius: 4, saturation: 110, brightness: 88 } } as any
+        }
+      },
+      anarchist: {
+        id: 'deus-ex-augment:anarchist',
+        name: 'Anarchist Path',
+        colors: {
+          accent: color(285, 85, 58),
+          accentForeground: color(240, 100, 3),
+          secondary: color(280, 40, 20)
+        },
+        effects: {
+          particles: { enabled: true, type: 'sparks', count: 48, speed: 1.0, size: { min: 1, max: 3 }, color: color(285, 85, 60), opacity: { min: 0.15, max: 0.45 }, direction: 315, wind: 0.15 },
+          animations: { glow: { name: 'glitchPulse', duration: 2200, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } } as any
+        }
+      }
+    },
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     tags: ['asphalt', 'highway', 'patrol', 'safety', 'high-visibility'],
@@ -684,6 +741,117 @@ export const getDefaultThemes = (): Theme[] => [
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     tags: ['tech', 'cyberpunk', 'neon', 'futuristic'],
+    featured: true,
+    public: true
+  },
+
+  // Deus Ex-inspired Theme
+  {
+    id: 'deus-ex-augment',
+    name: 'Deus Ex: Augment',
+    description: 'A modern tribute to Deus Ex: stealthy blacks, augment gold accents, and a choice-driven cyberpunk aura.',
+    category: 'tech',
+    author: 'OverWatch Systems',
+    version: '1.0.0',
+    baseMode: 'dark',
+    colors: {
+      background: color(45, 20, 6),
+      foreground: color(45, 20, 88),
+      primary: color(45, 95, 55),
+      primaryForeground: color(35, 20, 8),
+      secondary: color(45, 25, 14),
+      secondaryForeground: color(45, 18, 86),
+      accent: color(50, 95, 52),
+      accentForeground: color(35, 20, 8),
+      destructive: color(0, 85, 58),
+      destructiveForeground: color(0, 0, 100),
+      success: color(120, 75, 40),
+      successForeground: color(0, 0, 100),
+      warning: color(45, 100, 60),
+      warningForeground: color(35, 20, 8),
+      info: color(200, 70, 52),
+      infoForeground: color(0, 0, 100),
+      muted: color(45, 15, 12),
+      mutedForeground: color(45, 12, 64),
+      border: color(45, 22, 18),
+      input: color(45, 22, 18),
+      ring: color(45, 95, 55),
+      card: color(45, 20, 6),
+      cardForeground: color(45, 20, 88),
+      popover: color(45, 20, 6),
+      popoverForeground: color(45, 20, 88),
+      sidebar: color(45, 22, 8),
+      sidebarForeground: color(45, 18, 90),
+      sidebarPrimary: color(45, 95, 55),
+      sidebarPrimaryForeground: color(35, 20, 8),
+      sidebarAccent: color(45, 16, 12),
+      sidebarAccentForeground: color(45, 18, 88),
+      sidebarBorder: color(45, 16, 12),
+      sidebarRing: color(45, 95, 55)
+    },
+    effects: {
+      shadows: {
+        ...commonShadows,
+        glow: { type: 'glow', x: 0, y: 0, blur: 22, color: color(45, 100, 58), intensity: 0.45 }
+      },
+      blur: {
+        background: { enabled: true, radius: 10, saturation: 110, brightness: 80 },
+        overlay: { enabled: true, radius: 6, saturation: 105, brightness: 86 },
+        card: { enabled: true, radius: 3, saturation: 102, brightness: 92 }
+      },
+      particles: {
+        enabled: true,
+        type: 'geometric',
+        count: 36,
+        speed: 0.3,
+        size: { min: 1, max: 3 },
+        color: color(45, 100, 60),
+        opacity: { min: 0.08, max: 0.24 },
+        direction: 60,
+        wind: 0.08
+      },
+      animations: {
+        ...commonAnimations,
+        glow: { name: 'augmentPulse', duration: 2600, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' }
+      },
+      gradients: {
+        primary: { type: 'linear', angle: 135, stops: [ { color: color(45, 96, 60), position: 0 }, { color: color(45, 92, 48), position: 100 } ] },
+        secondary: { type: 'linear', angle: 90, stops: [ { color: color(45, 25, 16), position: 0 }, { color: color(45, 20, 8), position: 100 } ] },
+        hero: { type: 'linear', angle: 180, stops: [ { color: color(45, 22, 10), position: 0 }, { color: color(45, 18, 6), position: 100 } ] },
+        card: { type: 'linear', angle: 145, stops: [ { color: color(45, 20, 7), position: 0 }, { color: color(45, 16, 5), position: 100 } ] },
+        button: { type: 'linear', angle: 90, stops: [ { color: color(45, 96, 58), position: 0 }, { color: color(45, 94, 50), position: 100 } ] },
+        border: { type: 'conic', angle: 0, stops: [ { color: color(45, 96, 58, 0.35), position: 0 }, { color: color(45, 85, 45, 0.35), position: 100 } ] }
+      }
+    },
+    wallpaper: {
+      type: 'gradient',
+      gradient: { type: 'radial', stops: [ { color: color(45, 24, 8), position: 0 }, { color: color(45, 16, 4), position: 100 } ] },
+      overlay: { color: color(45, 96, 50), opacity: 0.08, blendMode: 'screen' }
+    },
+    typography: {
+      heading: { fontFamily: 'Inter', fontWeight: 800, letterSpacing: -0.035, lineHeight: 1.1 },
+      body: { fontFamily: 'Inter', fontWeight: 400, letterSpacing: 0.005, lineHeight: 1.6 },
+      caption: { fontFamily: 'Inter', fontWeight: 600, letterSpacing: 0.02, lineHeight: 1.4 },
+      code: { fontFamily: 'Monaco', fontWeight: 400, letterSpacing: 0, lineHeight: 1.5 },
+      label: { fontFamily: 'Inter', fontWeight: 700, letterSpacing: 0.015, lineHeight: 1.3 }
+    },
+    performance: {
+      enableAnimations: true,
+      enableParticles: true,
+      enableBlur: true,
+      enableShadows: true,
+      enableGradients: true,
+      quality: 'high'
+    },
+    accessibility: {
+      highContrast: true,
+      reducedMotion: false,
+      largeText: false,
+      focusVisible: true
+    },
+    createdAt: '2025-01-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z',
+    tags: ['tech', 'deus-ex', 'augment', 'gold', 'cyberpunk', 'triangles'],
     featured: true,
     public: true
   },

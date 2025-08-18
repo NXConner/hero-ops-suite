@@ -42,6 +42,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAdvancedTheme } from "@/contexts/AdvancedThemeContext";
 import ColorPicker from "@/components/theme/ColorPicker";
 import { useTerminology } from "@/contexts/TerminologyContext";
+import { ChoicePathToggle } from "@/components/theme/ChoicePathToggle";
 
 const Settings = () => {
   const { profile, save, reset } = useBusinessProfile();
@@ -85,6 +86,7 @@ const Settings = () => {
     setTheme
   } = useAdvancedTheme();
   const { terminologyMode, setTerminologyMode } = useTerminology();
+  const { choicePath, setChoicePath } = useAdvancedTheme();
 
   return (
     <div className="flex h-screen bg-background">
