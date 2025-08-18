@@ -31,6 +31,11 @@ export function AdvancedThemeProvider({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Dynamic choice path for theme variants
+  const [choicePath, setChoicePathState] = useState<string | null>(() => {
+    try { return localStorage.getItem('theme-choice-path') || null; } catch { return null; }
+  });
+
   // Global wallpaper override
   const [globalWallpaperOverride, setGlobalWallpaperOverrideState] = useState<ThemeWallpaper | null>(null);
   const [isGlobalWallpaperEnabled, setIsGlobalWallpaperEnabledState] = useState<boolean>(false);
@@ -159,6 +164,11 @@ export function AdvancedThemeProvider({
         activeTheme = mergeThemes(activeTheme, theme.timeVariants[timeVariant]);
       }
 
+      // Apply dynamic choice variant if present
+      if (choicePath && theme.choiceVariants && theme.choiceVariants[choicePath]) {
+        activeTheme = mergeThemes(activeTheme, theme.choiceVariants[choicePath]);
+      }
+
       // Adjust performance settings and apply low-power override
       const derived = {
         ...activeTheme.performance,
@@ -224,7 +234,7 @@ export function AdvancedThemeProvider({
       setError(err instanceof Error ? err.message : 'Failed to apply theme');
       console.error('Theme application error:', err);
     }
-  }, [globalWallpaperOverride, isGlobalWallpaperEnabled, lowPowerMode, isVeteran]);
+  }, [globalWallpaperOverride, isGlobalWallpaperEnabled, lowPowerMode, isVeteran, choicePath]);
 
   const setTheme = useCallback((themeId: string) => {
     const theme = [...availableThemes, ...customThemes].find(t => t.id === themeId);
@@ -349,6 +359,16 @@ export function AdvancedThemeProvider({
       console.error('Theme import error:', err);
     }
   }, [customThemes, presets, saveToStorage]);
+
+  // Dynamic choice path: setter
+  const setChoicePath = useCallback((path: string | null) => {
+    setChoicePathState(path);
+    try {
+      if (path === null) localStorage.removeItem('theme-choice-path');
+      else localStorage.setItem('theme-choice-path', path);
+    } catch { /* ignore */ }
+    if (currentTheme) applyTheme(currentTheme);
+  }, [applyTheme, currentTheme]);
 
   const resetTheme = useCallback(() => {
     if (availableThemes.length > 0) {
@@ -515,7 +535,10 @@ export function AdvancedThemeProvider({
     veteranBranch,
     setVeteranBranch,
     isBranchWallpaperPersistent,
-    setIsBranchWallpaperPersistent
+    setIsBranchWallpaperPersistent,
+    // Dynamic choice path
+    choicePath,
+    setChoicePath
   }), [
     currentTheme,
     filteredAvailableThemes,
@@ -543,7 +566,9 @@ export function AdvancedThemeProvider({
     lowPowerMode,
     isVeteran,
     veteranBranch,
-    isBranchWallpaperPersistent
+    isBranchWallpaperPersistent,
+    choicePath,
+    setChoicePath
   ]);
 
   return (

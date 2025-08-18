@@ -217,6 +217,10 @@ export interface Theme {
     evening?: ThemeVariant;
     night?: ThemeVariant;
   };
+
+  // Choice/dynamic variants that can be activated by app state
+  // Key is a choice path identifier, e.g., 'stealth', 'aggressive', 'corporate', 'anarchist'
+  choiceVariants?: Record<string, ThemeVariant>;
   
   // Custom CSS
   customCSS?: string;
@@ -295,6 +299,9 @@ export interface ThemeContext {
   applyPreset: (presetId: string) => void;
   isLoading: boolean;
   error: string | null;
+  // Dynamic choice path
+  choicePath: string | null;
+  setChoicePath: (path: string | null) => void;
   // Global wallpaper override API
   globalWallpaperOverride: ThemeWallpaper | null;
   isGlobalWallpaperEnabled: boolean;

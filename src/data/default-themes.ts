@@ -570,6 +570,63 @@ export const getDefaultThemes = (): Theme[] => [
       largeText: false,
       focusVisible: true
     },
+    // Dynamic choice variants to reflect player choices
+    choiceVariants: {
+      stealth: {
+        id: 'deus-ex-augment:stealth',
+        name: 'Stealth Path',
+        colors: {
+          accent: color(210, 30, 55),
+          accentForeground: color(0, 0, 100),
+          ring: color(210, 60, 55),
+          border: color(210, 12, 18)
+        },
+        effects: {
+          particles: { enabled: true, type: 'dust', count: 12, speed: 0.15, size: { min: 0.5, max: 1.5 }, color: color(210, 60, 55), opacity: { min: 0.04, max: 0.12 }, direction: 30, wind: 0.03 },
+          shadows: { glow: { type: 'glow', x: 0, y: 0, blur: 14, color: color(210, 60, 55), intensity: 0.25 } } as any
+        }
+      },
+      aggressive: {
+        id: 'deus-ex-augment:aggressive',
+        name: 'Aggressive Path',
+        colors: {
+          primary: color(10, 90, 58),
+          warning: color(10, 100, 58),
+          destructive: color(0, 90, 62)
+        },
+        effects: {
+          particles: { enabled: true, type: 'sparks', count: 70, speed: 1.4, size: { min: 1, max: 4 }, color: color(10, 100, 60), opacity: { min: 0.25, max: 0.7 }, direction: 0, wind: 0.2 },
+          animations: { glow: { name: 'ragePulse', duration: 1800, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } } as any
+        }
+      },
+      corporate: {
+        id: 'deus-ex-augment:corporate',
+        name: 'Corporate Alignment',
+        colors: {
+          background: color(45, 10, 8),
+          card: color(45, 10, 8),
+          border: color(45, 14, 22),
+          primary: color(45, 88, 52)
+        },
+        effects: {
+          particles: { enabled: false, type: 'geometric', count: 0, speed: 0, size: { min: 0, max: 0 }, color: color(0, 0, 0), opacity: { min: 0, max: 0 }, direction: 0, wind: 0 },
+          blur: { overlay: { enabled: true, radius: 4, saturation: 110, brightness: 88 } } as any
+        }
+      },
+      anarchist: {
+        id: 'deus-ex-augment:anarchist',
+        name: 'Anarchist Path',
+        colors: {
+          accent: color(285, 85, 58),
+          accentForeground: color(240, 100, 3),
+          secondary: color(280, 40, 20)
+        },
+        effects: {
+          particles: { enabled: true, type: 'sparks', count: 48, speed: 1.0, size: { min: 1, max: 3 }, color: color(285, 85, 60), opacity: { min: 0.15, max: 0.45 }, direction: 315, wind: 0.15 },
+          animations: { glow: { name: 'glitchPulse', duration: 2200, easing: 'ease-in-out', iterations: 'infinite', direction: 'alternate' } } as any
+        }
+      }
+    },
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     tags: ['asphalt', 'highway', 'patrol', 'safety', 'high-visibility'],
