@@ -46,7 +46,7 @@ const Header = () => {
 
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border">
-            <nav className="flex flex-col space-y-4 pt-4">
+            <nav className="flex items-center gap-4 overflow-x-auto whitespace-nowrap py-4">
               <a href="#features" className="text-foreground hover:text-primary transition-colors">
                 Features
               </a>
@@ -56,7 +56,7 @@ const Header = () => {
               <a href="#contact" className="text-foreground hover:text-primary transition-colors">
                 Contact
               </a>
-              <Link to="/dashboard">
+              <Link to="/dashboard" className="shrink-0">
                 <Button variant="default" className="bg-gradient-to-r from-primary to-accent">
                   Launch System
                 </Button>
