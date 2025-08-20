@@ -52,6 +52,8 @@ const OverWatch: React.FC = () => {
   const [heatmapEnabled, setHeatmapEnabled] = useState(false);
   const [autoRefreshPoints, setAutoRefreshPoints] = useState(false);
   const [refreshMs, setRefreshMs] = useState(15000);
+  const [selectedPresetId, setSelectedPresetId] = useState("");
+  const importFileRef = React.useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     try {
@@ -144,13 +146,66 @@ const OverWatch: React.FC = () => {
     persistPresets(next);
   };
 
+  const applyPreset = (id: string) => {
+    const p = presets.find((x) => x.id === id);
+    if (!p) return;
+    setSelectedMapService(p.selectedMapService);
+    setActiveOverlays(p.activeOverlays);
+    setMapCenter(p.mapCenter);
+    setMapZoom(p.mapZoom);
+  };
+
+  const deletePreset = (id: string) => {
+    const next = presets.filter((p) => p.id !== id);
+    persistPresets(next);
+    setSelectedPresetId("");
+  };
+
+  const exportPresets = () => {
+    try {
+      const data = JSON.stringify(presets, null, 2);
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "overwatch-layer-presets.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {}
+  };
+
+  const triggerImport = () => importFileRef.current?.click();
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const json = JSON.parse(String(reader.result));
+        if (Array.isArray(json)) persistPresets(json as any);
+      } catch {}
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
   return (
     <div className="flex h-screen bg-slate-950">
       <Sidebar />
       <div className="flex-1 relative">
-        <div className="p-3 flex gap-2">
+        <div className="p-3 flex gap-2 items-center">
           <Button variant="outline" onClick={handleLoadDemoPoints}>Load Demo Points</Button>
           <Button variant="outline" onClick={handleQuickSave}>Quick Save</Button>
+          <select
+            value={selectedMapService}
+            onChange={(e) => setSelectedMapService(e.target.value)}
+            className="h-8 bg-slate-800 border border-slate-600 text-xs text-slate-200 rounded px-2"
+            title="Basemap"
+          >
+            <option value="osm">OpenStreetMap</option>
+            <option value="satellite">Satellite</option>
+            <option value="topo">Topographic</option>
+          </select>
         </div>
         <div className="absolute inset-0">
           <RealMapComponent
@@ -193,23 +248,85 @@ const OverWatch: React.FC = () => {
             <span>Fleet</span>
             <Switch
               checked={activeOverlays.includes("fleet")}
-              onCheckedChange={(v) => setActiveOverlays((prev) => (v ? [...new Set([...prev, "fleet")] : prev.filter((id) => id !== "fleet")))}
+              onCheckedChange={(v) => {
+                setActiveOverlays((prev) => {
+                  if (v) return Array.from(new Set([...prev, "fleet"]));
+                  return prev.filter((id) => id !== "fleet");
+                });
+              }}
             />
             <span>Weather</span>
             <Switch
               checked={activeOverlays.includes("weather")}
-              onCheckedChange={(v) => setActiveOverlays((prev) => (v ? [...new Set([...prev, "weather")] : prev.filter((id) => id !== "weather")))}
+              onCheckedChange={(v) => {
+                setActiveOverlays((prev) => {
+                  if (v) return Array.from(new Set([...prev, "weather"]));
+                  return prev.filter((id) => id !== "weather");
+                });
+              }}
             />
             <span>Pavement</span>
             <Switch
               checked={activeOverlays.includes("pavement")}
-              onCheckedChange={(v) => setActiveOverlays((prev) => (v ? [...new Set([...prev, "pavement")] : prev.filter((id) => id !== "pavement")))}
+              onCheckedChange={(v) => {
+                setActiveOverlays((prev) => {
+                  if (v) return Array.from(new Set([...prev, "pavement"]));
+                  return prev.filter((id) => id !== "pavement");
+                });
+              }}
             />
           </div>
           <div className="mt-3">
             <Button variant="outline" size="sm" className="bg-slate-800 border-slate-600 text-xs w-full" onClick={handleQuickSave}>
               Save Current as Preset
             </Button>
+            <div className="mt-2 grid grid-cols-2 gap-2 items-center">
+              <select
+                value={selectedPresetId}
+                onChange={(e) => setSelectedPresetId(e.target.value)}
+                className="h-8 bg-slate-800 border border-slate-600 text-xs text-slate-200 rounded px-2 col-span-2"
+              >
+                <option value="">Select preset…</option>
+                {presets.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={() => selectedPresetId && applyPreset(selectedPresetId)}
+              >
+                Apply
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={() => selectedPresetId && deletePreset(selectedPresetId)}
+              >
+                Delete
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs col-span-1"
+                onClick={exportPresets}
+              >
+                Export
+              </Button>
+              <input ref={importFileRef} type="file" accept="application/json" className="hidden" onChange={handleImport} />
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs col-span-1"
+                onClick={triggerImport}
+              >
+                Import
+              </Button>
+            </div>
           </div>
         </div>
       </div>
