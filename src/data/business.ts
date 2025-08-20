@@ -124,5 +124,8 @@ export const BUSINESS_PROFILE: BusinessProfile = {
     phone: "",
     email: "",
     website: "",
+    primaryColor: "#0f172a",
+    secondaryColor: "#22d3ee",
+    footerText: "Terms: Net 30. Prices valid 30 days. Work scheduled weather permitting.",
   },
 };

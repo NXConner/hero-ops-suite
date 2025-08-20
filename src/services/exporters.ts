@@ -10,7 +10,7 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = "invoice
   const margin = 40;
   const maxWidth = 612 - margin * 2; // letter width in pts
   // Header
-  doc.setFillColor("#0f172a");
+  doc.setFillColor(branding.primaryColor || "#0f172a");
   doc.rect(0, 0, 612, 90, "F");
   const company = BUSINESS_PROFILE.businessName || "Asphalt Company";
   const addr = BUSINESS_PROFILE.address?.full || "";
@@ -62,7 +62,7 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = "invoice
       // ignore outer logo rendering errors
     }
   }
-  doc.setTextColor("#22d3ee");
+  doc.setTextColor(branding.secondaryColor || "#22d3ee");
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.text(company, hasLogo ? margin + 130 : margin, 40);
@@ -100,7 +100,8 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = "invoice
   });
 
   // Footer: terms and signature
-  const terms = "Terms: Net 30. Prices valid 30 days. Work scheduled weather permitting.";
+  const terms = branding.footerText ||
+    "Terms: Net 30. Prices valid 30 days. Work scheduled weather permitting.";
   y += 12;
   if (y > 730) {
     doc.addPage();
