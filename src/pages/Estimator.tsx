@@ -18,7 +18,7 @@ import type { EstimateInput, ServiceType } from "@/lib/estimator";
 import { buildEstimate } from "@/lib/estimator";
 import { BUSINESS_PROFILE } from "@/data/business";
 import { useBusinessProfile } from "@/hooks/useBusinessProfile";
-import { computeRoundTripMilesBetween, reverseGeocode } from "@/lib/geo";
+import { computeRoundTripMilesBetween, reverseGeocode, inferSalesTaxPctFromAddress } from "@/lib/geo";
 import { searchAddressCandidates, type AddressCandidate } from "@/lib/geo";
 import { saveJob, listJobs, type StoredJob } from "@/services/jobs";
 import { listCustomers, saveCustomer, type Customer } from "@/services/customers";
@@ -347,6 +347,9 @@ const Estimator = () => {
       setJobAddress(full);
       const res = await geocodeAddress(full);
       setJobCoords(res);
+      // Auto tax inference
+      const inferred = inferSalesTaxPctFromAddress(full);
+      if (inferred !== null) setOverrideSalesTaxPct(inferred);
     }
   };
 

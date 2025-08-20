@@ -104,6 +104,15 @@ describe("estimator helpers", () => {
     expect(out.total).toBeCloseTo(out.subtotal + out.overhead.cost + out.profit.cost, 2);
   });
 
+  it("uses overrideSalesTaxPct when provided", () => {
+    const input = baseInput();
+    (input as any).applySalesTax = true;
+    (input as any).overrideSalesTaxPct = 0.05;
+    const out = buildEstimate(input);
+    const expectedBase = out.subtotal + out.overhead.cost + out.profit.cost;
+    expect(out.total).toBeGreaterThan(expectedBase);
+  });
+
   it("respects trailer MPG modifier", () => {
     const input = baseInput();
     (input as any).trailerMpgModifierPct = -0.1;
