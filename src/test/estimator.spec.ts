@@ -97,6 +97,13 @@ describe("estimator helpers", () => {
     expect(out.total).toBeGreaterThan(out.subtotal + out.overhead.cost + out.profit.cost - 1);
   });
 
+  it("computes identical totals when tax is off", () => {
+    const input = baseInput();
+    (input as any).applySalesTax = false;
+    const out = buildEstimate(input);
+    expect(out.total).toBeCloseTo(out.subtotal + out.overhead.cost + out.profit.cost, 2);
+  });
+
   it("respects trailer MPG modifier", () => {
     const input = baseInput();
     (input as any).trailerMpgModifierPct = -0.1;

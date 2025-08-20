@@ -24,6 +24,7 @@ import { saveJob, listJobs, type StoredJob } from "@/services/jobs";
 import { listCustomers, saveCustomer, type Customer } from "@/services/customers";
 import {
   exportInvoicePDF,
+  exportInvoiceTablePDF,
   exportJobsCSV,
   exportCustomersCSV,
   downloadTextFile,
@@ -1224,6 +1225,28 @@ ${textInvoiceRounded}`}
                   }
                 >
                   Export PDF
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    exportInvoiceTablePDF(
+                      {
+                        projectDescription: result.projectDescription,
+                        materials: result.materials,
+                        labor: result.labor,
+                        equipmentAndFuel: result.equipmentAndFuel,
+                        mobilization: result.mobilization,
+                        subtotal: result.subtotal,
+                        overhead: result.overhead,
+                        profit: result.profit,
+                        total: result.total,
+                      },
+                      jobName || "invoice",
+                    )
+                  }
+                >
+                  Export Table PDF
                 </Button>
                 <div className="flex items-center gap-2">
                   <Label className="text-xs">Compliance State</Label>
