@@ -409,32 +409,57 @@ const OverWatch: React.FC = () => {
                     <div className="text-xs text-slate-500 mt-2">
                       Cluster: {clusterEnabled ? "On" : "Off"} · Heatmap: {heatmapEnabled ? "On" : "Off"}
                     </div>
-                    <div className="mt-3 inline-flex items-center gap-3 rounded border border-slate-700 bg-slate-900/70 px-3 py-2">
-                      <span className="text-xs text-slate-300">Legend:</span>
-                      <span className="inline-flex items-center gap-1 text-xs text-cyan-300">
-                        <span className="inline-block w-3 h-3 rounded-full bg-cyan-400" /> Cluster
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-xs text-red-300">
-                        <span className="inline-block w-3 h-3 rounded-full bg-red-500 opacity-60" /> Heat
-                      </span>
-                      <span className="inline-flex items-center gap-2 text-xs text-slate-400 ml-3">
-                        <Label className="text-xs">Show</Label>
+                    <div className="fixed right-4 bottom-24 z-40 w-72 rounded-md border border-slate-700 bg-slate-900/85 p-3 shadow-lg backdrop-blur">
+                      <div className="text-xs text-slate-300 mb-2">Legend & Controls</div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="inline-flex items-center gap-1 text-xs text-cyan-300">
+                          <span className="inline-block w-3 h-3 rounded-full bg-cyan-400" /> Cluster
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-xs text-red-300">
+                          <span className="inline-block w-3 h-3 rounded-full bg-red-500 opacity-60" /> Heat
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 items-center text-xs text-slate-300">
+                        <span>Show Clusters</span>
                         <Switch checked={clusterEnabled} onCheckedChange={setClusterEnabled} />
-                        <span className="text-xs">Clusters</span>
+                        <span>Show Heatmap</span>
                         <Switch checked={heatmapEnabled} onCheckedChange={setHeatmapEnabled} />
-                        <span className="text-xs">Heatmap</span>
+                        <span>Auto Refresh</span>
                         <Switch checked={autoRefreshPoints} onCheckedChange={setAutoRefreshPoints} />
-                        <span className="text-xs">Auto Refresh</span>
+                        <span>Refresh (ms)</span>
                         <input
                           type="number"
                           min={2000}
                           step={1000}
                           value={refreshMs}
                           onChange={(e) => setRefreshMs(Math.max(2000, Number(e.target.value) || 15000))}
-                          className="h-6 w-20 bg-slate-800 border border-slate-600 text-xs text-slate-200 rounded px-1"
+                          className="h-6 w-full bg-slate-800 border border-slate-600 text-xs text-slate-200 rounded px-1"
                           title="Refresh ms"
                         />
-                      </span>
+                      </div>
+                      <div className="mt-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-slate-800 border-slate-600 text-xs w-full"
+                          onClick={() => {
+                            const name = `${selectedMapService.toUpperCase()} · ${new Date().toLocaleTimeString()}`;
+                            const id = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                            const preset = {
+                              id,
+                              name,
+                              selectedMapService,
+                              activeOverlays: [...activeOverlays],
+                              mapCenter: [...mapCenter] as [number, number],
+                              mapZoom,
+                            };
+                            const next = [preset, ...layerPresets].slice(0, 20);
+                            persistLayerPresets(next);
+                          }}
+                        >
+                          Save Current as Preset
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
