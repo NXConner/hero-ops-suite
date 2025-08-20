@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import Sidebar from "@/components/Sidebar";
 import { useSearchParams } from "react-router-dom";
 import { useTerminology } from "@/contexts/TerminologyContext";
+import { authService } from "@/services/auth";
 
 const mapServices = [
   { id: "osm", name: "OpenStreetMap", icon: null },
@@ -68,6 +69,26 @@ const OverWatch: React.FC = () => {
     } catch {
       /* ignore */
     }
+    // Apply role-based default preset once per user
+    try {
+      const user = authService.getCurrentUser?.();
+      const appliedKey = user ? `ow-default-applied-${user.id}` : null;
+      if (user && !localStorage.getItem(appliedKey!)) {
+        const roleDefaults: Record<string, { overlays: string[]; service: string }> = {
+          admin: { overlays: ["fleet", "weather", "pavement"], service: "satellite" },
+          supervisor: { overlays: ["fleet", "weather"], service: "osm" },
+          operator: { overlays: ["fleet"], service: "osm" },
+          analyst: { overlays: ["pavement", "weather"], service: "topo" },
+          field_worker: { overlays: ["fleet"], service: "osm" },
+          viewer: { overlays: ["weather"], service: "osm" },
+          super_admin: { overlays: ["fleet", "weather", "pavement"], service: "satellite" },
+        };
+        const def = roleDefaults[user.role] || roleDefaults.viewer;
+        setSelectedMapService(def.service);
+        setActiveOverlays(def.overlays);
+        localStorage.setItem(appliedKey!, "1");
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -208,6 +229,27 @@ const OverWatch: React.FC = () => {
               <Label htmlFor="layer-presets" className="text-xs text-slate-300">
                 Layer Presets:
               </Label>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={() => {
+                  const name = `${selectedMapService.toUpperCase()} · ${new Date().toLocaleTimeString()}`;
+                  const id = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                  const preset = {
+                    id,
+                    name,
+                    selectedMapService,
+                    activeOverlays: [...activeOverlays],
+                    mapCenter: [...mapCenter] as [number, number],
+                    mapZoom,
+                  };
+                  const next = [preset, ...layerPresets].slice(0, 20);
+                  persistLayerPresets(next);
+                }}
+              >
+                Quick Save
+              </Button>
               <Input
                 value={layerPresetName}
                 onChange={(e) => setLayerPresetName(e.target.value)}
