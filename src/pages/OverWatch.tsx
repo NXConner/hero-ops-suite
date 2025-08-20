@@ -50,6 +50,8 @@ const OverWatch: React.FC = () => {
   >([]);
   const [clusterEnabled, setClusterEnabled] = useState<boolean>(false);
   const [heatmapEnabled, setHeatmapEnabled] = useState<boolean>(false);
+  const [autoRefreshPoints, setAutoRefreshPoints] = useState<boolean>(false);
+  const [refreshMs, setRefreshMs] = useState<number>(15000);
 
   useEffect(() => {
     try {
@@ -119,6 +121,27 @@ const OverWatch: React.FC = () => {
     clusterEnabled,
     heatmapEnabled,
   ]);
+
+  // Auto-refresh demo points when enabled
+  useEffect(() => {
+    if (!autoRefreshPoints) return;
+    let stop = false;
+    const tick = async () => {
+      try {
+        const resp = await fetch(`/demo/points?n=150&lng=${mapCenter[0]}&lat=${mapCenter[1]}&spread=0.3`);
+        const json = await resp.json();
+        const api = (window as any).mapMethods;
+        if (!stop && api?.setPoints && Array.isArray(json.points)) {
+          api.setPoints(json.points);
+        }
+      } catch {}
+      if (!stop) setTimeout(tick, refreshMs);
+    };
+    tick();
+    return () => {
+      stop = true;
+    };
+  }, [autoRefreshPoints, mapCenter, refreshMs]);
 
   function persistLayerPresets(next: typeof layerPresets) {
     setLayerPresets(next);
@@ -385,6 +408,33 @@ const OverWatch: React.FC = () => {
                     <div className="h-full w-full" id="map-container"></div>
                     <div className="text-xs text-slate-500 mt-2">
                       Cluster: {clusterEnabled ? "On" : "Off"} · Heatmap: {heatmapEnabled ? "On" : "Off"}
+                    </div>
+                    <div className="mt-3 inline-flex items-center gap-3 rounded border border-slate-700 bg-slate-900/70 px-3 py-2">
+                      <span className="text-xs text-slate-300">Legend:</span>
+                      <span className="inline-flex items-center gap-1 text-xs text-cyan-300">
+                        <span className="inline-block w-3 h-3 rounded-full bg-cyan-400" /> Cluster
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-red-300">
+                        <span className="inline-block w-3 h-3 rounded-full bg-red-500 opacity-60" /> Heat
+                      </span>
+                      <span className="inline-flex items-center gap-2 text-xs text-slate-400 ml-3">
+                        <Label className="text-xs">Show</Label>
+                        <Switch checked={clusterEnabled} onCheckedChange={setClusterEnabled} />
+                        <span className="text-xs">Clusters</span>
+                        <Switch checked={heatmapEnabled} onCheckedChange={setHeatmapEnabled} />
+                        <span className="text-xs">Heatmap</span>
+                        <Switch checked={autoRefreshPoints} onCheckedChange={setAutoRefreshPoints} />
+                        <span className="text-xs">Auto Refresh</span>
+                        <input
+                          type="number"
+                          min={2000}
+                          step={1000}
+                          value={refreshMs}
+                          onChange={(e) => setRefreshMs(Math.max(2000, Number(e.target.value) || 15000))}
+                          className="h-6 w-20 bg-slate-800 border border-slate-600 text-xs text-slate-200 rounded px-1"
+                          title="Refresh ms"
+                        />
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
