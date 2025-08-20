@@ -171,14 +171,26 @@ export function exportInvoiceTablePDF(
     y += 6;
   };
 
-  drawSection(
-    "Materials",
-    est.materials.map((m) => ({
-      label: m.label,
-      cost: m.cost,
-      extra: m.quantity && m.unit ? `${m.quantity} ${m.unit}` : undefined,
-    })),
-  );
+  // Materials with Qty/Unit rendering
+  if (est.materials.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.text("Materials", margin, y);
+    y += 12;
+    doc.setFont("helvetica", "normal");
+    est.materials.forEach((m) => {
+      if (y > 720) {
+        doc.addPage();
+        y = margin;
+      }
+      const qtyUnit = m.quantity && m.unit ? `${m.quantity} ${m.unit}` : "";
+      const right = `$${m.cost.toFixed(2)}`;
+      doc.text(m.label, margin, y);
+      if (qtyUnit) doc.text(qtyUnit, margin + 320, y);
+      doc.text(right, 612 - margin, y, { align: "right" });
+      y += 14;
+    });
+    y += 6;
+  }
   drawSection("Labor", est.labor.map((l) => ({ label: l.label, cost: l.cost, extra: l.notes })));
   drawSection(
     "Equipment & Fuel",
