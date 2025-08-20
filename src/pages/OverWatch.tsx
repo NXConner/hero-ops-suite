@@ -20,6 +20,7 @@ import Sidebar from "@/components/Sidebar";
 import { useSearchParams } from "react-router-dom";
 import { useTerminology } from "@/contexts/TerminologyContext";
 import { authService } from "@/services/auth";
+import { saveLayerPresetsToCloud, loadLayerPresetsFromCloud } from "@/services/overwatchPresets";
 
 const mapServices = [
   { id: "osm", name: "OpenStreetMap", icon: null },
@@ -71,6 +72,11 @@ const OverWatch: React.FC = () => {
     } catch {
       /* ignore */
     }
+    // Cloud load best-effort
+    (async () => {
+      const cloud = await loadLayerPresetsFromCloud();
+      if (cloud && cloud.length > 0) setLayerPresets(cloud as any);
+    })();
     // Apply role-based default preset once per user
     try {
       const user = authService.getCurrentUser?.();
@@ -150,6 +156,7 @@ const OverWatch: React.FC = () => {
     } catch {
       /* ignore */
     }
+    void saveLayerPresetsToCloud(next as any);
   }
 
   function saveCurrentAsPreset() {
