@@ -100,18 +100,29 @@ Object.defineProperty(window, "indexedDB", {
   },
 });
 
-// Mock localStorage
-Object.defineProperty(window, "localStorage", {
-  writable: true,
-  value: {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-    length: 0,
-    key: vi.fn(),
-  },
-});
+// Mock localStorage with in-memory store
+(() => {
+  const store: Record<string, string> = {};
+  Object.defineProperty(window, "localStorage", {
+    writable: true,
+    value: {
+      getItem: vi.fn((key: string) => (key in store ? store[key] : null)),
+      setItem: vi.fn((key: string, value: string) => {
+        store[key] = String(value);
+      }),
+      removeItem: vi.fn((key: string) => {
+        delete store[key];
+      }),
+      clear: vi.fn(() => {
+        for (const k of Object.keys(store)) delete store[k];
+      }),
+      get length() {
+        return Object.keys(store).length;
+      },
+      key: vi.fn((index: number) => Object.keys(store)[index] ?? null),
+    },
+  });
+})();
 
 // Mock URL.createObjectURL
 Object.defineProperty(window.URL, "createObjectURL", {

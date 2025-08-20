@@ -10,11 +10,11 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = "invoice
   const margin = 40;
   const maxWidth = 612 - margin * 2; // letter width in pts
   // Header
+  const branding = BUSINESS_PROFILE.branding || {};
   doc.setFillColor(branding.primaryColor || "#0f172a");
   doc.rect(0, 0, 612, 90, "F");
   const company = BUSINESS_PROFILE.businessName || "Asphalt Company";
   const addr = BUSINESS_PROFILE.address?.full || "";
-  const branding = BUSINESS_PROFILE.branding || {};
   // Optional logo
   const hasLogo = !!branding.logoUrl;
   if (hasLogo) {
