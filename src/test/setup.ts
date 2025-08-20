@@ -100,18 +100,29 @@ Object.defineProperty(window, "indexedDB", {
   },
 });
 
-// Mock localStorage
-Object.defineProperty(window, "localStorage", {
-  writable: true,
-  value: {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-    length: 0,
-    key: vi.fn(),
-  },
-});
+// Mock localStorage with in-memory store
+(() => {
+  const store: Record<string, string> = {};
+  Object.defineProperty(window, "localStorage", {
+    writable: true,
+    value: {
+      getItem: vi.fn((key: string) => (key in store ? store[key] : null)),
+      setItem: vi.fn((key: string, value: string) => {
+        store[key] = String(value);
+      }),
+      removeItem: vi.fn((key: string) => {
+        delete store[key];
+      }),
+      clear: vi.fn(() => {
+        for (const k of Object.keys(store)) delete store[k];
+      }),
+      get length() {
+        return Object.keys(store).length;
+      },
+      key: vi.fn((index: number) => Object.keys(store)[index] ?? null),
+    },
+  });
+})();
 
 // Mock URL.createObjectURL
 Object.defineProperty(window.URL, "createObjectURL", {
@@ -209,3 +220,82 @@ console.error = (...args: any[]) => {
   }
   originalConsoleError(...args);
 };
+
+// Mock maplibre-gl to avoid WebGL in tests
+vi.mock("maplibre-gl", () => {
+  class Map {
+    private _sources: Record<string, any> = {};
+    private _layers: Record<string, any> = {};
+    private _handlers: Record<string, Function> = {};
+    constructor(opts: any) {
+      // noop
+      setTimeout(() => {
+        if (this._handlers["load"]) this._handlers["load"]({});
+      }, 0);
+    }
+    addControl(): void {}
+    on(evt: string, cb: Function): void {
+      this._handlers[evt] = cb as any;
+    }
+    setStyle(): void {}
+    isStyleLoaded(): boolean {
+      return true;
+    }
+    getCenter(): { lng: number; lat: number } {
+      return { lng: -74, lat: 40 };
+    }
+    getZoom(): number {
+      return 10;
+    }
+    remove(): void {}
+    addSource(id: string, src: any): void {
+      this._sources[id] = {
+        data: src.data,
+        setData: (d: any) => {
+          this._sources[id].data = d;
+        },
+      };
+    }
+    getSource(id: string): any {
+      return this._sources[id];
+    }
+    addLayer(layer: any): void {
+      this._layers[layer.id] = layer;
+    }
+    getLayer(id: string): any {
+      return this._layers[id];
+    }
+    setLayoutProperty(): void {}
+  }
+  class NavigationControl {}
+  class GeolocateControl {}
+  class ScaleControl {}
+  class FullscreenControl {}
+  class Marker {
+    setLngLat(): this {
+      return this;
+    }
+    addTo(): this {
+      return this;
+    }
+    setPopup(): this {
+      return this;
+    }
+  }
+  class Popup {
+    setHTML(): this {
+      return this;
+    }
+  }
+  return {
+    default: {
+      Map,
+      NavigationControl,
+      GeolocateControl,
+      ScaleControl,
+      FullscreenControl,
+      Marker,
+      Popup,
+    },
+  };
+});

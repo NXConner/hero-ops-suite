@@ -37,6 +37,8 @@ interface RealMapComponentProps {
   // Preferred: provide open/free raster tiles
   tileUrls?: string[];
   attribution?: string;
+  clusterEnabled?: boolean;
+  heatmapEnabled?: boolean;
 }
 
 const RealMapComponent: React.FC<RealMapComponentProps> = ({
@@ -49,11 +51,14 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   children,
   tileUrls = ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
   attribution = "© OpenStreetMap contributors",
+  clusterEnabled = false,
+  heatmapEnabled = false,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const drawRef = useRef<any>(null);
+  const pointsDataRef = useRef<GeoJSON.FeatureCollection<GeoJSON.Point> | null>(null);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -179,6 +184,123 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     }
   }, [tileUrls, attribution, mapLoaded]);
 
+  // Placeholder effects for cluster/heatmap toggles until data layers are wired
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+    // Expose toggle states for potential child components to use
+    (window as any).mapMethods = {
+      ...(window as any).mapMethods,
+      clusterEnabled,
+      heatmapEnabled,
+    };
+  }, [clusterEnabled, heatmapEnabled, mapLoaded]);
+
+  // Helpers to create clustered point layers
+  const ensurePointLayers = () => {
+    if (!map.current || !mapLoaded) return;
+    const m = map.current;
+    const sourceId = "ow-points";
+
+    if (!m.getSource(sourceId)) {
+      m.addSource(sourceId, {
+        type: "geojson",
+        data: pointsDataRef.current || { type: "FeatureCollection", features: [] },
+        cluster: true,
+        clusterMaxZoom: 14,
+        clusterRadius: 50,
+      } as any);
+    }
+    // Cluster circles
+    if (!m.getLayer("ow-clusters")) {
+      m.addLayer({
+        id: "ow-clusters",
+        type: "circle",
+        source: sourceId,
+        filter: ["has", "point_count"],
+        paint: {
+          "circle-color": [
+            "step",
+            ["get", "point_count"],
+            "#51bbd6",
+            100,
+            "#f1f075",
+            750,
+            "#f28cb1",
+          ],
+          "circle-radius": [
+            "step",
+            ["get", "point_count"],
+            15,
+            100,
+            20,
+            750,
+            25,
+          ],
+          "circle-opacity": 0.8,
+        },
+      } as any);
+    }
+    // Cluster count labels
+    if (!m.getLayer("ow-cluster-count")) {
+      m.addLayer({
+        id: "ow-cluster-count",
+        type: "symbol",
+        source: sourceId,
+        filter: ["has", "point_count"],
+        layout: {
+          "text-field": ["get", "point_count_abbreviated"],
+          "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+          "text-size": 12,
+        },
+        paint: { "text-color": "#0f172a" },
+      } as any);
+    }
+    // Unclustered points
+    if (!m.getLayer("ow-unclustered")) {
+      m.addLayer({
+        id: "ow-unclustered",
+        type: "circle",
+        source: sourceId,
+        filter: ["!has", "point_count"],
+        paint: {
+          "circle-color": "#11b4da",
+          "circle-radius": 6,
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+      } as any);
+    }
+    // Heat layer (simulated via large semi-transparent circles)
+    if (!m.getLayer("ow-heat")) {
+      m.addLayer({
+        id: "ow-heat",
+        type: "circle",
+        source: sourceId,
+        paint: {
+          "circle-color": "#ef4444",
+          "circle-radius": 20,
+          "circle-blur": 1,
+          "circle-opacity": 0.25,
+        },
+      } as any);
+    }
+
+    // Toggle visibility
+    try {
+      m.setLayoutProperty("ow-clusters", "visibility", clusterEnabled ? "visible" : "none");
+      m.setLayoutProperty("ow-cluster-count", "visibility", clusterEnabled ? "visible" : "none");
+      m.setLayoutProperty("ow-unclustered", "visibility", clusterEnabled ? "none" : "visible");
+      m.setLayoutProperty("ow-heat", "visibility", heatmapEnabled ? "visible" : "none");
+    } catch (_e) {
+      /* ignore */
+    }
+  };
+
+  // Apply layers on load and whenever toggles change
+  useEffect(() => {
+    ensurePointLayers();
+  }, [mapLoaded, clusterEnabled, heatmapEnabled]);
+
   const addMarker = (
     lng: number,
     lat: number,
@@ -251,6 +373,24 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         flyTo,
         getMap: () => map.current,
         lastAreaSqFt: (window as any).mapMethods?.lastAreaSqFt || 0,
+        clusterEnabled: (window as any).mapMethods?.clusterEnabled || false,
+        heatmapEnabled: (window as any).mapMethods?.heatmapEnabled || false,
+        setPoints: (features: Array<{ lng: number; lat: number }>) => {
+          const fc: GeoJSON.FeatureCollection<GeoJSON.Point> = {
+            type: "FeatureCollection",
+            features: (features || []).map((pt) => ({
+              type: "Feature",
+              properties: {},
+              geometry: { type: "Point", coordinates: [pt.lng, pt.lat] },
+            })),
+          };
+          pointsDataRef.current = fc;
+          if (map.current && mapLoaded) {
+            const src = map.current.getSource("ow-points") as any;
+            if (src && src.setData) src.setData(fc);
+            else ensurePointLayers();
+          }
+        },
       };
     }
   }, [mapLoaded]);

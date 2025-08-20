@@ -10,11 +10,11 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = "invoice
   const margin = 40;
   const maxWidth = 612 - margin * 2; // letter width in pts
   // Header
-  doc.setFillColor("#0f172a");
+  const branding = BUSINESS_PROFILE.branding || {};
+  doc.setFillColor(branding.primaryColor || "#0f172a");
   doc.rect(0, 0, 612, 90, "F");
   const company = BUSINESS_PROFILE.businessName || "Asphalt Company";
   const addr = BUSINESS_PROFILE.address?.full || "";
-  const branding = BUSINESS_PROFILE.branding || {};
   // Optional logo
   const hasLogo = !!branding.logoUrl;
   if (hasLogo) {
@@ -62,7 +62,7 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = "invoice
       // ignore outer logo rendering errors
     }
   }
-  doc.setTextColor("#22d3ee");
+  doc.setTextColor(branding.secondaryColor || "#22d3ee");
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.text(company, hasLogo ? margin + 130 : margin, 40);
@@ -100,7 +100,8 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = "invoice
   });
 
   // Footer: terms and signature
-  const terms = "Terms: Net 30. Prices valid 30 days. Work scheduled weather permitting.";
+  const terms = branding.footerText ||
+    "Terms: Net 30. Prices valid 30 days. Work scheduled weather permitting.";
   y += 12;
   if (y > 730) {
     doc.addPage();
@@ -115,6 +116,127 @@ export function exportInvoicePDF(invoiceText: string, jobName: string = "invoice
   y += 28;
   doc.setTextColor("#0f172a");
   doc.text("Customer Signature: ________________________________   Date: ____________", margin, y);
+  doc.save(`${sanitize(jobName)}.pdf`);
+}
+
+export function exportInvoiceTablePDF(
+  est: {
+    projectDescription: string;
+    materials: { label: string; cost: number; quantity?: number; unit?: string }[];
+    labor: { label: string; cost: number; notes?: string }[];
+    equipmentAndFuel: { label: string; cost: number; notes?: string }[];
+    mobilization?: { label: string; cost: number }[];
+    subtotal: number;
+    overhead: { label: string; cost: number };
+    profit: { label: string; cost: number };
+    total: number;
+    taxIncludedNote?: string;
+  },
+  jobName = "invoice",
+): void {
+  const doc = new jsPDF({ unit: "pt", format: "letter" });
+  const margin = 40;
+  const branding = BUSINESS_PROFILE.branding || {};
+  doc.setFillColor(branding.primaryColor || "#0f172a");
+  doc.rect(0, 0, 612, 70, "F");
+  doc.setTextColor(branding.secondaryColor || "#22d3ee");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text(BUSINESS_PROFILE.businessName || "Asphalt Company", margin, 40);
+
+  let y = margin + 50;
+  doc.setTextColor("#0f172a");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Project", margin, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(est.projectDescription || "", margin + 120, y);
+  y += 20;
+
+  const drawSection = (title: string, rows: { label: string; cost: number; extra?: string }[]) => {
+    if (rows.length === 0) return;
+    doc.setFont("helvetica", "bold");
+    doc.text(title, margin, y);
+    y += 12;
+    doc.setFont("helvetica", "normal");
+    rows.forEach((r) => {
+      if (y > 720) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(r.label + (r.extra ? ` (${r.extra})` : ""), margin, y);
+      doc.text(`$${r.cost.toFixed(2)}`, 612 - margin, y, { align: "right" });
+      y += 14;
+    });
+    y += 6;
+  };
+
+  // Materials with Qty/Unit rendering
+  if (est.materials.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.text("Materials", margin, y);
+    y += 12;
+    doc.setFont("helvetica", "normal");
+    est.materials.forEach((m) => {
+      if (y > 720) {
+        doc.addPage();
+        y = margin;
+      }
+      const qtyUnit = m.quantity && m.unit ? `${m.quantity} ${m.unit}` : "";
+      const right = `$${m.cost.toFixed(2)}`;
+      doc.text(m.label, margin, y);
+      if (qtyUnit) doc.text(qtyUnit, margin + 320, y);
+      doc.text(right, 612 - margin, y, { align: "right" });
+      y += 14;
+    });
+    y += 6;
+  }
+  drawSection("Labor", est.labor.map((l) => ({ label: l.label, cost: l.cost, extra: l.notes })));
+  drawSection(
+    "Equipment & Fuel",
+    est.equipmentAndFuel.map((e) => ({ label: e.label, cost: e.cost, extra: e.notes })),
+  );
+  drawSection(
+    "Mobilization",
+    (est.mobilization || []).map((m) => ({ label: m.label, cost: m.cost })),
+  );
+
+  // Totals
+  if (y > 700) {
+    doc.addPage();
+    y = margin;
+  }
+  doc.setDrawColor("#94a3b8");
+  doc.line(margin, y, 612 - margin, y);
+  y += 16;
+  doc.text("Subtotal", margin, y);
+  doc.text(`$${est.subtotal.toFixed(2)}`, 612 - margin, y, { align: "right" });
+  y += 16;
+  doc.text(est.overhead.label, margin, y);
+  doc.text(`$${est.overhead.cost.toFixed(2)}`, 612 - margin, y, { align: "right" });
+  y += 16;
+  doc.text(est.profit.label, margin, y);
+  doc.text(`$${est.profit.cost.toFixed(2)}`, 612 - margin, y, { align: "right" });
+  y += 16;
+  doc.setFont("helvetica", "bold");
+  doc.text("Total", margin, y);
+  doc.text(`$${est.total.toFixed(2)}`, 612 - margin, y, { align: "right" });
+  doc.setFont("helvetica", "normal");
+  y += 24;
+  if (est.taxIncludedNote) {
+    doc.setTextColor("#475569");
+    doc.setFontSize(10);
+    doc.text(est.taxIncludedNote, margin, y);
+    y += 16;
+    doc.setTextColor("#0f172a");
+    doc.setFontSize(11);
+  }
+
+  if (branding.footerText) {
+    doc.setTextColor("#475569");
+    doc.setFontSize(10);
+    doc.text(branding.footerText, margin, y);
+  }
   doc.save(`${sanitize(jobName)}.pdf`);
 }
 

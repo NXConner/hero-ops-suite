@@ -1,778 +1,331 @@
-import React, { useState, useRef, useEffect, Suspense, lazy } from "react";
-// Removed react-leaflet dependency - using placeholder
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import React, { useEffect, useMemo, useState } from "react";
 import Sidebar from "@/components/Sidebar";
-import {
-  Radar,
-  Map,
-  Layers,
-  Navigation,
-  Crosshair,
-  Ruler,
-  Camera,
-  Users,
-  Truck,
-  Cloud,
-  Thermometer,
-  Eye,
-  Settings,
-  Target,
-  RadioIcon as Radio,
-  Activity,
-  AlertTriangle,
-  Zap,
-} from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
-import html2canvas from "html2canvas";
-import MapTools from "@/components/map/MapTools";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import RealMapComponent from "@/components/map/RealMapComponent";
 import FleetTracking from "@/components/map/FleetTracking";
-import DraggableWidgets from "@/components/map/DraggableWidgets";
 import WeatherOverlay from "@/components/map/WeatherOverlay";
 import PavementScan3D from "@/components/pavement/PavementScan3D";
-import VoiceCommandInterface from "@/components/ai/VoiceCommandInterface";
-const RealMapComponent = lazy(() => import("@/components/map/RealMapComponent"));
 import { useTerminology } from "@/contexts/TerminologyContext";
-import CustomOverlayManager from "@/components/map/CustomOverlayManager";
+import { authService } from "@/services/auth";
+import { saveLayerPresetsToCloud, loadLayerPresetsFromCloud } from "@/services/overwatchPresets";
 
-// Removed leaflet icon configuration
-
-interface MapService {
+type LayerPreset = {
   id: string;
   name: string;
-  url: string;
-  attribution: string;
-  icon: React.ReactNode;
-}
+  selectedMapService: string;
+  activeOverlays: string[];
+  mapCenter: [number, number];
+  mapZoom: number;
+};
 
-const mapServices: MapService[] = [
-  {
-    id: "osm",
-    name: "OpenStreetMap",
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+const LAYER_PRESETS_KEY = "overwatch-layer-presets";
+
+const tileSets: Record<string, { tiles: string[]; attribution?: string }> = {
+  osm: {
+    tiles: [
+      "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    ],
     attribution: "© OpenStreetMap contributors",
-    icon: <Map className="w-4 h-4" />,
   },
-  {
-    id: "satellite",
-    name: "Satellite View",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  satellite: {
+    tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
     attribution: "© Esri",
-    icon: <Eye className="w-4 h-4" />,
   },
-  {
-    id: "terrain",
-    name: "Terrain",
-    url: "https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg",
-    attribution: "© Stamen Design",
-    icon: <Layers className="w-4 h-4" />,
-  },
-  {
-    id: "topo",
-    name: "Topographic",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+  topo: {
+    tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"],
     attribution: "© Esri",
-    icon: <Target className="w-4 h-4" />,
   },
-  {
-    id: "google-satellite",
-    name: "Google Satellite",
-    url:
-      typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY
-        ? `https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&key=${(import.meta as any).env.VITE_GOOGLE_MAPS_API_KEY}`
-        : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution: "© Google",
-    icon: <Eye className="w-4 h-4" />,
-  },
-  {
-    id: "google-roads",
-    name: "Google Roads",
-    url:
-      typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY
-        ? `https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}&key=${(import.meta as any).env.VITE_GOOGLE_MAPS_API_KEY}`
-        : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution: "© Google",
-    icon: <Navigation className="w-4 h-4" />,
-  },
-  {
-    id: "mapbox-streets",
-    name: "Mapbox Streets",
-    url:
-      typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_MAPBOX_TOKEN
-        ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_TOKEN}`
-        : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution: "© Mapbox",
-    icon: <Map className="w-4 h-4" />,
-  },
-  {
-    id: "mapbox-satellite",
-    name: "Mapbox Satellite",
-    url:
-      typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_MAPBOX_TOKEN
-        ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${(import.meta as any).env.VITE_MAPBOX_TOKEN}`
-        : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attribution: "© Mapbox",
-    icon: <Eye className="w-4 h-4" />,
-  },
-  {
-    id: "carto-dark",
-    name: "Dark Theme",
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-    attribution: "© CARTO",
-    icon: <Target className="w-4 h-4" />,
-  },
-  {
-    id: "qgis-local",
-    name: "QGIS Local Server",
-    url:
-      (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_QGIS_SERVER_URL) ||
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution: "© Local QGIS Server",
-    icon: <Layers className="w-4 h-4" />,
-  },
-];
-
-interface WidgetConfig {
-  id: string;
-  title: string;
-  icon: React.ReactNode;
-  component: React.ReactNode;
-  defaultSize: { w: number; h: number };
-  minSize: { w: number; h: number };
-}
+};
 
 const OverWatch: React.FC = () => {
-  const [selectedMapService, setSelectedMapService] = useState("osm");
-  const { terminologyMode, setTerminologyMode, getTerm } = useTerminology();
+  const { terminologyMode } = useTerminology();
+  const [selectedMapService, setSelectedMapService] = useState<string>("osm");
   const [activeOverlays, setActiveOverlays] = useState<string[]>(["fleet", "weather"]);
-  const [isDrawingMode, setIsDrawingMode] = useState(false);
-  const [isMeasurementMode, setIsMeasurementMode] = useState(false);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.006]); // NYC default
-  const [mapZoom, setMapZoom] = useState(13);
-  const [drawings, setDrawings] = useState<any[]>([]);
-  const [measurements, setMeasurements] = useState<any[]>([]);
-  const [showWidgets, setShowWidgets] = useState(true);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [weatherRecommendations, setWeatherRecommendations] = useState<string[]>([]);
-  const [showVoiceInterface, setShowVoiceInterface] = useState(false);
-  const [searchParams] = useSearchParams();
-  const [showCustomOverlayManager, setShowCustomOverlayManager] = useState<boolean>(false);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([-74.006, 40.7128]);
+  const [mapZoom, setMapZoom] = useState<number>(11);
+  const [presets, setPresets] = useState<LayerPreset[]>([]);
+  const [clusterEnabled, setClusterEnabled] = useState(false);
+  const [heatmapEnabled, setHeatmapEnabled] = useState(false);
+  const [autoRefreshPoints, setAutoRefreshPoints] = useState(false);
+  const [refreshMs, setRefreshMs] = useState(15000);
+  const [selectedPresetId, setSelectedPresetId] = useState("");
+  const importFileRef = React.useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem("overwatch-prefs") || "{}");
-      if (saved.selectedMapService) setSelectedMapService(saved.selectedMapService);
-      if (saved.terminologyMode) setTerminologyMode(saved.terminologyMode);
-      if (Array.isArray(saved.activeOverlays)) setActiveOverlays(saved.activeOverlays);
-      if (Array.isArray(saved.mapCenter) && saved.mapCenter.length === 2)
-        setMapCenter(saved.mapCenter);
-      if (typeof saved.mapZoom === "number") setMapZoom(saved.mapZoom);
-      if (typeof saved.showCustomOverlayManager === "boolean")
-        setShowCustomOverlayManager(saved.showCustomOverlayManager);
-    } catch {
-      /* ignore */
-    }
+      const saved = JSON.parse(localStorage.getItem(LAYER_PRESETS_KEY) || "[]");
+      if (Array.isArray(saved)) setPresets(saved as LayerPreset[]);
+    } catch {}
+    // Cloud load (gated)
+    (async () => {
+      try {
+        const enabled = localStorage.getItem("ow-cloud-presets") === "1";
+        if (!enabled) return;
+        const cloud = await loadLayerPresetsFromCloud();
+        if (cloud && cloud.length > 0) setPresets(cloud as any);
+      } catch {}
+    })();
+    // Role defaults (one-time)
+    try {
+      const user = authService.getCurrentUser?.();
+      const appliedKey = user ? `ow-default-applied-${user.id}` : null;
+      if (user && !localStorage.getItem(appliedKey!)) {
+        const roleDefaults: Record<string, { overlays: string[]; service: string }> = {
+          admin: { overlays: ["fleet", "weather", "pavement"], service: "satellite" },
+          supervisor: { overlays: ["fleet", "weather"], service: "osm" },
+          operator: { overlays: ["fleet"], service: "osm" },
+          analyst: { overlays: ["pavement", "weather"], service: "topo" },
+          field_worker: { overlays: ["fleet"], service: "osm" },
+          viewer: { overlays: ["weather"], service: "osm" },
+          super_admin: { overlays: ["fleet", "weather", "pavement"], service: "satellite" },
+        };
+        const def = roleDefaults[user.role] || roleDefaults.viewer;
+        setSelectedMapService(def.service);
+        setActiveOverlays(def.overlays);
+        localStorage.setItem(appliedKey!, "1");
+      }
+    } catch {}
   }, []);
 
-  useEffect(() => {
+  const persistPresets = (next: LayerPreset[]) => {
+    setPresets(next);
     try {
-      localStorage.setItem(
-        "overwatch-prefs",
-        JSON.stringify({
-          selectedMapService,
-          terminologyMode,
-          activeOverlays,
-          mapCenter,
-          mapZoom,
-          showCustomOverlayManager,
-        }),
-      );
-    } catch {
-      /* ignore */
-    }
-  }, [
-    selectedMapService,
-    terminologyMode,
-    activeOverlays,
-    mapCenter,
-    mapZoom,
-    showCustomOverlayManager,
-  ]);
+      localStorage.setItem(LAYER_PRESETS_KEY, JSON.stringify(next));
+    } catch {}
+    try {
+      const enabled = localStorage.getItem("ow-cloud-presets") === "1";
+      if (enabled) void saveLayerPresetsToCloud(next as any);
+    } catch {}
+  };
 
-  // Auto-enable pavement overlay when opened with a scan_id link
+  // Auto-refresh demo points
   useEffect(() => {
-    const id = searchParams.get("scan_id");
-    if (id) {
-      setActiveOverlays((prev) => (prev.includes("pavement") ? prev : [...prev, "pavement"]));
-    }
-  }, [searchParams]);
+    if (!autoRefreshPoints) return;
+    let stop = false;
+    const tick = async () => {
+      try {
+        const resp = await fetch(`/demo/points?n=150&lng=${mapCenter[0]}&lat=${mapCenter[1]}&spread=0.3`);
+        const json = await resp.json();
+        const api = (window as any).mapMethods;
+        if (!stop && api?.setPoints && Array.isArray(json.points)) api.setPoints(json.points);
+      } catch {}
+      if (!stop) setTimeout(tick, refreshMs);
+    };
+    tick();
+    return () => {
+      stop = true;
+    };
+  }, [autoRefreshPoints, mapCenter, refreshMs]);
 
-  const currentService =
-    mapServices.find((service) => service.id === selectedMapService) || mapServices[0];
-  const serviceToTiles: Record<string, { tiles: string[]; attribution?: string }> = {
-    osm: {
-      tiles: [
-        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      ],
-      attribution: "© OpenStreetMap contributors",
-    },
-    satellite: {
-      tiles: [
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      ],
-      attribution: "© Esri",
-    },
-    terrain: {
-      tiles: [
-        "https://a.tile.stamen.com/terrain/{z}/{x}/{y}.jpg",
-        "https://b.tile.stamen.com/terrain/{z}/{x}/{y}.jpg",
-        "https://c.tile.stamen.com/terrain/{z}/{x}/{y}.jpg",
-      ],
-      attribution: "© Stamen Design",
-    },
-    topo: {
-      tiles: [
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-      ],
-      attribution: "© Esri",
-    },
-    "google-satellite": {
-      tiles: [
-        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      ],
-      attribution: "© OpenStreetMap contributors",
-    },
-    "google-roads": {
-      tiles: [
-        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      ],
-      attribution: "© OpenStreetMap contributors",
-    },
-    "mapbox-streets": {
-      tiles: [
-        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      ],
-      attribution: "© OpenStreetMap contributors",
-    },
-    "mapbox-satellite": {
-      tiles: [
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      ],
-      attribution: "© Esri",
-    },
-    "carto-dark": {
-      tiles: [
-        "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-        "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-        "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-      ],
-      attribution: "© CARTO",
-    },
-    "qgis-local": {
-      tiles: [
-        (
-          (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_QGIS_SERVER_URL) ||
-          "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        ),
-      ],
-      attribution: "© Local QGIS Server",
-    },
+  const tiles = useMemo(() => tileSets[selectedMapService] || tileSets.osm, [selectedMapService]);
+
+  const handleLoadDemoPoints = () => {
+    try {
+      const api = (window as any).mapMethods;
+      if (api?.setPoints) {
+        const pts = [
+          { lng: -74.006, lat: 40.7128 },
+          { lng: -73.9857, lat: 40.7484 },
+          { lng: -73.9772, lat: 40.7527 },
+          { lng: -73.968, lat: 40.7851 },
+        ];
+        api.setPoints(pts);
+      }
+    } catch {}
   };
 
-  const getTerminology = (military: string, civilian: string) => {
-    return getTerm(military, civilian);
+  const handleQuickSave = () => {
+    const id = (crypto as any).randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const name = `${selectedMapService.toUpperCase()} · ${new Date().toLocaleTimeString()}`;
+    const preset: LayerPreset = { id, name, selectedMapService, activeOverlays: [...activeOverlays], mapCenter: [...mapCenter] as [number, number], mapZoom };
+    const next = [preset, ...presets].slice(0, 20);
+    persistPresets(next);
   };
 
-  const toggleOverlay = (overlayId: string) => {
-    setActiveOverlays((prev) =>
-      prev.includes(overlayId) ? prev.filter((id) => id !== overlayId) : [...prev, overlayId],
-    );
+  const applyPreset = (id: string) => {
+    const p = presets.find((x) => x.id === id);
+    if (!p) return;
+    setSelectedMapService(p.selectedMapService);
+    setActiveOverlays(p.activeOverlays);
+    setMapCenter(p.mapCenter);
+    setMapZoom(p.mapZoom);
   };
 
-  // MapControls functionality moved to RealMapComponent event handlers
-
-  const handleDrawingComplete = (feature: any) => {
-    setDrawings((prev) => [...prev, feature]);
-    console.log("Drawing completed:", feature);
+  const deletePreset = (id: string) => {
+    const next = presets.filter((p) => p.id !== id);
+    persistPresets(next);
+    setSelectedPresetId("");
   };
 
-  const handleMeasurementComplete = (measurement: any) => {
-    setMeasurements((prev) => [...prev, measurement]);
-    console.log("Measurement completed:", measurement);
+  const exportPresets = () => {
+    try {
+      const data = JSON.stringify(presets, null, 2);
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "overwatch-layer-presets.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {}
   };
 
-  const handleVoiceCommand = (command: any) => {
-    console.log("Voice command received:", command);
-
-    // Execute the command based on its action
-    switch (command.action) {
-      case "show_weather_overlay":
-        if (!activeOverlays.includes("weather")) {
-          setActiveOverlays((prev) => [...prev, "weather"]);
-        }
-        break;
-      case "hide_weather_overlay":
-        setActiveOverlays((prev) => prev.filter((id) => id !== "weather"));
-        break;
-      case "show_fleet_tracking":
-        if (!activeOverlays.includes("fleet")) {
-          setActiveOverlays((prev) => [...prev, "fleet"]);
-        }
-        break;
-      case "hide_fleet_tracking":
-        setActiveOverlays((prev) => prev.filter((id) => id !== "fleet"));
-        break;
-      case "show_defects":
-        if (!activeOverlays.includes("pavement")) {
-          setActiveOverlays((prev) => [...prev, "pavement"]);
-        }
-        break;
-      case "hide_defects":
-        setActiveOverlays((prev) => prev.filter((id) => id !== "pavement"));
-        break;
-      case "switch_map_service":
-        if (command.parameters?.service) {
-          setSelectedMapService(command.parameters.service);
-        }
-        break;
-      case "start_measuring":
-        setIsMeasurementMode(true);
-        break;
-      case "stop_measuring":
-        setIsMeasurementMode(false);
-        break;
-      case "take_screenshot":
-        // Implement screenshot functionality
-        html2canvas(document.body).then((canvas) => {
-          const link = document.createElement("a");
-          link.download = `overwatch-screenshot-${Date.now()}.png`;
-          link.href = canvas.toDataURL();
-          link.click();
-        });
-        break;
-      default:
-        console.log("Unhandled voice command:", command.action);
-    }
+  const triggerImport = () => importFileRef.current?.click();
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const json = JSON.parse(String(reader.result));
+        if (Array.isArray(json)) persistPresets(json as any);
+      } catch {}
+    };
+    reader.readAsText(file);
+    e.target.value = "";
   };
-
-  const FleetTrackingWidget = () => (
-    <Card className="h-full bg-slate-900/95 border-cyan-500/30">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
-          <Users className="w-4 h-4" />
-          {getTerminology("Asset Tracking", "Fleet Tracking")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">
-            Active {getTerminology("Units", "Vehicles")}
-          </span>
-          <Badge variant="outline" className="text-cyan-400 border-cyan-400">
-            12
-          </Badge>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">{getTerminology("Personnel", "Employees")}</span>
-          <Badge variant="outline" className="text-orange-400 border-orange-400">
-            24
-          </Badge>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">Alerts</span>
-          <Badge variant="destructive">2</Badge>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const WeatherWidget = () => (
-    <Card className="h-full bg-slate-900/95 border-cyan-500/30">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
-          <Cloud className="w-4 h-4" />
-          {getTerminology("Environmental Intel", "Weather Conditions")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">Temperature</span>
-          <span className="text-orange-400 font-mono">72°F</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">Humidity</span>
-          <span className="text-cyan-400 font-mono">65%</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">Wind</span>
-          <span className="text-slate-300 font-mono">8 mph NE</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Thermometer className="w-3 h-3 text-orange-400" />
-          <span className="text-xs text-green-400">Optimal for Operations</span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const PavementScanWidget = () => (
-    <Card className="h-full bg-slate-900/95 border-cyan-500/30">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
-          <Activity className="w-4 h-4" />
-          {getTerminology("Surface Intel", "Pavement Analysis")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">Scanned Areas</span>
-          <Badge variant="outline" className="text-cyan-400 border-cyan-400">
-            8
-          </Badge>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">Defects Found</span>
-          <Badge variant="outline" className="text-orange-400 border-orange-400">
-            23
-          </Badge>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">Critical Issues</span>
-          <Badge variant="destructive">3</Badge>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const MissionStatusWidget = () => (
-    <Card className="h-full bg-slate-900/95 border-cyan-500/30">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-cyan-400 text-sm flex items-center gap-2">
-          <Target className="w-4 h-4" />
-          {getTerminology("Mission Status", "Project Status")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">
-            Active {getTerminology("Operations", "Projects")}
-          </span>
-          <Badge variant="outline" className="text-green-400 border-green-400">
-            5
-          </Badge>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">Completion Rate</span>
-          <span className="text-cyan-400 font-mono">78%</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-300">ETA</span>
-          <span className="text-orange-400 font-mono">14:30</span>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="flex h-screen bg-slate-950">
       <Sidebar />
-
-      <div className="flex-1 flex flex-col relative z-0">
-        {/* Header Controls */}
-        <div className="bg-slate-900/95 border-b border-cyan-500/30 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Radar className="w-6 h-6 text-cyan-400" />
-                <h1 className="text-xl font-bold text-cyan-400">
-                  {getTerminology("OverWatch Command Center", "OverWatch Control Hub")}
-                </h1>
-              </div>
-              <Badge variant="outline" className="text-green-400 border-green-400">
-                {getTerminology("OPERATIONAL", "ACTIVE")}
-              </Badge>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {/* Terminology Toggle */}
-              <div className="flex items-center gap-2">
-                <Label htmlFor="terminology" className="text-xs text-slate-300">
-                  Terminology:
-                </Label>
-                <Select
-                  value={terminologyMode}
-                  onValueChange={(value: any) => setTerminologyMode(value)}
-                >
-                  <SelectTrigger className="w-32 h-8 text-xs bg-slate-800 border-slate-600">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-600">
-                    <SelectItem value="military">Military</SelectItem>
-                    <SelectItem value="civilian">Civilian</SelectItem>
-                    <SelectItem value="both">Both</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Map Service Selection */}
-              <div className="flex items-center gap-2">
-                <Label htmlFor="map-service" className="text-xs text-slate-300">
-                  Map Service:
-                </Label>
-                <Select value={selectedMapService} onValueChange={setSelectedMapService}>
-                  <SelectTrigger className="w-40 h-8 text-xs bg-slate-800 border-slate-600">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-600">
-                    {mapServices.map((service) => (
-                      <SelectItem key={service.id} value={service.id}>
-                        <div className="flex items-center gap-2">
-                          {service.icon}
-                          {service.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Link to="/builder">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-slate-800 border-slate-600 text-xs"
-                >
-                  Edit Layout
-                </Button>
-              </Link>
-              <Button
-                variant={isEditMode ? "default" : "outline"}
-                size="sm"
-                className="bg-slate-800 border-slate-600 text-xs"
-                onClick={() => setIsEditMode((v) => !v)}
-              >
-                In-Place Edit
-              </Button>
-            </div>
-          </div>
-
-          {/* Tool Bar */}
-          <div className="flex items-center gap-2 mt-4">
-            <Button
-              variant={isDrawingMode ? "default" : "outline"}
-              size="sm"
-              onClick={() => setIsDrawingMode(!isDrawingMode)}
-              className="bg-slate-800 border-slate-600 text-cyan-400"
-            >
-              <Crosshair className="w-4 h-4 mr-2" />
-              {getTerminology("Draw AOI", "Draw Area")}
-            </Button>
-            <Button
-              variant={isMeasurementMode ? "default" : "outline"}
-              size="sm"
-              onClick={() => setIsMeasurementMode(!isMeasurementMode)}
-              className="bg-slate-800 border-slate-600 text-cyan-400"
-            >
-              <Ruler className="w-4 h-4 mr-2" />
-              Measure
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-slate-800 border-slate-600 text-cyan-400"
-              onClick={() => {
-                html2canvas(document.body).then((canvas) => {
-                  const link = document.createElement("a");
-                  link.download = `overwatch-screenshot-${Date.now()}.png`;
-                  link.href = canvas.toDataURL();
-                  link.click();
+      <div className="flex-1 relative">
+        <div className="p-3 flex gap-2 items-center">
+          <Button variant="outline" onClick={handleLoadDemoPoints}>Load Demo Points</Button>
+          <Button variant="outline" onClick={handleQuickSave}>Quick Save</Button>
+          <select
+            value={selectedMapService}
+            onChange={(e) => setSelectedMapService(e.target.value)}
+            className="h-8 bg-slate-800 border border-slate-600 text-xs text-slate-200 rounded px-2"
+            title="Basemap"
+          >
+            <option value="osm">OpenStreetMap</option>
+            <option value="satellite">Satellite</option>
+            <option value="topo">Topographic</option>
+          </select>
+        </div>
+        <div className="absolute inset-0">
+          <RealMapComponent
+            center={mapCenter}
+            zoom={mapZoom}
+            tileUrls={tiles.tiles}
+            attribution={tiles.attribution}
+            clusterEnabled={clusterEnabled}
+            heatmapEnabled={heatmapEnabled}
+            onMapMove={(center, zoom) => {
+              setMapCenter(center);
+              setMapZoom(zoom);
+            }}
+          >
+            <FleetTracking terminologyMode={terminologyMode} isVisible={activeOverlays.includes("fleet")} />
+            <WeatherOverlay terminologyMode={terminologyMode} isVisible={activeOverlays.includes("weather")} onRecommendationChange={() => {}} />
+            <PavementScan3D terminologyMode={terminologyMode} isVisible={activeOverlays.includes("pavement")} onDefectSelect={() => {}} onAnalysisComplete={() => {}} />
+          </RealMapComponent>
+        </div>
+        {/* Floating controls */}
+        <div className="fixed right-4 bottom-24 z-40 w-72 rounded-md border border-slate-700 bg-slate-900/85 p-3 shadow-lg backdrop-blur">
+          <div className="text-xs text-slate-300 mb-2">Legend & Controls</div>
+          <div className="grid grid-cols-2 gap-2 items-center text-xs text-slate-300">
+            <span>Show Clusters</span>
+            <Switch checked={clusterEnabled} onCheckedChange={setClusterEnabled} />
+            <span>Show Heatmap</span>
+            <Switch checked={heatmapEnabled} onCheckedChange={setHeatmapEnabled} />
+            <span>Auto Refresh</span>
+            <Switch checked={autoRefreshPoints} onCheckedChange={setAutoRefreshPoints} />
+            <span>Refresh (ms)</span>
+            <input
+              type="number"
+              min={2000}
+              step={1000}
+              value={refreshMs}
+              onChange={(e) => setRefreshMs(Math.max(2000, Number(e.target.value) || 15000))}
+              className="h-6 w-full bg-slate-800 border border-slate-600 text-xs text-slate-200 rounded px-1"
+              title="Refresh ms"
+            />
+            <span>Fleet</span>
+            <Switch
+              checked={activeOverlays.includes("fleet")}
+              onCheckedChange={(v) => {
+                setActiveOverlays((prev) => {
+                  if (v) return Array.from(new Set([...prev, "fleet"]));
+                  return prev.filter((id) => id !== "fleet");
                 });
               }}
-            >
-              <Camera className="w-4 h-4 mr-2" />
-              Snap Picture
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-slate-800 border-slate-600 text-cyan-400"
-            >
-              <Navigation className="w-4 h-4 mr-2" />
-              Navigate
-            </Button>
-
-            <Separator orientation="vertical" className="h-8 bg-slate-600" />
-
-            {/* Overlay Toggles */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-300">Overlays:</span>
-              {[
-                { id: "fleet", label: getTerminology("Assets", "Fleet"), icon: Truck },
-                { id: "weather", label: "Weather", icon: Cloud },
-                {
-                  id: "pavement",
-                  label: getTerminology("Surface Intel", "Pavement"),
-                  icon: Activity,
-                },
-                { id: "alerts", label: "Alerts", icon: AlertTriangle },
-                { id: "custom", label: getTerminology("Custom", "Custom"), icon: Layers },
-              ].map(({ id, label, icon: Icon }) => (
-                <Button
-                  key={id}
-                  variant={activeOverlays.includes(id) ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => {
-                    if (id === "custom") {
-                      setShowCustomOverlayManager((v) => !v);
-                      if (!activeOverlays.includes("custom")) {
-                        setActiveOverlays((prev) => [...prev, "custom"]);
-                      }
-                    } else {
-                      toggleOverlay(id);
-                    }
-                  }}
-                  className="bg-slate-800 border-slate-600 text-xs"
-                >
-                  <Icon className="w-3 h-3 mr-1" />
-                  {label}
-                </Button>
-              ))}
-
-              <Separator orientation="vertical" className="h-8 bg-slate-600" />
-
-              <Button
-                variant={showWidgets ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowWidgets(!showWidgets)}
-                className="bg-slate-800 border-slate-600 text-xs"
-              >
-                <Settings className="w-3 h-3 mr-1" />
-                Widgets
-              </Button>
-
-              <Button
-                variant={showVoiceInterface ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowVoiceInterface(!showVoiceInterface)}
-                className="bg-slate-800 border-slate-600 text-xs"
-              >
-                <Radio className="w-3 h-3 mr-1" />
-                Voice
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 relative">
-          {/* Map Container */}
-          <div className="absolute inset-0">
-            <Suspense fallback={<div className="grid place-items-center h-full text-sm text-muted-foreground">Loading map…</div>}><RealMapComponent
-              center={mapCenter}
-              zoom={mapZoom}
-              className="h-full w-full"
-              tileUrls={serviceToTiles[selectedMapService]?.tiles}
-              attribution={serviceToTiles[selectedMapService]?.attribution}
-              onMapClick={(e) => {
-                if (isDrawingMode) {
-                  console.log("Drawing mode click:", e.lngLat);
-                }
-                if (isMeasurementMode) {
-                  console.log("Measurement mode click:", e.lngLat);
-                }
+            />
+            <span>Weather</span>
+            <Switch
+              checked={activeOverlays.includes("weather")}
+              onCheckedChange={(v) => {
+                setActiveOverlays((prev) => {
+                  if (v) return Array.from(new Set([...prev, "weather"]));
+                  return prev.filter((id) => id !== "weather");
+                });
               }}
-              onMapMove={(center, zoom) => {
-                setMapCenter(center);
-                setMapZoom(zoom);
+            />
+            <span>Pavement</span>
+            <Switch
+              checked={activeOverlays.includes("pavement")}
+              onCheckedChange={(v) => {
+                setActiveOverlays((prev) => {
+                  if (v) return Array.from(new Set([...prev, "pavement"]));
+                  return prev.filter((id) => id !== "pavement");
+                });
               }}
-            >
-              <FleetTracking
-                terminologyMode={terminologyMode}
-                isVisible={activeOverlays.includes("fleet")}
-              />
-              <WeatherOverlay
-                terminologyMode={terminologyMode}
-                isVisible={activeOverlays.includes("weather")}
-                onRecommendationChange={setWeatherRecommendations}
-              />
-              <PavementScan3D
-                terminologyMode={terminologyMode}
-                isVisible={activeOverlays.includes("pavement")}
-                onDefectSelect={(defect) => console.log("Defect selected:", defect)}
-                onAnalysisComplete={(analysis) => console.log("Analysis complete:", analysis)}
-              />
-              <MapTools
-                isDrawingMode={isDrawingMode}
-                isMeasurementMode={isMeasurementMode}
-                onDrawingComplete={handleDrawingComplete}
-                onMeasurementComplete={handleMeasurementComplete}
-                terminologyMode={terminologyMode}
-              />
-              {showCustomOverlayManager && (
-                <CustomOverlayManager isVisible={activeOverlays.includes("custom")} />
-              )}
-            </RealMapComponent></Suspense>
+            />
           </div>
-
-          {/* Draggable Widgets System */}
-          <DraggableWidgets
-            terminologyMode={terminologyMode}
-            isVisible={showWidgets}
-            editMode={isEditMode}
-            onLayoutChange={(layout) => console.log("Layout changed:", layout)}
-          />
-
-          {/* Voice Command Interface */}
-          <VoiceCommandInterface
-            isVisible={showVoiceInterface}
-            terminologyMode={terminologyMode}
-            onCommand={handleVoiceCommand}
-            onClose={() => setShowVoiceInterface(false)}
-          />
-
-          {/* Bottom Status Bar */}
-          <div className="absolute bottom-0 left-0 right-0 bg-slate-900/95 border-t border-cyan-500/30 p-2">
-            <div className="flex items-center justify-between text-xs text-slate-300">
-              <div className="flex items-center gap-4">
-                <span>
-                  Center: {mapCenter[0].toFixed(4)}, {mapCenter[1].toFixed(4)}
-                </span>
-                <span>Zoom: {mapZoom}</span>
-                <span>Service: {currentService.name}</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span>Real-time Data Active</span>
-                </div>
-                {weatherRecommendations.length > 0 && (
-                  <div className="text-xs text-orange-400 max-w-xs truncate">
-                    {weatherRecommendations[0]}
-                  </div>
-                )}
-                <span>{new Date().toLocaleTimeString()}</span>
-              </div>
+          <div className="mt-3">
+            <Button variant="outline" size="sm" className="bg-slate-800 border-slate-600 text-xs w-full" onClick={handleQuickSave}>
+              Save Current as Preset
+            </Button>
+            <div className="mt-2 grid grid-cols-2 gap-2 items-center">
+              <select
+                value={selectedPresetId}
+                onChange={(e) => setSelectedPresetId(e.target.value)}
+                className="h-8 bg-slate-800 border border-slate-600 text-xs text-slate-200 rounded px-2 col-span-2"
+              >
+                <option value="">Select preset…</option>
+                {presets.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={() => selectedPresetId && applyPreset(selectedPresetId)}
+              >
+                Apply
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={() => selectedPresetId && deletePreset(selectedPresetId)}
+              >
+                Delete
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs col-span-1"
+                onClick={exportPresets}
+              >
+                Export
+              </Button>
+              <input ref={importFileRef} type="file" accept="application/json" className="hidden" onChange={handleImport} />
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs col-span-1"
+                onClick={triggerImport}
+              >
+                Import
+              </Button>
             </div>
           </div>
         </div>
@@ -782,3 +335,4 @@ const OverWatch: React.FC = () => {
 };
 
 export default OverWatch;
+

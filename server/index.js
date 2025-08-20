@@ -343,5 +343,20 @@ app.get("/intel/trends", async (req, res) => {
   }
 });
 
+// Dev: random demo points for map clusters/heat
+app.get("/demo/points", async (req, res) => {
+  const num = Math.max(10, Math.min(500, Number(req.query.n || 100)));
+  const centerLng = Number(req.query.lng || -74.006);
+  const centerLat = Number(req.query.lat || 40.7128);
+  const spread = Number(req.query.spread || 0.2);
+  const points = [];
+  for (let i = 0; i < num; i++) {
+    const lng = centerLng + (Math.random() - 0.5) * spread;
+    const lat = centerLat + (Math.random() - 0.5) * spread;
+    points.push({ lng, lat });
+  }
+  res.json({ points });
+});
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => console.log(`API server listening on http://localhost:${port}`));

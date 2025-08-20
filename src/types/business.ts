@@ -99,6 +99,9 @@ export interface BrandingInfo {
   phone?: string;
   email?: string;
   website?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  footerText?: string;
 }
 
 export interface BusinessProfile {

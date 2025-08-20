@@ -158,3 +158,11 @@ export async function searchAddressCandidates(
   saveCache(AUTOCOMPLETE_CACHE_KEY, cache);
   return results;
 }
+
+// Heuristic sales tax lookup based on state abbreviation in display name
+export function inferSalesTaxPctFromAddress(address: string): number | null {
+  const a = address.toUpperCase();
+  if (a.includes(", VA") || a.endsWith(" VA") || a.includes(" VIRGINIA")) return 0.053;
+  if (a.includes(", NC") || a.endsWith(" NC") || a.includes(" NORTH CAROLINA")) return 0.0475;
+  return null;
+}

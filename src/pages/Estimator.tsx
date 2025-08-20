@@ -18,12 +18,13 @@ import type { EstimateInput, ServiceType } from "@/lib/estimator";
 import { buildEstimate } from "@/lib/estimator";
 import { BUSINESS_PROFILE } from "@/data/business";
 import { useBusinessProfile } from "@/hooks/useBusinessProfile";
-import { computeRoundTripMilesBetween, reverseGeocode } from "@/lib/geo";
+import { computeRoundTripMilesBetween, reverseGeocode, inferSalesTaxPctFromAddress } from "@/lib/geo";
 import { searchAddressCandidates, type AddressCandidate } from "@/lib/geo";
 import { saveJob, listJobs, type StoredJob } from "@/services/jobs";
 import { listCustomers, saveCustomer, type Customer } from "@/services/customers";
 import {
   exportInvoicePDF,
+  exportInvoiceTablePDF,
   exportJobsCSV,
   exportCustomersCSV,
   downloadTextFile,
@@ -64,6 +65,7 @@ const Estimator = () => {
   const [jobZip, setJobZip] = useState("");
   const [jobCoords, setJobCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [supplierCoords, setSupplierCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [overrideSalesTaxPct, setOverrideSalesTaxPct] = useState<number | "">("");
   const [roundTripMilesSupplier, setRoundTripMilesSupplier] = useState(
     BUSINESS_PROFILE.travelDefaults.roundTripMilesSupplier,
   ); // Stuart, VA ↔ Madison, NC approx
@@ -147,6 +149,8 @@ const Estimator = () => {
       propanePerTank: BUSINESS_PROFILE.materials.propanePerTank,
       includeTransportWeightCheck: includeWeightCheck,
       applySalesTax: (params as any).applySalesTax === true,
+      overrideSalesTaxPct:
+        typeof overrideSalesTaxPct === "number" ? Number(overrideSalesTaxPct) : undefined,
     }),
     [
       serviceType,
@@ -313,6 +317,7 @@ const Estimator = () => {
     setPmmPrice(j.params.pmmPrice ?? BUSINESS_PROFILE.materials.pmmPricePerGallon);
     setNotes(j.params.notes ?? "");
     setParams((p) => ({ ...p, applySalesTax: !!(j as any).params?.applySalesTax }));
+    setOverrideSalesTaxPct((j as any).params?.overrideSalesTaxPct ?? "");
     setComplianceState(((j.params as any).stateCode as StateCode) ?? "VA");
   };
 
@@ -342,6 +347,9 @@ const Estimator = () => {
       setJobAddress(full);
       const res = await geocodeAddress(full);
       setJobCoords(res);
+      // Auto tax inference
+      const inferred = inferSalesTaxPctFromAddress(full);
+      if (inferred !== null) setOverrideSalesTaxPct(inferred);
     }
   };
 
@@ -998,6 +1006,20 @@ const Estimator = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <div>
+                  <Label>Override Sales Tax % (optional)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder={`${(BUSINESS_PROFILE.pricing.salesTaxPct ?? 0) * 100}`}
+                    value={overrideSalesTaxPct}
+                    onChange={(e) =>
+                      setOverrideSalesTaxPct(
+                        e.target.value === "" ? "" : Math.max(0, Number(e.target.value) || 0) / 100,
+                      )
+                    }
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1224,6 +1246,31 @@ ${textInvoiceRounded}`}
                   }
                 >
                   Export PDF
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    exportInvoiceTablePDF(
+                      {
+                        projectDescription: result.projectDescription,
+                        materials: result.materials,
+                        labor: result.labor,
+                        equipmentAndFuel: result.equipmentAndFuel,
+                        mobilization: result.mobilization,
+                        subtotal: result.subtotal,
+                        overhead: result.overhead,
+                        profit: result.profit,
+                        total: result.total,
+                        taxIncludedNote: (params as any).applySalesTax
+                          ? "Sales tax included in total."
+                          : undefined,
+                      },
+                      jobName || "invoice",
+                    )
+                  }
+                >
+                  Export Table PDF
                 </Button>
                 <div className="flex items-center gap-2">
                   <Label className="text-xs">Compliance State</Label>

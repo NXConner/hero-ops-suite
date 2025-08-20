@@ -64,6 +64,7 @@ export interface EstimateInput {
   // Options
   includeTransportWeightCheck?: boolean;
   applySalesTax?: boolean; // per‑job toggle to include sales tax in total
+  overrideSalesTaxPct?: number; // optional override of BUSINESS_PROFILE.pricing.salesTaxPct
   multiCoat?: number; // e.g., 1,2
   wasteFactorPct?: number; // e.g., 0.05
   applicationMethod?: "spray" | "squeegee";
@@ -577,7 +578,10 @@ export function buildEstimate(input: EstimateInput): EstimateOutput {
   let total = roundToTwo(subtotal + overheadCost + profitCost);
 
   // Sales tax (optional per-job)
-  const taxPct = BUSINESS_PROFILE.pricing.salesTaxPct ?? 0;
+  const taxPct =
+    typeof input.overrideSalesTaxPct === "number"
+      ? input.overrideSalesTaxPct
+      : BUSINESS_PROFILE.pricing.salesTaxPct ?? 0;
   if (input.applySalesTax && taxPct > 0) {
     const tax = roundToTwo(total * taxPct);
     materials.push({ label: `Sales Tax (${Math.round(taxPct * 100)}%)`, cost: tax });
