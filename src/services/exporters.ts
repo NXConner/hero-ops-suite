@@ -130,6 +130,7 @@ export function exportInvoiceTablePDF(
     overhead: { label: string; cost: number };
     profit: { label: string; cost: number };
     total: number;
+    taxIncludedNote?: string;
   },
   jobName = "invoice",
 ): void {
@@ -210,6 +211,14 @@ export function exportInvoiceTablePDF(
   doc.text(`$${est.total.toFixed(2)}`, 612 - margin, y, { align: "right" });
   doc.setFont("helvetica", "normal");
   y += 24;
+  if (est.taxIncludedNote) {
+    doc.setTextColor("#475569");
+    doc.setFontSize(10);
+    doc.text(est.taxIncludedNote, margin, y);
+    y += 16;
+    doc.setTextColor("#0f172a");
+    doc.setFontSize(11);
+  }
 
   if (branding.footerText) {
     doc.setTextColor("#475569");
