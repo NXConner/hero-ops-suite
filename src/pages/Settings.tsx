@@ -1712,6 +1712,52 @@ const Settings = () => {
                         />
                       </div>
                       <div>
+                        <Label>Brand Primary Color</Label>
+                        <Input
+                          type="text"
+                          placeholder="#0f172a"
+                          defaultValue={(profile.branding as any)?.primaryColor || ""}
+                          onBlur={(e) =>
+                            save({
+                              branding: {
+                                ...(profile.branding || {}),
+                                primaryColor: e.target.value,
+                              } as any,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Brand Secondary Color</Label>
+                        <Input
+                          type="text"
+                          placeholder="#22d3ee"
+                          defaultValue={(profile.branding as any)?.secondaryColor || ""}
+                          onBlur={(e) =>
+                            save({
+                              branding: {
+                                ...(profile.branding || {}),
+                                secondaryColor: e.target.value,
+                              } as any,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>PDF Footer Text</Label>
+                        <Input
+                          defaultValue={(profile.branding as any)?.footerText || ""}
+                          onBlur={(e) =>
+                            save({
+                              branding: {
+                                ...(profile.branding || {}),
+                                footerText: e.target.value,
+                              } as any,
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
                         <Label>Crew (FT / PT)</Label>
                         <div className="flex gap-2">
                           <Input
