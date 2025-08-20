@@ -47,6 +47,8 @@ const OverWatch: React.FC = () => {
   const [layerPresets, setLayerPresets] = useState<
     Array<{ id: string; name: string; selectedMapService: string; activeOverlays: string[]; mapCenter: [number, number]; mapZoom: number }>
   >([]);
+  const [clusterEnabled, setClusterEnabled] = useState<boolean>(false);
+  const [heatmapEnabled, setHeatmapEnabled] = useState<boolean>(false);
 
   useEffect(() => {
     try {
@@ -59,6 +61,8 @@ const OverWatch: React.FC = () => {
       if (typeof saved.mapZoom === "number") setMapZoom(saved.mapZoom);
       if (typeof saved.showCustomOverlayManager === "boolean")
         setShowCustomOverlayManager(saved.showCustomOverlayManager);
+      if (typeof saved.clusterEnabled === "boolean") setClusterEnabled(saved.clusterEnabled);
+      if (typeof saved.heatmapEnabled === "boolean") setHeatmapEnabled(saved.heatmapEnabled);
       const presets = JSON.parse(localStorage.getItem("overwatch-layer-presets") || "[]");
       if (Array.isArray(presets)) setLayerPresets(presets);
     } catch {
@@ -77,6 +81,8 @@ const OverWatch: React.FC = () => {
           mapCenter,
           mapZoom,
           showCustomOverlayManager,
+          clusterEnabled,
+          heatmapEnabled,
         }),
       );
     } catch {
@@ -89,6 +95,8 @@ const OverWatch: React.FC = () => {
     mapCenter,
     mapZoom,
     showCustomOverlayManager,
+    clusterEnabled,
+    heatmapEnabled,
   ]);
 
   function persistLayerPresets(next: typeof layerPresets) {
@@ -128,6 +136,49 @@ const OverWatch: React.FC = () => {
   function deletePreset(presetId: string) {
     const next = layerPresets.filter((x) => x.id !== presetId);
     persistLayerPresets(next);
+  }
+
+  function exportLayerPresets() {
+    const data = JSON.stringify(layerPresets, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "overwatch-layer-presets.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const importFileRef = useRef<HTMLInputElement | null>(null);
+  function triggerImportPresets() {
+    importFileRef.current?.click();
+  }
+  function handleImportPresets(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const json = JSON.parse(String(reader.result));
+        if (Array.isArray(json)) {
+          const sanitized = json
+            .filter((p) => p && typeof p.id === "string" && typeof p.name === "string")
+            .map((p) => ({
+              id: String(p.id),
+              name: String(p.name),
+              selectedMapService: String(p.selectedMapService ?? "osm"),
+              activeOverlays: Array.isArray(p.activeOverlays) ? p.activeOverlays.slice(0, 20) : [],
+              mapCenter: Array.isArray(p.mapCenter) && p.mapCenter.length === 2 ? [Number(p.mapCenter[0]), Number(p.mapCenter[1])] : mapCenter,
+              mapZoom: Number(p.mapZoom ?? mapZoom),
+            }));
+          persistLayerPresets(sanitized);
+        }
+      } catch {
+        // ignore invalid JSON
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
   }
 
   return (
@@ -196,6 +247,40 @@ const OverWatch: React.FC = () => {
                   Delete Last
                 </Button>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={exportLayerPresets}
+              >
+                Export
+              </Button>
+              <input
+                ref={importFileRef}
+                type="file"
+                accept="application/json"
+                className="hidden"
+                onChange={handleImportPresets}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={triggerImportPresets}
+              >
+                Import
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-slate-300">Cluster</Label>
+                <Switch checked={clusterEnabled} onCheckedChange={setClusterEnabled} />
+              </div>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-slate-300">Heatmap</Label>
+                <Switch checked={heatmapEnabled} onCheckedChange={setHeatmapEnabled} />
+              </div>
             </div>
           </div>
         </div>
