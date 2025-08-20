@@ -220,3 +220,82 @@ console.error = (...args: any[]) => {
   }
   originalConsoleError(...args);
 };
+
+// Mock maplibre-gl to avoid WebGL in tests
+vi.mock("maplibre-gl", () => {
+  class Map {
+    private _sources: Record<string, any> = {};
+    private _layers: Record<string, any> = {};
+    private _handlers: Record<string, Function> = {};
+    constructor(opts: any) {
+      // noop
+      setTimeout(() => {
+        if (this._handlers["load"]) this._handlers["load"]({});
+      }, 0);
+    }
+    addControl(): void {}
+    on(evt: string, cb: Function): void {
+      this._handlers[evt] = cb as any;
+    }
+    setStyle(): void {}
+    isStyleLoaded(): boolean {
+      return true;
+    }
+    getCenter(): { lng: number; lat: number } {
+      return { lng: -74, lat: 40 };
+    }
+    getZoom(): number {
+      return 10;
+    }
+    remove(): void {}
+    addSource(id: string, src: any): void {
+      this._sources[id] = {
+        data: src.data,
+        setData: (d: any) => {
+          this._sources[id].data = d;
+        },
+      };
+    }
+    getSource(id: string): any {
+      return this._sources[id];
+    }
+    addLayer(layer: any): void {
+      this._layers[layer.id] = layer;
+    }
+    getLayer(id: string): any {
+      return this._layers[id];
+    }
+    setLayoutProperty(): void {}
+  }
+  class NavigationControl {}
+  class GeolocateControl {}
+  class ScaleControl {}
+  class FullscreenControl {}
+  class Marker {
+    setLngLat(): this {
+      return this;
+    }
+    addTo(): this {
+      return this;
+    }
+    setPopup(): this {
+      return this;
+    }
+  }
+  class Popup {
+    setHTML(): this {
+      return this;
+    }
+  }
+  return {
+    default: {
+      Map,
+      NavigationControl,
+      GeolocateControl,
+      ScaleControl,
+      FullscreenControl,
+      Marker,
+      Popup,
+    },
+  };
+});
