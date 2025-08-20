@@ -37,6 +37,8 @@ interface RealMapComponentProps {
   // Preferred: provide open/free raster tiles
   tileUrls?: string[];
   attribution?: string;
+  clusterEnabled?: boolean;
+  heatmapEnabled?: boolean;
 }
 
 const RealMapComponent: React.FC<RealMapComponentProps> = ({
@@ -49,6 +51,8 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
   children,
   tileUrls = ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
   attribution = "© OpenStreetMap contributors",
+  clusterEnabled = false,
+  heatmapEnabled = false,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -179,6 +183,17 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
     }
   }, [tileUrls, attribution, mapLoaded]);
 
+  // Placeholder effects for cluster/heatmap toggles until data layers are wired
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+    // Expose toggle states for potential child components to use
+    (window as any).mapMethods = {
+      ...(window as any).mapMethods,
+      clusterEnabled,
+      heatmapEnabled,
+    };
+  }, [clusterEnabled, heatmapEnabled, mapLoaded]);
+
   const addMarker = (
     lng: number,
     lat: number,
@@ -251,6 +266,8 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
         flyTo,
         getMap: () => map.current,
         lastAreaSqFt: (window as any).mapMethods?.lastAreaSqFt || 0,
+        clusterEnabled: (window as any).mapMethods?.clusterEnabled || false,
+        heatmapEnabled: (window as any).mapMethods?.heatmapEnabled || false,
       };
     }
   }, [mapLoaded]);

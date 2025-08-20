@@ -301,6 +301,9 @@ const OverWatch: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="h-full w-full" id="map-container"></div>
+                    <div className="text-xs text-slate-500 mt-2">
+                      Cluster: {clusterEnabled ? "On" : "Off"} · Heatmap: {heatmapEnabled ? "On" : "Off"}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
