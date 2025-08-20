@@ -270,6 +270,46 @@ const OverWatch: React.FC = () => {
               >
                 Import
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={() => {
+                  try {
+                    const api = (window as any).mapMethods;
+                    if (api?.setPoints) {
+                      const pts = [
+                        { lng: -74.006, lat: 40.7128 },
+                        { lng: -73.9857, lat: 40.7484 },
+                        { lng: -73.9772, lat: 40.7527 },
+                        { lng: -73.9680, lat: 40.7851 },
+                      ];
+                      api.setPoints(pts);
+                    } else {
+                      console.log("mapMethods.setPoints not available yet");
+                    }
+                  } catch (e) {
+                    console.log("Error loading demo points", e);
+                  }
+                }}
+              >
+                Load Demo Points
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-slate-800 border-slate-600 text-xs"
+                onClick={() => {
+                  try {
+                    const api = (window as any).mapMethods;
+                    if (api?.setPoints) {
+                      api.setPoints([]);
+                    }
+                  } catch {}
+                }}
+              >
+                Clear Points
+              </Button>
             </div>
 
             <div className="flex items-center gap-4">
