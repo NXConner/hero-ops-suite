@@ -18,8 +18,14 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import Sidebar from "@/components/Sidebar";
 import { useSearchParams } from "react-router-dom";
-import { useTerminology } from "@/hooks/useTerminology";
-import { mapServices } from "@/data/mapServices";
+import { useTerminology } from "@/contexts/TerminologyContext";
+
+const mapServices = [
+  { id: "osm", name: "OpenStreetMap", icon: null },
+  { id: "satellite", name: "Satellite", icon: null },
+  { id: "terrain", name: "Terrain", icon: null },
+  { id: "topo", name: "Topographic", icon: null },
+];
 
 const OverWatch: React.FC = () => {
   const [selectedMapService, setSelectedMapService] = useState("osm");
