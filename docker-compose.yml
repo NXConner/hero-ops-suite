@@ -7,4 +7,19 @@ services:
       - "8080:80"
     environment:
       - NODE_ENV=production
+      - VITE_API_BASE_URL=/api
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: hero-ops-api:latest
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    ports:
+      - "3001:3001"
     restart: unless-stopped

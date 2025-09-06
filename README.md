@@ -91,9 +91,10 @@ Components are wired to CSS vars, enabling live preview and persistence across r
 
 ## Environment
 
-- Set `VITE_WEATHER_API_KEY` in a root `.env.local` to enable live weather data in the OverWatch Weather overlay.
-  - Example: `VITE_WEATHER_API_KEY=your_openweather_key`
-- Other optional endpoints (GPS/sensors) can be set via corresponding `VITE_*` vars as implemented in `src/services/api.ts`.
+- Copy `.env.example` to `.env.local` and set values:
+  - `VITE_API_BASE_URL=/api` for Docker/Nginx (or `http://localhost:3001` for local dev)
+  - `VITE_WEATHER_API_KEY=your_openweather_key` to enable live weather
+  - Optional: `VITE_SENTRY_DSN`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, other `VITE_*` keys used in `src/services/api.ts`
 
 ## Mobile Companion web build
 
@@ -102,6 +103,19 @@ Components are wired to CSS vars, enabling live preview and persistence across r
   1. `cd mobile && npm install`
   2. `npx expo export --platform web --output-dir ../public/mobile`
 - During development, static fallbacks exist for `/mobile/`, `/suite/`, `/suite/fleet/`, `/suite/atlas/`, `/suite/mapper/`, and `/suite/weather/` to avoid 404s. Production serving is handled by Nginx (see `docker/nginx.conf`).
+
+## Docker (production-like)
+
+Run both the static web and API server locally behind Nginx:
+
+```bash
+docker compose up --build
+```
+
+- Web served at `http://localhost:8080`
+- API proxied at `http://localhost:8080/api` → server on `api:3001`
+
+Nginx security headers and a basic CSP are enabled. Adjust `docker/nginx.conf` as needed when adding external providers.
 
 ## Documentation
 
