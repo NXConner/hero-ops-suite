@@ -416,7 +416,7 @@ const MarketplaceIntegration: React.FC = () => {
                   <p className="text-xs font-medium mb-1">Features:</p>
                   <div className="flex flex-wrap gap-1">
                     {module.features.slice(0, 2).map((feature, idx) => (
-                      <Badge key={`feature-${idx}`} variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs">
                         {feature}
                       </Badge>
                     ))}
