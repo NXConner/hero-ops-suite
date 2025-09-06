@@ -1,5 +1,5 @@
-// @ts-nocheck
 // Authentication Service for Blacktop Blackout OverWatch System
+import React from "react";
 import { databaseService } from "./database";
 
 export interface User {
@@ -70,7 +70,7 @@ class AuthService {
   private currentUser: User | null = null;
   private authToken: string | null = null;
   private refreshToken: string | null = null;
-  private sessionCheckInterval: NodeJS.Timeout | null = null;
+  private sessionCheckInterval: number | null = null;
   private readonly API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
 
   // Role Permissions Matrix
@@ -300,7 +300,7 @@ class AuthService {
       clearInterval(this.sessionCheckInterval);
     }
 
-    this.sessionCheckInterval = setInterval(
+    this.sessionCheckInterval = window.setInterval(
       async () => {
         if (this.authToken) {
           const isValid = await this.verifyToken();
