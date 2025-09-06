@@ -676,6 +676,15 @@ const Estimator = () => {
                       )}
                     </SelectContent>
                   </Select>
+                  {(() => {
+                    const delta =
+                      BUSINESS_PROFILE.pricing.paintColorCostDelta?.[params.paintColor] ?? 0;
+                    return (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Color price delta: {delta > 0 ? `+$${delta.toFixed(2)}` : "$0.00"} per LF
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -1152,6 +1161,11 @@ const Estimator = () => {
                           />
                         </div>
                       ))}
+                      <div className="text-xs text-muted-foreground">
+                        Arrow unit cost: ${
+                          (BUSINESS_PROFILE.pricing.arrowCost ?? 15).toFixed(2)
+                        } each
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <div className="text-sm font-medium">Text</div>
@@ -1171,6 +1185,11 @@ const Estimator = () => {
                           />
                         </div>
                       ))}
+                      <div className="text-xs text-muted-foreground">
+                        Text stencil unit cost: ${
+                          (BUSINESS_PROFILE.pricing.textStencilCost ?? 15).toFixed(2)
+                        } each
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <div className="text-sm font-medium">Handicap Symbols</div>
@@ -1187,6 +1206,11 @@ const Estimator = () => {
                             }))
                           }
                         />
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Handicap symbol cost: ${
+                          (BUSINESS_PROFILE.pricing.handicapSymbolCost ?? 40).toFixed(2)
+                        } each
                       </div>
                     </div>
                   </div>
