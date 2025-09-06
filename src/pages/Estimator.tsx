@@ -22,14 +22,7 @@ import { computeRoundTripMilesBetween, reverseGeocode, inferSalesTaxPctFromAddre
 import { searchAddressCandidates, type AddressCandidate } from "@/lib/geo";
 import { saveJob, listJobs, type StoredJob } from "@/services/jobs";
 import { listCustomers, saveCustomer, type Customer } from "@/services/customers";
-import {
-  exportInvoicePDF,
-  exportInvoiceTablePDF,
-  exportJobsCSV,
-  exportCustomersCSV,
-  downloadTextFile,
-  exportComplianceChecklistPDF,
-} from "@/services/exporters";
+// Heavy exporters are lazy-loaded where used to reduce initial bundle size
 import type { StateCode } from "@/data/state-compliance";
 import RealMapComponent from "@/components/map/RealMapComponent";
 import { geocodeAddress } from "@/lib/geo";
@@ -97,6 +90,8 @@ const Estimator = () => {
   const [arrowCounts, setArrowCounts] = useState<Record<string, number>>({});
   const [textCounts, setTextCounts] = useState<Record<string, number>>({});
   const [complianceState, setComplianceState] = useState<StateCode>("VA");
+  const [geoBusy, setGeoBusy] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
 
   // React to business profile changes
   useMemo(() => {
@@ -345,11 +340,18 @@ const Estimator = () => {
     const full = composeStructuredAddress();
     if (full) {
       setJobAddress(full);
-      const res = await geocodeAddress(full);
-      setJobCoords(res);
-      // Auto tax inference
-      const inferred = inferSalesTaxPctFromAddress(full);
-      if (inferred !== null) setOverrideSalesTaxPct(inferred);
+      try {
+        setGeoBusy(true);
+        setGeoError(null);
+        const res = await geocodeAddress(full);
+        setJobCoords(res);
+        const inferred = inferSalesTaxPctFromAddress(full);
+        if (inferred !== null) setOverrideSalesTaxPct(inferred);
+      } catch (_e) {
+        setGeoError("Geocoding failed. Please try again.");
+      } finally {
+        setGeoBusy(false);
+      }
     }
   };
 
@@ -486,19 +488,63 @@ const Estimator = () => {
                       const v = e.target.value;
                       setAddressSearch(v);
                       setShowCandidates(true);
-                      const c = await searchAddressCandidates(v, 5);
-                      setAddressCandidates(c);
+                      try {
+                        setGeoBusy(true);
+                        setGeoError(null);
+                        const c = await searchAddressCandidates(v, 5);
+                        setAddressCandidates(c);
+                      } catch (_e) {
+                        setGeoError("Address search limited. Please slow down.");
+                      } finally {
+                        setGeoBusy(false);
+                      }
                     }}
                     onBlur={async () => {
                       // On blur, if user typed custom, set and geocode
                       const full = addressSearch || jobAddress;
                       setJobAddress(full);
-                      const res = await geocodeAddress(full);
-                      setJobCoords(res);
+                      try {
+                        setGeoBusy(true);
+                        setGeoError(null);
+                        const res = await geocodeAddress(full);
+                        setJobCoords(res);
+                      } catch (_e) {
+                        setGeoError("Geocoding failed. Try again.");
+                      } finally {
+                        setGeoBusy(false);
+                      }
                       setTimeout(() => setShowCandidates(false), 150);
                     }}
                     onFocus={() => setShowCandidates(true)}
                   />
+                  {geoBusy && (
+                    <div className="mt-1 text-xs text-muted-foreground">Looking up address…</div>
+                  )}
+                  {geoError && (
+                    <div className="mt-1 text-xs text-red-500 flex items-center gap-2">
+                      {geoError}
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onMouseDown={async () => {
+                          try {
+                            setGeoBusy(true);
+                            setGeoError(null);
+                            const full = addressSearch || jobAddress;
+                            const res = await geocodeAddress(full);
+                            setJobCoords(res);
+                          } catch (_e) {
+                            setGeoError("Retry failed. Wait and try again.");
+                          } finally {
+                            setGeoBusy(false);
+                          }
+                        }}
+                      >
+                        Try again
+                      </Button>
+                    </div>
+                  )}
                   {showCandidates && addressCandidates.length > 0 && (
                     <div className="mt-1 border border-border/40 rounded bg-background shadow-lg max-h-48 overflow-auto">
                       {addressCandidates.map((c, idx) => (
@@ -1238,19 +1284,21 @@ ${textInvoiceRounded}`}
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() =>
+                  onClick={async () => {
+                    const { exportInvoicePDF } = await import("@/services/exporters");
                     exportInvoicePDF(
                       `${textInvoice}\n\n${textInvoice25}\n\n${textInvoiceRounded}`,
                       jobName || "invoice",
-                    )
-                  }
+                    );
+                  }}
                 >
                   Export PDF
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() =>
+                  onClick={async () => {
+                    const { exportInvoiceTablePDF } = await import("@/services/exporters");
                     exportInvoiceTablePDF(
                       {
                         projectDescription: result.projectDescription,
@@ -1267,8 +1315,8 @@ ${textInvoiceRounded}`}
                           : undefined,
                       },
                       jobName || "invoice",
-                    )
-                  }
+                    );
+                  }}
                 >
                   Export Table PDF
                 </Button>
@@ -1290,25 +1338,32 @@ ${textInvoiceRounded}`}
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() =>
-                    exportComplianceChecklistPDF(complianceState, jobName || "compliance")
-                  }
+                  onClick={async () => {
+                    const { exportComplianceChecklistPDF } = await import("@/services/exporters");
+                    exportComplianceChecklistPDF(complianceState, jobName || "compliance");
+                  }}
                 >
                   Compliance PDF
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => downloadTextFile(exportJobsCSV(jobs), "jobs.csv", "text/csv")}
+                  onClick={async () => {
+                    const { downloadTextFile, exportJobsCSV } = await import("@/services/exporters");
+                    downloadTextFile(exportJobsCSV(jobs), "jobs.csv", "text/csv");
+                  }}
                 >
                   Jobs CSV
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() =>
-                    downloadTextFile(exportCustomersCSV(customers), "customers.csv", "text/csv")
-                  }
+                  onClick={async () => {
+                    const { downloadTextFile, exportCustomersCSV } = await import(
+                      "@/services/exporters"
+                    );
+                    downloadTextFile(exportCustomersCSV(customers), "customers.csv", "text/csv");
+                  }}
                 >
                   Customers CSV
                 </Button>
