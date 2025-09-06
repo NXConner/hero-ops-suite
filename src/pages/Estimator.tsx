@@ -28,6 +28,8 @@ import RealMapComponent from "@/components/map/RealMapComponent";
 import { geocodeAddress } from "@/lib/geo";
 import { listProjects, saveProject, type Project } from "@/services/projects";
 import { addChangeOrder } from "@/services/projects";
+import { migrateLocalDataToSupabase } from "@/services/migration";
+import { isSupabaseEnabled } from "@/services/supabaseClient";
 
 const DEFAULT_FUEL_PRICE = 3.14; // EIA default; editable
 
@@ -1407,6 +1409,19 @@ ${textInvoiceRounded}`}
                 <Button type="button" onClick={handleConvertToProject}>
                   Convert to Project
                 </Button>
+                {isSupabaseEnabled() && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={async () => {
+                      const rep = await migrateLocalDataToSupabase();
+                      const msg = `Migrated to Supabase:\nJobs: ${rep.migrated.jobs}\nCustomers: ${rep.migrated.customers}\nProjects: ${rep.migrated.projects}\n${rep.errors.length ? "Errors: " + rep.errors.join("; ") : ""}`;
+                      alert(msg);
+                    }}
+                  >
+                    Migrate to Supabase
+                  </Button>
+                )}
                 {currentProjectId && (
                   <Button type="button" variant="outline" onClick={handleAddChangeOrder}>
                     Add as Change Order
