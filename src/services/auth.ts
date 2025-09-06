@@ -71,7 +71,7 @@ class AuthService {
   private authToken: string | null = null;
   private refreshToken: string | null = null;
   private sessionCheckInterval: NodeJS.Timeout | null = null;
-  private readonly API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001/api";
+  private readonly API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
 
   // Role Permissions Matrix
   private readonly ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
