@@ -7,3 +7,12 @@ declare module "react/jsx-runtime" {
   const _default: any;
   export default _default;
 }
+
+// Global JSX namespace declaration
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+  }
+}

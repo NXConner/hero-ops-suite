@@ -70,7 +70,7 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
       style: initialStyle,
       center: center,
       zoom: zoom,
-      attributionControl: true,
+      attributionControl: false,
     });
 
     // Add navigation controls
@@ -83,7 +83,6 @@ const RealMapComponent: React.FC<RealMapComponentProps> = ({
           enableHighAccuracy: true,
         },
         trackUserLocation: true,
-        showUserHeading: true,
       }),
       "top-right",
     );

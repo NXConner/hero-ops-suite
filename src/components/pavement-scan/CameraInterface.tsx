@@ -57,7 +57,7 @@ const CameraInterface: React.FC<CameraInterfaceProps> = ({
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const frameCountRef = useRef(0);
   const lastFrameTimeRef = useRef(Date.now());
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number>(0);
 
   // Mock AI detection function - in production this would use TensorFlow.js or similar
   const detectDefects = useCallback(
@@ -261,7 +261,6 @@ const CameraInterface: React.FC<CameraInterfaceProps> = ({
       {/* Camera Stream */}
       <div className="relative aspect-video bg-black">
         <Webcam
-          ref={webcamRef}
           audio={false}
           videoConstraints={videoConstraints}
           onUserMedia={handleCameraReady}
@@ -269,6 +268,10 @@ const CameraInterface: React.FC<CameraInterfaceProps> = ({
           className="w-full h-full object-cover"
           screenshotFormat="image/jpeg"
           screenshotQuality={0.8}
+          disablePictureInPicture={false}
+          forceScreenshotSourceSize={false}
+          imageSmoothing={true}
+          mirrored={false}
         />
 
         {/* Processing Overlay Canvas */}

@@ -331,7 +331,7 @@ const IntelReports = () => {
 
                         <div className="flex flex-wrap gap-1">
                           {report.keywords.map((keyword, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
+                            <Badge key={`keyword-${index}`} variant="outline" className="text-xs">
                               {keyword}
                             </Badge>
                           ))}

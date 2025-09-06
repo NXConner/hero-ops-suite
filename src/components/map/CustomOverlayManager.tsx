@@ -225,7 +225,7 @@ const CustomOverlayManager: React.FC<CustomOverlayManagerProps> = ({ isVisible }
                       checked={o.visible}
                       onCheckedChange={(v) => updateOverlay(o.id, { visible: v })}
                     />
-                    <Button variant="outline" size="xs" onClick={() => removeOverlayById(o.id)}>
+                    <Button variant="outline" size="sm" onClick={() => removeOverlayById(o.id)}>
                       Remove
                     </Button>
                   </div>
