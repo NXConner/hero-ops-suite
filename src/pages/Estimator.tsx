@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -119,7 +119,7 @@ const Estimator = () => {
       hasCrosswalks: params.hasCrosswalks || (Number(params.numCrosswalks) || 0) > 0,
       numArrows: (() => {
         const manual = Number(params.numArrows) || 0;
-        const sum = Object.values(arrowCounts).reduce((s, n) => s + (Number(n) || 0), 0);
+        const sum = Object.values(arrowCounts).reduce<number>((s, n) => s + (Number(n) || 0), 0);
         return sum || manual;
       })(),
       oilSpotSquareFeet: Number(params.oilSpotSquareFeet) || 0,
@@ -185,7 +185,8 @@ const Estimator = () => {
     });
     if (result.mobilization && result.mobilization.length) {
       lines.push(
-        "- Mobilization: " + formatMoney(result.mobilization.reduce((s, i) => s + i.cost, 0)),
+        "- Mobilization: " +
+          formatMoney(result.mobilization.reduce<number>((s, i) => s + i.cost, 0)),
       );
     }
     lines.push("");
@@ -1164,10 +1165,7 @@ const Estimator = () => {
                             onChange={(e) => {
                               const n = Math.max(0, Number(e.target.value) || 0);
                               setTextCounts((prev) => ({ ...prev, [it]: n }));
-                              const total = Object.values({ ...textCounts, [it]: n }).reduce(
-                                (s, v) => s + (Number(v) || 0),
-                                0,
-                              );
+                              const total = Object.values({ ...textCounts, [it]: n }).reduce<number>((s, v) => s + (Number(v) || 0), 0);
                               setParams((p) => ({ ...p, numTextStencils: total }));
                             }}
                           />
